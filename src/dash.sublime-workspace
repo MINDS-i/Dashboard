@@ -1,0 +1,1548 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"swap",
+				"swap_line_down"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "Dashboard.java",
+			"settings":
+			{
+				"buffer_size": 11688,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "SerialParser.java",
+			"settings":
+			{
+				"buffer_size": 2921,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "SerialSender.java",
+			"settings":
+			{
+				"buffer_size": 1954,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "map/Dot.java",
+			"settings":
+			{
+				"buffer_size": 511,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "map/Message.java",
+			"settings":
+			{
+				"buffer_size": 1528,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Serial.java",
+			"settings":
+			{
+				"buffer_size": 2088,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/brett/sketchbook/fletcher8benchmark/fletcher8benchmark.ino",
+			"settings":
+			{
+				"buffer_size": 1578,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "map/MapPanel.java",
+			"settings":
+			{
+				"buffer_size": 86104,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/home/brett/Programming/swing/6x6Dash/CommProtocol.txt",
+			"settings":
+			{
+				"buffer_size": 1056,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "Packages/Java/Ant.sublime-build",
+	"command_palette":
+	{
+		"height": 180.0,
+		"selected_items":
+		[
+			[
+				"package o remo",
+				"Package Control: Remove Package"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control:  Disco",
+				"Package Control: Discover Packages"
+			]
+		],
+		"width": 593.0
+	},
+	"console":
+	{
+		"height": 111.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/home/brett/.config/sublime-text-2/Packages/User/Preferences.sublime-settings",
+		"/home/brett/.config/sublime-text-2/Packages/Default/Preferences.sublime-settings",
+		"/usr/share/arduino/libraries/MINDSi/examples/3-Projects/HexaBot/HexaBot.ino",
+		"/home/brett/Programming/swing/6x6Dash/src/Latitude",
+		"/home/brett/sketchbook/RoboMagellanDemo/RoboMagellanDemo.ino",
+		"/usr/share/arduino/libraries/MINDSi/examples/2-Applications/ESC/ESC.ino",
+		"/home/brett/Programming/swing/6x6Dash/TODO",
+		"/home/brett/Programming/swing/6x6Dash/build.xml",
+		"/home/brett/Programming/swing/6x6Dash/src/map/ContentPanel.java",
+		"/home/brett/Programming/swing/6x6Dash/src/Dashboard.java",
+		"/home/brett/Downloads/Arduino-master/app/src/processing/app/SerialMonitor.java",
+		"/home/brett/Downloads/Arduino-master/app/src/processing/app/Serial.java",
+		"/usr/share/arduino/libraries/NMEA/NMEA.cpp",
+		"/home/brett/Downloads/RXTX_example/build.xml",
+		"/home/brett/Programming/swing/6x6Dash/map/MapPanel.java",
+		"/home/brett/Programming/swing/6x6Dash/build.properties",
+		"/home/brett/Downloads/RXTX_example.zip",
+		"/home/brett/sketchbook/TankDrive/TankDrive.ino",
+		"/usr/share/arduino/libraries/MINDSi/MINDSi.cpp",
+		"/home/brett/sketchbook/interruptExample/interruptExample.ino",
+		"/home/brett/Desktop/radio adjusted.psc",
+		"/media/brett/USB DISK/radio adjusted.psc",
+		"/media/brett/USB DISK/radio.psc",
+		"/home/brett/sketchbook/RoboMagellan6x6/RoboMagellan6x6.ino",
+		"/usr/share/arduino/libraries/MINDSi/examples/1-Calibration/Accelerometer/Accelerometer.ino",
+		"/home/brett/sketchbook/CompetitionTemplate/CompetitionTemplate.ino",
+		"/media/brett/12E91A470E51562F/Competition/Competition.ino",
+		"/media/brett/12E91A470E51562F/Competition.ino",
+		"/usr/share/arduino/libraries/MINDSi/examples/3-Projects/AdvancedRadioDrive/AdvancedRadioDrive.ino",
+		"/usr/share/arduino/libraries/MINDSi/MINDSi.h",
+		"/home/brett/sketchbook/timePulse/timePulse.ino",
+		"/media/brett/STORE'N'GO/Good Code/horizon_middle_school_code_ino/horizon_middle_school_code_ino.ino",
+		"/home/brett/Programming/swing/6x6Dash/map/fx/Main.fx",
+		"/home/brett/Programming/swing/6x6Dash/map/MapApplet.java",
+		"/home/brett/Programming/swing/6x6Dash/MapPanel.java",
+		"/home/brett/Programming/codeJam/Treasure/source.cpp",
+		"/home/brett/Programming/codeJam/Treasure/output.c",
+		"/home/brett/Programming/codeJam/LawnMower/B-small-practice.in",
+		"/home/brett/Programming/codeJam/LawnMower/B-large-practice.in",
+		"/home/brett/Programming/codeJam/LawnMower/output.txt",
+		"/home/brett/Programming/codeJam/LawnMower/test.in",
+		"/home/brett/Programming/codeJam/LawnMower/source.cpp",
+		"/home/brett/sketchbook/6x6Display/sketch_6x6Display/sketch_6x6Display.pde",
+		"/home/brett/sketchbook/Brake/Brake.ino",
+		"/home/brett/Desktop/AUV4x4/AUV4x4.ino",
+		"/usr/share/arduino/libraries/GreatCircle/greatcircle.cpp",
+		"/home/brett/sketchbook/AUV/AUV.ino",
+		"/usr/share/arduino/libraries/EEStream/EEStream.cpp",
+		"/usr/share/arduino/libraries/EEPROM/EEPROM.h",
+		"/usr/share/arduino/libraries/EEPROM/EEPROM.cpp",
+		"/home/brett/sketchbook/pointcompass/pointcompass.ino",
+		"/home/brett/sketchbook/NMEA_Test/NMEA_Test.ino",
+		"/home/brett/sketchbook/NMEA_Test/testStream.h",
+		"/home/brett/sketchbook/NMEA_Parse/NMEA_Parse.ino",
+		"/usr/share/arduino/libraries/MINDSi/examples/3-Projects/AUV5ping/AUV5ping.ino",
+		"/usr/share/arduino/libraries/MINDSi/examples/2-Applications/QTI/QTI.ino",
+		"/usr/share/arduino/libraries/MINDSi/examples/3-Projects/AUV/AUV.ino",
+		"/home/brett/sketchbook/Hexapod/Hexapod.ino",
+		"/home/brett/sketchbook/MiddleCompDemo/MiddleCompDemo.ino",
+		"/home/brett/sketchbook/Hexapod/Leg.cpp",
+		"/home/brett/sketchbook/Hexapod/Leg.h",
+		"/home/brett/sketchbook/MiddleCompDemo/logo.h",
+		"/home/brett/Desktop/Spider_bot/Spider_bot.ino",
+		"/home/brett/sketchbook/GoHomeGps/GoHomeGps.ino",
+		"/home/brett/sketchbook/Bomb/Bomb.ino",
+		"/home/brett/.config/sublime-text-2/Packages/User/SublimeLinter.sublime-settings",
+		"/home/brett/.config/sublime-text-2/Packages/SublimeLinter/SublimeLinter.sublime-settings",
+		"/home/brett/.config/sublime-text-2/Packages/SublimeLinter/README.md",
+		"/usr/share/arduino/libraries/NMEA/NMEA.h",
+		"/home/brett/sketchbook/nmeaparse/nmeaparse.ino",
+		"/usr/share/arduino/libraries/Servo/Servo.h",
+		"/home/brett/.config/sublime-text-2/Packages/C++/C++.sublime-build",
+		"/home/brett/.config/sublime-text-2/Packages/User/arduino.sublime-build",
+		"/usr/share/arduino/libraries/MS5611/MS5611.h",
+		"/home/brett/sketchbook/laserStand/laserStand.ino",
+		"/home/brett/sketchbook/testAeroLibs/testAeroLibs.ino",
+		"/usr/share/arduino/libraries/MPU/MPU.h",
+		"/usr/share/arduino/libraries/MPU/MPU.cpp",
+		"/usr/share/arduino/libraries/MPU6050/MPU6050.h",
+		"/usr/share/arduino/libraries/MPU6050/MPU6050.cpp",
+		"/usr/share/arduino/libraries/GreatCircle/greatcircle.h",
+		"/usr/share/arduino/libraries/AQ_Gyroscope/Gyroscope_APM.h",
+		"/home/brett/Downloads/ArduCopter-2.8.1/libraries/AP_Baro/AP_Baro_MS5611.h",
+		"/home/brett/Downloads/ArduCopter-2.8.1/libraries/AP_Baro/AP_Baro_MS5611.cpp",
+		"/home/brett/Downloads/ArduCopter-2.8.1/libraries/AP_Baro/AP_Baro_BMP085.h",
+		"/home/brett/Downloads/ArduCopter-2.8.1/libraries/AP_Baro/AP_Baro.h",
+		"/home/brett/Downloads/ArduCopter-2.8.1/libraries/AP_Baro/AP_Baro.cpp",
+		"/usr/share/arduino/libraries/MINDSi/examples/2-Applications/SimpleRadioDrive/SimpleRadioDrive.ino",
+		"/usr/share/arduino/libraries/LiquidCrystal/LCD.h",
+		"/usr/share/arduino/libraries/LiquidCrystal/LCD.cpp",
+		"/usr/share/arduino/libraries/LiquidCrystal/LiquidCrystal_I2C.h",
+		"/usr/share/arduino/libraries/LiquidCrystal/LiquidCrystal_I2C.cpp",
+		"/usr/share/arduino/libraries/MINDSi/examples/1-Calibration/AutomatedTesting/AutomatedTesting.ino",
+		"/home/brett/Desktop/_20x4_LCD/_20x4_LCD.ino",
+		"/home/brett/.config/sublime-text-2/Packages/C++/C++.sublime-settings",
+		"/home/brett/Downloads/ArduPlane-2.67/ArduCopter/UserCode.pde",
+		"/home/brett/Downloads/ArduPlane-2.67/ArduCopter/UserVariables.h",
+		"/home/brett/Downloads/ArduPlane-2.67/ArduCopter/read_me.text",
+		"/home/brett/Downloads/ArduPlane-2.67/ArduCopter/options.cmake",
+		"/home/brett/Downloads/ArduPlane-2.67/ArduCopter/Makefile",
+		"/home/brett/Downloads/ArduPlane-2.67/ArduCopter/command_description.txt",
+		"/home/brett/Downloads/ArduPlane-2.67/ArduCopter/CMakeLists.txt",
+		"/home/brett/.config/sublime-text-2/Packages/Java/Ant.sublime-build",
+		"/home/brett/.config/sublime-text-2/Packages/User/ant_debug.sublime-build",
+		"/home/brett/Programming/androidProjects/mindsapp/src/com/mindsi/Mindsi.java",
+		"/home/brett/.conkyrc",
+		"/home/brett/.config/sublime-text-2/Packages/User/Default (Linux).sublime-keymap",
+		"/home/brett/.config/sublime-text-2/Packages/User/hello.sublime-snippet",
+		"/home/brett/testlint.cpp",
+		"/home/brett/.config/sublime-text-2/Packages/C++/010-main()-(main).sublime-snippet",
+		"/home/brett/.config/sublime-text-2/Packages/C++/030-for-int-loop-(fori).sublime-snippet",
+		"/home/brett/.config/sublime-text-2/Packages/User/guard.sublime-snippet",
+		"/home/brett/.config/sublime-text-2/Packages/User/while.sublime-snippet",
+		"/home/brett/.config/sublime-text-2/Packages/User/case.sublime-snippet",
+		"/home/brett/.config/sublime-text-2/Packages/User/switch.sublime-snippet",
+		"/home/brett/.config/sublime-text-2/Packages/C++/if-..-(if).sublime-snippet",
+		"/home/brett/.config/sublime-text-2/Packages/C++/forv.sublime-snippet",
+		"/home/brett/.config/sublime-text-2/Packages/SublimeLinter/Default (Linux).sublime-keymap",
+		"/home/brett/.config/sublime-text-2/Packages/User/BracketHighlighter.sublime-settings",
+		"/home/brett/.config/sublime-text-2/Packages/User/Package Control.sublime-settings",
+		"/home/brett/.config/sublime-text-2/Packages/BracketHighlighter/BracketHighlighter.sublime-settings",
+		"/home/brett/.config/sublime-text-2/Packages/Default/Default (Linux).sublime-keymap",
+		"/home/brett/.config/sublime-text-2/Packages/BracketHighlighter/Default (Linux).sublime-keymap",
+		"/home/brett/.config/sublime-text-2/Packages/Alignment/Default (Linux).sublime-keymap",
+		"/home/brett/.config/sublime-text-2/Packages/Alignment/Base File.sublime-settings",
+		"/home/brett/.config/sublime-text-2/Packages/Default/Delete Line.sublime-macro",
+		"/home/brett/.config/sublime-text-2/Packages/User/shiftDown.sublime-macro",
+		"/home/brett/.config/sublime-text-2/Packages/User/shiftUp.sublime-macro"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"date",
+			"high",
+			"BufferedInputStream",
+			"byte",
+			"20",
+			"fletcher16",
+			"short",
+			"outStream",
+			"check",
+			"tmp",
+			"Lat",
+			"int",
+			"Dot",
+			"static byte",
+			"static int",
+			"int",
+			"INT",
+			"int",
+			"INT",
+			"int",
+			"Input",
+			"InputStream",
+			"Input",
+			"InputStream",
+			"Input",
+			"addDot",
+			"mapPanel",
+			"new Dot",
+			"addDot",
+			"dots",
+			"waypoint",
+			"d",
+			"pitch",
+			"d",
+			"roll",
+			"pitch",
+			"buf",
+			"<;>",
+			"BufferedInputStream",
+			"err",
+			"short",
+			"System.print",
+			"System.",
+			"data",
+			"DataInputStream",
+			"fletcher8",
+			"8",
+			"message",
+			"short",
+			"registerListener",
+			"scanner",
+			"Scanner",
+			"scanner",
+			"Scanner",
+			"scanner",
+			"makeIcon",
+			"makeCircle",
+			"flip",
+			"makeCircle",
+			"makenCircle",
+			"makecir",
+			"makeButton",
+			"loopWaypoint",
+			"ControlPanel",
+			"controlPanel",
+			"addDot",
+			"paintDots",
+			"Overlay",
+			"overlay",
+			"lineSegment",
+			"g2d",
+			"FIle",
+			"overlayPanel",
+			"downDot",
+			"isOverDot",
+			"isOverLine",
+			"downCoords",
+			"point",
+			"adp",
+			"a.y",
+			"b",
+			"a",
+			"overLap",
+			"removeDot",
+			"isOverDot",
+			"x",
+			"h",
+			"y",
+			"Math.abs",
+			"line2d",
+			"convert",
+			"config",
+			"lastElement",
+			".ima",
+			"Image",
+			"image",
+			".image",
+			"Image",
+			"image",
+			"dots.add(",
+			"LinkedList",
+			"lastElement",
+			"dots",
+			"Dots",
+			"Vector",
+			"dots",
+			"Dots",
+			"dots.lastElement().image",
+			"dots.elementAt(i).image",
+			"paint(",
+			"paintTile",
+			"paint(",
+			"Paint(",
+			"paint(",
+			"Paint(",
+			"paint(",
+			"paint",
+			"paintDots",
+			"prevPoint",
+			"thisPoint",
+			"line",
+			"overlayPanel",
+			"mouseAdapter",
+			"Dots.add",
+			"getPosition",
+			"Computeposition(",
+			"Computeposition",
+			"ComputerPosition"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"Vector",
+			"gauge",
+			"Gauge",
+			"radioDrive()"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 4,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "Dashboard.java",
+					"settings":
+					{
+						"buffer_size": 11688,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								664,
+								664
+							]
+						],
+						"settings":
+						{
+							"annotations":
+							[
+								"TODO",
+								"README",
+								"FIXME"
+							],
+							"csslint_options":
+							{
+								"adjoining-classes": "warning",
+								"box-model": true,
+								"box-sizing": "warning",
+								"compatible-vendor-prefixes": "warning",
+								"display-property-grouping": true,
+								"duplicate-background-images": "warning",
+								"duplicate-properties": true,
+								"empty-rules": true,
+								"errors": true,
+								"fallback-colors": "warning",
+								"floats": "warning",
+								"font-faces": "warning",
+								"font-sizes": "warning",
+								"gradients": "warning",
+								"ids": "warning",
+								"import": "warning",
+								"important": "warning",
+								"known-properties": true,
+								"outline-none": "warning",
+								"overqualified-elements": "warning",
+								"qualified-headings": "warning",
+								"regex-selectors": "warning",
+								"rules-count": "warning",
+								"shorthand": "warning",
+								"star-property-hack": "warning",
+								"text-indent": "warning",
+								"underscore-property-hack": "warning",
+								"unique-headings": "warning",
+								"universal-selector": "warning",
+								"vendor-prefix": true,
+								"zero-units": "warning"
+							},
+							"gjslint_ignore":
+							[
+								110
+							],
+							"gjslint_options":
+							[
+							],
+							"javascript_linter": "jshint",
+							"jshint_options":
+							{
+								"browser": true,
+								"evil": true,
+								"regexdash": true,
+								"sub": true,
+								"trailing": true,
+								"wsh": true
+							},
+							"pep8": true,
+							"pep8_ignore":
+							[
+								"E501"
+							],
+							"perl_linter": "perlcritic",
+							"pyflakes_ignore":
+							[
+							],
+							"pyflakes_ignore_import_*": true,
+							"sublimelinter": true,
+							"sublimelinter_delay": 2,
+							"sublimelinter_disable":
+							[
+							],
+							"sublimelinter_executable_map":
+							{
+							},
+							"sublimelinter_fill_outlines": false,
+							"sublimelinter_gutter_marks": false,
+							"sublimelinter_mark_style": "outline",
+							"sublimelinter_notes": false,
+							"sublimelinter_objj_check_ascii": false,
+							"sublimelinter_popup_errors_on_save": false,
+							"sublimelinter_syntax_map":
+							{
+								"C++": "c",
+								"Python Django": "python",
+								"Ruby on Rails": "ruby"
+							},
+							"sublimelinter_wrap_find": true,
+							"syntax": "Packages/Java/Java.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1248.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "SerialParser.java",
+					"settings":
+					{
+						"buffer_size": 2921,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2667,
+								2667
+							]
+						],
+						"settings":
+						{
+							"annotations":
+							[
+								"TODO",
+								"README",
+								"FIXME"
+							],
+							"csslint_options":
+							{
+								"adjoining-classes": "warning",
+								"box-model": true,
+								"box-sizing": "warning",
+								"compatible-vendor-prefixes": "warning",
+								"display-property-grouping": true,
+								"duplicate-background-images": "warning",
+								"duplicate-properties": true,
+								"empty-rules": true,
+								"errors": true,
+								"fallback-colors": "warning",
+								"floats": "warning",
+								"font-faces": "warning",
+								"font-sizes": "warning",
+								"gradients": "warning",
+								"ids": "warning",
+								"import": "warning",
+								"important": "warning",
+								"known-properties": true,
+								"outline-none": "warning",
+								"overqualified-elements": "warning",
+								"qualified-headings": "warning",
+								"regex-selectors": "warning",
+								"rules-count": "warning",
+								"shorthand": "warning",
+								"star-property-hack": "warning",
+								"text-indent": "warning",
+								"underscore-property-hack": "warning",
+								"unique-headings": "warning",
+								"universal-selector": "warning",
+								"vendor-prefix": true,
+								"zero-units": "warning"
+							},
+							"gjslint_ignore":
+							[
+								110
+							],
+							"gjslint_options":
+							[
+							],
+							"javascript_linter": "jshint",
+							"jshint_options":
+							{
+								"browser": true,
+								"evil": true,
+								"regexdash": true,
+								"sub": true,
+								"trailing": true,
+								"wsh": true
+							},
+							"pep8": true,
+							"pep8_ignore":
+							[
+								"E501"
+							],
+							"perl_linter": "perlcritic",
+							"pyflakes_ignore":
+							[
+							],
+							"pyflakes_ignore_import_*": true,
+							"sublimelinter": true,
+							"sublimelinter_delay": 2,
+							"sublimelinter_disable":
+							[
+							],
+							"sublimelinter_executable_map":
+							{
+							},
+							"sublimelinter_fill_outlines": false,
+							"sublimelinter_gutter_marks": false,
+							"sublimelinter_mark_style": "outline",
+							"sublimelinter_notes": false,
+							"sublimelinter_objj_check_ascii": false,
+							"sublimelinter_popup_errors_on_save": false,
+							"sublimelinter_syntax_map":
+							{
+								"C++": "c",
+								"Python Django": "python",
+								"Ruby on Rails": "ruby"
+							},
+							"sublimelinter_wrap_find": true,
+							"syntax": "Packages/Java/Java.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 36.0,
+						"translation.y": 936.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "SerialSender.java",
+					"settings":
+					{
+						"buffer_size": 1954,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								463,
+								463
+							]
+						],
+						"settings":
+						{
+							"annotations":
+							[
+								"TODO",
+								"README",
+								"FIXME"
+							],
+							"csslint_options":
+							{
+								"adjoining-classes": "warning",
+								"box-model": true,
+								"box-sizing": "warning",
+								"compatible-vendor-prefixes": "warning",
+								"display-property-grouping": true,
+								"duplicate-background-images": "warning",
+								"duplicate-properties": true,
+								"empty-rules": true,
+								"errors": true,
+								"fallback-colors": "warning",
+								"floats": "warning",
+								"font-faces": "warning",
+								"font-sizes": "warning",
+								"gradients": "warning",
+								"ids": "warning",
+								"import": "warning",
+								"important": "warning",
+								"known-properties": true,
+								"outline-none": "warning",
+								"overqualified-elements": "warning",
+								"qualified-headings": "warning",
+								"regex-selectors": "warning",
+								"rules-count": "warning",
+								"shorthand": "warning",
+								"star-property-hack": "warning",
+								"text-indent": "warning",
+								"underscore-property-hack": "warning",
+								"unique-headings": "warning",
+								"universal-selector": "warning",
+								"vendor-prefix": true,
+								"zero-units": "warning"
+							},
+							"gjslint_ignore":
+							[
+								110
+							],
+							"gjslint_options":
+							[
+							],
+							"javascript_linter": "jshint",
+							"jshint_options":
+							{
+								"browser": true,
+								"evil": true,
+								"regexdash": true,
+								"sub": true,
+								"trailing": true,
+								"wsh": true
+							},
+							"pep8": true,
+							"pep8_ignore":
+							[
+								"E501"
+							],
+							"perl_linter": "perlcritic",
+							"pyflakes_ignore":
+							[
+							],
+							"pyflakes_ignore_import_*": true,
+							"sublimelinter": true,
+							"sublimelinter_delay": 2,
+							"sublimelinter_disable":
+							[
+							],
+							"sublimelinter_executable_map":
+							{
+							},
+							"sublimelinter_fill_outlines": false,
+							"sublimelinter_gutter_marks": false,
+							"sublimelinter_mark_style": "outline",
+							"sublimelinter_notes": false,
+							"sublimelinter_objj_check_ascii": false,
+							"sublimelinter_popup_errors_on_save": false,
+							"sublimelinter_syntax_map":
+							{
+								"C++": "c",
+								"Python Django": "python",
+								"Ruby on Rails": "ruby"
+							},
+							"sublimelinter_wrap_find": true,
+							"syntax": "Packages/Java/Java.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 546.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "map/Dot.java",
+					"settings":
+					{
+						"buffer_size": 511,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								17,
+								17
+							]
+						],
+						"settings":
+						{
+							"annotations":
+							[
+								"TODO",
+								"README",
+								"FIXME"
+							],
+							"csslint_options":
+							{
+								"adjoining-classes": "warning",
+								"box-model": true,
+								"box-sizing": "warning",
+								"compatible-vendor-prefixes": "warning",
+								"display-property-grouping": true,
+								"duplicate-background-images": "warning",
+								"duplicate-properties": true,
+								"empty-rules": true,
+								"errors": true,
+								"fallback-colors": "warning",
+								"floats": "warning",
+								"font-faces": "warning",
+								"font-sizes": "warning",
+								"gradients": "warning",
+								"ids": "warning",
+								"import": "warning",
+								"important": "warning",
+								"known-properties": true,
+								"outline-none": "warning",
+								"overqualified-elements": "warning",
+								"qualified-headings": "warning",
+								"regex-selectors": "warning",
+								"rules-count": "warning",
+								"shorthand": "warning",
+								"star-property-hack": "warning",
+								"text-indent": "warning",
+								"underscore-property-hack": "warning",
+								"unique-headings": "warning",
+								"universal-selector": "warning",
+								"vendor-prefix": true,
+								"zero-units": "warning"
+							},
+							"gjslint_ignore":
+							[
+								110
+							],
+							"gjslint_options":
+							[
+							],
+							"javascript_linter": "jshint",
+							"jshint_options":
+							{
+								"browser": true,
+								"evil": true,
+								"regexdash": true,
+								"sub": true,
+								"trailing": true,
+								"wsh": true
+							},
+							"pep8": true,
+							"pep8_ignore":
+							[
+								"E501"
+							],
+							"perl_linter": "perlcritic",
+							"pyflakes_ignore":
+							[
+							],
+							"pyflakes_ignore_import_*": true,
+							"sublimelinter": true,
+							"sublimelinter_delay": 2,
+							"sublimelinter_disable":
+							[
+							],
+							"sublimelinter_executable_map":
+							{
+							},
+							"sublimelinter_fill_outlines": false,
+							"sublimelinter_gutter_marks": false,
+							"sublimelinter_mark_style": "outline",
+							"sublimelinter_notes": false,
+							"sublimelinter_objj_check_ascii": false,
+							"sublimelinter_popup_errors_on_save": false,
+							"sublimelinter_syntax_map":
+							{
+								"C++": "c",
+								"Python Django": "python",
+								"Ruby on Rails": "ruby"
+							},
+							"sublimelinter_wrap_find": true,
+							"syntax": "Packages/Java/Java.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "map/Message.java",
+					"settings":
+					{
+						"buffer_size": 1528,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1145,
+								1145
+							]
+						],
+						"settings":
+						{
+							"annotations":
+							[
+								"TODO",
+								"README",
+								"FIXME"
+							],
+							"csslint_options":
+							{
+								"adjoining-classes": "warning",
+								"box-model": true,
+								"box-sizing": "warning",
+								"compatible-vendor-prefixes": "warning",
+								"display-property-grouping": true,
+								"duplicate-background-images": "warning",
+								"duplicate-properties": true,
+								"empty-rules": true,
+								"errors": true,
+								"fallback-colors": "warning",
+								"floats": "warning",
+								"font-faces": "warning",
+								"font-sizes": "warning",
+								"gradients": "warning",
+								"ids": "warning",
+								"import": "warning",
+								"important": "warning",
+								"known-properties": true,
+								"outline-none": "warning",
+								"overqualified-elements": "warning",
+								"qualified-headings": "warning",
+								"regex-selectors": "warning",
+								"rules-count": "warning",
+								"shorthand": "warning",
+								"star-property-hack": "warning",
+								"text-indent": "warning",
+								"underscore-property-hack": "warning",
+								"unique-headings": "warning",
+								"universal-selector": "warning",
+								"vendor-prefix": true,
+								"zero-units": "warning"
+							},
+							"gjslint_ignore":
+							[
+								110
+							],
+							"gjslint_options":
+							[
+							],
+							"javascript_linter": "jshint",
+							"jshint_options":
+							{
+								"browser": true,
+								"evil": true,
+								"regexdash": true,
+								"sub": true,
+								"trailing": true,
+								"wsh": true
+							},
+							"pep8": true,
+							"pep8_ignore":
+							[
+								"E501"
+							],
+							"perl_linter": "perlcritic",
+							"pyflakes_ignore":
+							[
+							],
+							"pyflakes_ignore_import_*": true,
+							"sublimelinter": true,
+							"sublimelinter_delay": 2,
+							"sublimelinter_disable":
+							[
+							],
+							"sublimelinter_executable_map":
+							{
+							},
+							"sublimelinter_fill_outlines": false,
+							"sublimelinter_gutter_marks": false,
+							"sublimelinter_mark_style": "outline",
+							"sublimelinter_notes": false,
+							"sublimelinter_objj_check_ascii": false,
+							"sublimelinter_popup_errors_on_save": false,
+							"sublimelinter_syntax_map":
+							{
+								"C++": "c",
+								"Python Django": "python",
+								"Ruby on Rails": "ruby"
+							},
+							"sublimelinter_wrap_find": true,
+							"syntax": "Packages/Java/Java.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 234.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "Serial.java",
+					"settings":
+					{
+						"buffer_size": 2088,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								568,
+								568
+							]
+						],
+						"settings":
+						{
+							"annotations":
+							[
+								"TODO",
+								"README",
+								"FIXME"
+							],
+							"csslint_options":
+							{
+								"adjoining-classes": "warning",
+								"box-model": true,
+								"box-sizing": "warning",
+								"compatible-vendor-prefixes": "warning",
+								"display-property-grouping": true,
+								"duplicate-background-images": "warning",
+								"duplicate-properties": true,
+								"empty-rules": true,
+								"errors": true,
+								"fallback-colors": "warning",
+								"floats": "warning",
+								"font-faces": "warning",
+								"font-sizes": "warning",
+								"gradients": "warning",
+								"ids": "warning",
+								"import": "warning",
+								"important": "warning",
+								"known-properties": true,
+								"outline-none": "warning",
+								"overqualified-elements": "warning",
+								"qualified-headings": "warning",
+								"regex-selectors": "warning",
+								"rules-count": "warning",
+								"shorthand": "warning",
+								"star-property-hack": "warning",
+								"text-indent": "warning",
+								"underscore-property-hack": "warning",
+								"unique-headings": "warning",
+								"universal-selector": "warning",
+								"vendor-prefix": true,
+								"zero-units": "warning"
+							},
+							"gjslint_ignore":
+							[
+								110
+							],
+							"gjslint_options":
+							[
+							],
+							"javascript_linter": "jshint",
+							"jshint_options":
+							{
+								"browser": true,
+								"evil": true,
+								"regexdash": true,
+								"sub": true,
+								"trailing": true,
+								"wsh": true
+							},
+							"pep8": true,
+							"pep8_ignore":
+							[
+								"E501"
+							],
+							"perl_linter": "perlcritic",
+							"pyflakes_ignore":
+							[
+							],
+							"pyflakes_ignore_import_*": true,
+							"sublimelinter": true,
+							"sublimelinter_delay": 2,
+							"sublimelinter_disable":
+							[
+							],
+							"sublimelinter_executable_map":
+							{
+							},
+							"sublimelinter_fill_outlines": false,
+							"sublimelinter_gutter_marks": false,
+							"sublimelinter_mark_style": "outline",
+							"sublimelinter_notes": false,
+							"sublimelinter_objj_check_ascii": false,
+							"sublimelinter_popup_errors_on_save": false,
+							"sublimelinter_syntax_map":
+							{
+								"C++": "c",
+								"Python Django": "python",
+								"Ruby on Rails": "ruby"
+							},
+							"sublimelinter_wrap_find": true,
+							"syntax": "Packages/Java/Java.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 2,
+			"sheets":
+			[
+				{
+					"buffer": 6,
+					"file": "/home/brett/sketchbook/fletcher8benchmark/fletcher8benchmark.ino",
+					"settings":
+					{
+						"buffer_size": 1578,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1127,
+								1127
+							]
+						],
+						"settings":
+						{
+							"annotations":
+							[
+								"TODO",
+								"README",
+								"FIXME"
+							],
+							"csslint_options":
+							{
+								"adjoining-classes": "warning",
+								"box-model": true,
+								"box-sizing": "warning",
+								"compatible-vendor-prefixes": "warning",
+								"display-property-grouping": true,
+								"duplicate-background-images": "warning",
+								"duplicate-properties": true,
+								"empty-rules": true,
+								"errors": true,
+								"fallback-colors": "warning",
+								"floats": "warning",
+								"font-faces": "warning",
+								"font-sizes": "warning",
+								"gradients": "warning",
+								"ids": "warning",
+								"import": "warning",
+								"important": "warning",
+								"known-properties": true,
+								"outline-none": "warning",
+								"overqualified-elements": "warning",
+								"qualified-headings": "warning",
+								"regex-selectors": "warning",
+								"rules-count": "warning",
+								"shorthand": "warning",
+								"star-property-hack": "warning",
+								"text-indent": "warning",
+								"underscore-property-hack": "warning",
+								"unique-headings": "warning",
+								"universal-selector": "warning",
+								"vendor-prefix": true,
+								"zero-units": "warning"
+							},
+							"gjslint_ignore":
+							[
+								110
+							],
+							"gjslint_options":
+							[
+							],
+							"javascript_linter": "jshint",
+							"jshint_options":
+							{
+								"browser": true,
+								"evil": true,
+								"regexdash": true,
+								"sub": true,
+								"trailing": true,
+								"wsh": true
+							},
+							"pep8": true,
+							"pep8_ignore":
+							[
+								"E501"
+							],
+							"perl_linter": "perlcritic",
+							"pyflakes_ignore":
+							[
+							],
+							"pyflakes_ignore_import_*": true,
+							"sublimelinter": true,
+							"sublimelinter_delay": 2,
+							"sublimelinter_disable":
+							[
+							],
+							"sublimelinter_executable_map":
+							{
+							},
+							"sublimelinter_fill_outlines": false,
+							"sublimelinter_gutter_marks": false,
+							"sublimelinter_mark_style": "outline",
+							"sublimelinter_notes": false,
+							"sublimelinter_objj_check_ascii": false,
+							"sublimelinter_popup_errors_on_save": false,
+							"sublimelinter_syntax_map":
+							{
+								"C++": "c",
+								"Python Django": "python",
+								"Ruby on Rails": "ruby"
+							},
+							"sublimelinter_wrap_find": true,
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 6,
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 468.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "map/MapPanel.java",
+					"settings":
+					{
+						"buffer_size": 86104,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								50537,
+								50537
+							]
+						],
+						"settings":
+						{
+							"annotations":
+							[
+								"TODO",
+								"README",
+								"FIXME"
+							],
+							"csslint_options":
+							{
+								"adjoining-classes": "warning",
+								"box-model": true,
+								"box-sizing": "warning",
+								"compatible-vendor-prefixes": "warning",
+								"display-property-grouping": true,
+								"duplicate-background-images": "warning",
+								"duplicate-properties": true,
+								"empty-rules": true,
+								"errors": true,
+								"fallback-colors": "warning",
+								"floats": "warning",
+								"font-faces": "warning",
+								"font-sizes": "warning",
+								"gradients": "warning",
+								"ids": "warning",
+								"import": "warning",
+								"important": "warning",
+								"known-properties": true,
+								"outline-none": "warning",
+								"overqualified-elements": "warning",
+								"qualified-headings": "warning",
+								"regex-selectors": "warning",
+								"rules-count": "warning",
+								"shorthand": "warning",
+								"star-property-hack": "warning",
+								"text-indent": "warning",
+								"underscore-property-hack": "warning",
+								"unique-headings": "warning",
+								"universal-selector": "warning",
+								"vendor-prefix": true,
+								"zero-units": "warning"
+							},
+							"gjslint_ignore":
+							[
+								110
+							],
+							"gjslint_options":
+							[
+							],
+							"javascript_linter": "jshint",
+							"jshint_options":
+							{
+								"browser": true,
+								"evil": true,
+								"regexdash": true,
+								"sub": true,
+								"trailing": true,
+								"wsh": true
+							},
+							"pep8": true,
+							"pep8_ignore":
+							[
+								"E501"
+							],
+							"perl_linter": "perlcritic",
+							"pyflakes_ignore":
+							[
+							],
+							"pyflakes_ignore_import_*": true,
+							"sublimelinter": true,
+							"sublimelinter_delay": 2,
+							"sublimelinter_disable":
+							[
+							],
+							"sublimelinter_executable_map":
+							{
+							},
+							"sublimelinter_fill_outlines": false,
+							"sublimelinter_gutter_marks": false,
+							"sublimelinter_mark_style": "outline",
+							"sublimelinter_notes": false,
+							"sublimelinter_objj_check_ascii": false,
+							"sublimelinter_popup_errors_on_save": false,
+							"sublimelinter_syntax_map":
+							{
+								"C++": "c",
+								"Python Django": "python",
+								"Ruby on Rails": "ruby"
+							},
+							"sublimelinter_wrap_find": true,
+							"syntax": "Packages/Java/Java.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 8919.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "/home/brett/Programming/swing/6x6Dash/CommProtocol.txt",
+					"settings":
+					{
+						"buffer_size": 1056,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								870,
+								870
+							]
+						],
+						"settings":
+						{
+							"annotations":
+							[
+								"TODO",
+								"README",
+								"FIXME"
+							],
+							"csslint_options":
+							{
+								"adjoining-classes": "warning",
+								"box-model": true,
+								"box-sizing": "warning",
+								"compatible-vendor-prefixes": "warning",
+								"display-property-grouping": true,
+								"duplicate-background-images": "warning",
+								"duplicate-properties": true,
+								"empty-rules": true,
+								"errors": true,
+								"fallback-colors": "warning",
+								"floats": "warning",
+								"font-faces": "warning",
+								"font-sizes": "warning",
+								"gradients": "warning",
+								"ids": "warning",
+								"import": "warning",
+								"important": "warning",
+								"known-properties": true,
+								"outline-none": "warning",
+								"overqualified-elements": "warning",
+								"qualified-headings": "warning",
+								"regex-selectors": "warning",
+								"rules-count": "warning",
+								"shorthand": "warning",
+								"star-property-hack": "warning",
+								"text-indent": "warning",
+								"underscore-property-hack": "warning",
+								"unique-headings": "warning",
+								"universal-selector": "warning",
+								"vendor-prefix": true,
+								"zero-units": "warning"
+							},
+							"gjslint_ignore":
+							[
+								110
+							],
+							"gjslint_options":
+							[
+							],
+							"javascript_linter": "jshint",
+							"jshint_options":
+							{
+								"browser": true,
+								"evil": true,
+								"regexdash": true,
+								"sub": true,
+								"trailing": true,
+								"wsh": true
+							},
+							"pep8": true,
+							"pep8_ignore":
+							[
+								"E501"
+							],
+							"perl_linter": "perlcritic",
+							"pyflakes_ignore":
+							[
+							],
+							"pyflakes_ignore_import_*": true,
+							"sublimelinter": true,
+							"sublimelinter_delay": 2,
+							"sublimelinter_disable":
+							[
+							],
+							"sublimelinter_executable_map":
+							{
+							},
+							"sublimelinter_fill_outlines": false,
+							"sublimelinter_gutter_marks": false,
+							"sublimelinter_mark_style": "outline",
+							"sublimelinter_notes": false,
+							"sublimelinter_objj_check_ascii": false,
+							"sublimelinter_popup_errors_on_save": false,
+							"sublimelinter_syntax_map":
+							{
+								"C++": "c",
+								"Python Django": "python",
+								"Ruby on Rails": "ruby"
+							},
+							"sublimelinter_wrap_find": true,
+							"syntax": "Packages/Java/Java.tmLanguage",
+							"tab_size": 6,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 0.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			],
+			[
+				1,
+				0,
+				2,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			0.48682284041,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 50.0
+	},
+	"replace":
+	{
+		"height": 64.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+			[
+				"led",
+				"/home/brett/Downloads/ArduPlane-2.67/ArduCopter/leds.pde"
+			],
+			[
+				"mot",
+				"/home/brett/Downloads/ArduPlane-2.67/ArduCopter/motors.pde"
+			],
+			[
+				"ap",
+				"/home/brett/Downloads/ArduPlane-2.67/ArduCopter/AP_State.pde"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"show_minimap": false,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 150.0,
+	"status_bar_visible": true
+}

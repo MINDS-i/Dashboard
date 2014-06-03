@@ -1,0 +1,36 @@
+
+find the source of gps drift
+	try parsing the binary format
+calculate correct gpsFoundShift
+stop sending old versions of a waypoint
+add help and about section to dashboard
+-test- reboot in the field
+-test- alternative object avoidance algorithms w/ parallel pings
+refactor mapView
+
+
+
+
+
+working stuff
+	if(maxVec < adjX*adjX+adjY*adjY) maxVec = adjX*adjX+adjY*adjY;
+	adjZ =  sqrt( maxVec-(adjX*adjX)-(adjY*adjY) );
+
+	float finalX, finalY;
+	finalX = adjX*cos(-eigenPitch)							+ adjZ*sin(-eigenPitch);
+	finalY = adjX*sin(eigenRoll)*sin(-eigenPitch)	+ adjY*cos(eigenRoll)	- adjZ*sin(eigenRoll)*cos(-eigenPitch);
+
+Robot arm setup positions:
+First calibration (step 12):
+	base servo (A3) to 90
+Second calibration (step 12):
+	arm attachment (7, 13) fully layed back onto the arduino
+
+pincer calibration (step 11, 12):
+	pincer (A5) to 90
+	arm servo (A4) to 0? fully backed in
+
+grabber calibration
+	grabber (A5) to 90
+
+

@@ -1,0 +1,1087 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"d",
+				"displayMessage"
+			],
+			[
+				"v",
+				"void"
+			],
+			[
+				"COPY",
+				"copyRightText"
+			],
+			[
+				"NU",
+				"NUM_DIGITAL_ONLY"
+			],
+			[
+				"NUM",
+				"NUM_DIGITAL_ONLY"
+			],
+			[
+				"int",
+				"int"
+			],
+			[
+				"compas",
+				"CompassHeading"
+			],
+			[
+				"eig",
+				"eigenRoll"
+			],
+			[
+				"eige",
+				"eigenRoll"
+			],
+			[
+				"second",
+				"secondaryRoll"
+			],
+			[
+				"x",
+				"x"
+			],
+			[
+				"read",
+				"readAccelerometer"
+			],
+			[
+				"seri",
+				"Serial1"
+			],
+			[
+				"Seri",
+				"Serial1"
+			],
+			[
+				"uit",
+				"uint16_t"
+			],
+			[
+				"ui",
+				"uint16_t"
+			],
+			[
+				"0x",
+				"0x62"
+			],
+			[
+				"cA",
+				"cA"
+			],
+			[
+				"uint",
+				"uint8_t"
+			],
+			[
+				"reTar",
+				"reTargetRover"
+			],
+			[
+				"sele",
+				"selectedWaypoint"
+			],
+			[
+				"vol",
+				"volume_widget"
+			],
+			[
+				"awe",
+				"awesome_icon"
+			],
+			[
+				"end",
+				"end"
+			],
+			[
+				"confr",
+				"confirmSum"
+			],
+			[
+				"waypointLis",
+				"waypointListWaitingCode"
+			],
+			[
+				"wayp",
+				"waypointListPosition"
+			],
+			[
+				"wa",
+				"waypointListWaitingCode"
+			],
+			[
+				"sending",
+				"sendingWaypointList"
+			],
+			[
+				"compute",
+				"computeScreenPosition"
+			],
+			[
+				"rover",
+				"roverTarget"
+			],
+			[
+				"setSele",
+				"setSelectedWaypoint"
+			],
+			[
+				"inter",
+				"interpretLoactionAction"
+			],
+			[
+				"in",
+				"interpretLoactionAction"
+			],
+			[
+				"sel",
+				"selectedWaypoint"
+			],
+			[
+				"way",
+				"waypointPanel"
+			],
+			[
+				"battery",
+				"battery_widget"
+			],
+			[
+				"last",
+				"lastActivityTime"
+			],
+			[
+				"su",
+				"sublime_text"
+			],
+			[
+				"sub",
+				"sublime_text_3"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "src/serial/Serial.java",
+			"settings":
+			{
+				"buffer_size": 2979,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "\n	synchronized public void serialEvent(SerialPortEvent serialEvent){\n		if(port == null) return;\n		try{\n			short tmp;\n			while(port.getInputBufferBytesCount()>0){\n				tmp = (short)port.readIntArray(1)[0];\n				if(bufPos > 1 && (buf[bufPos-1] == Serial.END_TAG[0]\n							   && tmp == Serial.END_TAG[1])){\n					bufPos--;\n					sortMessage()\n					bufPos = 0;\n					break;\n				}\n				buf[bufPos++] = tmp;\n				// any correct messages should be read before this happens\n				if(bufPos >= BUFLEN) bufPos = 0;\n			}\n		} catch(SerialPortException ex) {\n			System.err.println(ex.getMessage());\n			AlertPanel.displayMessage(ex.getMessage());\n		}\n	}\n",
+			"settings":
+			{
+				"buffer_size": 631,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/serial/SerialParser.java",
+			"settings":
+			{
+				"buffer_size": 3507,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/TODO",
+			"settings":
+			{
+				"buffer_size": 913,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/serial/SerialSender.java",
+			"settings":
+			{
+				"buffer_size": 5007,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/ui/AlertPanel.java",
+			"settings":
+			{
+				"buffer_size": 1316,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/ui/BackgroundPanel.java",
+			"settings":
+			{
+				"buffer_size": 792,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/ui/DataLabel.java",
+			"settings":
+			{
+				"buffer_size": 932,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/ui/RotatePanel.java",
+			"settings":
+			{
+				"buffer_size": 1310,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/serial/Message.java",
+			"settings":
+			{
+				"buffer_size": 2176,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/Dashboard.java",
+			"settings":
+			{
+				"buffer_size": 10803,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/map/MapPanel.java",
+			"settings":
+			{
+				"buffer_size": 44858,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/map/WaypointPanel.java",
+			"settings":
+			{
+				"buffer_size": 10485,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"console":
+	{
+		"height": 0.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/home/brett/BrettMenzies/README.txt",
+		"/home/brett/BrettMenzies/Transcript",
+		"/usr/share/arduino/libraries/MINDSi/src/MINDSi.cpp",
+		"/home/brett/.config/sublime-text-3/Packages/Default/Preferences.sublime-settings",
+		"/home/brett/.config/sublime-text-3/Packages/User/Preferences.sublime-settings",
+		"/home/brett/.config/awesome/rc.lua",
+		"/home/brett/Programming/swing/6x6Dash/src/dash.sublime-project",
+		"/home/brett/Programming/swing/6x6Dash/src/serial/coordinateListener.java",
+		"/home/brett/Programming/swing/6x6Dash/src/serial/Message.java",
+		"/home/brett/Programming/swing/6x6Dash/src/map/WaypointPanel.java",
+		"/home/brett/Programming/swing/6x6Dash/src/map/MapPanel.java",
+		"/home/brett/Programming/swing/6x6Dash/src/map/Dot.java",
+		"/home/brett/Programming/swing/6x6Dash/src/serial/SerialSender.java",
+		"/home/brett/Programming/swing/6x6Dash/src/serial/SerialParser.java",
+		"/home/brett/Programming/swing/6x6Dash/src/serial/Serial.java",
+		"/home/brett/Programming/swing/6x6Dash/src/ui/WaypointPanel.java",
+		"/home/brett/Programming/swing/6x6Dash/src/ui/RotatePanel.java",
+		"/home/brett/Programming/swing/6x6Dash/src/ui/DataLabel.java",
+		"/home/brett/Programming/swing/6x6Dash/src/ui/BackgroundPanel.java",
+		"/home/brett/Programming/swing/6x6Dash/src/ui/AlertPanel.java",
+		"/home/brett/Programming/swing/6x6Dash/src/Dashboard.java",
+		"/home/brett/Programming/swing/6x6Dash/src/map/TODO:",
+		"/home/brett/Programming/swing/6x6Dash/src/AlertPanel.java",
+		"/home/brett/Programming/swing/6x6Dash/src/BackgroundPanel.java",
+		"/home/brett/Programming/swing/6x6Dash/src/DataLabel.java",
+		"/home/brett/Programming/swing/6x6Dash/src/RotatePanel.java",
+		"/home/brett/Programming/swing/6x6Dash/src/SerialParser.java",
+		"/home/brett/Programming/swing/6x6Dash/src/SerialSender.java",
+		"/home/brett/.swapLayouts.sh",
+		"/home/brett/Programming/swing/6x6Dash/src/Serial.java",
+		"/home/brett/Programming/pushMindsi.sh",
+		"/usr/share/arduino/libraries/MINDSi/examples/3-Projects/LineFollowingBot/LineFollowingBot.ino",
+		"/usr/share/arduino/libraries/MINDSi/examples/3-Projects/LineFollowBot_Line/LineFollowBot_Line.ino",
+		"/usr/share/arduino/libraries/MINDSi/examples/3-Projects/LineFollowBot_Ping/LineFollowBot_Ping.ino",
+		"/home/brett/.config/sublime-text-3/Packages/Default/Default (Linux).sublime-keymap",
+		"/home/brett/.config/sublime-text-3/Packages/User/Default (Linux).sublime-keymap",
+		"/usr/share/arduino/libraries/MINDSi/examples/1-Calibration/Accelerometer/Accelerometer.ino",
+		"/home/brett/.config/awesome/rc.bak",
+		"/home/brett/sketchbook/serialBugTest/serialBugTest.ino",
+		"/home/brett/sketchbook/Serial_repeater/Serial_repeater.ino",
+		"/home/brett/emulator/emR.txt",
+		"/usr/share/arduino/libraries/DroneUtils/src/Protocol.cpp",
+		"/usr/share/arduino/libraries/DroneUtils/src/Protocol.h",
+		"/home/brett/Programming/AUV5pingHYBRID.ino/AUV5pingHYBRID.ino",
+		"/usr/share/arduino/libraries/DroneUtils/src/DroneUtils.cpp",
+		"/usr/share/arduino/libraries/DroneUtils/src/DroneUtils.h",
+		"/usr/share/arduino/hardware/arduino/avr/cores/arduino/HardwareSerial0.cpp",
+		"/usr/share/arduino/hardware/arduino/avr/cores/arduino/HardwareSerial.cpp",
+		"/usr/share/arduino/hardware/arduino/avr/cores/arduino/HardwareSerial.h",
+		"/home/brett/sketchbook/serialBugTest",
+		"/home/brett/Programming/swing/6x6Dash/src/map/Message.java",
+		"/usr/share/arduino/libraries/MINDSi/examples/1-Calibration/AutomatedTesting/AutomatedTesting.ino",
+		"/usr/share/arduino/hardware/arduino/avr/libraries/EEPROM/EEPROM.h",
+		"/usr/share/arduino/hardware/arduino/avr/variants/mega/pins_arduino.h",
+		"/usr/share/arduino/hardware/arduino/avr/cores/arduino/Arduino.h",
+		"/usr/share/arduino/hardware/arduino/avr/cores/arduino/Platform.h",
+		"/usr/share/arduino/libraries/MINDSi/examples/1-Calibration/AutomatedTesting/AutomatedTestingTwo.ino",
+		"/home/brett/Programming/AUV5pingTANGENT.ino",
+		"/home/brett/.bashrc",
+		"/home/brett/sketchbook/testCalc/testCalc.ino",
+		"/home/brett/Programming/AUV5pingNOBLOCK.ino",
+		"/usr/share/arduino/libraries/MINDSi/examples/3-Projects/AUV5ping/AUV5ping.ino",
+		"/home/brett/Programming/arduinoCommunicator/arduinoCommunicator.ino",
+		"/home/brett/Programming/swing/6x6Dash/CommProtocol.txt",
+		"/usr/share/arduino/libraries/DroneUtils/GreatCircle.h",
+		"/home/brett/sketchbook/RoboMagellan6x6/RoboMagellan6x6.ino",
+		"/usr/share/arduino/libraries/MINDSi/Compass.cpp",
+		"/home/brett/Downloads/arduino-1.5.5/libraries/MINDSi/src/MINDSi.cpp",
+		"/home/brett/Downloads/arduino-1.5.5/libraries/MINDSi/src/Compass.cpp",
+		"/home/brett/avoidingBlockingCode.txt",
+		"/home/brett/GPSstuff/README",
+		"/var/log/pm-suspend.log",
+		"/home/brett/Downloads/arduino-1.5.5/libraries/MINDSi/src/MINDSi.h",
+		"/usr/share/arduino/libraries/MINDSi/Compass.h",
+		"/usr/share/arduino/libraries/MINDSi/MPU.cpp",
+		"/usr/share/arduino/libraries/MINDSi/MINDSi.h",
+		"/usr/share/arduino/libraries/MINDSi/MINDSi.cpp",
+		"/usr/share/arduino/libraries/MINDSi/MPU.h",
+		"/home/brett/.config/sublime-text-3/Packages/User/arduino.sublime-build",
+		"/usr/share/arduino/libraries/DroneUtils/DroneUtils.h",
+		"/usr/share/arduino/libraries/DroneUtils/DroneUtils.cpp",
+		"/usr/share/arduino/libraries/DroneUtils/Protocol.h",
+		"/usr/share/arduino/libraries/DroneUtils/Protocol.cpp",
+		"/usr/share/arduino/libraries/DroneUtils/NMEA.cpp",
+		"/home/brett/Programming/ArduPlane-2.75/missionPlanner/MissionPlanner/CurrentState.cs",
+		"/home/brett/Programming/robotData/gpsRun/error.txt",
+		"/home/brett/Programming/robotData/gpsRun/ccomp",
+		"/home/brett/Programming/robotData/gpsRun/g.txt",
+		"/home/brett/Programming/robotData/gpsRun/compass.txt",
+		"/home/brett/Programming/robotData/gpsRun/gps.txt",
+		"/home/brett/Programming/robotData/gpsRun/justgps.txt",
+		"/home/brett/Programming/robotData/gpsRun/headingDrive.txt",
+		"/home/brett/sketchbook/testCalc.ino",
+		"/home/brett/data",
+		"/usr/share/arduino/libraries/DroneUtils/GreatCircle.cpp",
+		"/home/brett/sketchbook/doz/doz.ino",
+		"/usr/share/arduino/libraries/EEStream/EEStream.h",
+		"/usr/share/arduino/libraries/EEStream/EEStream.cpp",
+		"/home/brett/Programming/swing/6x6Dash/src/Dot.java",
+		"/usr/share/arduino/libraries/DroneUtils/NMEA.h",
+		"/home/brett/sketchbook/NMEA_Test/NMEA_Test.ino",
+		"/usr/share/arduino/libraries/MINDSi/Encoder.cpp",
+		"/home/brett/Programming/swing/6x6Dash/dashProject.sublime-project",
+		"/usr/share/arduino/libraries/ArduinoCommManager/ArduinoCommManager.h",
+		"/usr/share/arduino/libraries/ArduinoCommManager/Protocol.cpp",
+		"/usr/share/arduino/libraries/ArduinoCommManager/ArduinoCommManager.cpp",
+		"/usr/share/arduino/libraries/ML1/MINDSi/MINDSi.h",
+		"/usr/share/arduino/libraries/ML1/MINDSi/MINDSi.cpp",
+		"/usr/share/arduino/libraries/NMEA/NMEA.h",
+		"/usr/share/arduino/libraries/NMEA/NMEA.cpp",
+		"/usr/share/arduino/hardware/arduino/cores/arduino/HardwareSerial.cpp",
+		"/home/brett/sketchbook/RecordData/RecordData.ino",
+		"/usr/share/arduino/hardware/arduino/cores/arduino/HardwareSerial.h",
+		"/home/brett/Programming/androidProjects/Mathstep/smali/nl/vertinode/mathstep/app/MathStepApplication.smali",
+		"/home/brett/Programming/androidProjects/Mathstep/res/layout/activity_plot_nogl.xml",
+		"/home/brett/Programming/androidProjects/Mathstep/res/layout/abs__screen_action_bar.xml",
+		"/home/brett/Programming/robotData/four/four.txt",
+		"/usr/share/arduino/libraries/MPU/MPU.cpp",
+		"/usr/share/arduino/libraries/MPU/MPU.h",
+		"/home/brett/Programming/robotData/two/gpsSpeedBeforeCut.txt",
+		"/home/brett/Programming/robotData/runOne/gyro.txt",
+		"/home/brett/Programming/robotData/runOne/compass.txt",
+		"/home/brett/Programming/robotData/runOne/serailData.txt",
+		"/home/brett/Programming/robotData/runOne/accelz.txt",
+		"/usr/share/arduino/libraries/MS5611/MS5611.h",
+		"/home/brett/sketchbook/RoboMagellanDemo/RoboMagellanDemo.ino",
+		"/home/brett/Programming/misc/mapTile.sh",
+		"/usr/share/arduino/libraries/LinkedList/LinkedList.h"
+	],
+	"find":
+	{
+		"height": 21.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": true,
+		"find_history":
+		[
+			"connection",
+			"addDot",
+			"interpretLocationEntry",
+			"new",
+			"ruler",
+			"EthernetUdp",
+			"awful.util.spawn",
+			"writeByte",
+			"writeBytes",
+			"AddSerialList",
+			"stream",
+			"InputStream",
+			"DataLabel",
+			"WaypointPanel",
+			"toggleLayout",
+			"BOOM_OFFSET",
+			"ctrl+;",
+			"find_under",
+			"},\n",
+			"command",
+			"},\n",
+			"command",
+			"find_under_expand",
+			"},\n",
+			"AddSerialList",
+			"UBLOX_GPS_FIX",
+			"UBLOX_GPS_FIX\\",
+			"UBLOX_GPS_FIX",
+			"JLabel",
+			"MapQuest",
+			"waypointPanel",
+			"waypoint",
+			"stop",
+			"resendMessage",
+			"max",
+			"index",
+			"roverTarget",
+			"updateGPS",
+			"DEBUG",
+			"sendDataMessage",
+			"Serial",
+			"sendDataMessage",
+			"CommMana",
+			"wait",
+			"Servo",
+			"sensorc",
+			"stop",
+			"XSHIFT",
+			"TURN",
+			"STEERTH",
+			"steer",
+			"\"   \"",
+			"   ",
+			"\"   \"",
+			"   ",
+			"location",
+			"40",
+			"100",
+			"40",
+			"LEDB",
+			"pitch",
+			"location",
+			"degLatitude",
+			"reportLocation",
+			"observeHeading",
+			"readAccelerometer",
+			"reportLocation",
+			"Message",
+			"target",
+			"observeHeading",
+			"pins",
+			"pings",
+			"1000",
+			"800",
+			"1200",
+			"1000",
+			"950",
+			"650",
+			"800",
+			"450",
+			"300",
+			"200",
+			"3000",
+			"steervalue",
+			"steerValue",
+			"bound",
+			"distanceData",
+			"left",
+			"dive",
+			"4000",
+			"650",
+			"describeSelf",
+			"System",
+			"System\\",
+			"System",
+			"DisplayMessage",
+			"System.",
+			"System.err",
+			".print",
+			".write",
+			"Contain",
+			"size",
+			"setPreferred",
+			"string",
+			"setColor",
+			"waypointPanel",
+			"createMapPanel",
+			"getWaypointPanel",
+			"WaypointPanel",
+			"setWaypointLooping",
+			"Looping",
+			"f",
+			"eigenRoll",
+			"eigenPitch",
+			"q",
+			"p",
+			"eigenRoll",
+			"eigenPitch",
+			"troll",
+			"tpitch",
+			"ehci",
+			"roll",
+			"readAccelerometer",
+			"azimuth",
+			"orientat",
+			"pitch",
+			"z",
+			"y"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"displayMessage",
+			"AlertPanel.DisplayMessage",
+			"CommSerial",
+			"sss",
+			"interpretLocationAction",
+			"",
+			"\\n",
+			"[\\n]",
+			"",
+			"longitude",
+			"",
+			"byte",
+			"const uint8_t",
+			"uint8_t",
+			"coordinateListener"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 2,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "src/serial/Serial.java",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2979,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2108,
+								2108
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Java/Java.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 429.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 631,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								335,
+								335
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Java/Java.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 11,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "src/serial/SerialParser.java",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3507,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								113,
+								113
+							]
+						],
+						"settings":
+						{
+							"rulers":
+							[
+								80
+							],
+							"syntax": "Packages/Java/Java.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "src/TODO",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 913,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								364,
+								364
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 12,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "src/serial/SerialSender.java",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5007,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								113,
+								113
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Java/Java.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "src/ui/AlertPanel.java",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1316,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								434,
+								434
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Java/Java.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 117.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "src/ui/BackgroundPanel.java",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 792,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								433,
+								433
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Java/Java.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "src/ui/DataLabel.java",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 932,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								367,
+								367
+							],
+							[
+								512,
+								512
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Java/Java.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "src/ui/RotatePanel.java",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1310,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								156,
+								156
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Java/Java.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "src/serial/Message.java",
+					"semi_transient": true,
+					"settings":
+					{
+						"buffer_size": 2176,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Java/Java.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": -0.0,
+						"translation.y": 624.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 10,
+					"file": "src/Dashboard.java",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 10803,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"rulers":
+							[
+								80
+							],
+							"syntax": "Packages/Java/Java.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2662.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 10,
+					"type": "text"
+				},
+				{
+					"buffer": 11,
+					"file": "src/map/MapPanel.java",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 44858,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1283,
+								1283
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Java/Java.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 116.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 8,
+					"type": "text"
+				},
+				{
+					"buffer": 12,
+					"file": "src/map/WaypointPanel.java",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 10485,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								10409,
+								10409
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Java/Java.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 4237.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 9,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 21.0
+	},
+	"input":
+	{
+		"height": 29.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 88.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"project": "dashProject.sublime-project",
+	"replace":
+	{
+		"height": 62.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 150.0,
+	"status_bar_visible": false,
+	"template_settings":
+	{
+	}
+}

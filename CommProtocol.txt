@@ -1,0 +1,38 @@
+56700 baud
+fletcher16 checksum
+most significant byte on left
+2 byte confirm messages in response to waypoint messages; checksum of full message.
+ETB - end of transmission block - dec. 17, 0x17
+US - unit seperator - dec. 31, 0x1F
+
+0x0* - 7  byte: tag, 32 bit fixed point, hash
+0x1* - 12 byte: tag, lat (32 bit), lon (32 bit), order, hash
+0x2* - 3  byte: tag, hash
+0x30 - 4  byte: confirmation hash, hash
+<tag> <a><b><c><d> <check><sum> <ETB><US>
+<tag> <l><a><t><t> <l><o><n><g> <order> <check><sum> <ETB><US>
+<tag> <action> <check><sum> <ETB><US>
+
+0x00 - latitude
+0x01 - longitude
+0x02 - heading
+0x03 - pitch
+0x04 - roll
+0x05 - speed
+0x06 - distance
+
+0x10 - add waypoint
+0x11 - change waypoint
+0x12 - delete waypoint
+0x13 - rover at waypoint
+0x14 - send rover to waypoint
+
+0x21 - loop waypoints on
+0x22 - loop waypoints off
+0x23 - clear waypoint list
+
+------------------------------------------------------------
+print position on the bottom of the map screen
+print checksum failures on bottom of the map screen
+
+IMU fusion
