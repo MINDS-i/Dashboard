@@ -33,6 +33,7 @@ import java.util.LinkedHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Vector;
+import java.util.Iterator;
 import javax.imageio.*;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
@@ -59,6 +60,10 @@ public class MapPanel extends JPanel {
     private static final int TILE_SIZE = 256;
     private static final int CACHE_SIZE = 256;
     private static final int MAGNIFIER_SIZE = 100;
+
+    private static final Color ACTIVE_LINE_FILL =  new Color(1.f,.2f,.2f,1f);
+    private static final Color PATH_LINE_FILL   =  new Color(0f,0f,0f, 1f);
+    private static final Color LINE_BORDER      =  new Color(.5f,.5f,.5f,0f);
 
     private Dimension mapSize = new Dimension(0, 0);
     private Point mapPosition = new Point(0, 0);
@@ -499,9 +504,7 @@ public class MapPanel extends JPanel {
     }
     //--------------------------------------------------------------------------
     //Painting functions
-    public void paintLine(Graphics g, Point pointA, Point pointB){
-        final Color fillColor = new Color(.1771f, .2355f, .9898f, 1f);
-        final Color borderColor = new Color(0f, 0f, 0f, .5f);
+    public void paintLine(Graphics g, Point pointA, Point pointB, Color fill){
         final int WIDTH = 10;
         Graphics2D g2d = (Graphics2D) g.create();
         RenderingHints hints = g2d.getRenderingHints();
@@ -524,10 +527,10 @@ public class MapPanel extends JPanel {
             g2d.rotate(angle);
             int w = (int)Math.sqrt((Math.abs(pointA.x-pointB.x)*Math.abs(pointA.x-pointB.x))+
                                     (Math.abs(pointA.y-pointB.y)*Math.abs(pointA.y-pointB.y)));
-            g2d.setPaint(new GradientPaint(0, 0, new Color(0f,0f,0f, 1f),
+            g2d.setPaint(new GradientPaint(0, 0, fill,
                                                  0,
                                                  -(WIDTH/2),
-                                                 new Color(.5f,.5f,.5f,0f),
+                                                 LINE_BORDER,
                                                  true));
             g2d.fillRect(0, -(WIDTH/2), w, WIDTH);
         } finally {
@@ -535,7 +538,18 @@ public class MapPanel extends JPanel {
         }
     }
 
-    private void paintDots(Graphics g) {
+
+
+
+
+
+
+
+
+
+
+
+/*    private void paintDots(Graphics g) {
         Point thisPoint;
         Point nextPoint;
         BufferedImage image=waypointImage;
@@ -562,22 +576,68 @@ public class MapPanel extends JPanel {
 
         g.translate(-image.getWidth()/2, -image.getHeight()/2);
         g.drawImage(image, thisPoint.x, thisPoint.y, this);
+    }*/
+
+
+
+    private void paintDots(Graphics g) {
+        if(dots.size()!=0){
+            drawLines(g);
+            drowRoverLine(g);
+            drawPoints(g);
+        }
+        drawRover(g);
     }
 
-    private void drawRover(Graphics g, Point targetPoint){
-        Point roverPoint = computeScreenPosition(rover.getLocation());
-        paintLine(g, targetPoint, roverPoint);
-        g.translate(-roverImage.getWidth()/2, -roverImage.getHeight()/2);
-        g.drawImage( roverImage , roverPoint.x, roverPoint.y, this);
-        g.translate( roverImage.getWidth()/2, roverImage.getHeight()/2);
+    private void drawLines(Graphics g){
+        Point n = null;
+        Point l = null;
+        Iterator itr = dots.iterator();
+        while(itr.hasNext()){
+            n = computeScreenPosition( ((Dot)itr.next()).getLocation() );
+            if(l!=null) paintLine(g, n, l, PATH_LINE_FILL);
+            l = n;
+        }
     }
 
-    private void drawRoverImage(Graphics g){
-        Point roverPoint = computeScreenPosition(rover.getLocation());
-        g.translate(-roverImage.getWidth()/2, -roverImage.getHeight()/2);
-        g.drawImage( roverImage , roverPoint.x, roverPoint.y, this);
-        g.translate( roverImage.getWidth()/2, roverImage.getHeight()/2);
+    private void drawPoints(Graphics g){
+        Point tmp;
+        Iterator itr = dots.iterator();
+        int i=0;
+        while(itr.hasNext()){
+            tmp = computeScreenPosition( ((Dot)itr.next()).getLocation() );
+            if(i++==waypointPanel.getSelectedWaypoint())
+                drawImg(g, waypointSelected, tmp);
+            else
+                drawImg(g, waypointImage, tmp);
+        }
     }
+
+    private void drawRover(Graphics g){
+        Point roverPoint = computeScreenPosition(rover.getLocation());
+        drawImg(g, roverImage, roverPoint);
+    }
+
+    private void drowRoverLine(Graphics g){
+        if(roverTarget >= dots.size()) {
+            System.err.println("roverTarget out of Bounds");
+            return;
+        }
+        Point n = computeScreenPosition( rover.getLocation() );
+        Point l = computeScreenPosition( dots.elementAt(roverTarget).getLocation() );
+        paintLine(g, n, l, ACTIVE_LINE_FILL);
+    }
+
+    private void drawImg(Graphics g, BufferedImage img, Point loc){
+        g.translate(-img.getWidth()/2, -img.getHeight()/2);
+        g.drawImage( img , loc.x, loc.y, this);
+        g.translate( img.getWidth()/2, img.getHeight()/2);
+    }
+
+
+
+
+
 
     private void paintInternal(Graphics2D g) {
         stats.reset();
@@ -611,8 +671,7 @@ public class MapPanel extends JPanel {
             painter.paint(g, position, null);
         }
 
-        if(dots.size() > 0) paintDots(g);
-        else drawRoverImage(g);
+        paintDots(g);
 
         long t1 = System.currentTimeMillis();
         stats.dt = t1 - t0;

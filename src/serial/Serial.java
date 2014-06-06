@@ -75,12 +75,14 @@ public class Serial{
 	}
 
 	public static boolean fletcher(short[] message, int length){
+		if(length <= 2) return false;
 		int foundSum = ( (message[length-2]<<8)|(message[length-1]&0xff) );
 		int generatedSum = fletcher16(message, length-2);
 		return generatedSum == foundSum;
 	}
 
 	public static boolean fletcher(byte[] message, int length){
+		if(length <= 2) return false;
 		int foundSum = ( (message[length-2]<<8)|(message[length-1]&0xff) );
 		int generatedSum = fletcher16(message, length-2);
 		return generatedSum == foundSum;

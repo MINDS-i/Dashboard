@@ -7,6 +7,7 @@ import java.awt.Point;
 
 public class Dot{
 	Point.Double location;
+	int status;
 	public Dot(){
 		location = new Point.Double(0,0);
 	}
