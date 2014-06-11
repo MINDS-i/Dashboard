@@ -27,6 +27,7 @@ public class Message{
 		waypointIndex = position;
 		needsConfirm = Serial.WAYPOINT_CONFIRM_REQ;
 		content = new byte[Serial.WAYPOINT_MSG_LENGTH];
+
 		int tmpLat = (int) (dot.getLatitude()*100000);
 		int tmpLon = (int) (dot.getLongitude()*100000);
 		content[0] = command;

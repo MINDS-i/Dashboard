@@ -61,7 +61,7 @@ public class MapPanel extends JPanel {
     private static final int CACHE_SIZE = 256;
     private static final int MAGNIFIER_SIZE = 100;
 
-    private static final Color ACTIVE_LINE_FILL =  new Color(1.f,.2f,.2f,1f);
+    private static final Color ACTIVE_LINE_FILL =  new Color(1.f,1.f,0.f,1f);
     private static final Color PATH_LINE_FILL   =  new Color(0f,0f,0f, 1f);
     private static final Color LINE_BORDER      =  new Color(.5f,.5f,.5f,0f);
 
@@ -411,7 +411,6 @@ public class MapPanel extends JPanel {
         if(sender != null && Serial.connection){
             Message msg = new Message(Serial.ADD_WAYPOINT_MSG, newDot, (byte)index);
             sender.sendMessage(msg);
-            if(roverTarget > index-1 && roverTarget != numDot()-1) roverTarget++;
         }
     }
     public void addDot(Dot newDot){
@@ -438,7 +437,6 @@ public class MapPanel extends JPanel {
         if(sender != null && Serial.connection){
             Message msg = new Message(Serial.DELETE_WAYPOINT_MSG, dots.elementAt(index), (byte)index);
             sender.sendMessage(msg);
-            if(roverTarget > index) roverTarget--;
         }
         dots.remove(index);
         waypointPanel.updateDisplay();
@@ -538,48 +536,6 @@ public class MapPanel extends JPanel {
         }
     }
 
-
-
-
-
-
-
-
-
-
-
-
-/*    private void paintDots(Graphics g) {
-        Point thisPoint;
-        Point nextPoint;
-        BufferedImage image=waypointImage;
-        thisPoint = computeScreenPosition(dots.lastElement().getLocation());
-
-        for(int i=0; i<dots.size(); i++){
-            nextPoint = computeScreenPosition(dots.elementAt(i).getLocation());
-            //draw line to new point and then draw PrevPoint
-            if(areWaypointsLooped() || i!=0){
-                paintLine(g, nextPoint, thisPoint);
-                g.translate(-image.getWidth()/2, -image.getHeight()/2);
-                g.drawImage( image , thisPoint.x, thisPoint.y, this);
-                g.translate( image.getWidth()/2, image.getHeight()/2);
-            }
-
-            if(roverTarget == i) {
-                drawRover(g, nextPoint);
-            }
-
-            thisPoint = nextPoint;
-            if(i==waypointPanel.getSelectedWaypoint()) image=waypointSelected;
-            else image = waypointImage;
-        }
-
-        g.translate(-image.getWidth()/2, -image.getHeight()/2);
-        g.drawImage(image, thisPoint.x, thisPoint.y, this);
-    }*/
-
-
-
     private void paintDots(Graphics g) {
         if(dots.size()!=0){
             drawLines(g);
@@ -597,6 +553,10 @@ public class MapPanel extends JPanel {
             n = computeScreenPosition( ((Dot)itr.next()).getLocation() );
             if(l!=null) paintLine(g, n, l, PATH_LINE_FILL);
             l = n;
+        }
+        if(loopWaypoint){
+            n = computeScreenPosition( dots.elementAt(0).getLocation() );
+            paintLine(g, n, l, PATH_LINE_FILL);
         }
     }
 
@@ -633,11 +593,6 @@ public class MapPanel extends JPanel {
         g.drawImage( img , loc.x, loc.y, this);
         g.translate( img.getWidth()/2, img.getHeight()/2);
     }
-
-
-
-
-
 
     private void paintInternal(Graphics2D g) {
         stats.reset();
