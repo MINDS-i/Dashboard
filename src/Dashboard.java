@@ -20,7 +20,9 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.awt.Point;
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Calendar;
 import javax.imageio.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -306,13 +308,19 @@ public class Dashboard implements Runnable {
 
   private void InitLog(){
     try{
-      fileWriter = new FileWriter("log.txt");
+      Calendar cal = Calendar.getInstance();
+      SimpleDateFormat sdf = new SimpleDateFormat("HH-mm_MM-DD_yyyyGG");
+      cal.getTime();
+      String time = sdf.format(cal.getTime());
+
+      fileWriter = new FileWriter("log/"+time+".log", false);
       logFile = new BufferedWriter(fileWriter);
 
       logTimer = new java.util.Timer();
       logTimer.scheduleAtFixedRate(new TimerTask(){
         public void run(){
           try{
+            if(Serial.connection == false) return;
             logFile.write(""+latitude.getData()+" "+longitude.getData()+" "
               +heading.getData()+" "+pitch.getData()+" "+roll.getData()+" "
               +speed.getData()+" "+distance.getData());
