@@ -81,7 +81,7 @@ public class MapPanel extends JPanel {
     private JPanel centerPanel = new JPanel();
 
     protected double smoothScale = 1.0D;
-    private boolean useAnimations = true;
+    private boolean useAnimations = false;
     private int smoothOffset = 0;
     private Point smoothPosition, smoothPivot;
 
@@ -707,15 +707,21 @@ public class MapPanel extends JPanel {
                 int x1 = (int) Math.ceil(((double) mapPosition.x + width) / TILE_SIZE);
                 int y1 = (int) Math.ceil(((double) mapPosition.y + height) / TILE_SIZE);
 
-                int dy = y0 * TILE_SIZE - mapPosition.y;
-                for (int y = y0; y < y1; ++y) {
-                    int dx = x0 * TILE_SIZE - mapPosition.x;
-                    for (int x = x0; x < x1; ++x) {
-                        paintTile(g, dx, dy, x, y);
-                        dx += TILE_SIZE;
-                        ++mapPanel.getStats().tileCount;
+                int nTx = (int) Math.ceil( ((double)x1-x0)/2 );
+                int nTy = (int) Math.ceil( ((double)y1-y0)/2 );
+                int  cx = x0 + nTx-1;
+                int  cy = y0 + nTy-1;
+                int  dx = x0 * TILE_SIZE - mapPosition.x + (nTx-1)*TILE_SIZE;
+                int  dy = y0 * TILE_SIZE - mapPosition.y + (nTy-1)*TILE_SIZE;
+                for(int i = 0; i <= nTx; i++){
+                    int dI = i*TILE_SIZE;
+                    for(int j = 0; j <= nTy; j++){
+                        int dJ = j*TILE_SIZE;
+                        paintTile(g, dx+dI, dy-dJ, cx+i, cy-j);
+                        paintTile(g, dx+dI, dy+dJ, cx+i, cy+j);
+                        paintTile(g, dx-dI, dy+dJ, cx-i, cy+j);
+                        paintTile(g, dx-dI, dy-dJ, cx-i, cy-j);
                     }
-                    dy += TILE_SIZE;
                 }
 
                 if (getScale() == 1d && mapPanel.magnifyRegion != null) {
