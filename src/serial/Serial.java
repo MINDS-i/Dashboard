@@ -1,5 +1,7 @@
 package com.serial;
 
+import jssc.SerialPort;
+
 public class Serial{
 	public static final byte DATA_MSG_LENGTH = 7;
 	public static final byte WAYPOINT_MSG_LENGTH = 12;
@@ -36,6 +38,9 @@ public class Serial{
 	public static final String WAYPOINT_DESCRIPTOR = "Waypoint ";
 	public static final String COMMAND_DESCRIPTOR = "Command ";
 	public static final String GENERIC_DESCRIPTOR = "Message";
+
+	public static final int   BAUD = SerialPort.BAUDRATE_9600;
+	public static final float FIXED_POINT_FACTOR = 0x100000;
 
 	public static boolean connection = false;
 

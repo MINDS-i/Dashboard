@@ -192,7 +192,7 @@ public class Dashboard implements Runnable {
     }
 
     try{
-      serialPort.setParams(SerialPort.BAUDRATE_9600,
+      serialPort.setParams(Serial.BAUD,
                            SerialPort.DATABITS_8,
                            SerialPort.STOPBITS_1,
                            SerialPort.PARITY_NONE);

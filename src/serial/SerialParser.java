@@ -96,14 +96,14 @@ public class SerialParser implements SerialPortEventListener{
 
 	private void handleData(short[] message){
 		short tag = message[0];
-		float data = ((float)(message[1]<<24 | message[2]<<16 | message[3]<<8 | message[4]))/10000000;
+		float data = ((float)(message[1]<<24 | message[2]<<16 | message[3]<<8 | message[4]))/Serial.FIXED_POINT_FACTOR;
 		parent.updateData(tag, data);
 	}
 
 	private void handleWaypoint(short[] message){
 		short tag = message[0];
-		float latitude  = ((float)(message[1]<<24 | message[2]<<16 | message[3]<<8 | message[4]))/10000000;
-		float longitude = ((float)(message[5]<<24 | message[6]<<16 | message[7]<<8 | message[8]))/10000000;
+		float latitude  = ((float)(message[1]<<24 | message[2]<<16 | message[3]<<8 | message[4]))/Serial.FIXED_POINT_FACTOR;
+		float longitude = ((float)(message[5]<<24 | message[6]<<16 | message[7]<<8 | message[8]))/Serial.FIXED_POINT_FACTOR;
 		short position = message[9];
 		if(position > parent.mapPanel.numDot()+1){ //Error; resend whole waypoint list
 			parent.sendWaypointList();
