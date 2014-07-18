@@ -7,24 +7,39 @@ import java.awt.Point;
 
 public class Dot{
 	Point.Double location;
+	short altitude;
 	int status;
 	public Dot(){
 		location = new Point.Double(0,0);
+		altitude = 0;
+	}
+	public Dot(Point.Double l, short alt){
+		location = l;
+		altitude = alt;
 	}
 	public Dot(Point.Double l){
 		location = l;
+		altitude = 0;
 	}
 	public Dot(Dot dot){
 		location = dot.getLocation();
+		altitude = dot.getAltitude();
 	}
 	public void setLocation(Point.Double l){
 		location = l;
+	}
+	public void setLocation(Point.Double l, short alt){
+		location = l;
+		altitude = alt;
 	}
 	public void setLatitude(double lat){
 		location = new Point.Double(location.getX(), lat);
 	}
 	public void setLongitude(double lng){
 		location = new Point.Double(lng, location.getY());
+	}
+	public void setAltitude(short alt){
+		altitude = alt;
 	}
 	public Point.Double getLocation(){
 		return location;
@@ -34,5 +49,8 @@ public class Dot{
 	}
 	public double getLatitude(){
 		return location.y;
+	}
+	public short getAltitude(){
+		return altitude;
 	}
 }

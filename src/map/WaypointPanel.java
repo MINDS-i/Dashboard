@@ -1,9 +1,11 @@
 package com.map;
 
 import com.Dashboard;
+import com.Logger;
 import com.map.coordinateListener;
 import com.map.Dot;
 import com.serial.*;
+import com.ui.DataWindow;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -23,6 +25,7 @@ class WaypointPanel extends JPanel {
 	private MapPanel parent;
 	JTextField latitude;
 	JTextField longitude;
+	JTextField altitude;
 	JLabel waypointIndexDisplay;
 
 	public WaypointPanel(MapPanel creator) {
@@ -32,7 +35,7 @@ class WaypointPanel extends JPanel {
 
 		buildPanel();
 
-		this.setPreferredSize(new Dimension(152,320));
+		this.setPreferredSize(new Dimension(152,350));
 	}
 
 	public int getSelectedWaypoint(){
@@ -50,8 +53,9 @@ class WaypointPanel extends JPanel {
 
 		if(parent.numDot() == 0) {
 			waypointIndexDisplay.setText(NO_WAYPOINT_MSG);
-			latitude.setText("");
+			latitude .setText("");
 			longitude.setText("");
+			altitude .setText("");
 			return;
 		}
 
@@ -59,27 +63,32 @@ class WaypointPanel extends JPanel {
 		waypointIndexDisplay.setText(indexField);
 		if(selectedWaypoint >= 0 && selectedWaypoint < parent.numDot()) {
 			Dot dot = parent.getDot(selectedWaypoint);
-			latitude.setText(dot.getLatitude()+"");
-			latitude.setForeground(Color.BLACK);
+			latitude .setText(dot.getLatitude()+"");
+			latitude .setForeground(Color.BLACK);
 			longitude.setText(dot.getLongitude()+"");
 			longitude.setForeground(Color.BLACK);
+			altitude .setText(dot.getAltitude()+"");
+			altitude .setForeground(Color.BLACK);
 		}
 	}
 
 	private void buildPanel(){
 		Insets basic = new Insets(1,1,1,1);
+		//open the data management panel
+		JButton dataPanel = new JButton(openDataPanel);
+		dataPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+		dataPanel.setMaximumSize(new Dimension(130, 40));
+		add(dataPanel);
 		//add looping button
 		JButton looping = new JButton(toggleLooping);
 		looping.setAlignmentX(Component.CENTER_ALIGNMENT);
 		looping.setMaximumSize(new Dimension(130, 40));
 		add(looping);
 		//add tile server switcher button
-		JPanel tileServer = new JPanel(new FlowLayout());
 		JButton tileButton = new JButton(nextTileServer);
-		tileButton.setPreferredSize(new Dimension(130,26));
-		tileServer.add(tileButton);
-		tileServer.setOpaque(false);
-		add(tileServer);
+		tileButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+		tileButton.setMaximumSize(new Dimension(130, 40));
+		add(tileButton);
 		//add navigation layout
 		JPanel navigation = new JPanel(new GridLayout(2,3,3,3));
 		navigation.setOpaque(false);
@@ -121,6 +130,13 @@ class WaypointPanel extends JPanel {
 		longitude.getDocument().addDocumentListener(listener);
 		longitude.addActionListener(listener);
 		add(longitude);
+		//add alitude box
+		altitude = new JTextField();
+		altitude.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+		listener = new coordinateListener(altitude, this);
+		altitude.getDocument().addDocumentListener(listener);
+		altitude.addActionListener(listener);
+		add(altitude);
 
 		//add enter button
 		JPanel waypointOptions = new JPanel(new FlowLayout());
@@ -152,10 +168,11 @@ class WaypointPanel extends JPanel {
 
 	public void interpretLocationEntry(){
 		try{
-			Double newLatitude = Double.parseDouble(latitude.getText());
+			Double newLatitude  = Double.parseDouble(latitude.getText());
 			Double newLongitude = Double.parseDouble(longitude.getText());
+			short  newAltitude  =  Short.parseShort (altitude.getText());
 			Point.Double newPosition = new Point.Double(newLongitude, newLatitude);
-			parent.changeDot(selectedWaypoint, newPosition);
+			parent.changeDot(selectedWaypoint, newPosition, newAltitude);
 			parent.repaint();
 		} catch (NumberFormatException e) {}
 		updateDisplay();
@@ -344,7 +361,7 @@ class WaypointPanel extends JPanel {
 			putValue(Action.NAME, text);
 		}
 		public void actionPerformed(ActionEvent e){
-			parent.sendMessage(new Message(Serial.SEND_ROVER_TO_MSG, new Dot(), (byte)selectedWaypoint));
+			parent.sendMessage(new Message(Serial.TARGET_INDEX, (float)selectedWaypoint));
 		}
 	};
 	private Action newWaypoint = new AbstractAction(){
@@ -356,6 +373,14 @@ class WaypointPanel extends JPanel {
 			parent.addDot( new Dot(parent.getDot(selectedWaypoint)), selectedWaypoint );
 		}
 	};
-
+	private Action openDataPanel = new AbstractAction(){
+		{
+			String text = "Data Log";
+			putValue(Action.NAME, text);
+		}
+		public void actionPerformed(ActionEvent e){
+			final DataWindow window = new DataWindow();
+		}
+	};
 }
 

@@ -93,7 +93,6 @@ public class MapPanel extends JPanel {
     private SerialSender sender;
     private Vector<Dot> dots = new Vector<Dot>();
     private Dot rover = new Dot();
-    private int roverTarget=0;
     private boolean loopWaypoint = false;
 
     public MapPanel() {
@@ -397,7 +396,7 @@ public class MapPanel extends JPanel {
     public void setWaypointLooping(boolean input){
         loopWaypoint = input;
         if(sender != null && Serial.connection){
-            Message msg = new Message( (input)? Serial.LOOP_ON_CMD : Serial.LOOP_OFF_CMD );
+            Message msg = new Message( Serial.LOOPING_TOGGLE, (input)?1.0f:0.0f );
             sender.sendMessage(msg);
         }
     }
@@ -406,6 +405,9 @@ public class MapPanel extends JPanel {
     }
     public void addDot(Dot newDot, int index){
         if(dots.size()>= Serial.MAX_WAYPOINTS) return;
+        if(newDot.getAltitude()==0 && index > 0) {
+            newDot.setAltitude(getDot(index-1).getAltitude());
+        }
         dots.insertElementAt(newDot, index);
         waypointPanel.updateDisplay();
         if(sender != null && Serial.connection){
@@ -424,6 +426,16 @@ public class MapPanel extends JPanel {
         if(index < 0 || index >= dots.size()) return;
 
         if(newPosition != null) dots.elementAt(index).setLocation(newPosition);
+
+        if(sender != null && Serial.connection){
+            Message msg = new Message(Serial.CHANGE_WAYPOINT_MSG, dots.elementAt(index), (byte)index);
+            sender.sendMessage(msg);
+        }
+    }
+    public void changeDot(int index, Point.Double newPosition, short alt){
+        if(index < 0 || index >= dots.size()) return;
+
+        if(newPosition != null) dots.elementAt(index).setLocation(newPosition, alt);
 
         if(sender != null && Serial.connection){
             Message msg = new Message(Serial.CHANGE_WAYPOINT_MSG, dots.elementAt(index), (byte)index);
@@ -451,7 +463,10 @@ public class MapPanel extends JPanel {
         rover.setLongitude(lng);
     }
     public void setRoverTarget(short target){
-        roverTarget = target;
+        sender.sendMessage(new Message(Serial.TARGET_INDEX, (float)target));
+    }
+    public short getRoverTarget(){
+        return (short) Serial.data[Serial.TARGET_INDEX];
     }
 
     public int isOverDot(Point p){
@@ -477,12 +492,12 @@ public class MapPanel extends JPanel {
         return -1;
     }
 
-    public int distFromLine(Point a, Point b, Point idp){ //TODO: fix div by zero fix
-        float abSlope = (a.y-b.y)/(a.x-b.x+.000001f);
+    public int distFromLine(Point a, Point b, Point idp){
+        float abSlope = (a.y-b.y)/(a.x-b.x+.0000001f);
         float abYCept = a.y - abSlope*a.x;
-        float perpSlope = (a.x-b.x)/(b.y-a.y+.000001f);
+        float perpSlope = (a.x-b.x)/(b.y-a.y+.0000001f);
         float perpYCept = idp.y - perpSlope*idp.x;
-        float interceptX = (abYCept - perpYCept) / (perpSlope-abSlope+.000001f);
+        float interceptX = (abYCept - perpYCept) / (perpSlope-abSlope+.0000001f);
         float interceptY = perpSlope*interceptX + perpYCept;
         if( a.x > b.x && a.x > interceptX && interceptX > b.x){
             return (int) Math.floor(
@@ -579,12 +594,12 @@ public class MapPanel extends JPanel {
     }
 
     private void drowRoverLine(Graphics g){
-        if(roverTarget >= dots.size()) {
+        if(getRoverTarget() >= dots.size()) {
             System.err.println("roverTarget out of Bounds");
             return;
         }
         Point n = computeScreenPosition( rover.getLocation() );
-        Point l = computeScreenPosition( dots.elementAt(roverTarget).getLocation() );
+        Point l = computeScreenPosition( dots.elementAt(getRoverTarget()).getLocation() );
         paintLine(g, n, l, ACTIVE_LINE_FILL);
     }
 
@@ -1252,6 +1267,8 @@ public class MapPanel extends JPanel {
         g.fillRoundRect(0, 0, width, height, 4, 4);
         g.setComposite(oldComposite);
     }
+
+
 }
 
 

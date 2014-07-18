@@ -5,6 +5,7 @@ import com.serial.SerialSender;
 import com.serial.SerialParser;
 import com.serial.Serial;
 import com.ui.*;
+import com.Logger;
 import jssc.SerialPort;
 import jssc.SerialPortException;
 import jssc.SerialPortList;
@@ -52,20 +53,16 @@ public class Dashboard implements Runnable {
   DataLabel speed;
   DataLabel pitch;
   DataLabel roll;
-  DataLabel distance;
+  DataLabel voltage;
   Frame loading;
   static final int[] dataBorderSize = {15,18,46,18};//top,left,bottom,right
   JFrame f;
-  public AlertPanel alertPanel;
-  public MapPanel mapPanel;
-
   SerialPort serialPort;
-  SerialSender serialSender;
-  SerialParser serialParser;
-
-  FileWriter fileWriter;
-  BufferedWriter logFile;
-  java.util.Timer logTimer;
+  public static AlertPanel    alertPanel;
+  public static MapPanel      mapPanel;
+  public static SerialSender  serialSender;
+  public static SerialParser  serialParser;
+  public static Logger        logWriter;
 
   @Override
   public void run() {
@@ -100,7 +97,8 @@ public class Dashboard implements Runnable {
       ocr = ocr.deriveFont(13f);
       digital = digital.deriveFont(36f);
       InitUI();
-      InitLog();
+      logWriter = new Logger();
+      for(int i=0; i<8; i++) Logger.isLogged[i] = true;
     } catch (IOException|FontFormatException e) {
       DisplayError((Exception)e);
     }
@@ -249,11 +247,11 @@ public class Dashboard implements Runnable {
                                         dataBorderSize[2],
                                         dataBorderSize[3]) );
     dataPanel.setLayout(new BoxLayout(dataPanel, BoxLayout.PAGE_AXIS));
-    latitude = new DataLabel("Lat:", "N");
+    latitude = new DataLabel("Lat:");
     latitude.setForeground(orange);
     latitude.setFont(ocr);
     dataPanel.add(latitude);
-    longitude = new DataLabel("Lng:", "W");
+    longitude = new DataLabel("Lng:");
     longitude.setForeground(orange);
     longitude.setFont(ocr);
     dataPanel.add(longitude);
@@ -269,14 +267,14 @@ public class Dashboard implements Runnable {
     roll.setForeground(orange);
     roll.setFont(ocr);
     dataPanel.add(roll);
-    speed = new DataLabel("Spd:", "MPH");
+    speed = new DataLabel("MPH:");
     speed.setForeground(orange);
     speed.setFont(ocr);
     dataPanel.add(speed);
-    distance = new DataLabel("Dst:", "ft");
-    distance.setForeground(orange);
-    distance.setFont(ocr);
-    dataPanel.add(distance);
+    voltage = new DataLabel("Vcc:");
+    voltage.setForeground(orange);
+    voltage.setFont(ocr);
+    dataPanel.add(voltage);
     dataPanel.setOpaque(false);
 
     dashPanel.setLayout(new GridBagLayout());
@@ -303,67 +301,37 @@ public class Dashboard implements Runnable {
     roll.update(0);
     frontGauge.update(0);
     speed.update(0);
-    distance.update(0);
+    voltage.update(0);
   }
 
-  private void InitLog(){
-    try{
-      Calendar cal = Calendar.getInstance();
-      SimpleDateFormat sdf = new SimpleDateFormat("HH-mm_MM-DD_yyyyGG");
-      cal.getTime();
-      String time = sdf.format(cal.getTime());
-
-      fileWriter = new FileWriter("log/"+time+".log", false);
-      logFile = new BufferedWriter(fileWriter);
-
-      logTimer = new java.util.Timer();
-      logTimer.scheduleAtFixedRate(new TimerTask(){
-        public void run(){
-          try{
-            if(Serial.connection == false) return;
-            logFile.write(""+latitude.getData()+" "+longitude.getData()+" "
-              +heading.getData()+" "+pitch.getData()+" "+roll.getData()+" "
-              +speed.getData()+" "+distance.getData());
-            logFile.newLine();
-            logFile.flush();
-          } catch (IOException ex){
-            System.err.println(ex);
-          }
-        }
-      }, 1000, 250);
-    } catch (IOException ex) {
-      System.err.println(ex);
-    }
-  }
-
-  public void updateData(short tag, float data){
-    switch(tag){
+  public void updateDash(byte id){
+    switch(id){
       case Serial.LATITUDE_MSG:
-        latitude.update(data);
-        mapPanel.updateRoverLatitude((double)data);
+        latitude.update(Serial.data[id]);
+        mapPanel.updateRoverLatitude((double)Serial.data[id]);
         break;
       case Serial.LONGITUDE_MSG:
-        longitude.update(data);
-        mapPanel.updateRoverLongitude((double)data);
+        longitude.update(Serial.data[id]);
+        mapPanel.updateRoverLongitude((double)Serial.data[id]);
         f.repaint();
         break;
       case Serial.HEADING_MSG:
-        heading.update(data);
-        topGauge.update(data+90);
+        heading.update(Serial.data[id]);
+        topGauge.update(Serial.data[id]+90);
         break;
       case Serial.PITCH_MSG:
-        pitch.update(data-90);
-        sideGauge.update(data-90);
+        pitch.update(Serial.data[id]-90);
+        sideGauge.update(Serial.data[id]-90);
         break;
       case Serial.ROLL_MSG:
-        roll.update(data-90);
-        frontGauge.update(data-90);
+        roll.update(Serial.data[id]-90);
+        frontGauge.update(Serial.data[id]-90);
         break;
       case Serial.SPEED_MSG:
-        speed.update(data);
+        speed.update(Serial.data[id]);
         break;
-      case Serial.DISTANCE_MSG:
-        distance.update(data);
+      case Serial.VOLTAGE_MSG:
+        voltage.update(Serial.data[id]);
         break;
     }
   }
@@ -373,7 +341,7 @@ public class Dashboard implements Runnable {
   }
 
   public static void DisplayError(Exception e){
-    final JFrame errorFrame = new JFrame("Error");
+    final JFrame errorFrame = new JFrame("Data");
     errorFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     errorFrame.setLayout(new FlowLayout());
     errorFrame.setVisible(true);
