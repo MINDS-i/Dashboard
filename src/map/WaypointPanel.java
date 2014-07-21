@@ -6,6 +6,7 @@ import com.map.coordinateListener;
 import com.map.Dot;
 import com.serial.*;
 import com.ui.DataWindow;
+import com.xml;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -14,6 +15,7 @@ import javax.imageio.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
+import javax.xml.stream.XMLStreamException;
 
 class WaypointPanel extends JPanel {
 	protected static final int MOVE_STEP = 32;
@@ -35,7 +37,7 @@ class WaypointPanel extends JPanel {
 
 		buildPanel();
 
-		this.setPreferredSize(new Dimension(152,350));
+		this.setPreferredSize(new Dimension(152,368));
 	}
 
 	public int getSelectedWaypoint(){
@@ -150,11 +152,11 @@ class WaypointPanel extends JPanel {
 		add(reTarget);
 
 		//add save/load flow layout
-/*		JPanel saveload = new JPanel(new FlowLayout());
+		JPanel saveload = new JPanel(new FlowLayout());
 		saveload.setOpaque(false);
 		saveload.add(new JButton(saveWaypoints));
 		saveload.add(new JButton(loadWaypoints));
-		add(saveload);*/
+		add(saveload);
 
 		JTextArea copyRights = new JTextArea();
 		Font tmp = copyRights.getFont();
@@ -335,6 +337,11 @@ class WaypointPanel extends JPanel {
 			putValue(Action.SHORT_DESCRIPTION, text);
 		}
 		public void actionPerformed(ActionEvent e){
+			try{
+				xml.writeXML();
+			} catch (XMLStreamException ex){
+				System.err.println(ex.getMessage());
+			}
 		}
 	};
 	private Action loadWaypoints = new AbstractAction(){
@@ -344,6 +351,13 @@ class WaypointPanel extends JPanel {
 			putValue(Action.SHORT_DESCRIPTION, text);
 		}
 		public void actionPerformed(ActionEvent e){
+			try{
+				xml.readXML();
+			} catch (XMLStreamException ex){
+				System.err.println(ex.getMessage());
+			}
+			updateDisplay();
+			parent.repaint();
 		}
 	};
 	private Action interpretLocationAction = new AbstractAction(){

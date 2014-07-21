@@ -25,6 +25,10 @@ public class Dot{
 		location = dot.getLocation();
 		altitude = dot.getAltitude();
 	}
+	public Dot(double lat, double lng, short alt){
+		location = new Point.Double(lng,lat);
+		altitude = alt;
+	}
 	public void setLocation(Point.Double l){
 		location = l;
 	}

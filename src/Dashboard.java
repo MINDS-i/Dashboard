@@ -336,7 +336,7 @@ public class Dashboard implements Runnable {
     }
   }
 
-  public void sendWaypointList(){
+  public static void sendWaypointList(){
     serialSender.sendWaypointList(mapPanel);
   }
 

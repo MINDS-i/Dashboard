@@ -456,6 +456,9 @@ public class MapPanel extends JPanel {
     public int numDot(){
         return dots.size();
     }
+    public void overWriteDots(Vector<Dot> vec){
+        dots = vec;
+    }
     public void updateRoverLatitude(double lat){
         rover.setLatitude(lat);
     }
