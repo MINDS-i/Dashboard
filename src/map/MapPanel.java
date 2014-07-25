@@ -15,6 +15,8 @@ import com.map.Dot;
 import com.map.TileServer;
 import com.map.WaypointPanel;
 import com.serial.*;
+import com.ContextViewer;
+import com.Context;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -46,7 +48,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.SAXException;
 
-public class MapPanel extends JPanel {
+public class MapPanel extends JPanel implements ContextViewer {
     private static final TileServer[] TILESERVERS = {
         new TileServer("http://otile1.mqcdn.com/tiles/1.0.0/sat/", 18),
         new TileServer("http://otile1.mqcdn.com/tiles/1.0.0/map/", 18),
@@ -74,10 +76,10 @@ public class MapPanel extends JPanel {
 
     private TileServer tileServer = TILESERVERS[0];
 
+    private WaypointPanel waypointPanel;
     private BorderLayout border = new BorderLayout();
     private TileCache cache = new TileCache();
     private Stats stats = new Stats();
-    private WaypointPanel waypointPanel = new WaypointPanel(this);
     private JPanel centerPanel = new JPanel();
 
     protected double smoothScale = 1.0D;
@@ -90,22 +92,22 @@ public class MapPanel extends JPanel {
     private BufferedImage lineSegment;
     private BufferedImage roverImage;
 
-    private SerialSender sender;
-    private Vector<Dot> dots = new Vector<Dot>();
     private Dot rover = new Dot();
-    private boolean loopWaypoint = false;
+    private Context context;
 
-    public MapPanel() {
-        this(new Point(8282, 5179), 6);
+    public MapPanel(Context cxt) {
+        this(cxt, new Point(8282, 5179), 6, null, null, null);
     }
 
-    public MapPanel(Point mapPosition, int zoom){
-        this(mapPosition, zoom, null, null, null);
+    public MapPanel(Context cxt, Point mapPosition, int zoom){
+        this(cxt, mapPosition, zoom, null, null, null);
     }
 
-    public MapPanel(Point mapPosition, int zoom, JPanel north,
-                                                 JPanel east,
-                                                 JPanel south) {
+    public MapPanel(Context cxt, Point mapPosition, int zoom, JPanel north,
+                                                              JPanel east,
+                                                              JPanel south) {
+        context = cxt;
+        context.registerViewer(this);
         addMouseListener(mouseListener);
         addMouseMotionListener(mouseListener);
         addMouseWheelListener(mouseListener);
@@ -115,6 +117,7 @@ public class MapPanel extends JPanel {
         setBackground(new Color(0xc0, 0xc0, 0xc0));
         setLayout(border);
 
+        waypointPanel = new WaypointPanel(context, this);
         centerPanel.setLayout(new BorderLayout());
         if(north != null) centerPanel.add(Contain(north),BorderLayout.NORTH);
         if(south != null) centerPanel.add(Contain(south),BorderLayout.SOUTH);
@@ -138,6 +141,10 @@ public class MapPanel extends JPanel {
         } catch(IOException e){
             Dashboard.DisplayError(e);
         }
+    }
+
+    public void waypointUpdate(){
+        repaint();
     }
 
     private void checkTileServers() {
@@ -383,98 +390,15 @@ public class MapPanel extends JPanel {
     }
     //--------------------------------------------------------------------------
     //MINDSi waypoint managing code
-    public void setOutput(SerialSender inSender){
-        sender = inSender;
-    }
-
-    public void sendMessage(Message msg){
-        if(sender != null && Serial.connection){
-            sender.sendMessage(msg);
-        }
-    }
-
-    public void setWaypointLooping(boolean input){
-        loopWaypoint = input;
-        if(sender != null && Serial.connection){
-            Message msg = new Message( Serial.LOOPING_TOGGLE, (input)?1.0f:0.0f );
-            sender.sendMessage(msg);
-        }
-    }
-    public boolean areWaypointsLooped(){
-        return loopWaypoint;
-    }
-    public void addDot(Dot newDot, int index){
-        if(dots.size()>= Serial.MAX_WAYPOINTS) return;
-        if(newDot.getAltitude()==0 && index > 0) {
-            newDot.setAltitude(getDot(index-1).getAltitude());
-        }
-        dots.insertElementAt(newDot, index);
-        waypointPanel.updateDisplay();
-        if(sender != null && Serial.connection){
-            Message msg = new Message(Serial.ADD_WAYPOINT_MSG, newDot, (byte)index);
-            sender.sendMessage(msg);
-        }
-    }
-    public void addDot(Dot newDot){
-        addDot(newDot, dots.size());
-    }
-    public void addDot(float longitude, float latitude, int index){
-        Dot tmp = new Dot(new Point.Double(longitude, latitude));
-        addDot(tmp, index);
-    }
-    public void changeDot(int index, Point.Double newPosition){
-        if(index < 0 || index >= dots.size()) return;
-
-        if(newPosition != null) dots.elementAt(index).setLocation(newPosition);
-
-        if(sender != null && Serial.connection){
-            Message msg = new Message(Serial.CHANGE_WAYPOINT_MSG, dots.elementAt(index), (byte)index);
-            sender.sendMessage(msg);
-        }
-    }
-    public void changeDot(int index, Point.Double newPosition, short alt){
-        if(index < 0 || index >= dots.size()) return;
-
-        if(newPosition != null) dots.elementAt(index).setLocation(newPosition, alt);
-
-        if(sender != null && Serial.connection){
-            Message msg = new Message(Serial.CHANGE_WAYPOINT_MSG, dots.elementAt(index), (byte)index);
-            sender.sendMessage(msg);
-        }
-    }
-    public Dot getDot(int index){
-        return dots.elementAt(index);
-    }
-    public void removeDot(int index){
-        if(sender != null && Serial.connection){
-            Message msg = new Message(Serial.DELETE_WAYPOINT_MSG, dots.elementAt(index), (byte)index);
-            sender.sendMessage(msg);
-        }
-        dots.remove(index);
-        waypointPanel.updateDisplay();
-    }
-    public int numDot(){
-        return dots.size();
-    }
-    public void overWriteDots(Vector<Dot> vec){
-        dots = vec;
-    }
     public void updateRoverLatitude(double lat){
         rover.setLatitude(lat);
     }
     public void updateRoverLongitude(double lng){
         rover.setLongitude(lng);
     }
-    public void setRoverTarget(short target){
-        sender.sendMessage(new Message(Serial.TARGET_INDEX, (float)target));
-    }
-    public short getRoverTarget(){
-        return (short) Serial.data[Serial.TARGET_INDEX];
-    }
-
     public int isOverDot(Point p){
-        for(int i=0; i<dots.size(); i++){
-            if(radialOverlap( computeScreenPosition(dots.elementAt(i).getLocation()) , p ,
+        for(int i=0; i<context.waypoint.size(); i++){
+            if(radialOverlap( computeScreenPosition(context.waypoint.get(i).getLocation()) , p ,
                                                  waypointImage.getWidth()/2 )){
                 return i;
             }
@@ -483,10 +407,11 @@ public class MapPanel extends JPanel {
     }
 
     public int isOverLine(Point p){
-        if(dots.size()<2) return -1;
+        if(context.waypoint.size()<2) return -1;
         Point prevPoint = computeScreenPosition(rover.getLocation());
-        for(int i=0; i<dots.size(); i++){
-            Point thisPoint = computeScreenPosition(dots.elementAt(i).getLocation());
+        for(int i=0; i<context.waypoint.size(); i++){
+            Point thisPoint = computeScreenPosition(
+                                context.waypoint.get(i).getLocation());
             if( distFromLine(prevPoint, thisPoint, p) < 8 ){
                 return i;
             }
@@ -555,7 +480,7 @@ public class MapPanel extends JPanel {
     }
 
     private void paintDots(Graphics g) {
-        if(dots.size()!=0){
+        if(context.waypoint.size()!=0){
             drawLines(g);
             drowRoverLine(g);
             drawPoints(g);
@@ -566,21 +491,21 @@ public class MapPanel extends JPanel {
     private void drawLines(Graphics g){
         Point n = null;
         Point l = null;
-        Iterator itr = dots.iterator();
+        Iterator itr = context.waypoint.iterator();
         while(itr.hasNext()){
             n = computeScreenPosition( ((Dot)itr.next()).getLocation() );
             if(l!=null) paintLine(g, n, l, PATH_LINE_FILL);
             l = n;
         }
-        if(loopWaypoint){
-            n = computeScreenPosition( dots.elementAt(0).getLocation() );
+        if(context.waypoint.isLooped()){
+            n = computeScreenPosition( context.waypoint.get(0).getLocation() );
             paintLine(g, n, l, PATH_LINE_FILL);
         }
     }
 
     private void drawPoints(Graphics g){
         Point tmp;
-        Iterator itr = dots.iterator();
+        Iterator itr = context.waypoint.iterator();
         int i=0;
         while(itr.hasNext()){
             tmp = computeScreenPosition( ((Dot)itr.next()).getLocation() );
@@ -597,12 +522,12 @@ public class MapPanel extends JPanel {
     }
 
     private void drowRoverLine(Graphics g){
-        if(getRoverTarget() >= dots.size()) {
+        if(context.waypoint.getTarget() >= context.waypoint.size()) {
             System.err.println("roverTarget out of Bounds");
             return;
         }
         Point n = computeScreenPosition( rover.getLocation() );
-        Point l = computeScreenPosition( dots.elementAt(getRoverTarget()).getLocation() );
+        Point l = computeScreenPosition( context.waypoint.getTargetWaypoint().getLocation() );
         paintLine(g, n, l, ACTIVE_LINE_FILL);
     }
 
@@ -1113,7 +1038,7 @@ public class MapPanel extends JPanel {
             if (downDot != -1){
                 Point.Double point = new Point.Double(position2lon(getCursorPosition().x, getZoom()),
                                         position2lat(getCursorPosition().y, getZoom()));
-                dots.elementAt(downDot).setLocation(point);
+                context.waypoint.get(downDot).setLocation(point);
                 repaint();
                 waypointPanel.updateDisplay();
             } else if (downCoords != null) {
@@ -1131,9 +1056,9 @@ public class MapPanel extends JPanel {
 
         public void mouseReleased(MouseEvent e) {
             handleDrag(e);
-            if(downDot != -1){
+/*            if(downDot != -1){
                 changeDot(downDot, null);
-            }
+            }*/
         }
 
         public void mouseClicked(MouseEvent e) {
@@ -1143,17 +1068,17 @@ public class MapPanel extends JPanel {
                     Point.Double point = new Point.Double(position2lon(getCursorPosition().x, getZoom()), position2lat(getCursorPosition().y, getZoom()));
                     int tmp = isOverLine(new Point(mouseCoords.x, mouseCoords.y));
                     if(tmp==-1) {
-                        addDot(new Dot(point));
-                        waypointPanel.setSelectedWaypoint(numDot()-1);
+                        context.waypoint.add(new Dot(point));
+                        waypointPanel.setSelectedWaypoint(context.waypoint.size()-1);
                     }
                     else{
-                        addDot(new Dot(point), tmp);
+                        context.waypoint.add(new Dot(point), tmp);
                         waypointPanel.setSelectedWaypoint(tmp);
                     }
                 }
 
             } else if (e.getButton() == MouseEvent.BUTTON3) {
-                if( downDot != -1 ) removeDot(downDot);
+                if( downDot != -1 ) context.waypoint.remove(downDot);
 
             } else if (e.getButton() == MouseEvent.BUTTON2) {
                 setCenterPosition(getCursorPosition());

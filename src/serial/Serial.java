@@ -40,9 +40,6 @@ public class Serial{
 	public static final String  CONFIRM_DESCRIPTOR = "Msg Confirmation ";
 	public static final String  GENERIC_DESCRIPTOR = "Message ";
 
-	public static boolean connection = false;
-	public static float[] data = new float[Serial.NUM_DATA_SLOTS];
-
 	public static int fletcher16( byte[] message, int length){
 		int iterator = 0;
 		int aSum=0xff, bSum=0xff;

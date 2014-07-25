@@ -10,15 +10,13 @@ import java.awt.FontMetrics;
 
 
 public class AlertPanel extends JPanel {
-	private static AlertPanel instance = null;
-	static int NUM_LINES = 8;
+	final static int NUM_LINES = 8;
 	Font font;
 	int lineHeight;
 	FontMetrics metrics;
 	String[] messages = new String[NUM_LINES];
 
 	public AlertPanel(Font inFont){
-		instance = this;
 		font = inFont;
 		this.setPreferredSize(new Dimension(4000,200)); //cheap fix for autoscaling
 		setOpaque(false);
@@ -41,14 +39,12 @@ public class AlertPanel extends JPanel {
 		}
 	}
 
-	public static void displayMessage(String msg){
-		if(instance != null){
-			for(int i=NUM_LINES-1; i>0; i--){
-				instance.messages[i] = instance.messages[i-1];
-			}
-			instance.messages[0] = msg;
-			instance.repaint();
+	public void displayMessage(String msg){
+		for(int i=NUM_LINES-1; i>0; i--){
+			messages[i] = messages[i-1];
 		}
+		messages[0] = msg;
+		repaint();
 	}
 
 }

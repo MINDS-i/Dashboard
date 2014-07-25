@@ -39,8 +39,6 @@ public class Message{
 		content		  = new byte[8];
 		int tmpData   = (int) (data*Serial.FIXED_POINT_FACTOR);
 
-		Serial.data[id] = data;
-
 		content[0] = Serial.DATA_MSG;
 		content[1] = id;
 		content[2] = (byte)((tmpData>>24)&0xff);

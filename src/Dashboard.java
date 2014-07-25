@@ -6,10 +6,10 @@ import com.serial.SerialParser;
 import com.serial.Serial;
 import com.ui.*;
 import com.Logger;
+import com.map.WaypointList;
 import jssc.SerialPort;
 import jssc.SerialPortException;
 import jssc.SerialPortList;
-
 import java.awt.*;
 import java.awt.Dimension;
 import java.awt.event.*;
@@ -57,12 +57,8 @@ public class Dashboard implements Runnable {
   Frame loading;
   static final int[] dataBorderSize = {15,18,46,18};//top,left,bottom,right
   JFrame f;
-  SerialPort serialPort;
-  public static AlertPanel    alertPanel;
-  public static MapPanel      mapPanel;
-  public static SerialSender  serialSender;
-  public static SerialParser  serialParser;
-  public static Logger        logWriter;
+  Context context;
+  MapPanel mapPanel;
 
   @Override
   public void run() {
@@ -76,10 +72,6 @@ public class Dashboard implements Runnable {
       loading.setSize(540,216);
       loading.setLocationRelativeTo(null);
       loading.setVisible(true);
-
-      alertPanel = new AlertPanel(ocr);
-      serialSender = new SerialSender();
-      serialParser = new SerialParser(this, serialSender);
 
       refreshImage = ImageIO.read(
               new File("./data/refresh.png"));
@@ -96,9 +88,17 @@ public class Dashboard implements Runnable {
                                 new File("./data/digital.ttf"));
       ocr = ocr.deriveFont(13f);
       digital = digital.deriveFont(36f);
+
+      context = new Context();
+      context.give(this,
+                   new AlertPanel(ocr),
+                   new SerialSender(context),
+                   new SerialParser(context),
+                   new WaypointList(context),
+                   new Logger(context),
+                   null //serialPort
+                                        );
       InitUI();
-      logWriter = new Logger();
-      for(int i=0; i<8; i++) Logger.isLogged[i] = true;
     } catch (IOException|FontFormatException e) {
       DisplayError((Exception)e);
     }
@@ -130,7 +130,7 @@ public class Dashboard implements Runnable {
         putValue(Action.SHORT_DESCRIPTION, text);
       }
       public void actionPerformed(ActionEvent e){
-        if (Serial.connection == false){
+        if (context.connected == false){
           if(connectSerial())
             putValue(Action.NAME, "Disconnect");
         }
@@ -153,13 +153,13 @@ public class Dashboard implements Runnable {
     serialPanel.add(connectButton);
     serialPanel.setOpaque(false);
 
-    mapPanel = new MapPanel(new Point(628,1211),
+    mapPanel = new MapPanel(  context,
+                              new Point(628,1211),
                               4,
                               serialPanel,
                               makeDashPanel(),
-                              alertPanel);
+                              context.alert);
     mapPanel.setVgap(-45);
-    mapPanel.setOutput(serialSender);
     serialPanel.setOpaque(false);
 
     f.add(mapPanel);
@@ -179,36 +179,35 @@ public class Dashboard implements Runnable {
   private boolean connectSerial(){
     if(dropDown.getSelectedItem() == null) return false;
 
-    serialPort = new SerialPort((String)dropDown.getSelectedItem());
+    SerialPort serialPort = new SerialPort((String)dropDown.getSelectedItem());
 
     try{
       serialPort.openPort();
     } catch (SerialPortException ex){
       System.err.println(ex.getMessage());
-      AlertPanel.displayMessage("Port not available");
+      context.alert.displayMessage("Port not available");
       return false;
     }
 
     try{
-      serialPort.setParams(Serial.BAUD,
+      serialPort.setParams(    Serial.BAUD,
                            SerialPort.DATABITS_8,
                            SerialPort.STOPBITS_1,
                            SerialPort.PARITY_NONE);
       serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN
                                     | SerialPort.FLOWCONTROL_RTSCTS_OUT);
       System.err.println("Flow Control mode: "+serialPort.getFlowControlMode());
-      serialSender.updatePort( serialPort );
-      serialParser.updatePort( serialPort );
-      Serial.connection = true;
-      AlertPanel.displayMessage("Port opened");
-      sendWaypointList();
+
+      context.updatePort(serialPort);
+      context.alert.displayMessage("Port opened");
+      context.sender.sendWaypointList();
 
       refreshButton.setEnabled(false);
       dropDown.setEnabled(false);
     } catch(SerialPortException ex){
       System.err.println(ex.getMessage());
-      AlertPanel.displayMessage(ex.getMessage());
-      AlertPanel.displayMessage("Connection Failed");
+      context.alert.displayMessage(ex.getMessage());
+      context.alert.displayMessage("Connection Failed");
       return false;
     }
     return true;
@@ -216,19 +215,16 @@ public class Dashboard implements Runnable {
 
   private boolean disconnectSerial(){
     try{
-      if(serialPort != null) serialPort.closePort();
+      context.closePort();
     } catch(SerialPortException ex){
       System.err.println(ex.getMessage());
-      AlertPanel.displayMessage(ex.getMessage());
+      context.alert.displayMessage(ex.getMessage());
       return false;
     }
 
     dropDown.setEnabled(true);
     refreshButton.setEnabled(true);
-    Serial.connection = false;
-    serialParser.stop();
-    serialSender.stop();
-    AlertPanel.displayMessage("Serial Port Closed");
+    context.alert.displayMessage("Serial Port Closed");
     resetData();
     return true;
   }
@@ -307,37 +303,33 @@ public class Dashboard implements Runnable {
   public void updateDash(byte id){
     switch(id){
       case Serial.LATITUDE_MSG:
-        latitude.update(Serial.data[id]);
-        mapPanel.updateRoverLatitude((double)Serial.data[id]);
+        latitude.update(context.data[id]);
+        mapPanel.updateRoverLatitude((double)context.data[id]);
         break;
       case Serial.LONGITUDE_MSG:
-        longitude.update(Serial.data[id]);
-        mapPanel.updateRoverLongitude((double)Serial.data[id]);
+        longitude.update(context.data[id]);
+        mapPanel.updateRoverLongitude((double)context.data[id]);
         f.repaint();
         break;
       case Serial.HEADING_MSG:
-        heading.update(Serial.data[id]);
-        topGauge.update(Serial.data[id]+90);
+        heading.update(context.data[id]);
+        topGauge.update(context.data[id]+90);
         break;
       case Serial.PITCH_MSG:
-        pitch.update(Serial.data[id]-90);
-        sideGauge.update(Serial.data[id]-90);
+        pitch.update(context.data[id]-90);
+        sideGauge.update(context.data[id]-90);
         break;
       case Serial.ROLL_MSG:
-        roll.update(Serial.data[id]-90);
-        frontGauge.update(Serial.data[id]-90);
+        roll.update(context.data[id]-90);
+        frontGauge.update(context.data[id]-90);
         break;
       case Serial.SPEED_MSG:
-        speed.update(Serial.data[id]);
+        speed.update(context.data[id]);
         break;
       case Serial.VOLTAGE_MSG:
-        voltage.update(Serial.data[id]);
+        voltage.update(context.data[id]);
         break;
     }
-  }
-
-  public static void sendWaypointList(){
-    serialSender.sendWaypointList(mapPanel);
   }
 
   public static void DisplayError(Exception e){

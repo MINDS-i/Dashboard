@@ -4,6 +4,7 @@ import com.Dashboard;
 import com.map.Dot;
 import com.map.MapPanel;
 import com.ui.AlertPanel;
+import com.Context;
 import jssc.SerialPort;
 import jssc.SerialPortException;
 import java.util.Arrays;
@@ -20,8 +21,10 @@ public class SerialSender{
 	private int waypointListPosition;
 	private int waypointListWaitingCode;
 	private MapPanel mapPanel;
+	private Context context;
 
-	public SerialSender(){
+	public SerialSender(Context cxt){
+		context = cxt;
 		setup();
 	}
 
@@ -38,7 +41,7 @@ public class SerialSender{
 							if(msg.numberOfFailures() >= Serial.MAX_FAILURES){
 								i.remove();
 								System.err.println("Message Failed to send repeatedly; connection bad");
-								AlertPanel.displayMessage("Connection failed; Rover unware of "+msg.describeSelf()+"!");
+								context.alert.displayMessage("Connection failed; Rover unware of "+msg.describeSelf()+"!");
 							} else {
 								resendMessage(msg);
 							}
@@ -51,8 +54,7 @@ public class SerialSender{
 		timer.scheduleAtFixedRate(checkTask, 1000, 100);
 	}
 
-	public void updatePort(SerialPort inStream){
-		port = inStream;
+	public void start(){
 		if(timer == null){
 			setup();
 		}
@@ -62,7 +64,6 @@ public class SerialSender{
 		timer.purge();
 		timer.cancel();
 		timer = null;
-		port = null;
 	}
 
 	public void addPendingConfirm(Message msg){
@@ -73,40 +74,40 @@ public class SerialSender{
 
 
 	public void sendMessage(Message msg){
-		if(port != null){
+		if(context.connected){
 			try{
-				port.writeBytes(Serial.HEADER);
-				port.writeBytes(msg.content);
-				port.writeBytes(Serial.FOOTER);
+				context.port().writeBytes(Serial.HEADER);
+				context.port().writeBytes(msg.content);
+				context.port().writeBytes(Serial.FOOTER);
 				msg.sendTime(new Date());
 				if(msg.needsConfirm())
 					synchronized(lock){ pendingConfirm.add(msg); }
 
 				System.err.println("Message " + Integer.toHexString(msg.confirmSum) + " Sent");
-				AlertPanel.displayMessage("Data for "+msg.describeSelf()+" Sent");
+				context.alert.displayMessage("Data for "+msg.describeSelf()+" Sent");
 			} catch (SerialPortException ex){
 				System.err.println(ex.getMessage());
-				AlertPanel.displayMessage(ex.getMessage());
+				context.alert.displayMessage(ex.getMessage());
 			}
 		}
 	}
 
 	public void resendMessage(Message msg){
-		if(port != null){
+		if(context.connected){
 			try{
-				port.writeBytes(Serial.HEADER);
-				port.writeBytes(msg.content);
-				port.writeBytes(Serial.FOOTER);
+				context.port().writeBytes(Serial.HEADER);
+				context.port().writeBytes(msg.content);
+				context.port().writeBytes(Serial.FOOTER);
 				msg.addFailure();
 				msg.sendTime(new Date());
 
 				System.out.print("Message resent; ");
 				System.out.print(Integer.toHexString(msg.confirmSum));
 				System.out.println(" needed");
-				AlertPanel.displayMessage("No response to "+msg.describeSelf()+" resend #"+msg.numberOfFailures());
+				context.alert.displayMessage("No response to "+msg.describeSelf()+" resend #"+msg.numberOfFailures());
 			} catch (SerialPortException ex){
 				System.err.println(ex.getMessage());
-				AlertPanel.displayMessage(ex.getMessage());
+				context.alert.displayMessage(ex.getMessage());
 			}
 		}
 	}
@@ -120,15 +121,14 @@ public class SerialSender{
 				Message msg = i.next();
 				if(msg.isConfirmedBy(confirm)){
 					i.remove();
-					AlertPanel.displayMessage(msg.describeSelf()+" Confirmed after "+msg.numberOfFailures()+" tries");
+					context.alert.displayMessage(msg.describeSelf()+" Confirmed after "+msg.numberOfFailures()+" tries");
 					break;
 				}
 			}
 		}
 	}
 
-	public void sendWaypointList(MapPanel panel){
-		mapPanel = panel;
+	public void sendWaypointList(){
 		sendingWaypointList = true;
 		waypointListPosition = 0;
 		Message msg = new Message(Serial.CLEAR_WAYPOINT_MSG, new Dot(), (byte)0);
@@ -138,14 +138,16 @@ public class SerialSender{
 
 	private void advanceWaypointList(int confirm){
 		if(confirm == waypointListWaitingCode){
-			if(waypointListPosition < mapPanel.numDot()){
-				Message msg = new Message( Serial.ADD_WAYPOINT_MSG, mapPanel.getDot(waypointListPosition), (byte)waypointListPosition);
+			if(waypointListPosition < context.waypoint.size()){
+				Message msg = new Message( Serial.ADD_WAYPOINT_MSG,
+									context.waypoint.get(waypointListPosition),
+									(byte)waypointListPosition);
 				sendMessage(msg);
 				waypointListWaitingCode = msg.getConfirmSum();
 			} else {
 				for(byte id=0; id<Serial.NUM_DATA_SLOTS; id++){
-					if(Serial.data[id]==0) continue;
-					Message msg = new Message( id , Serial.data[id] );
+					if(context.data[id]==0) continue;
+					Message msg = new Message( id , context.data[id] );
 					sendMessage(msg);
 				}
 				sendingWaypointList = false;

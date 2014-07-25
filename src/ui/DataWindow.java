@@ -2,6 +2,7 @@ package com.ui;
 import com.Dashboard;
 import com.serial.*;
 import com.Logger;
+import com.Context;
 
 import java.awt.*;
 import java.awt.FlowLayout;
@@ -22,14 +23,16 @@ public class DataWindow implements ActionListener{
 	dataTableModel  model;
 	JScrollPane 	scroll;
 	java.util.Timer update;
-	public DataWindow(){
+	Context 		context;
+	public DataWindow(Context cxt){
+		context = cxt;
 		frame = new JFrame("Data");
 		panel = new JPanel();
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     	frame.setLayout(new FlowLayout());
     	frame.setVisible(true);
 		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-		model  = new dataTableModel();
+		model  = new dataTableModel(context);
 		table  = new JTable(model);
 		scroll = new JScrollPane(table);
 
@@ -57,7 +60,7 @@ public class DataWindow implements ActionListener{
 
 		logInput = new JTextField();
 		logInput.addActionListener(this);
-		logInput.setText(Integer.toString(Dashboard.logWriter.getLogPeriod()));
+		logInput.setText(Integer.toString(context.log.getLogPeriod()));
 		logInput.setColumns(8);
 
 		logPanel.add(label);
@@ -68,7 +71,7 @@ public class DataWindow implements ActionListener{
 		update.scheduleAtFixedRate(new TimerTask(){
 				public void run(){
 					if(model == null) return;
-					if(Serial.connection){
+					if(context.connected){
 						model.fireTableRowsUpdated(0, Serial.NUM_DATA_SLOTS);
 					}
 				}
@@ -80,15 +83,20 @@ public class DataWindow implements ActionListener{
 	    try {
       		input = Integer.parseInt(inputText);
       		logInput.setText(Integer.toString(input));
-      		Dashboard.logWriter.setLogPeriod(input);
+      		context.log.setLogPeriod(input);
 		} catch (NumberFormatException e) {
-			logInput.setText(Integer.toString(Dashboard.logWriter.getLogPeriod()));
+			logInput.setText(Integer.toString(context.log.getLogPeriod()));
 		}
 	}
 }
 
 class dataTableModel extends AbstractTableModel{
 	public static final String[] COL_NAMES = {"ID", "Log", "Value"};
+	private Context context;
+
+	public dataTableModel(Context cxt){
+		context = cxt;
+	}
 
 	public int getColumnCount() {
         return COL_NAMES.length;
@@ -104,9 +112,9 @@ class dataTableModel extends AbstractTableModel{
     		case 0:
     			return row;
     		case 1:
-    			return Logger.isLogged[row];
+    			return context.isLogged[row];
     		case 2:
-    			return Serial.data[row];
+    			return context.data[row];
     		default:
     			return false;
     	}
@@ -130,12 +138,11 @@ class dataTableModel extends AbstractTableModel{
         switch(col){
         	case 1:
         		if(value.getClass()==Boolean.class)
-        			Logger.isLogged[row] = (boolean)value;
+        			context.isLogged[row] = (boolean)value;
         		break;
         	case 2:
         		if(value.getClass()==Float.class){
-        			Message msg = new Message((byte)row, (float)value);
-        			Dashboard.serialSender.sendMessage(msg);
+        			context.updateData((byte)row, (float)value);
         		}
         		break;
         }

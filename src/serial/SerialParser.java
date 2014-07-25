@@ -5,6 +5,7 @@ import com.map.Dot;
 import com.map.MapPanel;
 import com.serial.Serial;
 import com.ui.AlertPanel;
+import com.Context;
 import jssc.SerialPort;
 import jssc.SerialPortException;
 import jssc.SerialPortEventListener;
@@ -15,38 +16,32 @@ import java.awt.*;
 
 public class SerialParser implements SerialPortEventListener{
 	Dashboard parent;
-	SerialPort port;
 	SerialSender sender;
 	byte[] buffer;
 	byte bufPos = 0;
+	Context context;
 	static int BUFLEN = 25;
 
-	public SerialParser(Dashboard inParent, SerialSender inSender){
-		parent = inParent;
-		sender = inSender;
+	public SerialParser(Context cxt){
+		context = cxt;
 		buffer = new byte[BUFLEN];
 	}
 
-	public void updatePort(SerialPort inStream){
-		port = inStream;
+	public void updatePort(){
 		try{
-			port.addEventListener(this);
+			context.port().addEventListener(this);
 		} catch(SerialPortException ex) {
 			System.err.println(ex.getMessage());
-      		AlertPanel.displayMessage(ex.getMessage());
+      		context.alert.displayMessage(ex.getMessage());
 		}
 	}
 
-	public void stop(){
-		port = null;
-	}
-
 	synchronized public void serialEvent(SerialPortEvent serialEvent){
-		if(port == null) return;
+		if(context.port() == null) return;
 		try{
 			byte tmp;
-			while(port.getInputBufferBytesCount()>0){
-				tmp = (byte)port.readBytes(1)[0];
+			while(context.port().getInputBufferBytesCount()>0){
+				tmp = (byte)context.port().readBytes(1)[0];
 				buffer[bufPos] = tmp;
 				bufPos++;
 				if(bufPos >= BUFLEN) bufPos = 0;
@@ -60,7 +55,7 @@ public class SerialParser implements SerialPortEventListener{
 			}
 		} catch(SerialPortException ex) {
 			System.err.println(ex.getMessage());
-			AlertPanel.displayMessage(ex.getMessage());
+			context.alert.displayMessage(ex.getMessage());
 		}
 	}
 
@@ -83,13 +78,15 @@ public class SerialParser implements SerialPortEventListener{
 				case Serial.DELETE_WAYPOINT_MSG:
 				case Serial.CLEAR_WAYPOINT_MSG:
 					handleWaypoint(msg);
-					sender.sendMessage(new Message(Serial.fletcher16(msg,msg.length)));
+					context.sender.sendMessage(
+								new Message(Serial.fletcher16(msg,msg.length)));
 					break;
 				case Serial.CONFIRMATION_MSG:
-					sender.notifyOfConfirm( (msg[1]&0xff)<<8 | (msg[2]&0xff) );
+					context.sender.notifyOfConfirm(
+											(msg[1]&0xff)<<8 | (msg[2]&0xff) );
 					break;
 				case Serial.REQUEST_RESYNC:
-					parent.sendWaypointList();
+					context.sender.sendWaypointList();
 					break;
 				default:
 					break;
@@ -113,8 +110,8 @@ public class SerialParser implements SerialPortEventListener{
 							((message[5]&0xff)    ) );
 		tmp /= Serial.FIXED_POINT_FACTOR;
 
-		Serial.data[id] = tmp;
-		parent.updateDash(id);
+		context.data[id] = tmp;
+		context.dash.updateDash(id);
 	}
 
 	private void handleWaypoint(byte[] message){
@@ -135,13 +132,13 @@ public class SerialParser implements SerialPortEventListener{
 		byte position = message[11];
 		switch(type){
 			case Serial.ADD_WAYPOINT_MSG:
-				parent.mapPanel.addDot(longitude, latitude, position);
+				context.waypoint.add(longitude, latitude, position);
 				break;
 			case Serial.CHANGE_WAYPOINT_MSG:
-				parent.mapPanel.getDot(position).setLocation(new Point.Double(longitude, latitude));
+				context.waypoint.get(position).setLocation(new Point.Double(longitude, latitude));
 				break;
 			case Serial.DELETE_WAYPOINT_MSG:
-				parent.mapPanel.removeDot(position);
+				context.waypoint.remove(position);
 				break;
 		}
 	}

@@ -7,6 +7,8 @@ import com.map.Dot;
 import com.serial.*;
 import com.ui.DataWindow;
 import com.xml;
+import com.ContextViewer;
+import com.Context;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -17,27 +19,34 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.xml.stream.XMLStreamException;
 
-class WaypointPanel extends JPanel {
+class WaypointPanel extends JPanel implements ContextViewer{
 	protected static final int MOVE_STEP = 32;
 	protected static final String NO_WAYPOINT_MSG = "N / A";
 	protected static final String COPY_RIGHT_TEXT = "Map Tiles Courtesy of MapQuest" +
 		"\nStreet Data from OpenStreetMap\nPortions Courtesy NASA/JPL-Caltech" +
 		"and U.S. Depart. of Agriculture, Farm Service Agency";
 	private int selectedWaypoint = 0;
-	private MapPanel parent;
+	private Context context;
+	private MapPanel map;
 	JTextField latitude;
 	JTextField longitude;
 	JTextField altitude;
 	JLabel waypointIndexDisplay;
 
-	public WaypointPanel(MapPanel creator) {
-		parent = creator;
+	public WaypointPanel(Context cxt, MapPanel mapPanel) {
+		map = mapPanel;
+		context = cxt;
+		context.registerViewer(this);
 		setOpaque(false);
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
 		buildPanel();
 
 		this.setPreferredSize(new Dimension(152,368));
+	}
+
+	public void waypointUpdate(){
+		updateDisplay();
 	}
 
 	public int getSelectedWaypoint(){
@@ -50,10 +59,10 @@ class WaypointPanel extends JPanel {
 	}
 
 	public void updateDisplay(){
-		if (selectedWaypoint > parent.numDot()-1) selectedWaypoint = parent.numDot()-1;
+		if (selectedWaypoint > context.waypoint.size()-1) selectedWaypoint = context.waypoint.size()-1;
 		else if(selectedWaypoint < 0) selectedWaypoint = 0;
 
-		if(parent.numDot() == 0) {
+		if(context.waypoint.size() == 0) {
 			waypointIndexDisplay.setText(NO_WAYPOINT_MSG);
 			latitude .setText("");
 			longitude.setText("");
@@ -61,10 +70,10 @@ class WaypointPanel extends JPanel {
 			return;
 		}
 
-		String indexField = (selectedWaypoint+1) + " / " + (parent.numDot());
+		String indexField = (selectedWaypoint+1) + " / " + context.waypoint.size();
 		waypointIndexDisplay.setText(indexField);
-		if(selectedWaypoint >= 0 && selectedWaypoint < parent.numDot()) {
-			Dot dot = parent.getDot(selectedWaypoint);
+		if(selectedWaypoint >= 0 && selectedWaypoint < context.waypoint.size()) {
+			Dot dot = context.waypoint.get(selectedWaypoint);
 			latitude .setText(dot.getLatitude()+"");
 			latitude .setForeground(Color.BLACK);
 			longitude.setText(dot.getLongitude()+"");
@@ -174,10 +183,8 @@ class WaypointPanel extends JPanel {
 			Double newLongitude = Double.parseDouble(longitude.getText());
 			short  newAltitude  =  Short.parseShort (altitude.getText());
 			Point.Double newPosition = new Point.Double(newLongitude, newLatitude);
-			parent.changeDot(selectedWaypoint, newPosition, newAltitude);
-			parent.repaint();
+			context.waypoint.set(selectedWaypoint, newPosition, newAltitude);
 		} catch (NumberFormatException e) {}
-		updateDisplay();
 	}
 
 	public void paint(Graphics gOrig) {
@@ -211,7 +218,7 @@ class WaypointPanel extends JPanel {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			parent.zoomInAnimated(new Point(parent.getWidth() / 2, parent.getHeight() / 2));
+			map.zoomInAnimated(new Point(map.getWidth() / 2, map.getHeight() / 2));
 		}
 	};
 	private Action zoomOutAction = new AbstractAction() {
@@ -222,7 +229,7 @@ class WaypointPanel extends JPanel {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			parent.zoomOutAnimated(new Point(parent.getWidth() / 2, parent.getHeight() / 2));
+			map.zoomOutAnimated(new Point(map.getWidth() / 2, map.getHeight() / 2));
 		}
 	};
 
@@ -234,8 +241,8 @@ class WaypointPanel extends JPanel {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			parent.translateMapPosition(0, -MOVE_STEP);
-			parent.repaint();
+			map.translateMapPosition(0, -MOVE_STEP);
+			map.repaint();
 		}
 	};
 	private Action downAction = new AbstractAction() {
@@ -246,8 +253,8 @@ class WaypointPanel extends JPanel {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			parent.translateMapPosition(0, +MOVE_STEP);
-			parent.repaint();
+			map.translateMapPosition(0, +MOVE_STEP);
+			map.repaint();
 		}
 	};
 	private Action leftAction = new AbstractAction() {
@@ -258,8 +265,8 @@ class WaypointPanel extends JPanel {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			parent.translateMapPosition(-MOVE_STEP, 0);
-			parent.repaint();
+			map.translateMapPosition(-MOVE_STEP, 0);
+			map.repaint();
 		}
 	};
 	private Action rightAction = new AbstractAction() {
@@ -270,8 +277,8 @@ class WaypointPanel extends JPanel {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			parent.translateMapPosition(+MOVE_STEP, 0);
-			parent.repaint();
+			map.translateMapPosition(+MOVE_STEP, 0);
+			map.repaint();
 		}
 	};
 	private Action nextTileServer = new AbstractAction() {
@@ -285,10 +292,10 @@ class WaypointPanel extends JPanel {
 		}
 
 		public void actionPerformed(ActionEvent e){
-			parent.nextTileServer();
+			map.nextTileServer();
 			state = !state;
 			putValue(Action.NAME, (state)?satMSG:mapMSG);
-			parent.repaint();
+			map.repaint();
 		}
 	};
 	private Action toggleLooping = new AbstractAction(){
@@ -299,10 +306,9 @@ class WaypointPanel extends JPanel {
 		}
 
 		public void actionPerformed(ActionEvent e){
-			parent.setWaypointLooping(!parent.areWaypointsLooped());
+			context.waypoint.setLooped(!context.waypoint.isLooped());
 			putValue(Action.NAME,
-				(parent.areWaypointsLooped())? "Looping Off" : "Looping On");
-			parent.repaint();
+				(context.waypoint.isLooped())? "Looping Off" : "Looping On");
 		}
 	};
 	private Action previousWaypoint = new AbstractAction(){
@@ -314,7 +320,7 @@ class WaypointPanel extends JPanel {
 		public void actionPerformed(ActionEvent e){
 			setSelectedWaypoint(selectedWaypoint-1);
 			updateDisplay();
-			parent.repaint();
+			map.repaint();
 		}
 	};
 	private Action nextWaypoint = new AbstractAction(){
@@ -326,7 +332,7 @@ class WaypointPanel extends JPanel {
 		public void actionPerformed(ActionEvent e){
 			setSelectedWaypoint(selectedWaypoint+1);
 			updateDisplay();
-			parent.repaint();
+			map.repaint();
 		}
 	};
 	private Action saveWaypoints = new AbstractAction(){
@@ -338,7 +344,7 @@ class WaypointPanel extends JPanel {
 		}
 		public void actionPerformed(ActionEvent e){
 			try{
-				xml.writeXML();
+				xml.writeXML(context);
 			} catch (XMLStreamException ex){
 				System.err.println(ex.getMessage());
 			}
@@ -352,12 +358,11 @@ class WaypointPanel extends JPanel {
 		}
 		public void actionPerformed(ActionEvent e){
 			try{
-				xml.readXML();
+				xml.readXML(context);
 			} catch (XMLStreamException ex){
 				System.err.println(ex.getMessage());
 			}
-			updateDisplay();
-			parent.repaint();
+			context.waypointUpdated();
 		}
 	};
 	private Action interpretLocationAction = new AbstractAction(){
@@ -375,7 +380,7 @@ class WaypointPanel extends JPanel {
 			putValue(Action.NAME, text);
 		}
 		public void actionPerformed(ActionEvent e){
-			parent.sendMessage(new Message(Serial.TARGET_INDEX, (float)selectedWaypoint));
+			context.waypoint.setTarget(selectedWaypoint);
 		}
 	};
 	private Action newWaypoint = new AbstractAction(){
@@ -384,7 +389,7 @@ class WaypointPanel extends JPanel {
 			putValue(Action.NAME, text);
 		}
 		public void actionPerformed(ActionEvent e){
-			parent.addDot( new Dot(parent.getDot(selectedWaypoint)), selectedWaypoint );
+			context.waypoint.add( new Dot(context.waypoint.get(selectedWaypoint)), selectedWaypoint );
 		}
 	};
 	private Action openDataPanel = new AbstractAction(){
@@ -393,7 +398,7 @@ class WaypointPanel extends JPanel {
 			putValue(Action.NAME, text);
 		}
 		public void actionPerformed(ActionEvent e){
-			final DataWindow window = new DataWindow();
+			final DataWindow window = new DataWindow(context);
 		}
 	};
 }

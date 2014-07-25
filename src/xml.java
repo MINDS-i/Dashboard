@@ -2,6 +2,7 @@ package com;
 
 import com.Dashboard;
 import com.map.*;
+import com.Context;
 
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -28,7 +29,7 @@ public class xml{
 		return "";
 	}
 
-	public static void writeXML() throws XMLStreamException{
+	public static void writeXML(Context context) throws XMLStreamException{
 		FileWriter outputStream;
 		try{
 			String fileName = getFileName("Choose a file to save");
@@ -54,14 +55,14 @@ public class xml{
 		writer.writeStartElement(URI, "rte");
 		writer.writeCharacters("\n");
 
-		MapPanel p = Dashboard.mapPanel;
-		for(int i=0; i<p.numDot(); i++){
+		WaypointList p = context.waypoint;
+		for(int i=0; i<p.size(); i++){
 			writer.writeStartElement(URI, "rtept");
-			writer.writeAttribute("lat", Double.toString(p.getDot(i).getLatitude ()));
-			writer.writeAttribute("lng", Double.toString(p.getDot(i).getLongitude()));
+			writer.writeAttribute("lat", Double.toString(p.get(i).getLatitude ()));
+			writer.writeAttribute("lng", Double.toString(p.get(i).getLongitude()));
 			writer.writeCharacters("\n");
 			writer.writeStartElement(URI, "ele");
-			writer.writeCharacters(Double.toString(p.getDot(i).getAltitude()/3.28084));//feet to meters
+			writer.writeCharacters(Double.toString(p.get(i).getAltitude()/3.28084));//feet to meters
 			writer.writeEndElement();// /ele
 			writer.writeCharacters("\n");
 			writer.writeEndElement();// /rtept
@@ -79,14 +80,14 @@ public class xml{
 		}
 	}
 
-	public static void readXML() throws XMLStreamException{
-		Dot 			pnt = new Dot();
-		Vector<Dot>     rte = new Vector<Dot>();
-		Vector<Vector>  routes = new Vector<Vector>();
-		XMLInputFactory factory = XMLInputFactory.newInstance();
-		String 			data = new String();
-		XMLStreamReader reader;
-		FileReader 		inputStream;
+	public static void readXML(Context context) throws XMLStreamException{
+		Dot 				 pnt = new Dot();
+		Vector<Dot>     	 list = new Vector<Dot>();
+		Vector<Vector>       routes = new Vector<Vector>();
+		XMLInputFactory 	 factory = XMLInputFactory.newInstance();
+		String 				 data = new String();
+		XMLStreamReader 	 reader;
+		FileReader 			 inputStream;
 		try{
 			inputStream = new FileReader(getFileName("Choose file to open"));
 		} catch (IOException ex) {
@@ -104,7 +105,7 @@ public class xml{
 				case XMLStreamConstants.START_ELEMENT:
 					switch(reader.getLocalName()){
 						case "rte":
-							rte = new Vector<Dot>();
+							list = new Vector<Dot>();
 							break;
 						case "rtept":
 							double lat = Double.parseDouble(reader.getAttributeValue(0));
@@ -121,12 +122,12 @@ public class xml{
 				case XMLStreamConstants.END_ELEMENT:
 					switch(reader.getLocalName()){
 						case "rte":
-							if(rte == null || routes == null) continue;
-							routes.add(rte);
+							if(list == null || routes == null) continue;
+							routes.add(list);
 							break;
 						case "rtept":
-							if(pnt == null || rte == null) continue;
-							rte.add(pnt);
+							if(pnt == null || list == null) continue;
+							list.add(pnt);
 							break;
 						case "ele":
 							if(pnt == null) continue;
@@ -167,8 +168,8 @@ public class xml{
 		}
 
 		//set mapPanel points to new points
-		Dashboard.mapPanel.overWriteDots( (Vector<Dot>)routes.get(selection) );
-		Dashboard.sendWaypointList();
+		context.waypoint.swap(routes.get(selection));
+		context.sender.sendWaypointList();
 	}
 
 }
