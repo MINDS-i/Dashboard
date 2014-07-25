@@ -78,7 +78,9 @@ public class Context{
 		toUpdate.remove(viewer);
 	}
 	public void updateData(int index, float value){
+		if(index < 0 || index >= Serial.NUM_DATA_SLOTS) return;
 		data[index] = value;
-		//send message here
+		Message msg = new Message((byte)index, value);
+		sender.sendMessage(msg);
 	}
 }
