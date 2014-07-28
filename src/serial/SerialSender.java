@@ -61,8 +61,10 @@ public class SerialSender{
 	}
 
 	public void stop(){
-		timer.purge();
-		timer.cancel();
+		if(timer != null){
+			timer.purge();
+			timer.cancel();
+		}
 		timer = null;
 	}
 
@@ -84,7 +86,7 @@ public class SerialSender{
 					synchronized(lock){ pendingConfirm.add(msg); }
 
 				System.err.println("Message " + Integer.toHexString(msg.confirmSum) + " Sent");
-				context.alert.displayMessage("Data for "+msg.describeSelf()+" Sent");
+				context.alert.displayMessage(msg.describeSelf()+" Sent");
 			} catch (SerialPortException ex){
 				System.err.println(ex.getMessage());
 				context.alert.displayMessage(ex.getMessage());
@@ -104,7 +106,9 @@ public class SerialSender{
 				System.out.print("Message resent; ");
 				System.out.print(Integer.toHexString(msg.confirmSum));
 				System.out.println(" needed");
-				context.alert.displayMessage("No response to "+msg.describeSelf()+" resend #"+msg.numberOfFailures());
+				context.alert.displayMessage(
+										"No response to "+msg.describeSelf()
+									   +" resend #"+msg.numberOfFailures());
 			} catch (SerialPortException ex){
 				System.err.println(ex.getMessage());
 				context.alert.displayMessage(ex.getMessage());
@@ -121,7 +125,9 @@ public class SerialSender{
 				Message msg = i.next();
 				if(msg.isConfirmedBy(confirm)){
 					i.remove();
-					context.alert.displayMessage(msg.describeSelf()+" Confirmed after "+msg.numberOfFailures()+" tries");
+					context.alert.displayMessage(
+										msg.describeSelf()+" Confirmed after "
+										+msg.numberOfFailures()+" tries");
 					break;
 				}
 			}
@@ -131,7 +137,7 @@ public class SerialSender{
 	public void sendWaypointList(){
 		sendingWaypointList = true;
 		waypointListPosition = 0;
-		Message msg = new Message(Serial.CLEAR_WAYPOINT_MSG, new Dot(), (byte)0);
+		Message msg = new Message(Serial.CLEAR_WAYPOINT_MSG, new Dot(),(byte)0);
 		sendMessage(msg);
 		waypointListWaitingCode = msg.getConfirmSum();
 	}

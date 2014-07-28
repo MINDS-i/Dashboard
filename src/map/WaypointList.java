@@ -36,7 +36,7 @@ public class WaypointList{
             newDot.setAltitude(context.waypoint.get(index-1).getAltitude());
         }
         waypoints.insertElementAt(newDot, index);
-        sendWaypoint((byte)index, Serial.ADD_WAYPOINT_MSG);
+        sendWaypoint((byte)(index&0xff), Serial.ADD_WAYPOINT_MSG);
         context.waypointUpdated();
 	}
 	public void set(int index, Point.Double newPosition){
@@ -45,17 +45,20 @@ public class WaypointList{
 	public void set(int index, Point.Double newPosition, short alt){
 		if(index < 0 || index >= waypoints.size()) return;
 		waypoints.get(index).setLocation(newPosition, alt);
-		sendWaypoint((byte)index, Serial.CHANGE_WAYPOINT_MSG);
+		sendWaypoint((byte)(index&0xff), Serial.CHANGE_WAYPOINT_MSG);
 		context.waypointUpdated();
 	}
 	public void remove(int index){
 		if(index < 0 || index >= waypoints.size()) return;
+		sendWaypoint((byte)(index&0xff), Serial.DELETE_WAYPOINT_MSG);
 		waypoints.remove(index);
-		sendWaypoint((byte)index, Serial.DELETE_WAYPOINT_MSG);
 		context.waypointUpdated();
 	}
 	public Dot get(int index){
 		return waypoints.get(index);
+	}
+	public Dot get(byte index){
+		return waypoints.get((index&0xff));
 	}
 	public int size(){
 		return waypoints.size();
@@ -91,9 +94,15 @@ public class WaypointList{
             context.sender.sendMessage(msg);
         }
 	}
-	private void sendWaypoint(int index, byte label){
+	public void sendWaypoint(byte index, byte label){
 		if(context.connected){
-		    Message msg = new Message(label, waypoints.get(index), (byte)index);
+		    Message msg = new Message(label, waypoints.get(index), (byte)(index&0xff));
+		    context.sender.sendMessage(msg);
+		}
+	}
+	public void sendWaypoint(int index, byte label){
+		if(context.connected){
+		    Message msg = new Message(label, waypoints.get(index), (byte)(index&0xff));
 		    context.sender.sendMessage(msg);
 		}
 	}

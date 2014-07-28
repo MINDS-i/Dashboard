@@ -60,7 +60,7 @@ public class MapPanel extends JPanel implements ContextViewer {
     private static final int ANIMATION_FPS = 15, ANIMATION_DURARTION_MS = 500;
 
     private static final int TILE_SIZE = 256;
-    private static final int CACHE_SIZE = 256;
+    private static final int CACHE_SIZE = 64;
     private static final int MAGNIFIER_SIZE = 100;
 
     private static final Color ACTIVE_LINE_FILL =  new Color(1.f,1.f,0.f,1f);
@@ -1056,9 +1056,9 @@ public class MapPanel extends JPanel implements ContextViewer {
 
         public void mouseReleased(MouseEvent e) {
             handleDrag(e);
-/*            if(downDot != -1){
-                changeDot(downDot, null);
-            }*/
+            if(downDot != -1){
+                context.waypoint.sendWaypoint(downDot, Serial.CHANGE_WAYPOINT_MSG);
+            }
         }
 
         public void mouseClicked(MouseEvent e) {

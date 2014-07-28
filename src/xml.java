@@ -108,8 +108,17 @@ public class xml{
 							list = new Vector<Dot>();
 							break;
 						case "rtept":
-							double lat = Double.parseDouble(reader.getAttributeValue(0));
-							double lng = Double.parseDouble(reader.getAttributeValue(1));
+							double lat, lng;
+							try {
+								lat = Double.parseDouble(reader.getAttributeValue(0));
+							} catch (NumberFormatException | NullPointerException e) {
+								lat = 0;
+							}
+							try {
+								lng = Double.parseDouble(reader.getAttributeValue(1));
+							} catch (NumberFormatException | NullPointerException e) {
+								lng = 0;
+							}
 							pnt = new Dot(lat,lng,(short)0);
 							break;
 						case "ele":
@@ -131,8 +140,12 @@ public class xml{
 							break;
 						case "ele":
 							if(pnt == null) continue;
-							//convert meters to feet
-							pnt.setAltitude((short) (Double.parseDouble(data)*3.28084) );
+							try {
+								//convert meters to feet
+								pnt.setAltitude((short) (Double.parseDouble(data)*3.28084) );
+							} catch (NumberFormatException | NullPointerException e) {
+								pnt.setAltitude((short)0);
+							}
 							break;
 					}
 					break;
@@ -171,5 +184,4 @@ public class xml{
 		context.waypoint.swap(routes.get(selection));
 		context.sender.sendWaypointList();
 	}
-
 }
