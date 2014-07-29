@@ -22,6 +22,7 @@ public class Context{
 	public boolean         connected;
 	public boolean         isLogged[] = new boolean[Serial.NUM_DATA_SLOTS];
 	public float           data[]     = new float  [Serial.NUM_DATA_SLOTS];
+	public Theme		   theme;
 
 	private SerialPort				port;
 	private Vector<ContextViewer> 	toUpdate;
@@ -38,7 +39,8 @@ public class Context{
 						SerialParser serialParser,
 						WaypointList waypointList,
 						Logger       logger,
-						SerialPort   serialPort){
+						SerialPort   serialPort,
+						Theme 		 thm){
 		dash     = dashboard;
 		alert    = alertPanel;
 		sender   = serialSender;
@@ -46,6 +48,7 @@ public class Context{
 		waypoint = waypointList;
 		log      = logger;
 		port     = serialPort;
+		theme    = thm;
 	}
 
 

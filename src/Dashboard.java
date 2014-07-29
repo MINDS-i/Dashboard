@@ -29,17 +29,6 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 public class Dashboard implements Runnable {
-  BufferedImage gaugeBackground;
-  BufferedImage gaugeSide;
-  BufferedImage gaugeTop;
-  BufferedImage gaugeFront;
-  BufferedImage refreshImage;
-  BufferedImage gaugeRed;
-  BufferedImage gaugeSquare;
-  BufferedImage gaugeGlare;
-  BufferedImage logo;
-  Font digital;
-  Font ocr;
   JPanel serialPanel;
   JButton refreshButton;
   JButton connectButton;
@@ -63,7 +52,7 @@ public class Dashboard implements Runnable {
   @Override
   public void run() {
     try{
-      logo = ImageIO.read(new File("./data/startup-logo.png"));
+      BufferedImage logo = ImageIO.read(new File("./data/startup-logo.png"));
       loading = new Frame("MINDS-i Loading Box");
       loading.setUndecorated(true);
       loading.setBackground(new Color(0,0,0,0));
@@ -73,33 +62,18 @@ public class Dashboard implements Runnable {
       loading.setLocationRelativeTo(null);
       loading.setVisible(true);
 
-      refreshImage = ImageIO.read(
-              new File("./data/refresh.png"));
-      gaugeBackground = ImageIO.read(new File("./data/Gauge.png"));
-      gaugeSide = ImageIO.read(new File("./data/6x6-Side.png"));
-      gaugeTop = ImageIO.read(new File("./data/6x6-Top.png"));
-      gaugeFront = ImageIO.read(new File("./data/6x6-Front.png"));
-      gaugeRed = ImageIO.read(new File("./data/direction-arrow.png"));
-      gaugeSquare = ImageIO.read(new File("./data/screenWithGlare.png"));
-      gaugeGlare = ImageIO.read(new File("./data/gaugeGlare.png"));
-      ocr = Font.createFont(Font.TRUETYPE_FONT,
-                            new File("./data/ocr.ttf"));
-      digital = Font.createFont(Font.TRUETYPE_FONT,
-                                new File("./data/digital.ttf"));
-      ocr = ocr.deriveFont(13f);
-      digital = digital.deriveFont(36f);
-
       context = new Context();
+      Theme theme = new Theme("./data/");
       context.give(this,
-                   new AlertPanel(ocr),
+                   new AlertPanel(theme.ocr),
                    new SerialSender(context),
                    new SerialParser(context),
                    new WaypointList(context),
                    new Logger(context),
-                   null //serialPort
-                                        );
+                   null, //serialPort
+                   theme);
       InitUI();
-    } catch (IOException|FontFormatException e) {
+    } catch (IOException e) {
       DisplayError((Exception)e);
     }
   }
@@ -108,14 +82,14 @@ public class Dashboard implements Runnable {
     f = new JFrame("MINDS-i Dashboard");
     f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     f.setVisible(false);
-    f.setIconImage(gaugeTop);
+    f.setIconImage(context.theme.roverTop);
     f.setTitle("MINDS-i dashboard");
 
     Action refreshAction = new AbstractAction(){
       {
         String text = "Refresh";
         putValue(Action.SHORT_DESCRIPTION, text);
-        putValue(Action.SMALL_ICON, new ImageIcon(refreshImage));
+        putValue(Action.SMALL_ICON, new ImageIcon(context.theme.refreshImage));
       }
       public void actionPerformed(ActionEvent e) {
         dropDown.removeAllItems();
@@ -194,8 +168,8 @@ public class Dashboard implements Runnable {
                            SerialPort.DATABITS_8,
                            SerialPort.STOPBITS_1,
                            SerialPort.PARITY_NONE);
-      serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN
-                                    | SerialPort.FLOWCONTROL_RTSCTS_OUT);
+      serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN |
+                                    SerialPort.FLOWCONTROL_RTSCTS_OUT);
       System.err.println("Flow Control mode: "+serialPort.getFlowControlMode());
 
       context.updatePort(serialPort);
@@ -231,10 +205,16 @@ public class Dashboard implements Runnable {
 
   private JPanel makeDashPanel(){
     Color orange = new Color(255,155,30);
-    sideGauge = new RotatePanel(gaugeSide, gaugeBackground, gaugeGlare);
-    topGauge = new RotatePanel(gaugeTop, gaugeBackground, gaugeGlare);
-    frontGauge = new RotatePanel(gaugeFront, gaugeBackground, gaugeGlare);
-    BackgroundPanel dataPanel = new BackgroundPanel(gaugeSquare);
+    sideGauge  = new RotatePanel(context.theme.roverSide,
+                                 context.theme.gaugeBackground,
+                                 context.theme.gaugeGlare);
+    topGauge   = new RotatePanel(context.theme.roverTop,
+                                 context.theme.gaugeBackground,
+                                 context.theme.gaugeGlare);
+    frontGauge = new RotatePanel(context.theme.roverFront,
+                                 context.theme.gaugeBackground,
+                                 context.theme.gaugeGlare);
+    BackgroundPanel dataPanel = new BackgroundPanel(context.theme.gaugeSquare);
     GridBagConstraints c = new GridBagConstraints();
     JPanel dashPanel = new JPanel();
 
@@ -245,31 +225,31 @@ public class Dashboard implements Runnable {
     dataPanel.setLayout(new BoxLayout(dataPanel, BoxLayout.PAGE_AXIS));
     latitude = new DataLabel("Lat:");
     latitude.setForeground(orange);
-    latitude.setFont(ocr);
+    latitude.setFont(context.theme.ocr);
     dataPanel.add(latitude);
     longitude = new DataLabel("Lng:");
     longitude.setForeground(orange);
-    longitude.setFont(ocr);
+    longitude.setFont(context.theme.ocr);
     dataPanel.add(longitude);
     heading = new DataLabel("Dir:");
     heading.setForeground(orange);
-    heading.setFont(ocr);
+    heading.setFont(context.theme.ocr);
     dataPanel.add(heading);
     pitch = new DataLabel("Ptc:");
     pitch.setForeground(orange);
-    pitch.setFont(ocr);
+    pitch.setFont(context.theme.ocr);
     dataPanel.add(pitch);
     roll = new DataLabel("Rol:");
     roll.setForeground(orange);
-    roll.setFont(ocr);
+    roll.setFont(context.theme.ocr);
     dataPanel.add(roll);
     speed = new DataLabel("MPH:");
     speed.setForeground(orange);
-    speed.setFont(ocr);
+    speed.setFont(context.theme.ocr);
     dataPanel.add(speed);
     voltage = new DataLabel("Vcc:");
     voltage.setForeground(orange);
-    voltage.setFont(ocr);
+    voltage.setFont(context.theme.ocr);
     dataPanel.add(voltage);
     dataPanel.setOpaque(false);
 

@@ -87,11 +87,6 @@ public class MapPanel extends JPanel implements ContextViewer {
     private int smoothOffset = 0;
     private Point smoothPosition, smoothPivot;
 
-    private BufferedImage waypointSelected;
-    private BufferedImage waypointImage;
-    private BufferedImage lineSegment;
-    private BufferedImage roverImage;
-
     private Dot rover = new Dot();
     private Context context;
 
@@ -132,15 +127,6 @@ public class MapPanel extends JPanel implements ContextViewer {
         setMapPosition(mapPosition);
         checkTileServers();
         checkActiveTileServer();
-
-        try{
-            roverImage       = ImageIO.read(new File("./data/auv-icon.png"));
-            waypointImage    = ImageIO.read(new File("./data/waypoint.png"));
-            waypointSelected = ImageIO.read(new File("./data/waypoint-green.png"));
-            lineSegment      = ImageIO.read(new File("./data/line.png"));
-        } catch(IOException e){
-            Dashboard.DisplayError(e);
-        }
     }
 
     public void waypointUpdate(){
@@ -396,12 +382,16 @@ public class MapPanel extends JPanel implements ContextViewer {
     public void updateRoverLongitude(double lng){
         rover.setLongitude(lng);
     }
-    public int isOverDot(Point p){
+    public int isOverDot(Point clk){
         for(int i=0; i<context.waypoint.size(); i++){
-            if(radialOverlap( computeScreenPosition(context.waypoint.get(i).getLocation()) , p ,
-                                                 waypointImage.getWidth()/2 )){
+/*            if(radialOverlap( computeScreenPosition(context.waypoint.get(i).getLocation()) , clk ,
+                                                 context.theme.waypointImage.getWidth()/2 )){
                 return i;
-            }
+            }*/
+            Point dot = computeScreenPosition(context.waypoint.get(i).getLocation());
+            if (Math.abs(clk.x-dot.x-1) > context.theme.waypointImage.getWidth ()/2) continue;
+            if (Math.abs(clk.y-dot.y-1) > context.theme.waypointImage.getHeight()/2) continue;
+            return i;
         }
         return -1;
     }
@@ -510,15 +500,15 @@ public class MapPanel extends JPanel implements ContextViewer {
         while(itr.hasNext()){
             tmp = computeScreenPosition( ((Dot)itr.next()).getLocation() );
             if(i++==waypointPanel.getSelectedWaypoint())
-                drawImg(g, waypointSelected, tmp);
+                drawImg(g, context.theme.waypointSelected, tmp);
             else
-                drawImg(g, waypointImage, tmp);
+                drawImg(g, context.theme.waypointImage, tmp);
         }
     }
 
     private void drawRover(Graphics g){
         Point roverPoint = computeScreenPosition(rover.getLocation());
-        drawImg(g, roverImage, roverPoint);
+        drawImg(g, context.theme.roverImage, roverPoint);
     }
 
     private void drowRoverLine(Graphics g){

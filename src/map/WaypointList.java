@@ -31,13 +31,13 @@ public class WaypointList{
 		add(tmp, index);
 	}
 	public void add(Dot newDot, int index){
-        if(waypoints.size()>= Serial.MAX_WAYPOINTS) return;
-        if(newDot.getAltitude()==0 && index > 0) {
-            newDot.setAltitude(context.waypoint.get(index-1).getAltitude());
-        }
-        waypoints.insertElementAt(newDot, index);
-        sendWaypoint((byte)(index&0xff), Serial.ADD_WAYPOINT_MSG);
-        context.waypointUpdated();
+		if(waypoints.size()>= Serial.MAX_WAYPOINTS) return;
+		if(newDot.getAltitude()==0 && index > 0) {
+			newDot.setAltitude(context.waypoint.get(index-1).getAltitude());
+		}
+		waypoints.insertElementAt(newDot, index);
+		sendWaypoint((byte)(index&0xff), Serial.ADD_WAYPOINT_MSG);
+		context.waypointUpdated();
 	}
 	public void set(int index, Point.Double newPosition){
 		set(index, newPosition, waypoints.get(index).getAltitude());
