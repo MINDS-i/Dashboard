@@ -3,33 +3,77 @@ package com.serial;
 import jssc.SerialPort;
 
 public class Serial{
-	public static final int   MAX_WAYPOINTS 		= 200;
-	public static final int   BAUD 					= SerialPort.BAUDRATE_9600;
-	public static final int   MAX_CONFIRM_WAIT 		= 2000; //in milliseconds
-	public static final int   MAX_FAILURES 			= 6;
-	public static final int   NUM_DATA_SLOTS        = 32;
-	public static final float FIXED_POINT_FACTOR 	= 0x100000;
+	public enum messageType{
+		STANDARD(0),
+		SETTINGS(1),
+		WAYPOINT(2),
+		PROTOCOL(3);
+		private static final byte bitValue;
+		public byte getValue(){ return bitValue; }
+		messageType(byte val){ bitValue = val; }
+	}
+	public enum standardSubtype{
+		TELEMETRY(0),
+		COMMAND(1);
+		private static final byte bitValue;
+		public byte getValue(){ return bitValue; }
+		standardSubtype(byte val){ bitValue = val; }
+	}
+	public enum waypointSubtype{
+		ADD(0),
+		ALTER(1),
+		DELETE(2);
+		private static final byte bitValue;
+		public byte getValue(){ return bitValue; }
+		waypointSubtype(byte val){ bitValue = val; }
+	}
+	public enum settingsSubtype{
+		SET(0),
+		POLL(1);
+		private static final byte bitValue;
+		public byte getValue(){ return bitValue; }
+		settingsSubtype(byte val){ bitValue = val; }
+	}
+	public enum protocolSubtype{
+		SYNC(0),
+		CONFIRM(1);
+		private static final byte bitValue;
+		public byte getValue(){ return bitValue; }
+		protocolSubtype(byte val){ bitValue = val; }
+	}
+	public enum telemetry{
+		LATITUDE(0),
+		LONGITUDE(1),
+		HEADING(2),
+		PITCH(3),
+		ROLL(4),
+		SPEED(5),
+		VOLTAGE(6);
+		private static final byte bitValue;
+		public byte getValue(){ return bitValue; }
+		telemetry(byte val){ bitValue = val; }
+	}
+	public enum commands{
+		ESTOP(0),
+		TARGET(1),
+		LOOPING(2),
+		CLEAR_WAYPOINTS(3);
+		private static final byte bitValue;
+		public byte getValue(){ return bitValue; }
+		commands(byte val){ bitValue = val; }
+	}
 
-	public static final boolean WAYPOINT_CONFIRM_REQ  = true;
-	public static final boolean DATA_CONFIRM_REQ  	  = false;
+	public static final int   MAX_WAYPOINTS		= 64;
+	public static final int   MAX_SETTINGS		= 32;
+	public static final int   MAX_TELEMETRY		= 8;
+	public static final int   BAUD				= SerialPort.BAUDRATE_9600;
 
-	public static final byte LATITUDE_MSG 	= 0x00;
-	public static final byte LONGITUDE_MSG 	= 0x01;
-	public static final byte HEADING_MSG 	= 0x02;
-	public static final byte PITCH_MSG 		= 0x03;
-	public static final byte ROLL_MSG 		= 0x04;
-	public static final byte SPEED_MSG 		= 0x05;
-	public static final byte VOLTAGE_MSG 	= 0x06;
-	public static final byte TARGET_INDEX 	= 0x07;
-	public static final byte LOOPING_TOGGLE	= 0x08;
+	public static final int   MAX_CONFIRM_WAIT	= 2000; //in milliseconds
+	public static final int   MAX_FAILURES		= 6;
 
-	public static final byte DATA_MSG			 = 0x00;
-	public static final byte ADD_WAYPOINT_MSG 	 = 0x10;
-	public static final byte CHANGE_WAYPOINT_MSG = 0x11;
-	public static final byte DELETE_WAYPOINT_MSG = 0x12;
-	public static final byte CLEAR_WAYPOINT_MSG  = 0x13;
-	public static final byte CONFIRMATION_MSG    = 0x20;
-	public static final byte REQUEST_RESYNC      = 0x30;
+	public static final boolean STANDARD_CONFIRM_REQ	= false;
+	public static final boolean SETTINGS_CONFIRM_REQ	= true;
+	public static final boolean WAYPOINT_CONFIRM_REQ	= true;
 
 	public static final byte[] HEADER = {0x13, 0x37};
 	public static final byte[] FOOTER = {0x7A };
