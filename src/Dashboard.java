@@ -280,34 +280,34 @@ public class Dashboard implements Runnable {
     voltage.update(0);
   }
 
-  public void updateDash(Serial.telemetry id){
+  public void updateDash(int id){
     switch(id){
-      case LATITUDE:
-        latitude.update(context.telemetry[id]);
-        mapPanel.updateRoverLatitude((double)context.telemetry[id]);
+      case Serial.LATITUDE:
+        latitude.update(context.getTelemetry(id));
+        mapPanel.updateRoverLatitude(context.getTelemetry(id));
         break;
-      case LONGITUDE:
-        longitude.update(context.telemetry[id]);
-        mapPanel.updateRoverLongitude((double)context.telemetry[id]);
+      case Serial.LONGITUDE:
+        longitude.update(context.getTelemetry(id));
+        mapPanel.updateRoverLongitude(context.getTelemetry(id));
         f.repaint();
         break;
-      case HEADING:
-        heading.update(context.telemetry[id]);
-        topGauge.update(context.telemetry[id]+90);
+      case Serial.HEADING:
+        heading.update(context.getTelemetry(id));
+        topGauge.update(context.getTelemetry(id)+90);
         break;
-      case PITCH:
-        pitch.update(context.telemetry[id]-90);
-        sideGauge.update(context.telemetry[id]-90);
+      case Serial.PITCH:
+        pitch.update(context.getTelemetry(id)-90);
+        sideGauge.update(context.getTelemetry(id)-90);
         break;
-      case ROLL:
-        roll.update(context.telemetry[id]-90);
-        frontGauge.update(context.telemetry[id]-90);
+      case Serial.ROLL:
+        roll.update(context.getTelemetry(id)-90);
+        frontGauge.update(context.getTelemetry(id)-90);
         break;
-      case SPEED:
-        speed.update(context.telemetry[id]);
+      case Serial.SPEED:
+        speed.update(context.getTelemetry(id));
         break;
-      case VOLTAGE:
-        voltage.update(context.telemetry[id]);
+      case Serial.VOLTAGE:
+        voltage.update(context.getTelemetry(id));
         break;
     }
   }

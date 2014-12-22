@@ -3,65 +3,36 @@ package com.serial;
 import jssc.SerialPort;
 
 public class Serial{
-	public enum messageType{
-		STANDARD(0),
-		SETTINGS(1),
-		WAYPOINT(2),
-		PROTOCOL(3);
-		private static final byte bitValue;
-		public byte getValue(){ return bitValue; }
-		messageType(byte val){ bitValue = val; }
-	}
-	public enum standardSubtype{
-		TELEMETRY(0),
-		COMMAND(1);
-		private static final byte bitValue;
-		public byte getValue(){ return bitValue; }
-		standardSubtype(byte val){ bitValue = val; }
-	}
-	public enum waypointSubtype{
-		ADD(0),
-		ALTER(1),
-		DELETE(2);
-		private static final byte bitValue;
-		public byte getValue(){ return bitValue; }
-		waypointSubtype(byte val){ bitValue = val; }
-	}
-	public enum settingsSubtype{
-		SET(0),
-		POLL(1);
-		private static final byte bitValue;
-		public byte getValue(){ return bitValue; }
-		settingsSubtype(byte val){ bitValue = val; }
-	}
-	public enum protocolSubtype{
-		SYNC(0),
-		CONFIRM(1);
-		private static final byte bitValue;
-		public byte getValue(){ return bitValue; }
-		protocolSubtype(byte val){ bitValue = val; }
-	}
-	public enum telemetry{
-		LATITUDE(0),
-		LONGITUDE(1),
-		HEADING(2),
-		PITCH(3),
-		ROLL(4),
-		SPEED(5),
-		VOLTAGE(6);
-		private static final byte bitValue;
-		public byte getValue(){ return bitValue; }
-		telemetry(byte val){ bitValue = val; }
-	}
-	public enum commands{
-		ESTOP(0),
-		TARGET(1),
-		LOOPING(2),
-		CLEAR_WAYPOINTS(3);
-		private static final byte bitValue;
-		public byte getValue(){ return bitValue; }
-		commands(byte val){ bitValue = val; }
-	}
+	public static final int STANDARD_TYPE = 0;
+	public static final int SETTINGS_TYPE = 1;
+	public static final int WAYPOINT_TYPE = 2;
+	public static final int PROTOCOL_TYPE = 3;
+
+	public static final int TELEMETRY_SUBTYPE = 0;
+	public static final int COMMAND_SUBTYPE   = 1;
+
+	public static final int ADD_SUBTYPE    = 0;
+	public static final int ALTER_SUBTYPE  = 1;
+	public static final int DELETE_SUBTYPE = 2;
+
+	public static final int SET_SUBTYPE  = 0;
+	public static final int POLL_SUBTYPE = 1;
+
+	public static final int SYNC_SUBTYPE    = 0;
+	public static final int CONFIRM_SUBTYPE = 1;
+
+	public static final int LATITUDE	= 0;
+	public static final int LONGITUDE	= 1;
+	public static final int HEADING		= 2;
+	public static final int PITCH		= 3;
+	public static final int ROLL		= 4;
+	public static final int SPEED		= 5;
+	public static final int VOLTAGE		= 6;
+
+	public static final int ESTOP_CMD	= 0;
+	public static final int TARGET_CMD	= 1;
+	public static final int LOOPING_CMD	= 2;
+	public static final int CLEAR_CMD	= 3;
 
 	public static final int   MAX_WAYPOINTS		= 64;
 	public static final int   MAX_SETTINGS		= 32;
@@ -107,5 +78,18 @@ public class Serial{
 		int foundSum = ( ( (message[length-2]&0xff) <<8) | (message[length-1]&0xff) );
 		int generatedSum = fletcher16(message, length-2);
 		return generatedSum == foundSum;
+	}
+
+	public static int getMsgType(byte input){
+		return (input&0x03);
+	}
+	public static int getSubtype(byte input){
+		return ((input>>2)&0x03);
+	}
+	public static byte buildMessageLabel(int type, int subType, int length){
+		if(length	> 0xf) return 0;
+		if(type 	> 0x3) return 0;
+		if(subType	> 0x3) return 0;
+		return (byte) ((length<<4)|(subType<<2)|type);
 	}
 }

@@ -6,6 +6,8 @@ import com.map.MapPanel;
 import com.serial.Serial;
 import com.ui.AlertPanel;
 import com.Context;
+import com.serial.*;
+import com.serial.Messages.*;
 import jssc.SerialPort;
 import jssc.SerialPortException;
 import jssc.SerialPortEventListener;
@@ -47,9 +49,8 @@ public class SerialParser implements SerialPortEventListener{
 				if(bufPos >= BUFLEN) bufPos = 0;
 				else if(rightMatch(buffer, bufPos, Serial.HEADER)) bufPos = 0;
 				else if(rightMatch(buffer, bufPos, Serial.FOOTER)) {
-					byte[] msg = Arrays.copyOfRange(buffer,
-													0,
-													bufPos-Serial.FOOTER.length);
+					byte[] msg = Arrays.copyOfRange(
+								buffer, 0, bufPos-Serial.FOOTER.length);
 					checkBuffer(msg);
 				}
 			}
@@ -68,77 +69,103 @@ public class SerialParser implements SerialPortEventListener{
 	}
 
 	private void checkBuffer(byte[] msg){
-		if(Serial.fletcher(msg, msg.length)){//checksum comes out correct
-			switch(msg[0]){
-				case Serial.DATA_MSG:
-					handleData(msg);
-					break;
-				case Serial.ADD_WAYPOINT_MSG:
-				case Serial.CHANGE_WAYPOINT_MSG:
-				case Serial.DELETE_WAYPOINT_MSG:
-				case Serial.CLEAR_WAYPOINT_MSG:
-					handleWaypoint(msg);
-					context.sender.sendMessage(
-								new Message(Serial.fletcher16(msg,msg.length)));
-					break;
-				case Serial.CONFIRMATION_MSG:
-					context.sender.notifyOfConfirm(
-											(msg[1]&0xff)<<8 | (msg[2]&0xff) );
-					break;
-				case Serial.REQUEST_RESYNC:
-					context.sender.sendWaypointList();
-					break;
-				default:
-					break;
-			}
-		} else {
+		int type = Serial.getMsgType(msg[0]);
+		if(!Serial.fletcher(msg, msg.length)){
 			System.err.print("ERROR: bad checksum, length " +msg.length +"\n");
-		}
-	}
-
-	private void handleData(byte[] message){
-		if(message.length != 8) {
-			System.err.print("ERROR: bad length of data message; was " + message.length);
 			return;
 		}
-		byte id = message[1];
-		if(id > Serial.NUM_DATA_SLOTS) return;
-
-		float tmp = (float)(((message[2]&0xff)<<24)|
-							((message[3]&0xff)<<16)|
-							((message[4]&0xff)<< 8)|
-							((message[5]&0xff)    ) );
-		tmp /= Serial.FIXED_POINT_FACTOR;
-
-		context.data[id] = tmp;
-		context.dash.updateDash(id);
+		switch(type){
+			case Serial.STANDARD_TYPE:
+				handleStandard(msg);
+				break;
+			case Serial.SETTINGS_TYPE:
+				handleSetting(msg);
+				break;
+			case Serial.WAYPOINT_TYPE:
+				handleWaypoint(msg);
+				break;
+			case Serial.PROTOCOL_TYPE:
+				handleProtocol(msg);
+				break;
+			default:
+				break;
+		}
 	}
 
-	private void handleWaypoint(byte[] message){
-		if(message.length != 14) {
-			System.err.print("ERROR: bad length of waypoint message; was " + message.length);
+	private void handleStandard(byte[] msg){
+		int subtype = Serial.getSubtype(msg[0]);
+		switch(subtype){
+			case Serial.TELEMETRY_SUBTYPE:
+				int index = msg[1];
+				int tmp = (	((msg[2]&0xff)<<24)|
+							((msg[3]&0xff)<<16)|
+							((msg[4]&0xff)<< 8)|
+							((msg[5]&0xff)    ) );
+				float data = Float.intBitsToFloat(tmp);
+				context.setTelemetry(index, data);
+				break;
+			case Serial.COMMAND_SUBTYPE:
+				//the commands currently only go one way
+				break;
 		}
-		byte  type = message[0];
-		float latitude  = (float)(((message[1]&0xff)<<24)|
-								  ((message[2]&0xff)<<16)|
-								  ((message[3]&0xff)<< 8)|
-								  ((message[4]&0xff)    ) );
-		float longitude = (float)(((message[5]&0xff)<<24)|
-								  ((message[6]&0xff)<<16)|
-								  ((message[7]&0xff)<< 8)|
-								  ((message[8]&0xff)    ) );
-		short altitude  = (short)(((message[9]&0xff)<< 8)|
-								  ((message[10]&0xff)   ) );
-		byte position = message[11];
-		switch(type){
-			case Serial.ADD_WAYPOINT_MSG:
-				context.waypoint.add(longitude, latitude, position);
+	}
+
+	private void handleProtocol(byte[] msg){
+		int subtype = Serial.getSubtype(msg[0]);
+		switch(subtype){
+			case Serial.SYNC_SUBTYPE:
+				context.onConnection();
+				Message message = new ProtocolMessage();
+				context.sender.sendMessage(message);
 				break;
-			case Serial.CHANGE_WAYPOINT_MSG:
-				context.waypoint.get(position).setLocation(new Point.Double(longitude, latitude));
+			case Serial.CONFIRM_SUBTYPE:
+				int confirmation = ((msg[1]&0xff)<<8) | msg[2];
+				context.sender.notifyOfConfirm(confirmation);
 				break;
-			case Serial.DELETE_WAYPOINT_MSG:
-				context.waypoint.remove(position);
+		}
+	}
+
+	private void handleSetting(byte[] msg){
+		int subtype = Serial.getSubtype(msg[0]);
+		switch(subtype){
+			case Serial.SET_SUBTYPE:
+				int index = msg[1];
+				int tmp = (	((msg[2]&0xff)<<24)|
+							((msg[3]&0xff)<<16)|
+							((msg[4]&0xff)<< 8)|
+							((msg[5]&0xff)    ) );
+				float data = Float.intBitsToFloat(tmp);
+				context.setSetting(index, data);
+				break;
+			case Serial.POLL_SUBTYPE:
+				context.sendSetting(msg[1]);
+				break;
+		}
+	}
+
+	private void handleWaypoint(byte[] msg){
+		int subtype = Serial.getSubtype(msg[0]);
+		int index = msg[1];
+		int tmpLat = (	((msg[2]&0xff)<<24)|
+						((msg[3]&0xff)<<16)|
+						((msg[4]&0xff)<< 8)|
+						((msg[5]&0xff)    ) );
+		int tmpLon = (	((msg[6]&0xff)<<24)|
+						((msg[7]&0xff)<<16)|
+						((msg[8]&0xff)<< 8)|
+						((msg[9]&0xff)    ) );
+		float latitude	= Float.intBitsToFloat(tmpLat);
+		float longitude	= Float.intBitsToFloat(tmpLon);
+		switch(subtype){
+			case Serial.ADD_SUBTYPE:
+				context.waypoint.add(longitude, latitude, index);
+				break;
+			case Serial.ALTER_SUBTYPE:
+				context.waypoint.get(index).setLocation(
+								new Point.Double(longitude, latitude));
+				break;
+			case Serial.DELETE_SUBTYPE:
+				context.waypoint.remove(index);
 				break;
 		}
 	}

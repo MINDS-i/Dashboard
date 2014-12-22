@@ -2,24 +2,26 @@ package com.serial.Messages;
 
 import com.map.Dot;
 import com.serial.Serial;
+import com.serial.Messages.*;
 
 import java.util.Date;
 
 public class SettingsMessage extends Message{
-	Serial.settingsSubtype msgType;
+	int msgType;
 	int settingIndex;
 	public SettingsMessage(int index){
-		msgType = POLL;
+		msgType = Serial.POLL_SUBTYPE;
 		settingIndex = index;
 
 		int length	= 2;
 		content		= new byte[length+2];
-		content[0]	= Serial.buildMessageLabel(msgType, length);
+		content[0]	= Serial.buildMessageLabel( Serial.SETTINGS_TYPE,
+												msgType, length);
 		content[1]  = (byte) index;
 		buildChecksum();
 	}
 	public SettingsMessage(int index, float value){
-		msgType = SET;
+		msgType = Serial.SET_SUBTYPE;
 		settingIndex = index;
 
 		//throw error if index is out of bounds?
@@ -28,7 +30,8 @@ public class SettingsMessage extends Message{
 
 		int length	= 8;
 		content		= new byte[length+2];
-		content[0]	= Serial.buildMessageLabel(msgType, length);
+		content[0]	= Serial.buildMessageLabel( Serial.SETTINGS_TYPE,
+												msgType, length);
 		content[1]	= (byte) index;
 		content[2]  = (byte)((num>>24)&0xff);
 		content[3]  = (byte)((num>>16)&0xff);

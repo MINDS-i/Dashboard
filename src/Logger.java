@@ -55,9 +55,9 @@ public class Logger {
 				public void run(){
 					try{
 						if(context.connected == false) return;
-						for(int i=0; i<Serial.NUM_DATA_SLOTS; i++){
+						for(int i=0; i<Serial.MAX_TELEMETRY; i++){
 							if(context.isLogged[i])
-								logFile.write(""+context.data[i]+" ");
+								logFile.write(""+context.telemetry[i]+" ");
 						}
 						logFile.newLine();
 						logFile.flush();

@@ -15,6 +15,7 @@ import com.map.Dot;
 import com.map.TileServer;
 import com.map.WaypointPanel;
 import com.serial.*;
+import com.serial.Messages.*;
 import com.ContextViewer;
 import com.Context;
 
@@ -1047,7 +1048,7 @@ public class MapPanel extends JPanel implements ContextViewer {
         public void mouseReleased(MouseEvent e) {
             handleDrag(e);
             if(downDot != -1){
-                context.waypoint.sendWaypoint(downDot, Serial.CHANGE_WAYPOINT_MSG);
+                context.waypoint.sendWaypoint((byte)downDot, Serial.ALTER_SUBTYPE);
             }
         }
 

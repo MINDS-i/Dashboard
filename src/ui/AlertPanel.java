@@ -1,7 +1,8 @@
 package com.ui;
 import com.Dashboard;
 import com.serial.SerialSender;
-import com.serial.Message;
+import com.serial.*;
+import com.serial.Messages.*;
 
 import java.awt.*;
 import javax.imageio.*;

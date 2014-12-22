@@ -1,7 +1,7 @@
-56700 baud
+9600 baud
 fletcher16 checksum
 most significant byte on left
-2 byte confirm messages in response to waypoint messages; checksum of full message.
+2 byte confirm messages in response to certian messages; checksum of full message.
 ETB - end of transmission block - dec. 17, 0x17
 US - unit seperator - dec. 31, 0x1F
 
@@ -32,7 +32,21 @@ US - unit seperator - dec. 31, 0x1F
 0x23 - clear waypoint list
 
 ------------------------------------------------------------
-print position on the bottom of the map screen
-print checksum failures on bottom of the map screen
 
-IMU fusion
+/* messages are minumum of 3 bytes, max of 19 bytes, constructed as
+	HEADER :(label[1 bytes] : data[length bytes] : checksum [2 bytes]): FOOTER
+	label = legth[4 bits] : subType[2 bits] : type[2 bits]
+	checksums calculated over everything except the checksum
+	types and subtypes listed as enums below.
+	some messages need confirmations, dictated by constants below
+	confirmation messages contain only the checksum of the entire message
+		being confirmed
+
+	sync messages can be sent or received
+	receiving a sync message should result in:
+		the sending of a sync message
+		the activation of any "on connection" commands
+
+	the dashboard will send all waypoins "on connection"
+	the drone will upload settings "on connection"
+*/

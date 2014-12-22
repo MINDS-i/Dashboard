@@ -1,13 +1,15 @@
 package com.serial;
 
+import com.Context;
 import com.Dashboard;
 import com.map.Dot;
 import com.map.MapPanel;
+import com.serial.Messages.*;
+import com.serial.*;
 import com.ui.AlertPanel;
-import com.Context;
+import java.util.Arrays;
 import jssc.SerialPort;
 import jssc.SerialPortException;
-import java.util.Arrays;
 
 import java.util.*;
 import javax.swing.SwingUtilities;
@@ -37,7 +39,7 @@ public class SerialSender{
 					Date now = new Date();
 					for(Iterator<Message> i = pendingConfirm.iterator(); i.hasNext();){
 						Message msg = i.next();
-						if(msg.pastExpiration(now)){
+						if(msg.isPastExpiration(now)){
 							if(msg.numberOfFailures() >= Serial.MAX_FAILURES){
 								i.remove();
 								System.err.println("Message Failed to send repeatedly; connection bad");
@@ -74,18 +76,15 @@ public class SerialSender{
 		}
 	}
 
-
 	public void sendMessage(Message msg){
 		if(context.connected){
 			try{
-				context.port().writeBytes(Serial.HEADER);
-				context.port().writeBytes(msg.content);
-				context.port().writeBytes(Serial.FOOTER);
-				msg.sendTime(new Date());
+				msg.send(context.port());
 				if(msg.needsConfirm())
 					synchronized(lock){ pendingConfirm.add(msg); }
 
-				System.err.println("Message " + Integer.toHexString(msg.confirmSum) + " Sent");
+				System.err.println("Message "
+						+ Integer.toHexString(msg.getConfirmSum()) + " Sent");
 				context.alert.displayMessage(msg.describeSelf()+" Sent");
 			} catch (SerialPortException ex){
 				System.err.println(ex.getMessage());
@@ -97,14 +96,10 @@ public class SerialSender{
 	public void resendMessage(Message msg){
 		if(context.connected){
 			try{
-				context.port().writeBytes(Serial.HEADER);
-				context.port().writeBytes(msg.content);
-				context.port().writeBytes(Serial.FOOTER);
 				msg.addFailure();
-				msg.sendTime(new Date());
-
+				msg.send(context.port());
 				System.out.print("Message resent; ");
-				System.out.print(Integer.toHexString(msg.confirmSum));
+				System.out.print(Integer.toHexString(msg.getConfirmSum()));
 				System.out.println(" needed");
 				context.alert.displayMessage(
 										"No response to "+msg.describeSelf()
@@ -126,8 +121,8 @@ public class SerialSender{
 				if(msg.isConfirmedBy(confirm)){
 					i.remove();
 					context.alert.displayMessage(
-										msg.describeSelf()+" Confirmed after "
-										+msg.numberOfFailures()+" tries");
+						msg.describeSelf()+" Confirmed after "
+						+msg.numberOfFailures()+" tries");
 					break;
 				}
 			}
@@ -137,27 +132,22 @@ public class SerialSender{
 	public void sendWaypointList(){
 		sendingWaypointList = true;
 		waypointListPosition = 0;
-		Message msg = new Message(Serial.CLEAR_WAYPOINT_MSG, new Dot(),(byte)0);
+		Message msg = new StandardMessage(Serial.CLEAR_CMD);
 		sendMessage(msg);
 		waypointListWaitingCode = msg.getConfirmSum();
 	}
 
 	private void advanceWaypointList(int confirm){
 		if(confirm == waypointListWaitingCode){
-			if(waypointListPosition < context.waypoint.size()){
-				Message msg = new Message( Serial.ADD_WAYPOINT_MSG,
-									context.waypoint.get(waypointListPosition),
-									(byte)waypointListPosition);
-				sendMessage(msg);
-				waypointListWaitingCode = msg.getConfirmSum();
-			} else {
-				for(byte id=0; id<Serial.NUM_DATA_SLOTS; id++){
-					if(context.data[id]==0) continue;
-					Message msg = new Message( id , context.data[id] );
-					sendMessage(msg);
-				}
+			if(waypointListPosition >= context.waypoint.size()){
 				sendingWaypointList = false;
+				return;
 			}
+			Message msg = new WaypointMessage(Serial.ADD_SUBTYPE,
+								(byte) waypointListPosition,
+								context.waypoint.get(waypointListPosition));
+			sendMessage(msg);
+			waypointListWaitingCode = msg.getConfirmSum();
 			waypointListPosition++;
 		}
 	}

@@ -5,6 +5,8 @@ import com.xml;
 import com.map.*;
 import com.serial.*;
 import com.Context;
+import com.serial.*;
+import com.serial.Messages.*;
 
 import java.util.Vector;
 import java.awt.Point;
@@ -13,6 +15,8 @@ import java.util.Iterator;
 public class WaypointList{
 	private Vector<Dot> waypoints = new Vector<Dot>();
 	private Context context;
+	private boolean isLooped;
+	private int targetIndex;
 	public WaypointList(Context cxt){
 		context = cxt;
 	}
@@ -36,7 +40,7 @@ public class WaypointList{
 			newDot.setAltitude(context.waypoint.get(index-1).getAltitude());
 		}
 		waypoints.insertElementAt(newDot, index);
-		sendWaypoint((byte)(index&0xff), Serial.ADD_WAYPOINT_MSG);
+		sendWaypoint((byte)(index&0xff), Serial.ADD_SUBTYPE);
 		context.waypointUpdated();
 	}
 	public void set(int index, Point.Double newPosition){
@@ -45,12 +49,12 @@ public class WaypointList{
 	public void set(int index, Point.Double newPosition, short alt){
 		if(index < 0 || index >= waypoints.size()) return;
 		waypoints.get(index).setLocation(newPosition, alt);
-		sendWaypoint((byte)(index&0xff), Serial.CHANGE_WAYPOINT_MSG);
+		sendWaypoint((byte)(index&0xff), Serial.ALTER_SUBTYPE);
 		context.waypointUpdated();
 	}
 	public void remove(int index){
 		if(index < 0 || index >= waypoints.size()) return;
-		sendWaypoint((byte)(index&0xff), Serial.DELETE_WAYPOINT_MSG);
+		sendWaypoint((byte)(index&0xff), Serial.DELETE_SUBTYPE);
 		waypoints.remove(index);
 		context.waypointUpdated();
 	}
@@ -67,22 +71,22 @@ public class WaypointList{
 		return waypoints.iterator();
 	}
 	public boolean isLooped(){
-		return (context.data[Serial.LOOPING_TOGGLE]==0)?(false):(true);
+		return isLooped;
 	}
 	public void setLooped(boolean loop){
-		context.data[Serial.LOOPING_TOGGLE] = (loop)?(1.f):(0.f);
-		sendDataMsg(Serial.LOOPING_TOGGLE);
+		isLooped = loop;
+		//send looping command message
 		context.waypointUpdated();
 	}
 	public int getTarget(){
-		return (int) context.data[Serial.TARGET_INDEX];
+		return targetIndex;
 	}
 	public Dot getTargetWaypoint(){
-		return waypoints.get((int)context.data[Serial.TARGET_INDEX]);
+		return waypoints.get(getTarget());
 	}
 	public void setTarget(int target){
-		context.data[Serial.TARGET_INDEX] = (float) target;
-		sendDataMsg(Serial.TARGET_INDEX);
+		targetIndex = target;
+		//send target change message
 		context.waypointUpdated();
 	}
 	public void swap(Vector<Dot> newList){
@@ -90,19 +94,15 @@ public class WaypointList{
 	}
 	private void sendDataMsg(int index){
         if(context.sender != null){
-            Message msg = new Message((byte)index, context.data[index] );
+            Message msg = new StandardMessage((byte)index,
+            								context.upstreamSettings[index]);
             context.sender.sendMessage(msg);
         }
 	}
-	public void sendWaypoint(byte index, byte label){
+	public void sendWaypoint(byte index, int type){
 		if(context.connected){
-		    Message msg = new Message(label, waypoints.get(index), (byte)(index&0xff));
-		    context.sender.sendMessage(msg);
-		}
-	}
-	public void sendWaypoint(int index, byte label){
-		if(context.connected){
-		    Message msg = new Message(label, waypoints.get(index), (byte)(index&0xff));
+		    Message msg = new WaypointMessage(
+		    			type, (byte)(index&0xff), waypoints.get(index));
 		    context.sender.sendMessage(msg);
 		}
 	}

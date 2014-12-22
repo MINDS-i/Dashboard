@@ -2,6 +2,8 @@ package com.serial.Messages;
 
 import com.map.Dot;
 import com.serial.Serial;
+import jssc.SerialPort;
+import jssc.SerialPortException;
 
 import java.util.Date;
 
@@ -16,25 +18,31 @@ public abstract class Message{
 		checkSum	= 0;
 		confirmSum	= 0;
 	}
-	void sendTime(Date date){
+	public void sendTime(Date date){
 		sent = date;
 	}
-	boolean isConfirmedBy(int confirmation){
+	public boolean isConfirmedBy(int confirmation){
 		return confirmation == confirmSum;
 	}
-	boolean isPastExpiration(Date now){
+	public boolean isPastExpiration(Date now){
 		return (now.getTime()-sent.getTime()) > Serial.MAX_CONFIRM_WAIT;
 	}
-	void addFailure(){
+	public void addFailure(){
 		failCount++;
 	}
-	int numberOfFailures(){
+	public int numberOfFailures(){
 		return failCount;
 	}
-	int getConfirmSum(){
+	public int getConfirmSum(){
 		return confirmSum;
 	}
-	private void buildChecksum(){
+	public void send(SerialPort port) throws SerialPortException {
+		port.writeBytes(Serial.HEADER);
+		port.writeBytes(content);
+		port.writeBytes(Serial.FOOTER);
+		sent = new Date();
+	}
+	protected void buildChecksum(){
 		int pos = content.length - 2;
 		checkSum		= Serial.fletcher16(content, pos);
 		content[pos+0]	= (byte)(checkSum>>8);
@@ -45,7 +53,7 @@ public abstract class Message{
 	public boolean needsConfirm(){
 		return false;
 	}
-	String describeSelf(){
+	public String describeSelf(){
 		return "A message";
 	}
 }

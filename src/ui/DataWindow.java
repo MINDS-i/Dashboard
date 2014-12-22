@@ -4,6 +4,9 @@ import com.serial.*;
 import com.Logger;
 import com.Context;
 
+import com.ui.TableColumn;
+import com.ui.ColumnTableModel;
+
 import java.awt.*;
 import java.awt.FlowLayout;
 import java.awt.event.*;
@@ -19,36 +22,94 @@ public class DataWindow implements ActionListener{
 	JPanel 		  	panel;
 	JPanel 		  	logPanel;
 	JTextField	  	logInput;
-	JTable 		  	table;
-	dataTableModel  model;
 	JScrollPane 	scroll;
 	java.util.Timer update;
 	Context 		context;
+	ColumnTableModel telModel;
+	ColumnTableModel setModel;
 	public DataWindow(Context cxt){
 		context = cxt;
-		frame = new JFrame("Data");
+		frame = new JFrame("Telemetry");
 		panel = new JPanel();
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     	frame.setLayout(new FlowLayout());
     	frame.setVisible(true);
 		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-		model  = new dataTableModel(context);
-		table  = new JTable(model);
-		scroll = new JScrollPane(table);
 
-		scroll.setPreferredSize(new Dimension(200, 300));
-		table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-		table.doLayout();
-		table.setDragEnabled(false);
-		TableColumn col;
+		ArrayList<TableColumn> telem	= new ArrayList<TableColumn>();
+		telem.add( new TableColumn(){
+			public String	getName(){ return "#"; }
+			public Object	getValueAt(int row){ return row; }
+			public int		getRowCount(){ return 10000; }
+			public Class	getDataClass(){ return Integer.class; }
+			public boolean	isRowEditable(int row){ return false; }
+			public void		setValueAt(Object val, int row){ ; }
+		});
+		telem.add( new TableColumn(){
+			public String	getName(){ return "Log?"; }
+			public Object	getValueAt(int row) { return context.isLogged[row]; }
+			public int		getRowCount(){ return context.isLogged.length; }
+			public Class	getDataClass(){ return Boolean.class; }
+			public boolean	isRowEditable(int row){ return true; }
+			public void		setValueAt(Object val, int row){
+				if(val.getClass()==Boolean.class)
+					context.isLogged[row] = (boolean) val;
+			}
+		});
+		telem.add( new TableColumn(){
+			public String	getName(){ return "Value"; }
+			public Object	getValueAt(int row) { return context.telemetry[row]; }
+			public int		getRowCount(){ return context.telemetry.length; }
+			public Class	getDataClass(){ return Float.class; }
+			public boolean	isRowEditable(int row){ return false; }
+			public void		setValueAt(Object val, int row){ ; }
+		});
+
+		ArrayList<TableColumn> settings	= new ArrayList<TableColumn>();
+		settings.add( new TableColumn(){
+			public String	getName(){ return "#"; }
+			public Object	getValueAt(int row){ return row; }
+			public int		getRowCount(){ return 10000; }
+			public Class	getDataClass(){ return Integer.class; }
+			public boolean	isRowEditable(int row){ return false; }
+			public void		setValueAt(Object val, int row){ ; }
+		});
+		settings.add( new TableColumn(){
+			public String	getName(){ return "Setting"; }
+			public Object	getValueAt(int row) { return context.upstreamSettings[row]; }
+			public int		getRowCount(){ return context.upstreamSettings.length; }
+			public Class	getDataClass(){ return Float.class; }
+			public boolean	isRowEditable(int row){ return true; }
+			public void		setValueAt(Object val, int row){
+				if(val.getClass()==Float.class)
+						context.upstreamSettings[row] = (Float) val;
+			}
+		});
+
+		JTable telTable, setTable;
+		JScrollPane telScroll, setScroll;
+		telModel	= new ColumnTableModel(telem);
+		telTable	= new JTable(telModel);
+		telScroll	= new JScrollPane(telTable);
+		setModel	= new ColumnTableModel(settings);
+		setTable	= new JTable(setModel);
+		setScroll	= new JScrollPane(setTable);
+
+		telScroll.setPreferredSize(new Dimension(200, 300));
+		telTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		telTable.doLayout();
+		telTable.setDragEnabled(false);
+
+/*		TableColumn col;
 		col = table.getColumn(dataTableModel.COL_NAMES[0]);
 		col.setPreferredWidth(20);
 		col = table.getColumn(dataTableModel.COL_NAMES[1]);
-		col.setPreferredWidth(20);
+		col.setPreferredWidth(20);*/
 
 		constructLogPane();
     	panel.add(logPanel);
-    	panel.add(scroll);
+    	panel.add(telScroll);
+    	panel.add(setScroll);
     	frame.add(panel);
     	frame.pack();
     	startUpdateTimer();
@@ -70,9 +131,11 @@ public class DataWindow implements ActionListener{
     	update = new java.util.Timer();
 		update.scheduleAtFixedRate(new TimerTask(){
 				public void run(){
-					if(model == null) return;
+					if(telModel == null) return;
+					if(setModel == null) return;
 					if(context.connected){
-						model.fireTableRowsUpdated(0, Serial.NUM_DATA_SLOTS);
+						telModel.fireTableRowsUpdated(0, Serial.MAX_TELEMETRY);
+						setModel.fireTableRowsUpdated(0, Serial.MAX_SETTINGS);
 					}
 				}
 			}, PERIOD, PERIOD);
@@ -90,7 +153,7 @@ public class DataWindow implements ActionListener{
 	}
 }
 
-class dataTableModel extends AbstractTableModel{
+/*class dataTableModel extends AbstractTableModel{
 	public static final String[] COL_NAMES = {"ID", "Log", "Value"};
 	private Context context;
 
@@ -102,7 +165,7 @@ class dataTableModel extends AbstractTableModel{
         return COL_NAMES.length;
     }
     public int getRowCount() {
-        return Serial.NUM_DATA_SLOTS;
+        return Serial.MAX_TELEMETRY;
     }
     public String getColumnName(int col) {
         return COL_NAMES[col];
@@ -114,7 +177,7 @@ class dataTableModel extends AbstractTableModel{
     		case 1:
     			return context.isLogged[row];
     		case 2:
-    			return context.data[row];
+    			return context.telemetry[row];
     		default:
     			return false;
     	}
@@ -142,10 +205,10 @@ class dataTableModel extends AbstractTableModel{
         		break;
         	case 2:
         		if(value.getClass()==Float.class){
-        			context.updateData((byte)row, (float)value);
+        			context.setSetting((int)row, (float)value);
         		}
         		break;
         }
     	fireTableCellUpdated(row, col);
     }
-}
+}*/
