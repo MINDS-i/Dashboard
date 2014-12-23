@@ -79,17 +79,20 @@ public class Context{
 	public void removeViewer(ContextViewer viewer){
 		toUpdate.remove(viewer);
 	}
-	public void sendSetting(int index, float value){
-		if(index < 0 || index >= upstreamSettings.length) return;
-		upstreamSettings[index] = value;
-		Message msg = new SettingsMessage((byte)index, value);
-		sender.sendMessage(msg);
-	}
 	public void sendSetting(int index){
 		Message msg = new SettingsMessage((byte)index, upstreamSettings[index]);
 		sender.sendMessage(msg);
 	}
 	public void setSetting(int index, float value){
+		if(index < 0 || index >= upstreamSettings.length) return;
+		upstreamSettings[index] = value;
+		sendSetting(index);
+	}
+	public void inputSetting(int index, float value){
+		if(index < 0 || index >= upstreamSettings.length) return;
+		upstreamSettings[index] = value;
+	}
+	public void setSettingQuiet(int index, float value){
 		if(index < 0 || index >= upstreamSettings.length) return;
 		upstreamSettings[index] = value;
 	}
@@ -102,6 +105,6 @@ public class Context{
 		return telemetry[id];
 	}
 	public void onConnection(){
-		//do something on connection
+		sender.sendWaypointList();
 	}
 }

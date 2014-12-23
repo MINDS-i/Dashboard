@@ -22,7 +22,7 @@ public abstract class Message{
 		sent = date;
 	}
 	public boolean isConfirmedBy(int confirmation){
-		return confirmation == confirmSum;
+		return ((short)confirmation == (short)confirmSum);
 	}
 	public boolean isPastExpiration(Date now){
 		return (now.getTime()-sent.getTime()) > Serial.MAX_CONFIRM_WAIT;

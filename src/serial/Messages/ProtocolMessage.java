@@ -8,7 +8,8 @@ import java.util.Date;
 
 public class ProtocolMessage extends Message{
 	int msgType;
-	public ProtocolMessage(int confirmationSum){
+	public ProtocolMessage(int type, int confirmationSum){
+		// for now this will ignore type
 		msgType = Serial.CONFIRM_SUBTYPE;
 
 		int length	= 3;
@@ -19,8 +20,8 @@ public class ProtocolMessage extends Message{
 		content[2]	= (byte)((confirmationSum     ) & 0xff);
 		buildChecksum();
 	}
-	public ProtocolMessage(){ //sync message
-		msgType = Serial.SYNC_SUBTYPE;
+	public ProtocolMessage(int type){ //sync message
+		msgType = type;
 
 		int length	= 1;
 		content 	= new byte[length+2];
@@ -39,7 +40,9 @@ public class ProtocolMessage extends Message{
 				return "Sync Message ";
 			case Serial.CONFIRM_SUBTYPE:
 				return "Confirmation ";
+			case Serial.SYNC_RESP_SUBTYPE:
+				return "Sync Response ";
 		}
-		return "Error";
+		return "Bad Protocol Message";
 	}
 }

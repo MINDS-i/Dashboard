@@ -174,7 +174,7 @@ public class Dashboard implements Runnable {
 
       context.updatePort(serialPort);
       context.alert.displayMessage("Port opened");
-      context.sender.sendWaypointList();
+      context.sender.sendSync();
 
       refreshButton.setEnabled(false);
       dropDown.setEnabled(false);

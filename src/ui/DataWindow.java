@@ -36,7 +36,7 @@ public class DataWindow implements ActionListener{
     	frame.setVisible(true);
 		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 
-		ArrayList<TableColumn> telem	= new ArrayList<TableColumn>();
+		ArrayList<TableColumn> telem = new ArrayList<TableColumn>();
 		telem.add( new TableColumn(){
 			public String	getName(){ return "#"; }
 			public Object	getValueAt(int row){ return row; }
@@ -65,7 +65,7 @@ public class DataWindow implements ActionListener{
 			public void		setValueAt(Object val, int row){ ; }
 		});
 
-		ArrayList<TableColumn> settings	= new ArrayList<TableColumn>();
+		ArrayList<TableColumn> settings = new ArrayList<TableColumn>();
 		settings.add( new TableColumn(){
 			public String	getName(){ return "#"; }
 			public Object	getValueAt(int row){ return row; }
@@ -82,7 +82,7 @@ public class DataWindow implements ActionListener{
 			public boolean	isRowEditable(int row){ return true; }
 			public void		setValueAt(Object val, int row){
 				if(val.getClass()==Float.class)
-						context.upstreamSettings[row] = (Float) val;
+						context.setSetting(row,(Float)val);
 			}
 		});
 
@@ -95,16 +95,16 @@ public class DataWindow implements ActionListener{
 		setTable	= new JTable(setModel);
 		setScroll	= new JScrollPane(setTable);
 
-		telScroll.setPreferredSize(new Dimension(200, 300));
-		telTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-		telTable.doLayout();
-		telTable.setDragEnabled(false);
+		telScroll.setPreferredSize(new Dimension(120, 160));
+		setScroll.setPreferredSize(new Dimension(120, 300));
 
-/*		TableColumn col;
-		col = table.getColumn(dataTableModel.COL_NAMES[0]);
-		col.setPreferredWidth(20);
-		col = table.getColumn(dataTableModel.COL_NAMES[1]);
-		col.setPreferredWidth(20);*/
+		javax.swing.table.TableColumn col;
+		col = telTable.getColumn(telem.get(0).getName());
+		col.setPreferredWidth(10);
+		col = telTable.getColumn(telem.get(1).getName());
+		col.setPreferredWidth(10);
+		col = setTable.getColumn(settings.get(0).getName());
+		col.setPreferredWidth(10);
 
 		constructLogPane();
     	panel.add(logPanel);

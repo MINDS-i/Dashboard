@@ -83,8 +83,10 @@ public class SerialSender{
 				if(msg.needsConfirm())
 					synchronized(lock){ pendingConfirm.add(msg); }
 
-				System.err.println("Message "
-						+ Integer.toHexString(msg.getConfirmSum()) + " Sent");
+				System.err.print("" + Integer.toHexString(msg.getConfirmSum())
+									+ " Sent "
+									+ msg.describeSelf()
+									+ "\n" );
 				context.alert.displayMessage(msg.describeSelf()+" Sent");
 			} catch (SerialPortException ex){
 				System.err.println(ex.getMessage());
@@ -98,9 +100,9 @@ public class SerialSender{
 			try{
 				msg.addFailure();
 				msg.send(context.port());
-				System.out.print("Message resent; ");
 				System.out.print(Integer.toHexString(msg.getConfirmSum()));
-				System.out.println(" needed");
+				System.out.print(" resend of " + msg.describeSelf());
+				System.out.println("");
 				context.alert.displayMessage(
 										"No response to "+msg.describeSelf()
 									   +" resend #"+msg.numberOfFailures());
@@ -134,7 +136,7 @@ public class SerialSender{
 		waypointListPosition = 0;
 		Message msg = new StandardMessage(Serial.CLEAR_CMD);
 		sendMessage(msg);
-		waypointListWaitingCode = msg.getConfirmSum();
+		advanceWaypointList(waypointListWaitingCode);
 	}
 
 	private void advanceWaypointList(int confirm){
@@ -150,5 +152,10 @@ public class SerialSender{
 			waypointListWaitingCode = msg.getConfirmSum();
 			waypointListPosition++;
 		}
+	}
+
+	public void sendSync(){
+		Message msg = new ProtocolMessage(Serial.SYNC_SUBTYPE);
+		sendMessage(msg);
 	}
 }

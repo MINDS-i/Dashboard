@@ -71,9 +71,22 @@ public class SerialParser implements SerialPortEventListener{
 	private void checkBuffer(byte[] msg){
 		int type = Serial.getMsgType(msg[0]);
 		if(!Serial.fletcher(msg, msg.length)){
-			System.err.print("ERROR: bad checksum, length " +msg.length +"\n");
+			System.err.print("ERROR: bad sum, length "
+								+ msg.length
+								+ " type "
+								+ type
+								+ " subtype "
+								+ Serial.getSubtype(msg[0])
+								+"\n");
 			return;
 		}
+		System.err.print("Received length "
+								+ msg.length
+								+ " type "
+								+ type
+								+ " subtype "
+								+ Serial.getSubtype(msg[0])
+								+"\n");
 		switch(type){
 			case Serial.STANDARD_TYPE:
 				handleStandard(msg);
@@ -114,12 +127,15 @@ public class SerialParser implements SerialPortEventListener{
 		int subtype = Serial.getSubtype(msg[0]);
 		switch(subtype){
 			case Serial.SYNC_SUBTYPE:
-				context.onConnection();
-				Message message = new ProtocolMessage();
+				Message message = new ProtocolMessage(Serial.SYNC_RESP_SUBTYPE);
 				context.sender.sendMessage(message);
+				context.onConnection();
+				break;
+			case Serial.SYNC_RESP_SUBTYPE:
+				context.onConnection();
 				break;
 			case Serial.CONFIRM_SUBTYPE:
-				int confirmation = ((msg[1]&0xff)<<8) | msg[2];
+				int confirmation = ((msg[1]&0xff)<<8) | (msg[2]&0xff);
 				context.sender.notifyOfConfirm(confirmation);
 				break;
 		}
@@ -135,7 +151,7 @@ public class SerialParser implements SerialPortEventListener{
 							((msg[4]&0xff)<< 8)|
 							((msg[5]&0xff)    ) );
 				float data = Float.intBitsToFloat(tmp);
-				context.setSetting(index, data);
+				context.inputSetting(index, data);
 				break;
 			case Serial.POLL_SUBTYPE:
 				context.sendSetting(msg[1]);

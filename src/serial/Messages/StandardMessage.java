@@ -46,6 +46,6 @@ public class StandardMessage extends Message{
 			case Serial.COMMAND_SUBTYPE:
 				return "Command Message ";
 		}
-		return "Error";
+		return "Bad Standard Message";
 	}
 }

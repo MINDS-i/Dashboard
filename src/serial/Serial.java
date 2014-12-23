@@ -7,20 +7,21 @@ public class Serial{
 	public static final int SETTINGS_TYPE = 1;
 	public static final int WAYPOINT_TYPE = 2;
 	public static final int PROTOCOL_TYPE = 3;
-
+	//standard type
 	public static final int TELEMETRY_SUBTYPE = 0;
 	public static final int COMMAND_SUBTYPE   = 1;
-
+	//waypoint type
 	public static final int ADD_SUBTYPE    = 0;
 	public static final int ALTER_SUBTYPE  = 1;
 	public static final int DELETE_SUBTYPE = 2;
-
+	//settings type
 	public static final int SET_SUBTYPE  = 0;
 	public static final int POLL_SUBTYPE = 1;
-
-	public static final int SYNC_SUBTYPE    = 0;
-	public static final int CONFIRM_SUBTYPE = 1;
-
+	//protocol type
+	public static final int SYNC_SUBTYPE      = 0;
+	public static final int CONFIRM_SUBTYPE   = 1;
+	public static final int SYNC_RESP_SUBTYPE = 2;
+	//telemetry tags
 	public static final int LATITUDE	= 0;
 	public static final int LONGITUDE	= 1;
 	public static final int HEADING		= 2;
@@ -28,7 +29,7 @@ public class Serial{
 	public static final int ROLL		= 4;
 	public static final int SPEED		= 5;
 	public static final int VOLTAGE		= 6;
-
+	//commands
 	public static final int ESTOP_CMD	= 0;
 	public static final int TARGET_CMD	= 1;
 	public static final int LOOPING_CMD	= 2;
