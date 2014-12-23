@@ -24,14 +24,15 @@ public class StandardMessage extends Message{
 		content[5]  = (byte)((num    )&0xff);
 		buildChecksum();
 	}
-	public StandardMessage(int cmd){
+	public StandardMessage(int cmd, byte data){
 		msgType = Serial.COMMAND_SUBTYPE;
 
-		int length	= 2;
+		int length	= 3;
 		content 	= new byte[length+2];
 		content[0]	= Serial.buildMessageLabel(Serial.STANDARD_TYPE,
 													msgType, length);
 		content[1]	= (byte) cmd;
+		content[2]	= data;
 		buildChecksum();
 	}
 	@Override

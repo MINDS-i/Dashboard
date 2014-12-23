@@ -69,6 +69,7 @@ public class SerialParser implements SerialPortEventListener{
 	}
 
 	private void checkBuffer(byte[] msg){
+		if(msg.length == 0) return;
 		int type = Serial.getMsgType(msg[0]);
 		if(!Serial.fletcher(msg, msg.length)){
 			System.err.print("ERROR: bad sum, length "
@@ -161,15 +162,16 @@ public class SerialParser implements SerialPortEventListener{
 
 	private void handleWaypoint(byte[] msg){
 		int subtype = Serial.getSubtype(msg[0]);
-		int index = msg[1];
-		int tmpLat = (	((msg[2]&0xff)<<24)|
-						((msg[3]&0xff)<<16)|
-						((msg[4]&0xff)<< 8)|
-						((msg[5]&0xff)    ) );
-		int tmpLon = (	((msg[6]&0xff)<<24)|
-						((msg[7]&0xff)<<16)|
-						((msg[8]&0xff)<< 8)|
-						((msg[9]&0xff)    ) );
+		int tmpLat = (	((msg[1]&0xff)<<24)|
+						((msg[2]&0xff)<<16)|
+						((msg[3]&0xff)<< 8)|
+						((msg[4]&0xff)    ) );
+		int tmpLon = (	((msg[5]&0xff)<<24)|
+						((msg[6]&0xff)<<16)|
+						((msg[7]&0xff)<< 8)|
+						((msg[8]&0xff)    ) );
+		int index = msg[11];
+		//msg 9, 10 are altitude
 		float latitude	= Float.intBitsToFloat(tmpLat);
 		float longitude	= Float.intBitsToFloat(tmpLon);
 		switch(subtype){

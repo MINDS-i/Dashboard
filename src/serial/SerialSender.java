@@ -134,7 +134,7 @@ public class SerialSender{
 	public void sendWaypointList(){
 		sendingWaypointList = true;
 		waypointListPosition = 0;
-		Message msg = new StandardMessage(Serial.CLEAR_CMD);
+		Message msg = new StandardMessage(Serial.CLEAR_CMD, (byte)0);
 		sendMessage(msg);
 		advanceWaypointList(waypointListWaitingCode);
 	}

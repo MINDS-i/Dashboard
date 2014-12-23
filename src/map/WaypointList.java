@@ -75,7 +75,8 @@ public class WaypointList{
 	}
 	public void setLooped(boolean loop){
 		isLooped = loop;
-		//send looping command message
+		Message msg = new StandardMessage(Serial.LOOPING_CMD, (byte) ((loop)?1:0) );
+        context.sender.sendMessage(msg);
 		context.waypointUpdated();
 	}
 	public int getTarget(){
@@ -86,7 +87,8 @@ public class WaypointList{
 	}
 	public void setTarget(int target){
 		targetIndex = target;
-		//send target change message
+		Message msg = new StandardMessage(Serial.TARGET_CMD, (byte) target);
+        context.sender.sendMessage(msg);
 		context.waypointUpdated();
 	}
 	public void swap(Vector<Dot> newList){
