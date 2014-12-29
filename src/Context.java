@@ -1,5 +1,6 @@
 package com;
 
+import com.ContextViewer;
 import com.Dashboard;
 import com.Logger;
 import com.map.*;
@@ -7,26 +8,26 @@ import com.serial.*;
 import com.serial.Messages.*;
 import com.ui.*;
 import com.xml;
-import com.ContextViewer;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.Vector;
 import jssc.SerialPort;
 import jssc.SerialPortException;
-import java.util.Vector;
-import java.util.Iterator;
 
 public class Context{
-	public Dashboard	dash;
 	public AlertPanel	alert;
-	public SerialSender	sender;
-	public SerialParser	parser;
-	public Logger		log;
-	public WaypointList	waypoint;
 	public boolean		connected;
+	public Dashboard	dash;
+	public Locale		locale;
+	public Logger		log;
+	public SerialParser	parser;
+	public SerialSender	sender;
 	public Theme		theme;
+	public WaypointList	waypoint;
 	public boolean		isLogged[]	= new boolean[Serial.MAX_TELEMETRY];
 	public float		telemetry[]	= new float  [Serial.MAX_TELEMETRY];
 	public float		upstreamSettings[] = new float[Serial.MAX_SETTINGS];
-
-	//needs to hold resource sets as well
 
 	private SerialPort				port;
 	private Vector<ContextViewer> 	toUpdate;
@@ -43,7 +44,7 @@ public class Context{
 						WaypointList waypointList,
 						Logger       logger,
 						SerialPort   serialPort,
-						Theme 		 thm){
+						Locale 		 loc){
 		dash     = dashboard;
 		alert    = alertPanel;
 		sender   = serialSender;
@@ -51,7 +52,9 @@ public class Context{
 		waypoint = waypointList;
 		log      = logger;
 		port     = serialPort;
-		theme    = thm;
+		locale	 = loc;
+		//build theme with locale
+		theme    = new Theme(locale);
 	}
 	public void updatePort(SerialPort newPort) throws SerialPortException{
 		closePort();

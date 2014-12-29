@@ -25,6 +25,10 @@ public class AlertPanel extends JPanel {
 		displayMessage("Welcome!");
 	}
 
+	public void setFont(Font inFont){
+		font = inFont;
+	}
+
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);

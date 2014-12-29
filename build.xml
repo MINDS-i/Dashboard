@@ -7,18 +7,22 @@
         <mkdir dir="${libDir}"/>
     </target>
 
+
     <target name="clean" depends="init">
         <delete dir="${outputDir}"/>
     </target>
 
     <target name="compile" depends="init">
-        <javac srcdir="${sourceDir}" destdir="${outputDir}" extdirs="${libDir}">
+        <javac srcdir="${sourceDir}" destdir="${outputDir}" extdirs="${libDir}"
+                includeantruntime="false" >
+            <classpath path="${classpath}"/>
             <compilerarg value="-XDignore.symbol.file"/>
         </javac>
     </target>
 
     <target name="jar" depends="compile">
         <jar destfile="${outputJar}" basedir="${outputDir}">
+            <fileset dir="${resourceDir}" />
             <zipfileset src="lib/jssc.jar" />
             <manifest>
                 <attribute name="Main-Class" value="com.Dashboard"/>
@@ -29,6 +33,7 @@
 
     <target name="build" depends="jar">
         <java jar="${outputJar}" fork="true">
+            <classpath path="${classpath}"/>
         </java>
     </target>
 </project>

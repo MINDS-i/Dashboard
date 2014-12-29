@@ -27,6 +27,7 @@ import java.util.Calendar;
 import javax.imageio.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import java.util.Locale;
 
 public class Dashboard implements Runnable {
   JPanel serialPanel;
@@ -63,15 +64,15 @@ public class Dashboard implements Runnable {
       loading.setVisible(true);
 
       context = new Context();
-      Theme theme = new Theme("./data/");
       context.give(this,
-                   new AlertPanel(theme.ocr),
+                   new AlertPanel(new Font(Font.MONOSPACED,Font.PLAIN,12)),
                    new SerialSender(context),
                    new SerialParser(context),
                    new WaypointList(context),
                    new Logger(context),
                    null, //serialPort
-                   theme);
+                   new Locale("en","US","ground"));
+      context.alert.setFont(context.theme.text);
       InitUI();
     } catch (IOException e) {
       DisplayError((Exception)e);
@@ -225,31 +226,31 @@ public class Dashboard implements Runnable {
     dataPanel.setLayout(new BoxLayout(dataPanel, BoxLayout.PAGE_AXIS));
     latitude = new DataLabel("Lat:");
     latitude.setForeground(orange);
-    latitude.setFont(context.theme.ocr);
+    latitude.setFont(context.theme.text);
     dataPanel.add(latitude);
     longitude = new DataLabel("Lng:");
     longitude.setForeground(orange);
-    longitude.setFont(context.theme.ocr);
+    longitude.setFont(context.theme.text);
     dataPanel.add(longitude);
     heading = new DataLabel("Dir:");
     heading.setForeground(orange);
-    heading.setFont(context.theme.ocr);
+    heading.setFont(context.theme.text);
     dataPanel.add(heading);
     pitch = new DataLabel("Ptc:");
     pitch.setForeground(orange);
-    pitch.setFont(context.theme.ocr);
+    pitch.setFont(context.theme.text);
     dataPanel.add(pitch);
     roll = new DataLabel("Rol:");
     roll.setForeground(orange);
-    roll.setFont(context.theme.ocr);
+    roll.setFont(context.theme.text);
     dataPanel.add(roll);
     speed = new DataLabel("MPH:");
     speed.setForeground(orange);
-    speed.setFont(context.theme.ocr);
+    speed.setFont(context.theme.text);
     dataPanel.add(speed);
     voltage = new DataLabel("Vcc:");
     voltage.setForeground(orange);
-    voltage.setFont(context.theme.ocr);
+    voltage.setFont(context.theme.text);
     dataPanel.add(voltage);
     dataPanel.setOpaque(false);
 

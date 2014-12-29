@@ -20,15 +20,16 @@ import javax.swing.table.*;
 public class DataWindow implements ActionListener{
 	public static final long PERIOD = 200; //update period in MS
 
-	final JFrame 	frame;
-	JPanel 		  	panel;
-	JPanel 		  	logPanel;
-	JTextField	  	logInput;
-	JScrollPane 	scroll;
-	java.util.Timer update;
-	Context 		context;
-	ColumnTableModel telModel;
 	ColumnTableModel setModel;
+	ColumnTableModel telModel;
+	Context 		context;
+	final JFrame 	frame;
+	java.util.Timer update;
+	JPanel 		  	logPanel;
+	JPanel 		  	panel;
+	JScrollPane 	scroll;
+	JTextField	  	logInput;
+
 	public DataWindow(Context cxt){
 		context = cxt;
 		frame = new JFrame("Telemetry");
@@ -69,7 +70,7 @@ public class DataWindow implements ActionListener{
 
 		ArrayList<TableColumn> settings = new ArrayList<TableColumn>();
 		settings.add( new TableColumn(){
-			public String	getName(){ return "#"; }
+			public String	getName(){ return "name"; }
 			public Object	getValueAt(int row){ return row; }
 			public int		getRowCount(){ return 10000; }
 			public Class	getDataClass(){ return Integer.class; }
