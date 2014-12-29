@@ -15,6 +15,8 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
 
+//import settings labels from properties
+
 public class DataWindow implements ActionListener{
 	public static final long PERIOD = 200; //update period in MS
 
