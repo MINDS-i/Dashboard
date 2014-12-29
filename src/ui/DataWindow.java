@@ -14,6 +14,9 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.PropertyResourceBundle;
 
 //import settings labels from properties
 
@@ -70,10 +73,21 @@ public class DataWindow implements ActionListener{
 
 		ArrayList<TableColumn> settings = new ArrayList<TableColumn>();
 		settings.add( new TableColumn(){
+			private ResourceBundle res = ResourceBundle.getBundle(
+													"settingLabels",
+													context.locale);
 			public String	getName(){ return "name"; }
-			public Object	getValueAt(int row){ return row; }
+			public Object	getValueAt(int row){
+				String ans;
+				try{
+					ans = res.getString("s"+row);
+				} catch(MissingResourceException e) {
+					ans = new String("#"+row);
+				}
+				return ans;
+			}
 			public int		getRowCount(){ return 10000; }
-			public Class	getDataClass(){ return Integer.class; }
+			public Class	getDataClass(){ return String.class; }
 			public boolean	isRowEditable(int row){ return false; }
 			public void		setValueAt(Object val, int row){ ; }
 		});
