@@ -26,6 +26,8 @@ public class Context{
 	public float		telemetry[]	= new float  [Serial.MAX_TELEMETRY];
 	public float		upstreamSettings[] = new float[Serial.MAX_SETTINGS];
 
+	//needs to hold resource sets as well
+
 	private SerialPort				port;
 	private Vector<ContextViewer> 	toUpdate;
 
