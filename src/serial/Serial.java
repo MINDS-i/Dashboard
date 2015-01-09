@@ -35,10 +35,11 @@ public class Serial{
 	public static final int LOOPING_CMD	= 2;
 	public static final int CLEAR_CMD	= 3;
 
-	public static final int   MAX_WAYPOINTS		= 64;
-	public static final int   MAX_SETTINGS		= 32;
-	public static final int   MAX_TELEMETRY		= 8;
-	public static final int   BAUD				= SerialPort.BAUDRATE_9600;
+	public static final int	MAX_WAYPOINTS		= 64;
+	public static final int	MAX_SETTINGS		= 32;
+	public static final int	MAX_TELEMETRY		= 8;
+	public static final int	BAUD				= SerialPort.BAUDRATE_9600;
+	public static final int	U16_FIXED_POINT		= 256;
 
 	public static final int   MAX_CONFIRM_WAIT	= 2000; //in milliseconds
 	public static final int   MAX_FAILURES		= 6;

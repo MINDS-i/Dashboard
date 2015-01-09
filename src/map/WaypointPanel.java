@@ -13,6 +13,8 @@ import com.Context;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
+import java.util.PropertyResourceBundle;
+import java.util.ResourceBundle;
 import javax.imageio.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -74,11 +76,11 @@ class WaypointPanel extends JPanel implements ContextViewer{
 		waypointIndexDisplay.setText(indexField);
 		if(selectedWaypoint >= 0 && selectedWaypoint < context.waypoint.size()) {
 			Dot dot = context.waypoint.get(selectedWaypoint);
-			latitude .setText(dot.getLatitude()+"");
+			latitude .setText(((float)dot.getLatitude())+"");
 			latitude .setForeground(Color.BLACK);
-			longitude.setText(dot.getLongitude()+"");
+			longitude.setText(((float)dot.getLongitude())+"");
 			longitude.setForeground(Color.BLACK);
-			altitude .setText(dot.getAltitude()+"");
+			altitude .setText(fixedToDouble(dot.getAltitude())+"");
 			altitude .setForeground(Color.BLACK);
 		}
 	}
@@ -128,26 +130,49 @@ class WaypointPanel extends JPanel implements ContextViewer{
 		selector.add(new JButton(nextWaypoint), BorderLayout.LINE_END);
 		add(selector);
 		//add latitude box
+
+		JPanel lat = new JPanel();
+		lat.setLayout(new BoxLayout(lat, BoxLayout.LINE_AXIS));
+		lat.setOpaque(false);
 		latitude = new JTextField();
 		latitude.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		coordinateListener listener = new coordinateListener(latitude, this);
 		latitude.getDocument().addDocumentListener(listener);
 		latitude.addActionListener(listener);
-		add(latitude);
+		JLabel latLabel = new JLabel("Lat: ");
+		latLabel.setFont(context.theme.text);
+		lat.add(latLabel);
+		lat.add(latitude);
+		add(lat);
 		//add longitude box
+		JPanel lng = new JPanel();
+		lng.setLayout(new BoxLayout(lng, BoxLayout.LINE_AXIS));
+		lng.setOpaque(false);
 		longitude = new JTextField();
 		longitude.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		listener = new coordinateListener(longitude, this);
 		longitude.getDocument().addDocumentListener(listener);
 		longitude.addActionListener(listener);
-		add(longitude);
+		JLabel lngLabel = new JLabel("Lng: ");
+		lngLabel.setFont(context.theme.text);
+		lng.add(lngLabel);
+		lng.add(longitude);
+		add(lng);
 		//add alitude box
+		JPanel alt = new JPanel();
+		alt.setLayout(new BoxLayout(alt, BoxLayout.LINE_AXIS));
+		alt.setOpaque(false);
 		altitude = new JTextField();
 		altitude.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		listener = new coordinateListener(altitude, this);
 		altitude.getDocument().addDocumentListener(listener);
 		altitude.addActionListener(listener);
-		add(altitude);
+		ResourceBundle res = ResourceBundle.getBundle("settingLabels", context.locale);
+		JLabel altLabel = new JLabel(res.getString("waypointExtra")+" ");
+		altLabel.setFont(context.theme.text);
+		alt.add(altLabel);
+		alt.add(altitude);
+		add(alt);
 
 		//add enter button
 		JPanel waypointOptions = new JPanel(new FlowLayout());
@@ -177,13 +202,28 @@ class WaypointPanel extends JPanel implements ContextViewer{
 		add(copyRights);
 	}
 
+	private double fixedToDouble(int i){
+		return ((double)(i&0xffff))/((double)Serial.U16_FIXED_POINT);
+	}
+	private int    doubleToFixed(double i){
+		return (int)(i*Serial.U16_FIXED_POINT);
+	}
+
 	public void interpretLocationEntry(){
 		try{
 			Double newLatitude  = Double.parseDouble(latitude.getText());
 			Double newLongitude = Double.parseDouble(longitude.getText());
-			short  newAltitude  =  Short.parseShort (altitude.getText());
+			Double tmpAltitude  = Double.parseDouble(altitude.getText());
+
+			int newAltitude = doubleToFixed(tmpAltitude);
 			Point.Double newPosition = new Point.Double(newLongitude, newLatitude);
-			context.waypoint.set(selectedWaypoint, newPosition, newAltitude);
+			if((newAltitude&0xffff) == newAltitude){
+				context.waypoint.set(selectedWaypoint, newPosition, (short)newAltitude);
+				//set to display reconverted value
+				altitude.setText(fixedToDouble(newAltitude)+"");
+			} else {
+				context.waypoint.set(selectedWaypoint, newPosition);
+			}
 		} catch (NumberFormatException e) {}
 	}
 

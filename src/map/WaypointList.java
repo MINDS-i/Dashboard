@@ -46,7 +46,7 @@ public class WaypointList{
 	public void set(int index, Point.Double newPosition){
 		set(index, newPosition, waypoints.get(index).getAltitude());
 	}
-	public void set(int index, Point.Double newPosition, short alt){
+	public void set(int index, Point.Double newPosition, Short alt){
 		if(index < 0 || index >= waypoints.size()) return;
 		waypoints.get(index).setLocation(newPosition, alt);
 		sendWaypoint((byte)(index&0xff), Serial.ALTER_SUBTYPE);
