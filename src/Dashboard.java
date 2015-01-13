@@ -71,7 +71,7 @@ public class Dashboard implements Runnable {
                    new WaypointList(context),
                    new Logger(context),
                    null, //serialPort
-                   new Locale("en","US","ground"));
+                   new Locale("en","US","air"));
       context.alert.setFont(context.theme.text);
       InitUI();
     } catch (IOException e) {
