@@ -143,6 +143,7 @@ public class SerialSender{
 		if(confirm == waypointListWaitingCode){
 			if(waypointListPosition >= context.waypoint.size()){
 				sendingWaypointList = false;
+				context.waypoint.sendLoopingStatus();
 				return;
 			}
 			Message msg = new WaypointMessage(Serial.ADD_SUBTYPE,

@@ -75,9 +75,12 @@ public class WaypointList{
 	}
 	public void setLooped(boolean loop){
 		isLooped = loop;
-		Message msg = new StandardMessage(Serial.LOOPING_CMD, (byte) ((loop)?1:0) );
-        context.sender.sendMessage(msg);
 		context.waypointUpdated();
+		sendLoopingStatus();
+	}
+	public void sendLoopingStatus(){
+		Message msg = new StandardMessage(Serial.LOOPING_CMD, (byte) ((isLooped)?1:0) );
+        context.sender.sendMessage(msg);
 	}
 	public int getTarget(){
 		return targetIndex;
