@@ -119,7 +119,14 @@ public class SerialParser implements SerialPortEventListener{
 				context.setTelemetry(index, data);
 				break;
 			case Serial.COMMAND_SUBTYPE:
-				//the commands currently only go one way
+				switch(msg[1]){
+					case Serial.TARGET_CMD:
+						//set dash target to msg[2]
+						context.waypoint.updateTarget(msg[2]);
+						break;
+					default:
+						break;
+				}
 				break;
 		}
 	}

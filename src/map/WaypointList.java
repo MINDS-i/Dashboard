@@ -85,10 +85,13 @@ public class WaypointList{
 	public Dot getTargetWaypoint(){
 		return waypoints.get(getTarget());
 	}
-	public void setTarget(int target){
-		targetIndex = target;
+	public void setTarget(int target){ //updates and transmits the target waypoint
+		updateTarget(target);
 		Message msg = new StandardMessage(Serial.TARGET_CMD, (byte) target);
         context.sender.sendMessage(msg);
+	}
+	public void updateTarget(int target){ //sets the target waypoint
+		targetIndex = target;
 		context.waypointUpdated();
 	}
 	public void swap(Vector<Dot> newList){
