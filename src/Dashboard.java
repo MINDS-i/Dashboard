@@ -1,15 +1,12 @@
 package com;
 
-import com.map.MapPanel;
-import com.serial.SerialSender;
-import com.serial.SerialParser;
-import com.serial.Serial;
-import com.ui.*;
 import com.Logger;
+import com.map.MapPanel;
 import com.map.WaypointList;
-import jssc.SerialPort;
-import jssc.SerialPortException;
-import jssc.SerialPortList;
+import com.serial.Serial;
+import com.serial.SerialParser;
+import com.serial.SerialSender;
+import com.ui.*;
 import java.awt.*;
 import java.awt.Dimension;
 import java.awt.event.*;
@@ -24,10 +21,13 @@ import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Calendar;
+import java.util.Locale;
 import javax.imageio.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import java.util.Locale;
+import jssc.SerialPort;
+import jssc.SerialPortException;
+import jssc.SerialPortList;
 
 public class Dashboard implements Runnable {
   JPanel serialPanel;
@@ -266,7 +266,7 @@ public class Dashboard implements Runnable {
     dashPanel.add(sideGauge,c);
 
     return dashPanel;
-    }
+  }
 
   private void resetData(){
     latitude.update(0);

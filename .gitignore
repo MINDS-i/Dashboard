@@ -2,3 +2,4 @@
 *.class
 log.txt
 DashBoard.jar
+reports/*

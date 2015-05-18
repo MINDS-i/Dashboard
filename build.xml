@@ -36,4 +36,25 @@
             <classpath path="${classpath}"/>
         </java>
     </target>
+
+    <target name="test" depends="compile">
+
+        <javac srcdir="${testDir}" destdir="${outputDir}" extdirs="${libDir}:${outputDir}"
+                includeantruntime="false" >
+            <classpath path="${classpath}:${junit}:${hamcrest}"/>
+            <compilerarg value="-XDignore.symbol.file"/>
+        </javac>
+
+        <junit printsummary="yes" haltonfailure="yes">
+          <classpath path="${classpath}:${junit}:${hamcrest}"/>
+          <formatter type="plain"/>
+
+          <batchtest fork="yes" todir="${reportsDir}">
+            <fileset dir="${testDir}">
+              <include name="**/*_test.java"/>
+            </fileset>
+          </batchtest>
+
+        </junit>
+    </target>
 </project>
