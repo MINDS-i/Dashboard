@@ -126,36 +126,34 @@ public class MapPanel extends JPanel implements ContextViewer {
 
         setZoom(zoom);
         setMapPosition(mapPosition);
-        checkTileServers();
-        checkActiveTileServer();
     }
 
     public void waypointUpdate(){
         repaint();
     }
 
-    private void checkTileServers() {
-        for (TileServer tileServer : TILESERVERS) {
-            String urlstring = getTileString(tileServer, 1, 1, 1);
-            try {
-                URL url = new URL(urlstring);
-                Object content = url.getContent();
-            } catch (Exception e) {
-                tileServer.setBroken(true);
-            }
+    private void testTileServer(TileServer server){
+        String urlstring = getTileString(tileServer, 1, 1, 1);
+        try {
+            URL url = new URL(urlstring);
+            Object content = url.getContent();
+        } catch (Exception e) {
+            tileServer.setBroken(true);
+            JOptionPane.showMessageDialog(
+                SwingUtilities.getWindowAncestor(MapPanel.this),
+                "The tileserver \"" + getTileServer().getURL() + "\" could not be reached.\r\nCheck internet connection",
+                "TileServer not reachable.", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private void checkActiveTileServer() {
-        if (getTileServer() != null && getTileServer().isBroken()) {
-            SwingUtilities.invokeLater(new Runnable() {
+    private void checkTileServers() {
+        for (TileServer server : TILESERVERS) {
+            Runnable tileTestRunner = new Runnable() {
                 public void run() {
-                    JOptionPane.showMessageDialog(
-                        SwingUtilities.getWindowAncestor(MapPanel.this),
-                        "The tileserver \"" + getTileServer().getURL() + "\" could not be reached.\r\nCheck internet connection",
-                        "TileServer not reachable.", JOptionPane.ERROR_MESSAGE);
+                    testTileServer(server);
                 }
-            });
+            };
+            SwingUtilities.invokeLater(tileTestRunner);
         }
     }
 
@@ -165,7 +163,6 @@ public class MapPanel extends JPanel implements ContextViewer {
         this.tileServer = tileServer;
         while (getZoom() > tileServer.getMaxZoom())
             zoomOut(new Point(getWidth() / 2, getHeight() / 2));
-        checkActiveTileServer();
     }
 
     public void nextTileServer() {
@@ -561,7 +558,6 @@ public class MapPanel extends JPanel implements ContextViewer {
         }
 
         paintDots(g);
-
         long t1 = System.currentTimeMillis();
         stats.dt = t1 - t0;
     }
@@ -596,6 +592,8 @@ public class MapPanel extends JPanel implements ContextViewer {
         private float transparency = 1F;
         private double scale = 1d;
         private final MapPanel mapPanel;
+        private final static BufferedImage loadImg = new BufferedImage(1,1,
+                                                        BufferedImage.TYPE_INT_ARGB);
 
         private Painter(MapPanel mapPanel, int zoom) {
             this.mapPanel = mapPanel;
@@ -683,14 +681,23 @@ public class MapPanel extends JPanel implements ContextViewer {
                 TileServer tileServer = mapPanel.getTileServer();
                 Image image = cache.get(tileServer, x, y, zoom);
                 if (image == null) {
-                    final String url = getTileString(tileServer, x, y, zoom);
-                    try {
-                        image = Toolkit.getDefaultToolkit().getImage(new URL(url));
-                    } catch (Exception e) {
-                        System.err.println("failed to load url \"" + url + "\"");
-                    }
-                    if (image != null)
-                        cache.put(tileServer, x, y, zoom, image);
+
+                    System.out.println("Getting tile "+x+" "+y+" "+zoom);
+                    cache.put(tileServer, x, y, zoom, loadImg);
+                    Runnable load = new Runnable(){
+                        public void run(){
+                            final String url = getTileString(tileServer, x, y, zoom);
+                            try {
+                                Image n = Toolkit.getDefaultToolkit().getImage(new URL(url));
+                                if(n != null) cache.put(tileServer, x, y, zoom, n);
+                                mapPanel.repaint();
+                            } catch (Exception e) {
+                                System.err.println("failed to load url \"" + url + "\"");
+                            }
+                        }
+                    };
+
+                    (new Thread(load)).start();
                 }
                 if (image != null) {
                     g.drawImage(image, dx, dy, mapPanel);

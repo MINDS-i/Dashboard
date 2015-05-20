@@ -60,7 +60,7 @@ public class Dashboard implements Runnable {
       loading.add(new JLabel(new ImageIcon(logo)));
       loading.pack();
       loading.setSize(540,216);
-      loading.setLocationRelativeTo(null);
+      //loading.setLocationRelativeTo(null);
       loading.setVisible(true);
 
       context = new Context();
@@ -141,6 +141,7 @@ public class Dashboard implements Runnable {
     f.pack();
     f.setSize(800, 650);
     f.setVisible(true);
+
     loading.dispose();
   }
 
