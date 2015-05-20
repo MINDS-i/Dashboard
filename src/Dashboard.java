@@ -139,9 +139,9 @@ public class Dashboard implements Runnable {
 
     f.add(mapPanel);
     f.pack();
-    loading.dispose();
-    f.setVisible(true);
     f.setSize(800, 650);
+    f.setVisible(true);
+    loading.dispose();
   }
 
   private void AddSerialList(JComboBox box){
@@ -294,15 +294,15 @@ public class Dashboard implements Runnable {
         break;
       case Serial.HEADING:
         heading.update(context.getTelemetry(id));
-        topGauge.update(context.getTelemetry(id)+90);
+        topGauge.update(context.getTelemetry(id));
         break;
       case Serial.PITCH:
-        pitch.update(context.getTelemetry(id)-90);
-        sideGauge.update(context.getTelemetry(id)-90);
+        pitch.update(context.getTelemetry(id));
+        sideGauge.update(context.getTelemetry(id));
         break;
       case Serial.ROLL:
-        roll.update(context.getTelemetry(id)-90);
-        frontGauge.update(context.getTelemetry(id)-90);
+        roll.update(context.getTelemetry(id));
+        frontGauge.update(context.getTelemetry(id));
         break;
       case Serial.SPEED:
         speed.update(context.getTelemetry(id));
