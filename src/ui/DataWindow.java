@@ -93,13 +93,26 @@ public class DataWindow implements ActionListener{
 		});
 		settings.add( new TableColumn(){
 			public String	getName(){ return "Setting"; }
-			public Object	getValueAt(int row) { return context.upstreamSettings[row]; }
+			public Object	getValueAt(int row) {
+				float val = context.upstreamSettings[row];
+				return "  "+val;
+			}
 			public int		getRowCount(){ return context.upstreamSettings.length; }
-			public Class	getDataClass(){ return Float.class; }
+			public Class	getDataClass(){ return String.class; }
 			public boolean	isRowEditable(int row){ return true; }
 			public void		setValueAt(Object val, int row){
-				if(val.getClass()==Float.class)
-						context.setSetting(row,(Float)val);
+				if(val.getClass()==Float.class){
+					context.setSetting(row,(Float)val);
+					System.out.println("Setting New Value "+(Float)val);
+				} else if(val.getClass()==String.class){
+					try{
+						Float newVal = new Float((String)val);
+						context.setSetting(row,newVal);
+						System.out.println("Setting New Value "+newVal);
+					} catch(Exception e) {
+						System.out.println("Bad new value");
+					}
+				}
 			}
 		});
 
