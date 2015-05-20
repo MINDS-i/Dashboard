@@ -682,14 +682,14 @@ public class MapPanel extends JPanel implements ContextViewer {
                 Image image = cache.get(tileServer, x, y, zoom);
                 if (image == null) {
 
-                    System.out.println("Getting tile "+x+" "+y+" "+zoom);
                     cache.put(tileServer, x, y, zoom, loadImg);
                     Runnable load = new Runnable(){
                         public void run(){
                             final String url = getTileString(tileServer, x, y, zoom);
                             try {
                                 Image n = Toolkit.getDefaultToolkit().getImage(new URL(url));
-                                if(n != null) cache.put(tileServer, x, y, zoom, n);
+                                //if n is null, painter will try again
+                                cache.put(tileServer, x, y, zoom, n);
                                 mapPanel.repaint();
                             } catch (Exception e) {
                                 System.err.println("failed to load url \"" + url + "\"");
