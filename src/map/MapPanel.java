@@ -148,9 +148,10 @@ public class MapPanel extends JPanel implements ContextViewer {
 
     private void checkTileServers() {
         for (TileServer server : TILESERVERS) {
+            final TileServer s = server;
             Runnable tileTestRunner = new Runnable() {
                 public void run() {
-                    testTileServer(server);
+                    testTileServer(s);
                 }
             };
             SwingUtilities.invokeLater(tileTestRunner);
@@ -677,19 +678,20 @@ public class MapPanel extends JPanel implements ContextViewer {
             boolean tileInBounds = x >= 0 && x < xTileCount && y >= 0 && y < yTileCount;
             boolean drawImage = DRAW_IMAGES && tileInBounds;
             if (drawImage) {
-                TileCache cache = mapPanel.getCache();
-                TileServer tileServer = mapPanel.getTileServer();
+                final TileCache cache = mapPanel.getCache();
+                final TileServer tileServer = mapPanel.getTileServer();
                 Image image = cache.get(tileServer, x, y, zoom);
                 if (image == null) {
-
+                    final int X = x;
+                    final int Y = y;
                     cache.put(tileServer, x, y, zoom, loadImg);
                     Runnable load = new Runnable(){
                         public void run(){
-                            final String url = getTileString(tileServer, x, y, zoom);
+                            final String url = getTileString(tileServer, X, Y, zoom);
                             try {
                                 Image n = Toolkit.getDefaultToolkit().getImage(new URL(url));
                                 //if n is null, painter will try again
-                                cache.put(tileServer, x, y, zoom, n);
+                                cache.put(tileServer, X, Y, zoom, n);
                                 mapPanel.repaint();
                             } catch (Exception e) {
                                 System.err.println("failed to load url \"" + url + "\"");
