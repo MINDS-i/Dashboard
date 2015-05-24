@@ -3,6 +3,7 @@ import com.Dashboard;
 import com.serial.*;
 import com.Logger;
 import com.Context;
+import com.ui.Graph;
 
 import com.ui.TableColumn;
 import com.ui.ColumnTableModel;
@@ -140,6 +141,7 @@ public class DataWindow implements ActionListener{
     	panel.add(logPanel);
     	panel.add(telScroll);
     	panel.add(setScroll);
+    	panel.add(new Graph());
     	frame.add(panel);
     	frame.pack();
     	startUpdateTimer();
