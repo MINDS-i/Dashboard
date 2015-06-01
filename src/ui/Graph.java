@@ -20,7 +20,7 @@ class Graph extends JPanel implements Runnable {
         final Graphics2D g2d = (Graphics2D) g;
         final int width  = this.getWidth();
         final int height = this.getHeight();
-        g2d.setPaint(new )
+        //g2d.setPaint(new )
         g2d.fillRect(0, width, 0, height);
     }
 }
