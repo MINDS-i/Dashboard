@@ -43,6 +43,13 @@ public class DataWindow implements ActionListener{
     	frame.setVisible(true);
 		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 
+		Graph graph = new Graph();
+		graph.setPreferredSize(new Dimension(500, 300));
+		JFrame gFrame = new JFrame("Telemetry Graph");
+		gFrame.add(graph);
+		gFrame.pack();
+		gFrame.setVisible(true);
+
 		ArrayList<TableColumn> telem = new ArrayList<TableColumn>();
 		telem.add( new TableColumn(){
 			public String	getName(){ return "#"; }
@@ -52,6 +59,7 @@ public class DataWindow implements ActionListener{
 			public boolean	isRowEditable(int row){ return false; }
 			public void		setValueAt(Object val, int row){ ; }
 		});
+
 /*		telem.add( new TableColumn(){
 			public String	getName(){ return "Log?"; }
 			public Object	getValueAt(int row) { return context.isLogged[row]; }
@@ -63,6 +71,20 @@ public class DataWindow implements ActionListener{
 					context.isLogged[row] = (boolean) val;
 			}
 		});*/
+		telem.add( new TableColumn(){
+			public String	getName(){ return "graph?"; }
+			public Object	getValueAt(int row) { return false; }
+			public int		getRowCount(){ return 256; }
+			public Class	getDataClass(){ return Boolean.class; }
+			public boolean	isRowEditable(int row){ return true; }
+			public void		setValueAt(Object val, int row){
+				System.out.println("trying to add data source");
+				if(graph != null) graph.addSource(
+					new TelemetryDataSource(row,context.telemetry,graph));
+			}
+		});
+
+
 		telem.add( new TableColumn(){
 			public String	getName(){ return "Value"; }
 			public Object	getValueAt(int row) { return context.getTelemetry(row); }
@@ -150,12 +172,7 @@ public class DataWindow implements ActionListener{
     	startUpdateTimer();
 
 
-		Graph graph = new Graph();
-		graph.setPreferredSize(new Dimension(500, 300));
-		JFrame gFrame = new JFrame("Telemetry Graph");
-		gFrame.add(graph);
-		gFrame.pack();
-		gFrame.setVisible(true);
+
 
 		//pitch and roll data sources
 		//graph.add();

@@ -18,6 +18,7 @@ public class Graph extends JPanel{
     }
 
     public void addSource(DataSource ds){
+        System.out.println("source added");
         sources.add(ds);
     }
 
