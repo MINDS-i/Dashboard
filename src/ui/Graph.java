@@ -1,5 +1,7 @@
 package com.ui;
 
+import com.ui.DataSource;
+
 import java.awt.*;
 import javax.imageio.*;
 import javax.swing.*;
@@ -8,40 +10,15 @@ import java.awt.image.BufferedImage;
 import java.util.Collection;
 import java.util.ArrayList;
 
-public class Graph extends JPanel implements Runnable {
+public class Graph extends JPanel{
     private Collection<DataSource> sources;
 
     public Graph(){
-//        this.setPreferredSize(new Dimension(500,500));
         sources = new ArrayList<DataSource>();
-
-        DataSource sin = new DataSource(){
-            public double get(double x){
-                return Math.sin(x*3.0f*Math.PI);
-            }
-            public Paint getPaint(){
-                return (Paint) Color.BLUE;
-            }
-        };
-        DataSource cos = new DataSource(){
-            public double get(double x){
-                return Math.cos(x*3.0f*Math.PI);
-            }
-            public Paint getPaint(){
-                return (Paint) Color.RED;
-            }
-        };
-        sources.add(sin);
-        sources.add(cos);
     }
 
-    @Override
-    public void run() {
-    }
-
-    private interface DataSource {
-        public double get(double x);
-        public Paint getPaint();
+    public void addSource(DataSource ds){
+        sources.add(ds);
     }
 
     private void drawGrid(Graphics2D g2d, int width,  int height,
@@ -100,8 +77,24 @@ public class Graph extends JPanel implements Runnable {
         f.pack();
         f.setVisible(true);
 
-        SwingUtilities.invokeLater(g);
-
+        DataSource sin = new DataSource(){
+            public double get(double x){
+                return Math.sin(x*3.0f*Math.PI);
+            }
+            public Paint getPaint(){
+                return (Paint) Color.BLUE;
+            }
+        };
+        DataSource cos = new DataSource(){
+            public double get(double x){
+                return Math.cos(x*3.0f*Math.PI);
+            }
+            public Paint getPaint(){
+                return (Paint) Color.RED;
+            }
+        };
+        g.addSource(sin);
+        g.addSource(cos);
 
         while(true){
             try {

@@ -33,6 +33,7 @@ public class DataWindow implements ActionListener{
 	JPanel 		  	panel;
 	JScrollPane 	scroll;
 	JTextField	  	logInput;
+	Graph			graph;
 
 	public DataWindow(Context cxt){
 		context = cxt;
@@ -129,6 +130,7 @@ public class DataWindow implements ActionListener{
 		telScroll.setPreferredSize(new Dimension(120, 160));
 		setScroll.setPreferredSize(new Dimension(120, 300));
 
+		//improve preferred size interface
 		javax.swing.table.TableColumn col;
 		col = telTable.getColumn(telem.get(0).getName());
 		col.setPreferredWidth(10);
@@ -137,14 +139,25 @@ public class DataWindow implements ActionListener{
 		col = setTable.getColumn(settings.get(0).getName());
 		col.setPreferredWidth(10);
 
+
 		constructLogPane();
     	panel.add(logPanel);
     	panel.add(telScroll);
     	panel.add(setScroll);
-    	panel.add(new Graph());
     	frame.add(panel);
     	frame.pack();
     	startUpdateTimer();
+
+
+		Graph graph = new Graph();
+		graph.setPreferredSize(new Dimension(500, 300));
+		JFrame gFrame = new JFrame("Telemetry Graph");
+		gFrame.add(graph);
+		gFrame.pack();
+		gFrame.setVisible(true);
+
+		//pitch and roll data sources
+		//graph.add();
 	}
 	private void constructLogPane(){
 		logPanel = new JPanel();
