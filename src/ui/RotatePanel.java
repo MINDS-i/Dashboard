@@ -1,12 +1,13 @@
 package com.ui;
 
+import com.ui.TelemetryListener;
 import java.awt.*;
 import javax.imageio.*;
 import javax.swing.*;
 import java.awt.FontMetrics;
 import java.awt.image.BufferedImage;
 
-public class RotatePanel extends JPanel{
+public class RotatePanel extends JPanel implements TelemetryListener{
   private double theta;
   private BufferedImage image;
   private BufferedImage background;

@@ -1,7 +1,6 @@
 package com.ui;
 import com.Dashboard;
 import com.serial.*;
-import com.Logger;
 import com.Context;
 import com.ui.Graph;
 
@@ -53,7 +52,7 @@ public class DataWindow implements ActionListener{
 			public boolean	isRowEditable(int row){ return false; }
 			public void		setValueAt(Object val, int row){ ; }
 		});
-		telem.add( new TableColumn(){
+/*		telem.add( new TableColumn(){
 			public String	getName(){ return "Log?"; }
 			public Object	getValueAt(int row) { return context.isLogged[row]; }
 			public int		getRowCount(){ return context.isLogged.length; }
@@ -63,14 +62,16 @@ public class DataWindow implements ActionListener{
 				if(val.getClass()==Boolean.class)
 					context.isLogged[row] = (boolean) val;
 			}
-		});
+		});*/
 		telem.add( new TableColumn(){
 			public String	getName(){ return "Value"; }
-			public Object	getValueAt(int row) { return context.telemetry[row]; }
-			public int		getRowCount(){ return context.telemetry.length; }
+			public Object	getValueAt(int row) { return context.getTelemetry(row); }
+			public int		getRowCount(){ return 256; }
 			public Class	getDataClass(){ return Float.class; }
 			public boolean	isRowEditable(int row){ return false; }
-			public void		setValueAt(Object val, int row){ ; }
+			public void		setValueAt(Object val, int row){
+				;
+			}
 		});
 
 		ArrayList<TableColumn> settings = new ArrayList<TableColumn>();
@@ -166,7 +167,7 @@ public class DataWindow implements ActionListener{
 
 		logInput = new JTextField();
 		logInput.addActionListener(this);
-		logInput.setText(Integer.toString(context.log.getLogPeriod()));
+		logInput.setText(Integer.toString(context.telemetry.getLogPeriod()));
 		logInput.setColumns(8);
 
 		logPanel.add(label);
@@ -191,9 +192,9 @@ public class DataWindow implements ActionListener{
 	    try {
       		input = Integer.parseInt(inputText);
       		logInput.setText(Integer.toString(input));
-      		context.log.setLogPeriod(input);
+      		context.telemetry.setLogPeriod(input);
 		} catch (NumberFormatException e) {
-			logInput.setText(Integer.toString(context.log.getLogPeriod()));
+			logInput.setText(Integer.toString(context.telemetry.getLogPeriod()));
 		}
 	}
 }

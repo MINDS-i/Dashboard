@@ -1,7 +1,6 @@
 package com.map;
 
 import com.Dashboard;
-import com.Logger;
 import com.map.coordinateListener;
 import com.map.Dot;
 import com.serial.*;

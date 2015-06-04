@@ -1,7 +1,6 @@
 package com.ui;
 import com.Dashboard;
 import com.serial.*;
-import com.Logger;
 import com.Context;
 import com.ui.TableColumn;
 

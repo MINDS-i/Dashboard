@@ -1,11 +1,13 @@
 package com.ui;
 
+import com.ui.TelemetryListener;
+
 import java.awt.*;
 import javax.imageio.*;
 import javax.swing.*;
 import java.awt.FontMetrics;
 
-public class DataLabel extends JLabel{
+public class DataLabel extends JLabel implements TelemetryListener{
   String label;
   String suffix;
   double data;
@@ -29,7 +31,6 @@ public class DataLabel extends JLabel{
     suffix = new String();
     setText(label + data + suffix);
   }
-
   public void update(double dat){
     data = dat;
     setText(label + data + suffix);

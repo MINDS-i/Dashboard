@@ -2,7 +2,6 @@ package com;
 
 import com.ContextViewer;
 import com.Dashboard;
-import com.Logger;
 import com.map.*;
 import com.serial.*;
 import com.serial.Messages.*;
@@ -20,21 +19,23 @@ public class Context{
 	public boolean		connected;
 	public Dashboard	dash;
 	public Locale		locale;
-	public Logger		log;
 	public SerialParser	parser;
 	public SerialSender	sender;
 	public Theme		theme;
 	public WaypointList	waypoint;
-	public boolean		isLogged[]	= new boolean[Serial.MAX_TELEMETRY];
-	public float		telemetry[]	= new float  [Serial.MAX_TELEMETRY];
 	public float		upstreamSettings[] = new float[Serial.MAX_SETTINGS];
+
+
+	public TelemetryManager telemetry;
+
+	//public boolean		isLogged[]	= new boolean[Serial.MAX_TELEMETRY];
+	//public float		telemetry[]	= new float  [Serial.MAX_TELEMETRY];
 
 	private SerialPort				port;
 	private Vector<ContextViewer> 	toUpdate;
 
 	public Context(){
 		connected = false;
-		for(int i=0; i<8; i++) isLogged[i] = true;
 		toUpdate = new Vector<ContextViewer>();
 	}
 	public void give( 	Dashboard    dashboard,
@@ -42,19 +43,17 @@ public class Context{
 						SerialSender serialSender,
 						SerialParser serialParser,
 						WaypointList waypointList,
-						Logger       logger,
 						SerialPort   serialPort,
 						Locale 		 loc){
-		dash     = dashboard;
-		alert    = alertPanel;
-		sender   = serialSender;
-		parser   = serialParser;
-		waypoint = waypointList;
-		log      = logger;
-		port     = serialPort;
-		locale	 = loc;
-		//build theme with locale
-		theme    = new Theme(locale);
+		dash      = dashboard;
+		alert     = alertPanel;
+		sender    = serialSender;
+		parser    = serialParser;
+		waypoint  = waypointList;
+		port      = serialPort;
+		locale	  = loc;
+		theme     = new Theme(locale);
+		telemetry = new TelemetryManager();
 	}
 	public void updatePort(SerialPort newPort) throws SerialPortException{
 		closePort();
@@ -101,13 +100,11 @@ public class Context{
 		if(index < 0 || index >= upstreamSettings.length) return;
 		upstreamSettings[index] = value;
 	}
-	public void setTelemetry(int index, float value){
-		if(index < 0 || index >= telemetry.length) return;
-		telemetry[index] = value;
-		dash.updateDash(index);
+	public void setTelemetry(int id, float value){
+		telemetry.updateTelemetry(id, (double)value);
 	}
 	public float getTelemetry(int id){
-		return telemetry[id];
+		return (float) telemetry.getTelemetry(id);
 	}
 	public void onConnection(){
 		sender.sendWaypointList();

@@ -1,6 +1,5 @@
 package com;
 
-import com.Logger;
 import com.map.MapPanel;
 import com.map.WaypointList;
 import com.serial.Serial;
@@ -30,6 +29,8 @@ import jssc.SerialPortException;
 import jssc.SerialPortList;
 
 public class Dashboard implements Runnable {
+  final static String dataLabels[] = {"Lat:", "Lng:", "Dir:", "Ptc:",
+                                              "Rol:", "MPH:", "Vcc:" };
   JPanel serialPanel;
   JButton refreshButton;
   JButton connectButton;
@@ -37,13 +38,9 @@ public class Dashboard implements Runnable {
   RotatePanel sideGauge;
   RotatePanel topGauge;
   RotatePanel frontGauge;
-  DataLabel latitude;
-  DataLabel longitude;
-  DataLabel heading;
-  DataLabel speed;
-  DataLabel pitch;
-  DataLabel roll;
-  DataLabel voltage;
+
+  Collection<DataLabel> displays;
+
   Frame loading;
   static final int[] dataBorderSize = {15,18,46,18};//top,left,bottom,right
   JFrame f;
@@ -69,7 +66,6 @@ public class Dashboard implements Runnable {
                    new SerialSender(context),
                    new SerialParser(context),
                    new WaypointList(context),
-                   new Logger(context),
                    null, //serialPort
                    new Locale("en","US","air"));
       context.alert.setFont(context.theme.text);
@@ -216,6 +212,11 @@ public class Dashboard implements Runnable {
     frontGauge = new RotatePanel(context.theme.roverFront,
                                  context.theme.gaugeBackground,
                                  context.theme.gaugeGlare);
+    context.telemetry.registerListener(Serial.HEADING, topGauge);
+    context.telemetry.registerListener(Serial.PITCH, sideGauge);
+    context.telemetry.registerListener(Serial.ROLL, frontGauge);
+
+
     BackgroundPanel dataPanel = new BackgroundPanel(context.theme.gaugeSquare);
     GridBagConstraints c = new GridBagConstraints();
     JPanel dashPanel = new JPanel();
@@ -225,34 +226,18 @@ public class Dashboard implements Runnable {
                                         dataBorderSize[2],
                                         dataBorderSize[3]) );
     dataPanel.setLayout(new BoxLayout(dataPanel, BoxLayout.PAGE_AXIS));
-    latitude = new DataLabel("Lat:");
-    latitude.setForeground(orange);
-    latitude.setFont(context.theme.text);
-    dataPanel.add(latitude);
-    longitude = new DataLabel("Lng:");
-    longitude.setForeground(orange);
-    longitude.setFont(context.theme.text);
-    dataPanel.add(longitude);
-    heading = new DataLabel("Dir:");
-    heading.setForeground(orange);
-    heading.setFont(context.theme.text);
-    dataPanel.add(heading);
-    pitch = new DataLabel("Ptc:");
-    pitch.setForeground(orange);
-    pitch.setFont(context.theme.text);
-    dataPanel.add(pitch);
-    roll = new DataLabel("Rol:");
-    roll.setForeground(orange);
-    roll.setFont(context.theme.text);
-    dataPanel.add(roll);
-    speed = new DataLabel("MPH:");
-    speed.setForeground(orange);
-    speed.setFont(context.theme.text);
-    dataPanel.add(speed);
-    voltage = new DataLabel("Vcc:");
-    voltage.setForeground(orange);
-    voltage.setFont(context.theme.text);
-    dataPanel.add(voltage);
+
+
+
+    displays = new ArrayList<DataLabel>();
+    for(int i=0; i<dataLabels.length; i++){
+      DataLabel label = new DataLabel(dataLabels[i]);
+      context.telemetry.registerListener(i, label);
+      label.setForeground(orange);
+      label.setFont(context.theme.text);
+      dataPanel.add(label);
+    }
+
     dataPanel.setOpaque(false);
 
     dashPanel.setLayout(new GridBagLayout());
@@ -270,47 +255,8 @@ public class Dashboard implements Runnable {
   }
 
   private void resetData(){
-    latitude.update(0);
-    longitude.update(0);
-    heading.update(0);
-    topGauge.update(0);
-    pitch.update(0);
-    sideGauge.update(0);
-    roll.update(0);
-    frontGauge.update(0);
-    speed.update(0);
-    voltage.update(0);
-  }
-
-  public void updateDash(int id){
-    switch(id){
-      case Serial.LATITUDE:
-        latitude.update(context.getTelemetry(id));
-        mapPanel.updateRoverLatitude(context.getTelemetry(id));
-        break;
-      case Serial.LONGITUDE:
-        longitude.update(context.getTelemetry(id));
-        mapPanel.updateRoverLongitude(context.getTelemetry(id));
-        f.repaint();
-        break;
-      case Serial.HEADING:
-        heading.update(context.getTelemetry(id));
-        topGauge.update(context.getTelemetry(id));
-        break;
-      case Serial.PITCH:
-        pitch.update(context.getTelemetry(id));
-        sideGauge.update(context.getTelemetry(id));
-        break;
-      case Serial.ROLL:
-        roll.update(context.getTelemetry(id));
-        frontGauge.update(context.getTelemetry(id));
-        break;
-      case Serial.SPEED:
-        speed.update(context.getTelemetry(id));
-        break;
-      case Serial.VOLTAGE:
-        voltage.update(context.getTelemetry(id));
-        break;
+    for(DataLabel label : displays){
+      label.update(0);
     }
   }
 
