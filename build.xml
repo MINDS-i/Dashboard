@@ -37,6 +37,12 @@
         </java>
     </target>
 
+    <target name="graph" depends="compile">
+        <java classname="com.ui.Graph">
+            <classpath path="${outputDir}"/>
+        </java>
+    </target>
+
     <target name="test" depends="compile">
 
         <javac srcdir="${testDir}" destdir="${outputDir}" extdirs="${libDir}:${outputDir}"
