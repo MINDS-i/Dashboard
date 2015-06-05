@@ -8,12 +8,17 @@ import java.awt.Color;
 
 public class TelemetryDataSource implements DataSource, TelemetryListener{
     static final int SAMPLES = 400;
+    static final float SAT = 0.90f;
+    static final float BRIGHT = 0.5f;
     private LinkedList<Double> data;
     private Graph graph;
+    private Paint paint;
     public TelemetryDataSource(int id, TelemetryManager tm, Graph g){
         data = new LinkedList<Double>();
         tm.registerListener(id, this);
         graph = g;
+        float hue = (float)Math.random();
+        paint = (Paint) Color.getHSBColor(hue, SAT, BRIGHT);
     }
     public void update(double d){
         data.add(d);
@@ -27,6 +32,6 @@ public class TelemetryDataSource implements DataSource, TelemetryListener{
         return data.get( xPoint ) / 180.0;
     }
     public Paint getPaint(){
-        return (Paint) Color.BLUE;
+        return paint;
     }
 }
