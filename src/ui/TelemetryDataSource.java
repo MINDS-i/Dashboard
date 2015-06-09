@@ -8,7 +8,7 @@ import java.awt.Paint;
 import java.awt.Color;
 
 public class TelemetryDataSource implements DataSource, TelemetryListener{
-    static final int SAMPLES = 1000;
+    static final int SAMPLES = 256;
     static final float SAT = 0.90f;
     static final float BRIGHT = 0.5f;
     private List<Double> data;
@@ -32,9 +32,13 @@ public class TelemetryDataSource implements DataSource, TelemetryListener{
     }
     public double get(double x){
         if(x > 1.0 || x < 0.0) return 0.0;
-        int xPoint  = (int) (x*((double)SAMPLES));
-        int dataPos = (xPoint+oldestPosition)%SAMPLES;
-        return data.get(xPoint) / 180.0;
+        double xPoint = (x*((double)SAMPLES-1));
+        int dataPos = ((int)Math.ceil(xPoint) +oldestPosition)%SAMPLES;
+        int dataPrv = ((int)Math.floor(xPoint)+oldestPosition)%SAMPLES;
+        double ratio = xPoint - Math.floor(xPoint);
+        double rtn = data.get(dataPos) * ratio
+                    +data.get(dataPrv) * (1.0d-ratio);
+        return rtn / 180.0d;
     }
     public Paint getPaint(){
         return paint;
