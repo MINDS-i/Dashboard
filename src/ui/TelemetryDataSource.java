@@ -31,6 +31,6 @@ public class TelemetryDataSource implements DataSource, TelemetryListener{
         double ratio = xPoint - Math.floor(xPoint);
         double rtn = data.get(dataPos) * ratio
                     +data.get(dataPrv) * (1.0d-ratio);
-        return rtn / 180.0d;
+        return rtn;
     }
 }

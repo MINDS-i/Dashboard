@@ -43,7 +43,7 @@ public class DataWindow implements ActionListener{
     	frame.setVisible(true);
 		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 
-		Graph graph = new Graph();
+		Graph graph = new Graph(new ArrayList<DataSource>());
 		graph.setPreferredSize(new Dimension(500, 300));
 		JFrame gFrame = new JFrame("Telemetry Graph");
 		gFrame.add(graph);
@@ -71,7 +71,7 @@ public class DataWindow implements ActionListener{
 					context.isLogged[row] = (boolean) val;
 			}
 		});*/
-		telem.add( new TableColumn(){
+/*		telem.add( new TableColumn(){
 			public String	getName(){ return "graph?"; }
 			public Object	getValueAt(int row) { return false; }
 			public int		getRowCount(){ return 256; }
@@ -83,7 +83,7 @@ public class DataWindow implements ActionListener{
 					new TelemetryDataSource(row,context.telemetry));
 			}
 		});
-
+*/
 
 		telem.add( new TableColumn(){
 			public String	getName(){ return "Value"; }
