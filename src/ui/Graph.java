@@ -43,16 +43,29 @@ public class Graph extends JPanel{
     }
 
     private void drawData(Graphics2D g2d, DataSource data){
+        //start only drawing in invalidated boxes
+
         Graphics2D g = (Graphics2D) g2d.create();
+
+        RenderingHints rh = new RenderingHints(
+             RenderingHints.KEY_ANTIALIASING,
+             RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setRenderingHints(rh);
+
         g.setPaint(data.getPaint());
         final double width = this.getWidth();
         final double hh  = this.getHeight()/2;
+
+        int px = 0; int py = (int)hh;
+
         for(int x=0; x<width; x++){
             final double xPos = ((double)x) / width;
             final int d = (int) (data.get( xPos )*hh + hh);
 
             //TODO draw line from last point to here
-            g.drawRect(x, d, 1, 1);
+            g.drawLine(x, d, px, py);
+            px = x;
+            py = d;
         }
     }
 

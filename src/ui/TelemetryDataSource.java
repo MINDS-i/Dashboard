@@ -8,7 +8,7 @@ import java.awt.Paint;
 import java.awt.Color;
 
 public class TelemetryDataSource implements DataSource, TelemetryListener{
-    static final int SAMPLES = 256;
+    static final int SAMPLES = 1000;
     static final float SAT = 0.90f;
     static final float BRIGHT = 0.5f;
     private List<Double> data;
