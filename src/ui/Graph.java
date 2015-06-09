@@ -9,12 +9,25 @@ import java.awt.FontMetrics;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Graph extends JPanel{
     private Collection<DataSource> sources;
+    private Timer refreshTimer;
 
     public Graph(){
         sources = new ArrayList<DataSource>();
+
+        //repaint at regular interval
+        refreshTimer = new Timer();
+        refreshTimer.scheduleAtFixedRate(new RefreshTimerTask(), 0, 25);
+    }
+
+    private class RefreshTimerTask extends TimerTask{
+        public void run(){
+            repaint();
+        }
     }
 
     public void addSource(DataSource ds){
@@ -52,7 +65,7 @@ public class Graph extends JPanel{
              RenderingHints.VALUE_ANTIALIAS_ON);
         g.setRenderingHints(rh);
 
-        g.setPaint(data.getPaint());
+        g.setPaint((Paint)Color.BLACK);
         final double width = this.getWidth();
         final double hh  = this.getHeight()/2;
 

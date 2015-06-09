@@ -80,7 +80,7 @@ public class DataWindow implements ActionListener{
 			public void		setValueAt(Object val, int row){
 				System.out.println("trying to add data source");
 				if(graph != null) graph.addSource(
-					new TelemetryDataSource(row,context.telemetry,graph));
+					new TelemetryDataSource(row,context.telemetry));
 			}
 		});
 
