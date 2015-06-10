@@ -1,5 +1,7 @@
 package com.ui;
 
+import com.ui.DataSource;
+import com.ui.TelemetryDataSource;
 import java.util.*;
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -34,9 +36,11 @@ public class TelemetryManager{
     private int                  logPeriod;
     private List<Double>         telemetry;
     private Collection<Observer> observers;
+    private List<DataSource>     streams;
     public TelemetryManager(){
         telemetry = new ArrayList<Double>();
         observers = new ArrayList<Observer>();
+        streams   = new ArrayList<DataSource>();
         try{
             Calendar cal = Calendar.getInstance();
             SimpleDateFormat sdf = new SimpleDateFormat("HH-mm_MM-DD_yyyyGG");
@@ -48,12 +52,19 @@ public class TelemetryManager{
         } catch (IOException ex) {
           System.err.println(ex);
         }
-    }
 
+        //build the first few telemetry locations up front
+        updateTelemetry(8, 0.0d);
+    }
+    public List<DataSource> getDataSources(){
+        return streams;
+    }
     public void updateTelemetry(int id, double value){
         if(id >= telemetry.size()){
-            for(int i=telemetry.size(); i<=id; i++)
+            for(int i=telemetry.size(); i<=id; i++){
                 telemetry.add(0.0);
+                streams.add(new TelemetryDataSource(i, this));
+            }
         }
         telemetry.set(id, value);
         updateObservers(id);

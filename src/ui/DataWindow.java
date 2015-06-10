@@ -43,7 +43,7 @@ public class DataWindow implements ActionListener{
     	frame.setVisible(true);
 		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 
-		Graph graph = new Graph(new ArrayList<DataSource>());
+		Graph graph = new Graph(context.telemetry.getDataSources());
 		graph.setPreferredSize(new Dimension(500, 300));
 		JFrame gFrame = new JFrame("Telemetry Graph");
 		gFrame.add(graph);

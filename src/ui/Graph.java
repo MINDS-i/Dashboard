@@ -22,7 +22,7 @@ public class Graph extends JPanel{
         boolean     drawn;
         public DataConfig(DataSource s){
             this.source = s;
-            this.drawn = true;
+            this.drawn = false;
             this.paint = (Paint) Color.BLACK;
         }
         public void setPaint(Paint p){
@@ -43,10 +43,18 @@ public class Graph extends JPanel{
     }
     private List<DataConfig> sources;
     private Timer refreshTimer;
-    private double xScale = 1.0;
-    private double yScale = 2.0;
+    private double xScale  = 1.0;
+    private double yScale  = 1.0;
+    private double yCenter = 0.0;
+    public List<DataConfig> getSources(){ return sources; }
+    double getXScale() { return xScale; }
+    double getYScale() { return yScale; }
+    double getYCenter(){ return yCenter;}
+    void setXScale(double s) { xScale = s; }
+    void setYScale(double s) { yScale = s; }
+    void setYCenter(double s){ yCenter= s; }
 
-    public Graph(Collection<DataSource> inputSources){
+    public Graph(List<DataSource> inputSources){
         sources = new ArrayList<DataConfig>();
         for(DataSource source : inputSources){
             sources.add(new DataConfig(source));
@@ -74,7 +82,7 @@ public class Graph extends JPanel{
         putValue(Action.SHORT_DESCRIPTION, text);
       }
       public void actionPerformed(ActionEvent e){
-        //GraphConfigWindow config = new GraphConfigWindow(this);
+        GraphConfigWindow config = new GraphConfigWindow(Graph.this);
       }
     };
 
@@ -88,14 +96,15 @@ public class Graph extends JPanel{
 
         final int hh = height/2;
         final int dy = height/hlines;
+        final int center = (int) (yCenter*(hh/yScale)) + hh;
 
         for(int y=dy; y<height/2; y+=dy){
-            g.drawLine(0,hh+y,width,hh+y);
-            g.drawLine(0,hh-y,width,hh-y);
+            g.drawLine(0,center+y,width,center+y);
+            g.drawLine(0,center-y,width,center-y);
         }
 
         g.setStroke(new BasicStroke(3));
-        g.drawLine(0, hh, width, hh); //bold 0 line
+        g.drawLine(0, center, width, center); //bold 0 line
     }
 
     private void drawData(Graphics2D g2d, DataConfig data){
@@ -111,13 +120,16 @@ public class Graph extends JPanel{
         g.setPaint(data.getPaint());
 
         final DataSource source = data.getSource();
-        final double width = this.getWidth();
-        final double hh  = this.getHeight()/2;
+        final double width  = this.getWidth();
+        final double hh     = this.getHeight()/2;
+        final double scale  = hh/yScale;
+        final double center = yCenter;
+
         int px = 0;
         int py = (int)hh;
         for(int x=0; x<width; x++){
-            final double xPos = ((double)x*xScale) / width ;
-            final int d = (int) (source.get( xPos )*hh/yScale + hh);
+            final double xPos = (1.0d-xScale) + xScale * (((double)x) / width);
+            final int d = (int) ((source.get(xPos)+center)*scale + hh);
 
             g.drawLine(x, d, px, py);
             px = x;
@@ -146,7 +158,7 @@ public class Graph extends JPanel{
     }
 
     public static void main(String[] args) {
-        Collection<DataSource> trialSources = new ArrayList<DataSource>();
+        List<DataSource> trialSources = new ArrayList<DataSource>();
         DataSource sin = new DataSource(){
             public double get(double x){
                 return Math.sin(x*3.0f*Math.PI);
