@@ -62,7 +62,7 @@ public class Graph extends JPanel{
 
         //repaint at regular interval
         refreshTimer = new Timer();
-        refreshTimer.scheduleAtFixedRate(new RefreshTimerTask(), 0, 25);
+        refreshTimer.scheduleAtFixedRate(new RefreshTimerTask(), 0, 50);
 
         //place configuration button
         this.setLayout(new FlowLayout(FlowLayout.LEADING));
@@ -117,20 +117,20 @@ public class Graph extends JPanel{
         RenderingHints rh = new RenderingHints(
              RenderingHints.KEY_ANTIALIASING,
              RenderingHints.VALUE_ANTIALIAS_ON);
-        g.setRenderingHints(rh);
+        //g.setRenderingHints(rh);
         g.setPaint(data.getPaint());
 
         final DataSource source = data.getSource();
         final double width  = this.getWidth();
         final double hh     = this.getHeight()/2;
         final double scale  = hh/yScale;
-        final double center = yCenter;
+        final double center = hh + yCenter*scale;
 
         int px = 0;
         int py = (int)hh;
         for(int x=0; x<width; x++){
             final double xPos = (1.0d-xScale) + xScale * (((double)x) / width);
-            final int d = (int) ((source.get(xPos)+center)*scale + hh);
+            final int d = (int) (source.get(xPos)*scale + center);
 
             g.drawLine(x, d, px, py);
             px = x;

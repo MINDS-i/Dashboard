@@ -8,6 +8,7 @@ import com.ui.DataWindow;
 import com.xml;
 import com.ContextViewer;
 import com.Context;
+import com.ui.Graph;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -43,7 +44,7 @@ class WaypointPanel extends JPanel implements ContextViewer{
 
 		buildPanel();
 
-		this.setPreferredSize(new Dimension(152,368));
+		this.setPreferredSize(new Dimension(152,408));
 	}
 
 	public void waypointUpdate(){
@@ -91,6 +92,11 @@ class WaypointPanel extends JPanel implements ContextViewer{
 		dataPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 		dataPanel.setMaximumSize(new Dimension(130, 40));
 		add(dataPanel);
+		//make a new graph
+		JButton graphButton = new JButton(buildGraph);
+		graphButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+		graphButton.setMaximumSize(new Dimension(130, 40));
+		add(graphButton);
 		//add looping button
 		JButton looping = new JButton(toggleLooping);
 		looping.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -438,6 +444,20 @@ class WaypointPanel extends JPanel implements ContextViewer{
 		}
 		public void actionPerformed(ActionEvent e){
 			final DataWindow window = new DataWindow(context);
+		}
+	};
+	private Action buildGraph = new AbstractAction(){
+		{
+			String text = "Graph";
+			putValue(Action.NAME, text);
+		}
+		public void actionPerformed(ActionEvent e){
+			Graph graph = new Graph(context.telemetry.getDataSources());
+			graph.setPreferredSize(new Dimension(500, 300));
+			JFrame gFrame = new JFrame("Telemetry Graph");
+			gFrame.add(graph);
+			gFrame.pack();
+			gFrame.setVisible(true);
 		}
 	};
 }
