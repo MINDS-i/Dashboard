@@ -11,11 +11,11 @@ import java.awt.FontMetrics;
 
 
 public class AlertPanel extends JPanel {
-	final static int NUM_LINES = 8;
-	Font font;
-	int lineHeight;
-	FontMetrics metrics;
-	String[] messages = new String[NUM_LINES];
+	private final static int NUM_LINES = 8;
+	private Font font;
+	private int lineHeight;
+	private FontMetrics metrics;
+	private String[] messages = new String[NUM_LINES];
 
 	public AlertPanel(Font inFont){
 		font = inFont;
