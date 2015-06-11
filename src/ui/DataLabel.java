@@ -8,9 +8,9 @@ import javax.swing.*;
 import java.awt.FontMetrics;
 
 public class DataLabel extends JLabel implements TelemetryListener{
-  String label;
-  String suffix;
-  double data;
+  private String label;
+  private String suffix;
+  private double data;
   public DataLabel(String prefix, double dat, String units){
     label = prefix;
     data = dat;
