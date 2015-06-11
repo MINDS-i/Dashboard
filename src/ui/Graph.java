@@ -113,10 +113,10 @@ public class Graph extends JPanel{
         //TODO start only drawing in invalidated boxes
 
         Graphics2D g = (Graphics2D) g2d.create();
-
+        /*
         RenderingHints rh = new RenderingHints(
              RenderingHints.KEY_ANTIALIASING,
-             RenderingHints.VALUE_ANTIALIAS_ON);
+             RenderingHints.VALUE_ANTIALIAS_ON);*/
         //g.setRenderingHints(rh);
         g.setPaint(data.getPaint());
 

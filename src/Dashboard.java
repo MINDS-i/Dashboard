@@ -188,7 +188,7 @@ public class Dashboard implements Runnable {
   private boolean disconnectSerial(){
     try{
       context.closePort();
-    } catch(SerialPortException ex){
+    } catch(Exception ex){
       System.err.println(ex.getMessage());
       context.alert.displayMessage(ex.getMessage());
       return false;
