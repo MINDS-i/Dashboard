@@ -130,7 +130,6 @@ public class DataWindow implements ActionListener{
 		col = setTable.getColumn(settings.get(0).getName());
 		col.setPreferredWidth(10);
 
-
 		constructLogPane();
     	panel.add(logPanel);
     	panel.add(telScroll);
@@ -138,12 +137,6 @@ public class DataWindow implements ActionListener{
     	frame.add(panel);
     	frame.pack();
     	startUpdateTimer();
-
-
-
-
-		//pitch and roll data sources
-		//graph.add();
 	}
 	private void constructLogPane(){
 		logPanel = new JPanel();

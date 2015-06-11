@@ -40,7 +40,11 @@ public class AlertPanel extends JPanel {
 		for(int i=0; i<NUM_LINES; i++){
 			color = new Color(0f, 0f, 0f, 1f-((float)i/(NUM_LINES)) );
 			g.setColor(color);
-			g.drawString(messages[i], (getWidth()-metrics.stringWidth(messages[i]))/2 , getHeight()-metrics.getMaxDescent()-i*metrics.getHeight());
+			//Draw string centered on the line
+			g.drawString(
+				messages[i],
+				(getWidth()-metrics.stringWidth(messages[i]))/2 ,
+				getHeight()-metrics.getMaxDescent()-i*metrics.getHeight() );
 		}
 	}
 

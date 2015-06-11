@@ -16,10 +16,10 @@ public class RotatePanel extends JPanel implements TelemetryListener{
   public RotatePanel(
       BufferedImage tiltImage,
       BufferedImage backgroundImage,
-      BufferedImage glare) {
+      BufferedImage foregroundImage) {
     image = tiltImage;
     background = backgroundImage;
-    overlay = glare;
+    overlay = foregroundImage;
     this.setPreferredSize(new Dimension(background.getWidth(this),
                           background.getHeight(this)));
     setOpaque(false);
