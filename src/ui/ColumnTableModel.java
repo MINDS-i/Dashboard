@@ -23,7 +23,7 @@ public class ColumnTableModel extends AbstractTableModel{
         return columns.size();
     }
     public int getRowCount() {
-    	int rowCount = 10000;
+    	int rowCount = Integer.MAX_VALUE;
     	Iterator itr = columns.iterator();
     	while(itr.hasNext()){
     		TableColumn col = (TableColumn) itr.next();
