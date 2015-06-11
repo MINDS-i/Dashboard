@@ -53,31 +53,6 @@ public class DataWindow implements ActionListener{
 			public void		setValueAt(Object val, int row){ ; }
 		});
 
-/*		telem.add( new TableColumn(){
-			public String	getName(){ return "Log?"; }
-			public Object	getValueAt(int row) { return context.isLogged[row]; }
-			public int		getRowCount(){ return context.isLogged.length; }
-			public Class	getDataClass(){ return Boolean.class; }
-			public boolean	isRowEditable(int row){ return true; }
-			public void		setValueAt(Object val, int row){
-				if(val.getClass()==Boolean.class)
-					context.isLogged[row] = (boolean) val;
-			}
-		});*/
-/*		telem.add( new TableColumn(){
-			public String	getName(){ return "graph?"; }
-			public Object	getValueAt(int row) { return false; }
-			public int		getRowCount(){ return 256; }
-			public Class	getDataClass(){ return Boolean.class; }
-			public boolean	isRowEditable(int row){ return true; }
-			public void		setValueAt(Object val, int row){
-				System.out.println("trying to add data source");
-				if(graph != null) graph.addSource(
-					new TelemetryDataSource(row,context.telemetry));
-			}
-		});
-*/
-
 		telem.add( new TableColumn(){
 			public String	getName(){ return "Value"; }
 			public Object	getValueAt(int row) { return context.getTelemetry(row); }

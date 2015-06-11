@@ -1,7 +1,7 @@
 package com.ui;
 
 import com.ui.DataSource;
-import com.ui.TelemetryDataSource;
+import com.ui.SampleSource;
 import java.util.*;
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -63,7 +63,9 @@ public class TelemetryManager{
         if(id >= telemetry.size()){
             for(int i=telemetry.size(); i<=id; i++){
                 telemetry.add(0.0);
-                streams.add(new TelemetryDataSource(i, this));
+                SampleSource newSource = new SampleSource();
+                this.registerListener(i, newSource);
+                streams.add(newSource);
             }
         }
         telemetry.set(id, value);

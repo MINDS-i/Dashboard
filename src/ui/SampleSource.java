@@ -1,23 +1,20 @@
 package com.ui;
 
 import com.ui.DataSource;
-import com.ui.TelemetryListener;
 import java.util.List;
 import java.util.ArrayList;
 import java.awt.Paint;
 import java.awt.Color;
 
-public class TelemetryDataSource implements DataSource, TelemetryListener{
+public class SampleSource implements DataSource, TelemetryListener{
     static final int   SAMPLES = 1000;
     static final float SAT     = 0.90f;
     static final float BRIGHT  = 0.5f;
     private List<Double> data;
     private int oldestPosition;
-    public TelemetryDataSource(int id, TelemetryManager tm){
+    public SampleSource(){
         data = new ArrayList<Double>(SAMPLES);
         for(int i=0; i<SAMPLES; i++) data.add(0.0d);
-
-        tm.registerListener(id, this);
     }
     public void update(double d){
         data.set(oldestPosition, d);
