@@ -64,9 +64,19 @@ public class Context{
 	}
 	public void closePort() throws SerialPortException{
 		sender.stop();
-		if(port != null){
-			port.closePort();
-		}
+		final SerialPort portToClose = port;
+		Runnable close = new Runnable(){
+			public void run(){
+				try{
+					portToClose.closePort();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		};
+		if(port != null)
+			(new Thread(close)).start();
+
 		port = null;
 		connected = false;
 	}
