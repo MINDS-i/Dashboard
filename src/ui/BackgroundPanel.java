@@ -7,7 +7,7 @@ import java.awt.FontMetrics;
 import java.awt.image.BufferedImage;
 
 public class BackgroundPanel extends JPanel{
-  BufferedImage background;
+  private BufferedImage background;
   public BackgroundPanel(BufferedImage image){
     background = image;
     this.setPreferredSize(new Dimension(background.getWidth(this),
