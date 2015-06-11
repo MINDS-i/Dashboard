@@ -9,6 +9,7 @@ import java.util.ResourceBundle;
 import java.util.PropertyResourceBundle;
 import javax.imageio.*;
 
+//POD class for theme elements
 public class Theme{
 	public BufferedImage gaugeBackground;
 	public BufferedImage gaugeRed;

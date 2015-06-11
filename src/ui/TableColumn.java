@@ -1,7 +1,6 @@
 package com.ui;
 
 public interface TableColumn{
-	//constructor
 	public String	getName();
 	public Object	getValueAt(int row);
 	public int		getRowCount();
