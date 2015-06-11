@@ -43,9 +43,9 @@ public class Graph extends JPanel{
     }
     private List<DataConfig> sources;
     private Timer refreshTimer;
-    private double xScale  = 1.0;
-    private double yScale  = 1.0;
-    private double yCenter = 0.0;
+    private double xScale  =  1.0;
+    private double yScale  = 20.0;
+    private double yCenter =  0.0;
     public List<DataConfig> getSources(){ return sources; }
     double getXScale() { return xScale; }
     double getYScale() { return yScale; }
@@ -113,6 +113,7 @@ public class Graph extends JPanel{
         //TODO start only drawing in invalidated boxes
 
         Graphics2D g = (Graphics2D) g2d.create();
+
         RenderingHints rh = new RenderingHints(
              RenderingHints.KEY_ANTIALIASING,
              RenderingHints.VALUE_ANTIALIAS_ON);

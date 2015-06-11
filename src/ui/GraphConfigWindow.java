@@ -6,6 +6,7 @@ import java.awt.*;
 import javax.swing.event.*;
 import java.util.List;
 import java.util.ArrayList;
+import javax.swing.colorchooser.AbstractColorChooserPanel;
 
 class GraphConfigWindow{
     private Graph  subject; //the graph to configure
@@ -80,10 +81,7 @@ class GraphConfigWindow{
             public int      getRowCount(){ return 10000; }
             public Class    getDataClass(){ return Integer.class; }
             public boolean  isRowEditable(int row){ return false; }
-            public void     setValueAt(Object val, int row){
-                if(val.getClass() == Integer.class)
-                    setCloseup( sources.get((Integer)val) );
-            }
+            public void     setValueAt(Object val, int row){;}
         });
         cols.add( new TableColumn() {
             public String   getName(){ return "Graph?"; }
@@ -102,6 +100,12 @@ class GraphConfigWindow{
         JTable table = new JTable(colModel);
         JPanel tablePanel = new JPanel();
         JScrollPane pane = new JScrollPane(table);
+        table.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
+        public void valueChanged(ListSelectionEvent event) {
+                setCloseup(sources.get(table.getSelectedRow()));
+            }
+        });
+
         tablePanel.add(pane);
 
         return tablePanel;
@@ -115,19 +119,21 @@ class GraphConfigWindow{
     private JPanel buildCloseupPanel(){
         JPanel panel = new JPanel();
 
-        strokeModel = new SpinnerNumberModel(1, 1, 100, 1);
-        JSpinner lineStroke = new JSpinner(strokeModel);
-        lineStroke.addChangeListener(new ChangeListener(){
+        ChangeListener updateListener = new ChangeListener(){
             public void stateChanged(ChangeEvent e){
                 updateCloseupPaint();
             }
-        });
+        };
+
+        strokeModel = new SpinnerNumberModel(1, 1, 100, 1);
+        JSpinner lineStroke = new JSpinner(strokeModel);
 
         //construct color picker
         colorPicker = new JColorChooser(Color.BLACK);
         colorPicker.setPreviewPanel(new JPanel());
+        colorPicker.getSelectionModel().addChangeListener(updateListener);
 
-        panel.add(lineStroke);
+        //panel.add(lineStroke);
         panel.add(colorPicker);
 
         return panel;
@@ -135,13 +141,11 @@ class GraphConfigWindow{
 
     private void setCloseup(Graph.DataConfig dc){
         closeupData = dc;
-        //update number model
-        //update color picker
+        colorPicker.setColor((Color)closeupData.getPaint());
     }
 
     private void updateCloseupPaint(){
-        //build paint from stroke and color picker
-        //set closeupData appropriatly
+        closeupData.setPaint( (Paint) colorPicker.getColor() );
     }
 
 }
