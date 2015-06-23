@@ -13,6 +13,7 @@ import com.ui.Graph;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
+import java.awt.geom.RoundRectangle2D;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import javax.imageio.*;
@@ -41,10 +42,7 @@ class WaypointPanel extends JPanel implements ContextViewer{
 		context.registerViewer(this);
 		setOpaque(false);
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-
 		buildPanel();
-
-		this.setPreferredSize(new Dimension(152,408));
 	}
 
 	public void waypointUpdate(){
@@ -234,14 +232,12 @@ class WaypointPanel extends JPanel implements ContextViewer{
 	}
 
 	private static void drawBackground(Graphics2D g, int width, int height) {
-		Color color1 = Color.black;
-		Color color2 = new Color(0x30, 0x30, 0x30);
-		color1 = new Color(0xc0, 0xc0, 0xc0);
-		color2 = new Color(0xe0, 0xe0, 0xe0);
+		Color color1 = new Color(0xc0, 0xc0, 0xc0);
+		Color color2 = new Color(0xe0, 0xe0, 0xe0);
 		Composite oldComposite = g.getComposite();
 		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.75f));
 		g.setPaint(new GradientPaint(0, 0, color1, 0, height*2, color2));
-		g.fillRoundRect(0, 0, width, height, 4, 4);
+		g.fillRoundRect(-1, -1, width, height, 12, 12);
 		g.setComposite(oldComposite);
 	}
 
@@ -265,55 +261,6 @@ class WaypointPanel extends JPanel implements ContextViewer{
 
 		public void actionPerformed(ActionEvent e) {
 			map.zoomOutAnimated(new Point(map.getWidth() / 2, map.getHeight() / 2));
-		}
-	};
-
-	private Action upAction = new AbstractAction() {
-		{
-			String text = "^";
-			putValue(Action.NAME, text);
-			putValue(Action.SHORT_DESCRIPTION, text);
-		}
-
-		public void actionPerformed(ActionEvent e) {
-			map.translateMapPosition(0, -MOVE_STEP);
-			map.repaint();
-		}
-	};
-	private Action downAction = new AbstractAction() {
-		{
-			String text = "v";
-			putValue(Action.NAME, text);
-			putValue(Action.SHORT_DESCRIPTION, text);
-		}
-
-		public void actionPerformed(ActionEvent e) {
-			map.translateMapPosition(0, +MOVE_STEP);
-			map.repaint();
-		}
-	};
-	private Action leftAction = new AbstractAction() {
-		{
-			String text = "<";
-			putValue(Action.NAME, text);
-			putValue(Action.SHORT_DESCRIPTION, text);
-		}
-
-		public void actionPerformed(ActionEvent e) {
-			map.translateMapPosition(-MOVE_STEP, 0);
-			map.repaint();
-		}
-	};
-	private Action rightAction = new AbstractAction() {
-		{
-			String text = ">";
-			putValue(Action.NAME, text);
-			putValue(Action.SHORT_DESCRIPTION, text);
-		}
-
-		public void actionPerformed(ActionEvent e) {
-			map.translateMapPosition(+MOVE_STEP, 0);
-			map.repaint();
 		}
 	};
 	private Action nextTileServer = new AbstractAction() {
