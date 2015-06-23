@@ -55,9 +55,9 @@ public class DataWindow implements ActionListener{
 
 		telem.add( new TableColumn(){
 			public String	getName(){ return "Value"; }
-			public Object	getValueAt(int row) { return context.getTelemetry(row); }
+			public Object	getValueAt(int row) { return " "+context.getTelemetry(row); }
 			public int		getRowCount(){ return 256; }
-			public Class	getDataClass(){ return Float.class; }
+			public Class	getDataClass(){ return String.class; }
 			public boolean	isRowEditable(int row){ return false; }
 			public void		setValueAt(Object val, int row){
 				;
