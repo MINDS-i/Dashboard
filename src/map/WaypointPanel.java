@@ -107,16 +107,6 @@ class WaypointPanel extends JPanel implements ContextViewer{
 		tileButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 		tileButton.setMaximumSize(new Dimension(130, 40));
 		add(tileButton);
-		//add navigation layout
-		JPanel navigation = new JPanel(new GridLayout(2,3,3,3));
-		navigation.setOpaque(false);
-		navigation.add(new JLabel());
-		navigation.add(new JButton(upAction));
-		navigation.add(new JLabel());
-		navigation.add(new JButton(leftAction));
-		navigation.add(new JButton(downAction));
-		navigation.add(new JButton(rightAction));
-		add(navigation);
 		//add zooming flow layout
 		JPanel zoom = new JPanel(new FlowLayout());
 		zoom.setOpaque(false);
