@@ -15,35 +15,35 @@ public class DataLabel extends JLabel implements TelemetryListener{
     label = prefix;
     data = dat;
     suffix = units;
-    setText(label + data  + suffix);
+    setText(label + String.format("%f", data)  + suffix);
   }
 
   public DataLabel(String prefix, String units){
     label = prefix;
     data = 0.;
     suffix = units;
-    setText(label + data + suffix);
+    setText(label + String.format("%f", data) + suffix);
   }
 
   public DataLabel(String prefix){
     label = prefix;
     data = 0.;
     suffix = new String();
-    setText(label + data + suffix);
+    setText(label + String.format("%f", data) + suffix);
   }
   public void update(double dat){
     data = dat;
-    setText(label + data + suffix);
+    setText(label + String.format("%f", data) + suffix);
   }
 
   public void setLabel(String prefix){
     label = prefix;
-    setText(label + data + suffix);
+    setText(label + String.format("%f", data) + suffix);
   }
 
   public void setUnits(String units){
     suffix = units;
-    setText(label + data + suffix);
+    setText(label + String.format("%f", data) + suffix);
   }
 
   public double getData(){
