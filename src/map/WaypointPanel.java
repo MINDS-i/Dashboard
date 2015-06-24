@@ -97,18 +97,24 @@ class WaypointPanel extends JPanel implements ContextViewer{
 		zoom.add(new JButton(zoomInAction));
 		zoom.add(new JButton(zoomOutAction));
 		add(zoom);
+
 		//open the data management panel
 		JButton dataPanel = new JButton(openDataPanel);
 		dataPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 		dataPanel.setMaximumSize(new Dimension(130, 40));
 		add(dataPanel);
+		add(Box.createRigidArea(new Dimension(0,5)));
 		//make a new graph
 		JButton graphButton = new JButton(buildGraph);
 		graphButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 		graphButton.setMaximumSize(new Dimension(130, 40));
 		add(graphButton);
+		add(Box.createRigidArea(new Dimension(0,5)));
 		//add spacer
-		add(new JSeparator(SwingConstants.HORIZONTAL));
+		JSeparator sep = new JSeparator(SwingConstants.HORIZONTAL);
+		add(sep);
+		add(Box.createRigidArea(new Dimension(0,5)));
+
 		//add selectedWaypoint flow layout
 		JPanel selector = new JPanel(new BorderLayout());
 		selector.setOpaque(false);
@@ -118,6 +124,7 @@ class WaypointPanel extends JPanel implements ContextViewer{
 		selector.add(waypointIndexDisplay, BorderLayout.CENTER);
 		selector.add(new JButton(nextWaypoint), BorderLayout.LINE_END);
 		add(selector);
+		add(Box.createRigidArea(new Dimension(0,5)));
 		//add latitude box
 		JPanel lat = new JPanel();
 		lat.setLayout(new BoxLayout(lat, BoxLayout.LINE_AXIS));
@@ -146,7 +153,7 @@ class WaypointPanel extends JPanel implements ContextViewer{
 		lng.add(lngLabel);
 		lng.add(longitude);
 		add(lng);
-		//add alitude box
+		//add altitude box
 		JPanel alt = new JPanel();
 		alt.setLayout(new BoxLayout(alt, BoxLayout.LINE_AXIS));
 		alt.setOpaque(false);
@@ -173,6 +180,7 @@ class WaypointPanel extends JPanel implements ContextViewer{
 		reTarget.setAlignmentX(Component.CENTER_ALIGNMENT);
 		reTarget.setMaximumSize(new Dimension(130, 40));
 		add(reTarget);
+		add(Box.createRigidArea(new Dimension(0,5)));
 
 		//add looping button
 		JButton looping = new JButton(toggleLooping);
