@@ -21,27 +21,34 @@ public class NinePatch{
     private final int edgeWidth;
     private final int edgeHeight;
 
-    static BufferedImage deepCopy(BufferedImage bi) {
+    /**
+     * Test with small, even and odd sised corners
+     * test with non-square corners
+     * fix edge rotation
+     */
+
+
+    static BufferedImage copyRotated(BufferedImage bi, double rotation){
+        //paramaterize rotation
+        double rot = Math.toRadians(rotation);
+        int newWidth  = (int) Math.abs(bi.getWidth()*Math.cos(rot) ) +
+                        (int) Math.abs(bi.getHeight()*Math.sin(rot))  ;
+        int newHeight = (int) Math.abs(bi.getWidth()*Math.sin(rot) ) +
+                        (int) Math.abs(bi.getHeight()*Math.cos(rot))  ;
+        //make compatible, rotated canvas
         ColorModel cm = bi.getColorModel();
         boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
-        WritableRaster raster = bi.copyData(null);
-        return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
-    }
-
-    static BufferedImage copyRotated(BufferedImage bi, double rot){
-        BufferedImage ni = deepCopy(bi);
+        WritableRaster raster = cm.createCompatibleWritableRaster(newWidth, newHeight);
+        BufferedImage ni = new BufferedImage(cm, raster, isAlphaPremultiplied, null);
+        //define transform to do rotation;
         Graphics2D g = ni.createGraphics();
-
-        double rotationRequired = Math.toRadians(rot);
-        double locationX = bi.getWidth() / 2;
-        double locationY = bi.getHeight() / 2;
-        AffineTransform tx = AffineTransform.getRotateInstance(rotationRequired, locationX, locationY);
-        //AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
-
-        // Drawing the rotated image at the required drawing locations
-        //g2d.drawImage(op.filter(image, null), drawLocationX, drawLocationY, null);
-
+        AffineTransform tx = new AffineTransform();
+        tx.translate(newWidth/2.0d, newHeight/2.0d); //move from 0,0 to new image center
+        tx.rotate(rot); //perform rotation
+        tx.translate(-bi.getWidth()/2.0d, -bi.getHeight()/2.0d); //move image to 0,0 for rotation
+        //draw the rotation into the new image
         g.drawImage(bi, tx, null);
+
         return ni;
     }
 
@@ -54,12 +61,12 @@ public class NinePatch{
         this.center = center;
 
         this.walls.put(Walls.TOP, copyRotated(wall, 0));
-        this.walls.put(Walls.LEFT, copyRotated(wall, 270));
+        this.walls.put(Walls.LEFT, copyRotated(wall, -90));
         this.walls.put(Walls.RIGHT, copyRotated(wall, 90));
         this.walls.put(Walls.BOTTOM, copyRotated(wall, 180));
 
         this.joint.put(Corner.TOP_LEFT, copyRotated(corner, 0));
-        this.joint.put(Corner.TOP_RIGHT, copyRotated(corner, 270));
+        this.joint.put(Corner.TOP_RIGHT, copyRotated(corner, -90));
         this.joint.put(Corner.LOWER_LEFT, copyRotated(corner, 90));
         this.joint.put(Corner.LOWER_RIGHT, copyRotated(corner, 180));
 
