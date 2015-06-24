@@ -18,16 +18,14 @@ public class NinePatch{
                     = new EnumMap<Walls, BufferedImage>(Walls.class);
     private final EnumMap<Corner, BufferedImage> joint
                     = new EnumMap<Corner, BufferedImage>(Corner.class);
-    private final int edgeWidth;
-    private final int edgeHeight;
-
+    private final int edgeWidth, edgeHeight;
+    private final int horzWallThickness,   vertWallThickness;
+    private final int horzCenterThickness, vertCenterThickness;
     /**
      * Test with small, even and odd sised corners
      * test with non-square corners
-     * fix edge rotation
+     * throw illegal size exceptions if any constraint is violated
      */
-
-
     static BufferedImage copyRotated(BufferedImage bi, double rotation){
         //paramaterize rotation
         double rot = Math.toRadians(rotation);
@@ -51,10 +49,13 @@ public class NinePatch{
 
         return ni;
     }
-
     private NinePatch(){
         edgeWidth  = 0;
         edgeHeight = 0;
+        horzWallThickness = 0;
+        vertWallThickness = 0;
+        horzCenterThickness = 0;
+        vertCenterThickness = 0;
         center = null;
     }
     public NinePatch(BufferedImage center, BufferedImage wall, BufferedImage corner){
@@ -72,6 +73,34 @@ public class NinePatch{
 
         edgeWidth = corner.getWidth();
         edgeHeight = corner.getHeight();
+        horzWallThickness = wall.getWidth();
+        vertWallThickness = wall.getWidth();
+        horzCenterThickness = center.getWidth();
+        vertCenterThickness = center.getHeight();
+    }
+    public NinePatch(BufferedImage center,
+                     BufferedImage topWall,
+                     BufferedImage sideWall,
+                     BufferedImage corner){
+       this.center = center;
+
+        this.walls.put(Walls.LEFT,  copyRotated(sideWall,0));
+        this.walls.put(Walls.RIGHT, copyRotated(sideWall, 180));
+
+        this.walls.put(Walls.TOP,    copyRotated(topWall, 0));
+        this.walls.put(Walls.BOTTOM, copyRotated(topWall, 180));
+
+        this.joint.put(Corner.TOP_LEFT, copyRotated(corner, 0));
+        this.joint.put(Corner.TOP_RIGHT, copyRotated(corner, -90));
+        this.joint.put(Corner.LOWER_LEFT, copyRotated(corner, 90));
+        this.joint.put(Corner.LOWER_RIGHT, copyRotated(corner, 180));
+
+        edgeWidth  = corner.getWidth();
+        edgeHeight = corner.getHeight();
+        horzWallThickness = topWall.getWidth();
+        vertWallThickness = sideWall.getHeight();
+        horzCenterThickness = center.getWidth();
+        vertCenterThickness = center.getHeight();
     }
     public NinePatch(BufferedImage center, BufferedImage[] walls, BufferedImage[] corners){
         this.center = center;
@@ -87,12 +116,17 @@ public class NinePatch{
 
         edgeWidth = corners[0].getWidth();
         edgeHeight = corners[0].getHeight();
+        horzWallThickness = walls[0].getWidth();
+        vertWallThickness = walls[1].getHeight();
+        horzCenterThickness = center.getWidth();
+        vertCenterThickness = center.getHeight();
     }
-
     public BufferedImage getAt(int width, int height){
-        return null;
+        BufferedImage me = new BufferedImage(width, height);
+        Graphics2D g2d = me.crateGraphics();
+        paintIn(g2d, width, height);
+        return me;
     }
-
     public void paintIn(Graphics g, int width, int height){
         System.out.println("Painting a 9-patch");
         Graphics2D g2d = (Graphics2D) g;
@@ -100,51 +134,78 @@ public class NinePatch{
         final int right = width - edgeWidth;
         final int base  = height - edgeHeight;
 
-        g.drawImage(joint.get(Corner.TOP_LEFT)   ,     0,    0,null);
-        g.drawImage(joint.get(Corner.TOP_RIGHT)  , right,    0,null);
-        g.drawImage(joint.get(Corner.LOWER_LEFT) ,     0, base,null);
-        g.drawImage(joint.get(Corner.LOWER_RIGHT), right, base,null);
+        for(int x = edgeWidth; x<right; x+=horzCenterThickness){
+            for(int y = edgeHeight; y<base; y+=vertCenterThickness){
+                g.drawImage(center, x, y, null);
+            }
+        }
 
-        for(int x = edgeWidth; x<right; x++){
+        for(int x = edgeWidth; x<right; x+=horzWallThickness){
             g.drawImage(walls.get(Walls.TOP),    x,    0, null);
             g.drawImage(walls.get(Walls.BOTTOM), x, base, null);
         }
 
-        for(int y = edgeHeight; y<base; y++){
+        for(int y = edgeHeight; y<base; y+=vertWallThickness){
             g.drawImage(walls.get(Walls.LEFT),      0, y, null);
             g.drawImage(walls.get(Walls.RIGHT), right, y, null);
         }
 
-        for(int x = edgeWidth; x<right; x++){
-            for(int y = edgeHeight; y<base; y++){
-                g.drawImage(center, x, y, null);
-            }
-        }
+        g.drawImage(joint.get(Corner.TOP_LEFT)   ,     0,    0,null);
+        g.drawImage(joint.get(Corner.TOP_RIGHT)  , right,    0,null);
+        g.drawImage(joint.get(Corner.LOWER_LEFT) ,     0, base,null);
+        g.drawImage(joint.get(Corner.LOWER_RIGHT), right, base,null);
     }
 
     public static void main(String[] args) {
         JFrame f = new JFrame("9-Patch Test");
 
-        NinePatch test = new NinePatch();
+        NinePatch test3 = new NinePatch();
+        NinePatch test4 = new NinePatch();
+        NinePatch test9 = new NinePatch();
         try{
-            test = new NinePatch(ImageIO.read(new File("./data/nP/center.png")),
-                                 ImageIO.read(new File("./data/nP/edge.png"  )),
-                                 ImageIO.read(new File("./data/nP/corner.png")) );
+            BufferedImage c1            = ImageIO.read(new File("./data/nP/c1.png"));
+            BufferedImage c2            = ImageIO.read(new File("./data/nP/c2.png"));
+            BufferedImage c3            = ImageIO.read(new File("./data/nP/c3.png"));
+            BufferedImage c4            = ImageIO.read(new File("./data/nP/c4.png"));
+            BufferedImage center        = ImageIO.read(new File("./data/nP/center.png"));
+            BufferedImage corner        = ImageIO.read(new File("./data/nP/corner.png"));
+            BufferedImage edge          = ImageIO.read(new File("./data/nP/edge.png"));
+            BufferedImage horzGreenGrad = ImageIO.read(new File("./data/nP/horzGreenGrad.png"));
+            BufferedImage spiral        = ImageIO.read(new File("./data/nP/spiral.png"));
+            BufferedImage vertGreenGrad = ImageIO.read(new File("./data/nP/vertGreenGrad.png"));
+
+            BufferedImage[] walls = new BufferedImage[]{
+                vertGreenGrad, horzGreenGrad, horzGreenGrad, vertGreenGrad
+            };
+            BufferedImage[] corners = new BufferedImage[]{
+                c1, c2, c3, c4
+            };
+
+            test3 = new NinePatch(center, edge, corner);
+            test4 = new NinePatch(spiral, vertGreenGrad, horzGreenGrad, c1);
+            test9 = new NinePatch(spiral, walls, corners);
         } catch (Exception e){
             e.printStackTrace();
         }
 
-        final NinePatch drawnPatch = test;
-
-        JPanel draw9patch = new JPanel(){
+        class NinePatchPanel extends JPanel{
+            private NinePatch np;
+            NinePatchPanel(NinePatch np){
+                this.np = np;
+                this.setPreferredSize(new Dimension(200, 200));
+            }
             @Override
             public void paintComponent(Graphics g){
                 super.paintComponent(g);
-                drawnPatch.paintIn(g, getWidth(), getHeight());
+                np.paintIn(g, getWidth(), getHeight());
             }
-        };
+        }
 
-        f.add(draw9patch);
+        JPanel layoutPanel = new JPanel();
+        layoutPanel.add(new NinePatchPanel(test3));
+        layoutPanel.add(new NinePatchPanel(test4));
+        layoutPanel.add(new NinePatchPanel(test9));
+        f.add(layoutPanel);
         f.pack();
         f.setVisible(true);
 
