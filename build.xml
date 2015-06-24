@@ -43,6 +43,12 @@
         </java>
     </target>
 
+    <target name="nine" depends="compile">
+        <java classname="com.ui.ninePatch.NinePatch">
+            <classpath path="${outputDir}"/>
+        </java>
+    </target>
+
     <target name="test" depends="compile">
 
         <javac srcdir="${testDir}" destdir="${outputDir}" extdirs="${libDir}:${outputDir}"

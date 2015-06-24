@@ -21,6 +21,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.xml.stream.XMLStreamException;
+import java.util.ArrayList;
 
 class WaypointPanel extends JPanel implements ContextViewer{
 	protected static final int MOVE_STEP = 32;
@@ -125,49 +126,46 @@ class WaypointPanel extends JPanel implements ContextViewer{
 		selector.add(new JButton(nextWaypoint), BorderLayout.LINE_END);
 		add(selector);
 		add(Box.createRigidArea(new Dimension(0,5)));
-		//add latitude box
-		JPanel lat = new JPanel();
-		lat.setLayout(new BoxLayout(lat, BoxLayout.LINE_AXIS));
-		lat.setOpaque(false);
-		latitude = new JTextField();
-		latitude.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-		coordinateListener listener = new coordinateListener(latitude, this);
-		latitude.getDocument().addDocumentListener(listener);
-		latitude.addActionListener(listener);
-		JLabel latLabel = new JLabel("Lat: ");
-		latLabel.setFont(context.theme.text);
-		lat.add(latLabel);
-		lat.add(latitude);
-		add(lat);
-		//add longitude box
-		JPanel lng = new JPanel();
-		lng.setLayout(new BoxLayout(lng, BoxLayout.LINE_AXIS));
-		lng.setOpaque(false);
-		longitude = new JTextField();
-		longitude.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-		listener = new coordinateListener(longitude, this);
-		longitude.getDocument().addDocumentListener(listener);
-		longitude.addActionListener(listener);
-		JLabel lngLabel = new JLabel("Lng: ");
-		lngLabel.setFont(context.theme.text);
-		lng.add(lngLabel);
-		lng.add(longitude);
-		add(lng);
-		//add altitude box
-		JPanel alt = new JPanel();
-		alt.setLayout(new BoxLayout(alt, BoxLayout.LINE_AXIS));
-		alt.setOpaque(false);
-		altitude = new JTextField();
-		altitude.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-		listener = new coordinateListener(altitude, this);
-		altitude.getDocument().addDocumentListener(listener);
-		altitude.addActionListener(listener);
+
+
+		class EditBoxSpec{
+			public final JTextField ref;
+			public final String label;
+			public EditBoxSpec(JTextField ref, String label){
+				this.ref = ref;
+				this.label = label;
+			}
+		}
+		ArrayList<EditBoxSpec> editorBoxes = new ArrayList<EditBoxSpec>();
+
 		ResourceBundle res = ResourceBundle.getBundle("settingLabels", context.locale);
-		JLabel altLabel = new JLabel(res.getString("waypointExtra")+" ");
-		altLabel.setFont(context.theme.text);
-		alt.add(altLabel);
-		alt.add(altitude);
-		add(alt);
+		latitude = new JTextField();
+		longitude = new JTextField();
+		altitude = new JTextField();
+		editorBoxes.add(new EditBoxSpec(latitude , "Lat: "));
+		editorBoxes.add(new EditBoxSpec(longitude, "Lng: "));
+		editorBoxes.add(new EditBoxSpec(altitude , res.getString("waypointExtra")+" "));
+
+		for(EditBoxSpec box : editorBoxes){
+			//construct panel
+			JPanel panel = new JPanel();
+			panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
+			panel.setOpaque(false);
+			//add label box
+			JLabel label = new JLabel(box.label);
+			label.setFont(context.theme.text);
+			panel.add(label);
+			//add textField
+			JTextField tf = box.ref;
+			tf.setBorder(BorderFactory.createLineBorder(Color.gray));
+			panel.add(tf);
+			//Setup text field listener
+			coordinateListener listener = new coordinateListener(tf, this);
+			tf.getDocument().addDocumentListener(listener);
+			tf.addActionListener(listener);
+			//add to layout
+			add(panel);
+		}
 
 		//add enter button
 		JPanel waypointOptions = new JPanel(new FlowLayout());
@@ -176,6 +174,7 @@ class WaypointPanel extends JPanel implements ContextViewer{
 		waypointOptions.add(new JButton(interpretLocationAction));
 		add(waypointOptions);
 
+		//add button to reset the rover's target
 		JButton reTarget = new JButton(reTargetRover);
 		reTarget.setAlignmentX(Component.CENTER_ALIGNMENT);
 		reTarget.setMaximumSize(new Dimension(130, 40));
