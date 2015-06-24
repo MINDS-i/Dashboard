@@ -41,7 +41,9 @@ class WaypointPanel extends JPanel implements ContextViewer{
 		context = cxt;
 		context.registerViewer(this);
 		setOpaque(false);
-		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+		LayoutManager layout = new BoxLayout(this, BoxLayout.PAGE_AXIS);
+		setLayout(layout);
+		setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 		buildPanel();
 	}
 
@@ -84,7 +86,6 @@ class WaypointPanel extends JPanel implements ContextViewer{
 	}
 
 	private void buildPanel(){
-		Insets basic = new Insets(1,1,1,1);
 		//add tile server switcher button
 		JButton tileButton = new JButton(nextTileServer);
 		tileButton.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -106,11 +107,6 @@ class WaypointPanel extends JPanel implements ContextViewer{
 		graphButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 		graphButton.setMaximumSize(new Dimension(130, 40));
 		add(graphButton);
-		//add looping button
-		JButton looping = new JButton(toggleLooping);
-		looping.setAlignmentX(Component.CENTER_ALIGNMENT);
-		looping.setMaximumSize(new Dimension(130, 40));
-		add(looping);
 		//add spacer
 		add(new JSeparator(SwingConstants.HORIZONTAL));
 		//add selectedWaypoint flow layout
@@ -175,7 +171,14 @@ class WaypointPanel extends JPanel implements ContextViewer{
 
 		JButton reTarget = new JButton(reTargetRover);
 		reTarget.setAlignmentX(Component.CENTER_ALIGNMENT);
+		reTarget.setMaximumSize(new Dimension(130, 40));
 		add(reTarget);
+
+		//add looping button
+		JButton looping = new JButton(toggleLooping);
+		looping.setAlignmentX(Component.CENTER_ALIGNMENT);
+		looping.setMaximumSize(new Dimension(130, 40));
+		add(looping);
 
 		//add save/load flow layout
 		JPanel saveload = new JPanel(new FlowLayout());
