@@ -85,6 +85,17 @@ class WaypointPanel extends JPanel implements ContextViewer{
 
 	private void buildPanel(){
 		Insets basic = new Insets(1,1,1,1);
+		//add tile server switcher button
+		JButton tileButton = new JButton(nextTileServer);
+		tileButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+		tileButton.setMaximumSize(new Dimension(130, 40));
+		add(tileButton);
+		//add zooming flow layout
+		JPanel zoom = new JPanel(new FlowLayout());
+		zoom.setOpaque(false);
+		zoom.add(new JButton(zoomInAction));
+		zoom.add(new JButton(zoomOutAction));
+		add(zoom);
 		//open the data management panel
 		JButton dataPanel = new JButton(openDataPanel);
 		dataPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -100,17 +111,6 @@ class WaypointPanel extends JPanel implements ContextViewer{
 		looping.setAlignmentX(Component.CENTER_ALIGNMENT);
 		looping.setMaximumSize(new Dimension(130, 40));
 		add(looping);
-		//add tile server switcher button
-		JButton tileButton = new JButton(nextTileServer);
-		tileButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-		tileButton.setMaximumSize(new Dimension(130, 40));
-		add(tileButton);
-		//add zooming flow layout
-		JPanel zoom = new JPanel(new FlowLayout());
-		zoom.setOpaque(false);
-		zoom.add(new JButton(zoomInAction));
-		zoom.add(new JButton(zoomOutAction));
-		add(zoom);
 		//add spacer
 		add(new JSeparator(SwingConstants.HORIZONTAL));
 		//add selectedWaypoint flow layout
@@ -123,7 +123,6 @@ class WaypointPanel extends JPanel implements ContextViewer{
 		selector.add(new JButton(nextWaypoint), BorderLayout.LINE_END);
 		add(selector);
 		//add latitude box
-
 		JPanel lat = new JPanel();
 		lat.setLayout(new BoxLayout(lat, BoxLayout.LINE_AXIS));
 		lat.setOpaque(false);
@@ -268,9 +267,7 @@ class WaypointPanel extends JPanel implements ContextViewer{
 		String mapMSG = "Street";
 		boolean state = false;
 		{
-			String text = satMSG;
-			putValue(Action.NAME, text);
-			putValue(Action.SHORT_DESCRIPTION, text);
+			putValue(Action.NAME, (state)?satMSG:mapMSG);
 		}
 
 		public void actionPerformed(ActionEvent e){
