@@ -11,6 +11,7 @@ import java.awt.geom.*;
 import java.io.*;
 
 import com.ui.BackgroundPanel;
+import com.ui.ninePatch.NinePatchPanel;
 
 public class NinePatch{
     private final BufferedImage center;
@@ -20,11 +21,7 @@ public class NinePatch{
                     = new EnumMap<Walls, BufferedImage>(Walls.class);
     private final EnumMap<Corner, BufferedImage> joint
                     = new EnumMap<Corner, BufferedImage>(Corner.class);
-    /**
-     * Test with small, even and odd sised corners
-     * test with non-square corners
-     * throw illegal size exceptions if any constraint is violated?
-     */
+
     static BufferedImage copyRotated(BufferedImage bi, double rotation){
         //paramaterize rotation
         double rot = Math.toRadians(rotation);
@@ -191,6 +188,7 @@ public class NinePatch{
         NinePatch test4 = new NinePatch();
         NinePatch test9 = new NinePatch();
         NinePatch testOdd = new NinePatch();
+        NinePatch testButton = new NinePatch();
         try{
             BufferedImage c1            = ImageIO.read(new File("./data/nP/c1.png"));
             BufferedImage c2            = ImageIO.read(new File("./data/nP/c2.png"));
@@ -215,33 +213,42 @@ public class NinePatch{
                 c1, c2, c3, c4
             };
 
+            BufferedImage buttonCenter = ImageIO.read(new File("./data/nP/blueButton/center.png"));
+            BufferedImage[] buttonWalls = new BufferedImage[]{
+                ImageIO.read(new File("./data/nP/blueButton/top.png")),
+                ImageIO.read(new File("./data/nP/blueButton/left.png")),
+                ImageIO.read(new File("./data/nP/blueButton/right.png")),
+                ImageIO.read(new File("./data/nP/blueButton/bottom.png")) };
+            BufferedImage[] buttonJoints = new BufferedImage[]{
+                ImageIO.read(new File("./data/nP/blueButton/topLeft.png")),
+                ImageIO.read(new File("./data/nP/blueButton/topRight.png")),
+                ImageIO.read(new File("./data/nP/blueButton/lowerLeft.png")),
+                ImageIO.read(new File("./data/nP/blueButton/lowerRight.png")) };
+
             test3 = new NinePatch(center, edge, corner);
             test4 = new NinePatch(spiral, vertGreenGrad, horzGreenGrad, c1);
             test9 = new NinePatch(spiral, walls, corners);
             testOdd = new NinePatch(oddCenter, oddVert, oddHorz, oddCorner);
+            testButton = new NinePatch(buttonCenter, buttonWalls, buttonJoints);
         } catch (Exception e){
             e.printStackTrace();
         }
 
-        class NinePatchPanel extends JPanel{
-            private NinePatch np;
-            NinePatchPanel(NinePatch np){
-                this.np = np;
-                this.setPreferredSize(new Dimension(200, 200));
-            }
-            @Override
-            public void paintComponent(Graphics g){
-                super.paintComponent(g);
-                np.paintIn(g, getWidth(), getHeight());
-            }
+        JPanel layoutPanel = new JPanel();
+        JComponent[] panels = new JComponent[]{
+            new NinePatchPanel(test3)
+            ,new NinePatchPanel(test4)
+            ,new NinePatchPanel(test9)
+            ,new BackgroundPanel(test9.getImage(200,200))
+            ,new NinePatchPanel(testOdd)
+            ,new NinePatchButton(testButton, "Hello")
+        };
+
+        for(JComponent panel: panels){
+            panel.setPreferredSize(new Dimension(200, 200));
+            layoutPanel.add(panel);
         }
 
-        JPanel layoutPanel = new JPanel();
-        layoutPanel.add(new NinePatchPanel(test3));
-        layoutPanel.add(new NinePatchPanel(test4));
-        layoutPanel.add(new NinePatchPanel(test9));
-        layoutPanel.add(new BackgroundPanel(test9.getImage(200,200)));
-        layoutPanel.add(new NinePatchPanel(testOdd));
         f.add(layoutPanel);
         f.pack();
         f.setVisible(true);
