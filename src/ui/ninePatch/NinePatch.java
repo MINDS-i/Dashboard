@@ -144,20 +144,6 @@ public class NinePatch{
         final int bottomDrawPoint = height - vertWallHeight;
         final int rightDrawPoint  = width  - horzWallWidth;
 
-        /**
-         * corner width/height
-         * horzWall thickness and height
-         * vertWall thickness and height
-         * center width
-         * center height
-         */
-
-/*        for(int x = cornerWidth; x<right; x+=horzCenterThickness){
-            for(int y = cornerHeight; y<base; y+=vertCenterThickness){
-                g.drawImage(center, x, y, null);
-            }
-        }
-*/
         //fill main body section
         for(int y = vertWallHeight; y < bottomDrawPoint; y += vertCenterThickness){
             for(int x = cornerWidth; x < right; x += horzCenterThickness){
