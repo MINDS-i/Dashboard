@@ -103,45 +103,25 @@ class WaypointPanel extends JPanel implements ContextViewer{
 		final Dimension space		= new Dimension(0,5);
 		final Dimension buttonSize	= new Dimension(140, 25);
 
-/*		Action actionButtons = new Action[]{
-			nextTileServer  ,openDataPanel
-		   ,buildGraph		,reTargetRover
-		   ,toggleLooping
-		};*/
+		//make all the buttons
+		JButton tileButton 	= theme.makeButton(nextTileServer);
+		JButton dataPanel 	= theme.makeButton(openDataPanel);//theme.makeButton(openDataPanel);
+		JButton graphButton = theme.makeButton(buildGraph);
+		JButton reTarget 	= theme.makeButton(reTargetRover);
+		JButton looping 	= theme.makeButton(toggleLooping);
+		JComponent[] format = new JComponent[]{
+			tileButton, dataPanel, graphButton, reTarget, looping
+		};
+		for(JComponent jc : format){
+			jc.setAlignmentX(Component.CENTER_ALIGNMENT);
+			jc.setMaximumSize(buttonSize);
+		}
 
-		JButton model = theme.makeButton();
-		model.setAlignmentX(Component.CENTER_ALIGNMENT);
-		model.setMaximumSize(buttonSize);
-
-		//add tile server switcher button
-		JButton tileButton = theme.makeButton(nextTileServer);
-		tileButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-		tileButton.setMaximumSize(buttonSize);
-		add(tileButton);
-		//add zooming flow layout
+		//make zoom button panel
 		JPanel zoom = new JPanel(new FlowLayout());
 		zoom.setOpaque(false);
 		zoom.add(theme.makeButton(zoomInAction));
 		zoom.add(theme.makeButton(zoomOutAction));
-		add(zoom);
-
-
-		//open the data management panel
-		JButton dataPanel = theme.makeButton(openDataPanel);//theme.makeButton(openDataPanel);
-		dataPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-		dataPanel.setMaximumSize(buttonSize);
-		add(dataPanel);
-		add(Box.createRigidArea(space));
-		//make a new graph
-		JButton graphButton = theme.makeButton(buildGraph);
-		graphButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-		graphButton.setMaximumSize(buttonSize);
-		add(graphButton);
-		add(Box.createRigidArea(space));
-		//add spacer
-		JSeparator sep = new JSeparator(SwingConstants.HORIZONTAL);
-		add(sep);
-		add(Box.createRigidArea(space));
 
 		//add selectedWaypoint flow layout
 		JPanel selector = new JPanel(new BorderLayout());
@@ -151,10 +131,8 @@ class WaypointPanel extends JPanel implements ContextViewer{
 		selector.add(theme.makeButton(previousWaypoint), BorderLayout.LINE_START);
 		selector.add(waypointIndexDisplay, BorderLayout.CENTER);
 		selector.add(theme.makeButton(nextWaypoint), BorderLayout.LINE_END);
-		add(selector);
-		add(Box.createRigidArea(space));
 
-
+		//Make edit boxes
 		class EditBoxSpec{
 			public final JTextField ref;
 			public final String label;
@@ -164,15 +142,14 @@ class WaypointPanel extends JPanel implements ContextViewer{
 			}
 		}
 		ArrayList<EditBoxSpec> editorBoxes = new ArrayList<EditBoxSpec>();
-
 		ResourceBundle res = ResourceBundle.getBundle("settingLabels", context.locale);
-		latitude = new JTextField();
+		latitude  = new JTextField();
 		longitude = new JTextField();
-		altitude = new JTextField();
+		altitude  = new JTextField();
 		editorBoxes.add(new EditBoxSpec(latitude , "Lat: "));
 		editorBoxes.add(new EditBoxSpec(longitude, "Lng: "));
 		editorBoxes.add(new EditBoxSpec(altitude , res.getString("waypointExtra")+" "));
-
+		ArrayList<JPanel> editorPanels = new ArrayList<JPanel>();
 		for(EditBoxSpec box : editorBoxes){
 			//construct panel
 			JPanel panel = new JPanel();
@@ -191,35 +168,18 @@ class WaypointPanel extends JPanel implements ContextViewer{
 			tf.getDocument().addDocumentListener(listener);
 			tf.addActionListener(listener);
 			//add to layout
-			add(panel);
+			editorPanels.add(panel);
 		}
 
-		//add enter button
 		JPanel waypointOptions = new JPanel(new FlowLayout());
 		waypointOptions.setOpaque(false);
 		waypointOptions.add(theme.makeButton(newWaypoint));
 		waypointOptions.add(theme.makeButton(interpretLocationAction));
-		add(waypointOptions);
 
-		//add button to reset the rover's target
-		JButton reTarget = theme.makeButton(reTargetRover);
-		reTarget.setAlignmentX(Component.CENTER_ALIGNMENT);
-		reTarget.setMaximumSize(buttonSize);
-		add(reTarget);
-		add(Box.createRigidArea(space));
-
-		//add looping button
-		JButton looping = theme.makeButton(toggleLooping);
-		looping.setAlignmentX(Component.CENTER_ALIGNMENT);
-		looping.setMaximumSize(buttonSize);
-		add(looping);
-
-		//add save/load flow layout
 		JPanel saveload = new JPanel(new FlowLayout());
 		saveload.setOpaque(false);
 		saveload.add(theme.makeButton(saveWaypoints));
 		saveload.add(theme.makeButton(loadWaypoints));
-		add(saveload);
 
 		JTextArea copyRights = new JTextArea();
 		Font tmp = copyRights.getFont();
@@ -228,6 +188,23 @@ class WaypointPanel extends JPanel implements ContextViewer{
 		copyRights.setLineWrap(true);
 		copyRights.setBorder(new EmptyBorder(0,0,0,0));
 		copyRights.setText(COPY_RIGHT_TEXT);
+
+		add(tileButton);
+		add(zoom);
+		add(dataPanel);
+		add(Box.createRigidArea(space));
+		add(graphButton);
+		add(Box.createRigidArea(space));
+		add(new JSeparator(SwingConstants.HORIZONTAL));
+		add(Box.createRigidArea(space));
+		add(selector);
+		add(Box.createRigidArea(space));
+		for(JPanel panel : editorPanels){ add(panel); }
+		add(waypointOptions);
+		add(reTarget);
+		add(Box.createRigidArea(space));
+		add(looping);
+		add(saveload);
 		add(copyRights);
 	}
 
