@@ -79,7 +79,7 @@ public class Dashboard implements Runnable {
     f = new JFrame("MINDS-i Dashboard");
     f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     f.setVisible(false);
-    f.setIconImage(context.theme.roverTop);
+    f.setIconImage(context.theme.appIcon);//roverTop);
     f.setTitle("MINDS-i dashboard");
 
     Action refreshAction = new AbstractAction(){

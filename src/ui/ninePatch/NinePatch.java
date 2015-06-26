@@ -135,30 +135,49 @@ public class NinePatch{
         final int vertCenterThickness = center.getHeight();
         final int horzCenterThickness = center.getWidth();
 
-
         final int right = width  - cornerWidth;
         final int base  = height - cornerHeight;
         final int bottomDrawPoint = height - vertWallHeight;
         final int rightDrawPoint  = width  - horzWallWidth;
 
-        //fill main body section
-        for(int y = vertWallHeight; y < bottomDrawPoint; y += vertCenterThickness){
-            for(int x = cornerWidth; x < right; x += horzCenterThickness){
-                g.drawImage(center, x, y, null);
+        class Texture{
+            private Graphics2D g;
+            Texture(Graphics2D g2d, BufferedImage bi){
+                g = (Graphics2D) g2d.create();
+                g.setPaint(new TexturePaint(bi,
+                                new Rectangle2D.Float(0f, 0f,
+                                    (float)bi.getWidth(), (float)bi.getHeight())));
             }
+            void draw(int x1, int y1, int x2, int y2){
+                g.fillRect(x1, y1, x2-x1, y2-y1);
+            }
+            void dispose() { g.dispose(); }
         }
 
-        //fill eclipsed body section
-        for(int y = cornerHeight; y < base; y += vertCenterThickness){
-            for(int x = horzWallWidth; x < cornerWidth; x += horzCenterThickness){
-                g.drawImage(center, x, y, null);
-            }
-            for(int x = right; x < rightDrawPoint; x += horzCenterThickness){
-                g.drawImage(center, x, y, null);
-            }
-        }
+
+        Texture centerFill = new Texture(g2d,center);
+        //main center rectangle through left/right wall holes
+        centerFill.draw(cornerWidth, vertWallHeight, right, bottomDrawPoint);
+        //fill eclipsed body section on the left
+        centerFill.draw(horzWallWidth, cornerHeight, cornerWidth, base);
+        //fill eclipsed body section on the right
+        centerFill.draw(right, cornerHeight, rightDrawPoint, base);
+        centerFill.dispose();
+
+/*        Texture topWall = new Texture(g2d, walls.get(Walls.TOP));
+        topWall.draw(cornerWidth, 0, right, vertWallHeight);
+        topWall.dispose();
+
+        Texture bottomWall = new Texture(g2d, walls.get(Walls.BOTTOM));
+        bottomWall.draw(cornerWidth, bottomDrawPoint, right, bottomDrawPoint+vertWallHeight);
+        bottomWall.dispose();*/
+
+        //(new Texture(g2d, walls.get(Walls.TOP))).draw(cornerWidth, 0, right, horzWallHeight);
+        //(new Texture(g2d, walls.get(Walls.TOP))).draw(cornerWidth, 0, right, horzWallHeight);
+        //(new Texture(g2d, walls.get(Walls.TOP))).draw(cornerWidth, 0, right, horzWallHeight);
 
         //draw horizontal walls
+
         for(int x = cornerWidth; x<right; x+=horzWallHeight){
             g.drawImage(walls.get(Walls.TOP),    x,               0, null);
             g.drawImage(walls.get(Walls.BOTTOM), x, bottomDrawPoint, null);
@@ -213,7 +232,7 @@ public class NinePatch{
                 c1, c2, c3, c4
             };
 
-            BufferedImage buttonCenter = ImageIO.read(new File("./data/nP/blueButton/center.png"));
+/*            BufferedImage buttonCenter = ImageIO.read(new File("./data/nP/blueButton/center.png"));
             BufferedImage[] buttonWalls = new BufferedImage[]{
                 ImageIO.read(new File("./data/nP/blueButton/top.png")),
                 ImageIO.read(new File("./data/nP/blueButton/left.png")),
@@ -223,7 +242,19 @@ public class NinePatch{
                 ImageIO.read(new File("./data/nP/blueButton/topLeft.png")),
                 ImageIO.read(new File("./data/nP/blueButton/topRight.png")),
                 ImageIO.read(new File("./data/nP/blueButton/lowerLeft.png")),
-                ImageIO.read(new File("./data/nP/blueButton/lowerRight.png")) };
+                ImageIO.read(new File("./data/nP/blueButton/lowerRight.png")) };*/
+
+            BufferedImage buttonCenter = ImageIO.read(new File("./data/nP/display/Middle.png"));
+            BufferedImage[] buttonWalls = new BufferedImage[]{
+                ImageIO.read(new File("./data/nP/display/TopBorder.png")),
+                ImageIO.read(new File("./data/nP/display/LeftBorder.png")),
+                ImageIO.read(new File("./data/nP/display/RightBorder.png")),
+                ImageIO.read(new File("./data/nP/display/BottomBorder.png")) };
+            BufferedImage[] buttonJoints = new BufferedImage[]{
+                ImageIO.read(new File("./data/nP/display/TopLeft.png")),
+                ImageIO.read(new File("./data/nP/display/TopRight.png")),
+                ImageIO.read(new File("./data/nP/display/BottomLeft.png")),
+                ImageIO.read(new File("./data/nP/display/BottomRight.png")) };
 
             test3 = new NinePatch(center, edge, corner);
             test4 = new NinePatch(spiral, vertGreenGrad, horzGreenGrad, c1);
@@ -245,7 +276,7 @@ public class NinePatch{
         };
 
         for(JComponent panel: panels){
-            panel.setPreferredSize(new Dimension(200, 200));
+            panel.setPreferredSize(new Dimension(400, 400));
             layoutPanel.add(panel);
         }
 

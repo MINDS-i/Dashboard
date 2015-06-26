@@ -9,9 +9,10 @@ import com.xml;
 import com.ContextViewer;
 import com.Context;
 import com.ui.Graph;
+import com.ui.Theme;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.awt.geom.RoundRectangle2D;
 import java.util.PropertyResourceBundle;
@@ -24,7 +25,12 @@ import javax.xml.stream.XMLStreamException;
 import java.util.ArrayList;
 
 class WaypointPanel extends JPanel implements ContextViewer{
+	/**
+	 * Make this just extend NinePatchPanel
+	 */
+
 	protected static final int MOVE_STEP = 32;
+	protected static final int BDR_SIZE = 25;
 	protected static final String NO_WAYPOINT_MSG = "N / A";
 	protected static final String COPY_RIGHT_TEXT = "Map Tiles Courtesy of MapQuest" +
 		"\nStreet Data from OpenStreetMap\nPortions Courtesy NASA/JPL-Caltech" +
@@ -44,8 +50,14 @@ class WaypointPanel extends JPanel implements ContextViewer{
 		setOpaque(false);
 		LayoutManager layout = new BoxLayout(this, BoxLayout.PAGE_AXIS);
 		setLayout(layout);
-		setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+		setBorder(BorderFactory.createEmptyBorder(BDR_SIZE,BDR_SIZE,BDR_SIZE,BDR_SIZE));
 		buildPanel();
+		addMouseListener(new MouseAdapter(){
+			public void mousePressed(MouseEvent me) {
+				//do nothing here to prevent clicks from falling through
+				//to the map panel in the background
+			}
+		});
 	}
 
 	public void waypointUpdate(){
@@ -87,45 +99,60 @@ class WaypointPanel extends JPanel implements ContextViewer{
 	}
 
 	private void buildPanel(){
+		final Theme theme 			= context.theme;
+		final Dimension space		= new Dimension(0,5);
+		final Dimension buttonSize	= new Dimension(140, 25);
+
+/*		Action actionButtons = new Action[]{
+			nextTileServer  ,openDataPanel
+		   ,buildGraph		,reTargetRover
+		   ,toggleLooping
+		};*/
+
+		JButton model = theme.makeButton();
+		model.setAlignmentX(Component.CENTER_ALIGNMENT);
+		model.setMaximumSize(buttonSize);
+
 		//add tile server switcher button
-		JButton tileButton = new JButton(nextTileServer);
+		JButton tileButton = theme.makeButton(nextTileServer);
 		tileButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-		tileButton.setMaximumSize(new Dimension(130, 40));
+		tileButton.setMaximumSize(buttonSize);
 		add(tileButton);
 		//add zooming flow layout
 		JPanel zoom = new JPanel(new FlowLayout());
 		zoom.setOpaque(false);
-		zoom.add(new JButton(zoomInAction));
-		zoom.add(new JButton(zoomOutAction));
+		zoom.add(theme.makeButton(zoomInAction));
+		zoom.add(theme.makeButton(zoomOutAction));
 		add(zoom);
 
+
 		//open the data management panel
-		JButton dataPanel = new JButton(openDataPanel);
+		JButton dataPanel = theme.makeButton(openDataPanel);//theme.makeButton(openDataPanel);
 		dataPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-		dataPanel.setMaximumSize(new Dimension(130, 40));
+		dataPanel.setMaximumSize(buttonSize);
 		add(dataPanel);
-		add(Box.createRigidArea(new Dimension(0,5)));
+		add(Box.createRigidArea(space));
 		//make a new graph
-		JButton graphButton = new JButton(buildGraph);
+		JButton graphButton = theme.makeButton(buildGraph);
 		graphButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-		graphButton.setMaximumSize(new Dimension(130, 40));
+		graphButton.setMaximumSize(buttonSize);
 		add(graphButton);
-		add(Box.createRigidArea(new Dimension(0,5)));
+		add(Box.createRigidArea(space));
 		//add spacer
 		JSeparator sep = new JSeparator(SwingConstants.HORIZONTAL);
 		add(sep);
-		add(Box.createRigidArea(new Dimension(0,5)));
+		add(Box.createRigidArea(space));
 
 		//add selectedWaypoint flow layout
 		JPanel selector = new JPanel(new BorderLayout());
 		selector.setOpaque(false);
 		waypointIndexDisplay = new JLabel(NO_WAYPOINT_MSG);
 		waypointIndexDisplay.setHorizontalAlignment(SwingConstants.CENTER);
-		selector.add(new JButton(previousWaypoint), BorderLayout.LINE_START);
+		selector.add(theme.makeButton(previousWaypoint), BorderLayout.LINE_START);
 		selector.add(waypointIndexDisplay, BorderLayout.CENTER);
-		selector.add(new JButton(nextWaypoint), BorderLayout.LINE_END);
+		selector.add(theme.makeButton(nextWaypoint), BorderLayout.LINE_END);
 		add(selector);
-		add(Box.createRigidArea(new Dimension(0,5)));
+		add(Box.createRigidArea(space));
 
 
 		class EditBoxSpec{
@@ -170,28 +197,28 @@ class WaypointPanel extends JPanel implements ContextViewer{
 		//add enter button
 		JPanel waypointOptions = new JPanel(new FlowLayout());
 		waypointOptions.setOpaque(false);
-		waypointOptions.add(new JButton(newWaypoint));
-		waypointOptions.add(new JButton(interpretLocationAction));
+		waypointOptions.add(theme.makeButton(newWaypoint));
+		waypointOptions.add(theme.makeButton(interpretLocationAction));
 		add(waypointOptions);
 
 		//add button to reset the rover's target
-		JButton reTarget = new JButton(reTargetRover);
+		JButton reTarget = theme.makeButton(reTargetRover);
 		reTarget.setAlignmentX(Component.CENTER_ALIGNMENT);
-		reTarget.setMaximumSize(new Dimension(130, 40));
+		reTarget.setMaximumSize(buttonSize);
 		add(reTarget);
-		add(Box.createRigidArea(new Dimension(0,5)));
+		add(Box.createRigidArea(space));
 
 		//add looping button
-		JButton looping = new JButton(toggleLooping);
+		JButton looping = theme.makeButton(toggleLooping);
 		looping.setAlignmentX(Component.CENTER_ALIGNMENT);
-		looping.setMaximumSize(new Dimension(130, 40));
+		looping.setMaximumSize(buttonSize);
 		add(looping);
 
 		//add save/load flow layout
 		JPanel saveload = new JPanel(new FlowLayout());
 		saveload.setOpaque(false);
-		saveload.add(new JButton(saveWaypoints));
-		saveload.add(new JButton(loadWaypoints));
+		saveload.add(theme.makeButton(saveWaypoints));
+		saveload.add(theme.makeButton(loadWaypoints));
 		add(saveload);
 
 		JTextArea copyRights = new JTextArea();
@@ -233,7 +260,8 @@ class WaypointPanel extends JPanel implements ContextViewer{
 		Graphics2D g = (Graphics2D) gOrig.create();
 		try {
 			int w = getWidth(), h = getHeight();
-			drawBackground(g, w, h);
+			//drawBackground(g, w, h);
+			context.theme.panelPatch.paintIn(g, w, h);
 		} finally {
 			g.dispose();
 		}
