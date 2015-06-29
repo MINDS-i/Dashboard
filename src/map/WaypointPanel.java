@@ -245,16 +245,6 @@ class WaypointPanel extends JPanel implements ContextViewer{
 		super.paint(gOrig);
 	}
 
-	private static void drawBackground(Graphics2D g, int width, int height) {
-		Color color1 = new Color(0xc0, 0xc0, 0xc0);
-		Color color2 = new Color(0xe0, 0xe0, 0xe0);
-		Composite oldComposite = g.getComposite();
-		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.75f));
-		g.setPaint(new GradientPaint(0, 0, color1, 0, height*2, color2));
-		g.fillRoundRect(-1, -1, width, height, 12, 12);
-		g.setComposite(oldComposite);
-	}
-
 	private Action zoomInAction = new AbstractAction() {
 		{
 			String text = "+";
