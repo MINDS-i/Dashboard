@@ -10,6 +10,7 @@ import com.ContextViewer;
 import com.Context;
 import com.ui.Graph;
 import com.ui.Theme;
+import com.ui.ninePatch.NinePatchPanel;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -24,11 +25,7 @@ import javax.swing.border.EtchedBorder;
 import javax.xml.stream.XMLStreamException;
 import java.util.ArrayList;
 
-class WaypointPanel extends JPanel implements ContextViewer{
-	/**
-	 * Make this just extend NinePatchPanel
-	 */
-
+class WaypointPanel extends NinePatchPanel implements ContextViewer{
 	protected static final int MOVE_STEP = 32;
 	protected static final int BDR_SIZE = 25;
 	protected static final String NO_WAYPOINT_MSG = "N / A";
@@ -44,6 +41,7 @@ class WaypointPanel extends JPanel implements ContextViewer{
 	JLabel waypointIndexDisplay;
 
 	public WaypointPanel(Context cxt, MapPanel mapPanel) {
+		super(cxt.theme.panelPatch);
 		map = mapPanel;
 		context = cxt;
 		context.registerViewer(this);
@@ -231,18 +229,6 @@ class WaypointPanel extends JPanel implements ContextViewer{
 				context.waypoint.set(selectedWaypoint, newPosition);
 			}
 		} catch (NumberFormatException e) {}
-	}
-
-	public void paint(Graphics gOrig) {
-		Graphics2D g = (Graphics2D) gOrig.create();
-		try {
-			int w = getWidth(), h = getHeight();
-			//drawBackground(g, w, h);
-			context.theme.panelPatch.paintIn(g, w, h);
-		} finally {
-			g.dispose();
-		}
-		super.paint(gOrig);
 	}
 
 	private Action zoomInAction = new AbstractAction() {
