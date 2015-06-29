@@ -45,10 +45,21 @@ public class DataWindow implements ActionListener{
 
 		ArrayList<TableColumn> telem = new ArrayList<TableColumn>();
 		telem.add( new TableColumn(){
-			public String	getName(){ return "#"; }
-			public Object	getValueAt(int row){ return row; }
-			public int		getRowCount(){ return 10000; }
-			public Class	getDataClass(){ return Integer.class; }
+			private ResourceBundle res = ResourceBundle.getBundle(
+													"telemetryLabels",
+													context.locale);
+			public String	getName(){ return "name"; }
+			public Object	getValueAt(int row){
+				String ans;
+				try{
+					ans = res.getString("t"+row);
+				} catch(MissingResourceException e) {
+					ans = new String("#"+row);
+				}
+				return ans;
+			}
+			public int		getRowCount(){ return 256; }
+			public Class	getDataClass(){ return String.class; }
 			public boolean	isRowEditable(int row){ return false; }
 			public void		setValueAt(Object val, int row){ ; }
 		});
@@ -79,7 +90,7 @@ public class DataWindow implements ActionListener{
 				}
 				return ans;
 			}
-			public int		getRowCount(){ return 10000; }
+			public int		getRowCount(){ return 256; }
 			public Class	getDataClass(){ return String.class; }
 			public boolean	isRowEditable(int row){ return false; }
 			public void		setValueAt(Object val, int row){ ; }
