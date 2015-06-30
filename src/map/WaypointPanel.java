@@ -11,6 +11,7 @@ import com.Context;
 import com.ui.Graph;
 import com.ui.Theme;
 import com.ui.ninePatch.NinePatchPanel;
+import com.ui.SystemConfigWindow;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -107,8 +108,9 @@ class WaypointPanel extends NinePatchPanel implements ContextViewer{
 		JButton graphButton = theme.makeButton(buildGraph);
 		JButton reTarget 	= theme.makeButton(reTargetRover);
 		JButton looping 	= theme.makeButton(toggleLooping);
+		JButton config      = theme.makeButton(openConfigWindow);
 		JComponent[] format = new JComponent[]{
-			tileButton, dataPanel, graphButton, reTarget, looping
+			tileButton, dataPanel, graphButton, reTarget, looping, config
 		};
 		for(JComponent jc : format){
 			jc.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -187,6 +189,8 @@ class WaypointPanel extends NinePatchPanel implements ContextViewer{
 		copyRights.setBorder(new EmptyBorder(0,0,0,0));
 		copyRights.setText(COPY_RIGHT_TEXT);
 
+		add(config);
+		add(Box.createRigidArea(space));
 		add(tileButton);
 		add(zoom);
 		add(dataPanel);
@@ -369,6 +373,15 @@ class WaypointPanel extends NinePatchPanel implements ContextViewer{
 		}
 		public void actionPerformed(ActionEvent e){
 			final DataWindow window = new DataWindow(context);
+		}
+	};
+	private Action openConfigWindow = new AbstractAction(){
+		{
+			String text = "Configuration";
+			putValue(Action.NAME, text);
+		}
+		public void actionPerformed(ActionEvent e){
+			final SystemConfigWindow window = new SystemConfigWindow(context);
 		}
 	};
 	private Action buildGraph = new AbstractAction(){
