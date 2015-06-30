@@ -29,8 +29,10 @@ public class Theme{
 	public BufferedImage appIcon;
 	public Font number;
   	public Font text;
+  	public Font alertFont;
   	public NinePatch buttonPatch;
   	public NinePatch panelPatch;
+  	public Color textColor;
 	public Theme(Locale locale){
 		ResourceBundle res = ResourceBundle.getBundle("resources", locale);
         try{
@@ -51,6 +53,8 @@ public class Theme{
 			number           = Font.createFont(Font.TRUETYPE_FONT, new File(url+res.getString("number_font")));
 			text             = text.deriveFont(13f);
 			number           = number.deriveFont(36f);
+			textColor        = new Color(255,155,30);
+			alertFont        = null;
 
 			appIcon = ImageIO.read(new File("./data/app-icon.png"));
 

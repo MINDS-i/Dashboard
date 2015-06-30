@@ -62,7 +62,7 @@ public class Dashboard implements Runnable {
 
       context = new Context();
       context.give(this,
-                   new AlertPanel(new Font(Font.MONOSPACED,Font.PLAIN,12)),
+                   new AlertPanel(),
                    new SerialSender(context),
                    new SerialParser(context),
                    new WaypointList(context),

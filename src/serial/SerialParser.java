@@ -81,13 +81,6 @@ public class SerialParser implements SerialPortEventListener{
 								+"\n");
 			return;
 		}
-		/*System.err.print("Received length "
-								+ msg.length
-								+ " type "
-								+ type
-								+ " subtype "
-								+ Serial.getSubtype(msg[0])
-								+"\n");*/
 		switch(type){
 			case Serial.STANDARD_TYPE:
 				handleStandard(msg);

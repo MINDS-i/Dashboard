@@ -54,6 +54,7 @@ public class Context{
 		locale	  = loc;
 		theme     = new Theme(locale);
 		telemetry = new TelemetryManager();
+		if(alertPanel != null) alertPanel.setTheme(theme);
 	}
 	public void updatePort(SerialPort newPort) throws SerialPortException{
 		closePort();

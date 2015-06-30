@@ -41,8 +41,8 @@ public class Serial{
 	public static final int	BAUD				= SerialPort.BAUDRATE_9600;
 	public static final int	U16_FIXED_POINT		= 256;
 
-	public static final int   MAX_CONFIRM_WAIT	= 2000; //in milliseconds
-	public static final int   MAX_FAILURES		= 6;
+	public static final int MAX_CONFIRM_WAIT	= 2000; //in milliseconds
+	public static final int MAX_FAILURES		= 6;
 
 	public static final boolean STANDARD_CONFIRM_REQ	= false;
 	public static final boolean SETTINGS_CONFIRM_REQ	= true;
