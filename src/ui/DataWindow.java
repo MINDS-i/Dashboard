@@ -14,6 +14,7 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
+import javax.swing.text.*;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.PropertyResourceBundle;
@@ -33,6 +34,7 @@ public class DataWindow implements ActionListener{
 	JScrollPane 	scroll;
 	JTextField	  	logInput;
 	Graph			graph;
+	JTextComponent	descriptionBox;
 
 	public DataWindow(Context cxt){
 		context = cxt;
@@ -120,6 +122,8 @@ public class DataWindow implements ActionListener{
 			}
 		});
 
+
+
 		JTable telTable, setTable;
 		JScrollPane telScroll, setScroll;
 		telModel	= new ColumnTableModel(telem);
@@ -141,10 +145,18 @@ public class DataWindow implements ActionListener{
 		col = setTable.getColumn(settings.get(0).getName());
 		col.setPreferredWidth(10);
 
+        setTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
+        public void valueChanged(ListSelectionEvent event) {
+                setDetail(setTable.getSelectedRow());
+            }
+        });
+        descriptionBox = new JTextPane();
+
 		constructLogPane();
     	panel.add(logPanel);
     	panel.add(telScroll);
     	panel.add(setScroll);
+    	panel.add(descriptionBox);
     	frame.add(panel);
     	frame.pack();
     	startUpdateTimer();
@@ -161,6 +173,18 @@ public class DataWindow implements ActionListener{
 
 		logPanel.add(label);
 		logPanel.add(logInput);
+	}
+	private void setDetail(int row){
+		ResourceBundle res = ResourceBundle.getBundle( "settingLabels",
+														context.locale);
+		try{
+			String detail = res.getString("long"+row);
+			if(descriptionBox != null){
+				descriptionBox.setText(detail);
+			}
+		} catch (Exception e) {
+		}
+
 	}
 	private void startUpdateTimer(){
     	update = new java.util.Timer();
