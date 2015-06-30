@@ -150,7 +150,12 @@ public class DataWindow implements ActionListener{
                 setDetail(setTable.getSelectedRow());
             }
         });
-        descriptionBox = new JTextPane();
+        JTextArea dBox = new JTextArea();
+        dBox.setBorder(BorderFactory.createLineBorder(Color.gray));
+        dBox.setColumns(20);
+        dBox.setLineWrap(true);
+        dBox.setWrapStyleWord(true);
+        descriptionBox = dBox;
 
 		constructLogPane();
     	panel.add(logPanel);
@@ -177,12 +182,14 @@ public class DataWindow implements ActionListener{
 	private void setDetail(int row){
 		ResourceBundle res = ResourceBundle.getBundle( "settingLabels",
 														context.locale);
+		String detail;
 		try{
-			String detail = res.getString("long"+row);
-			if(descriptionBox != null){
-				descriptionBox.setText(detail);
-			}
+			detail = res.getString("long"+row);
 		} catch (Exception e) {
+			detail = "";
+		}
+		if(descriptionBox != null){
+			descriptionBox.setText(detail);
 		}
 
 	}
