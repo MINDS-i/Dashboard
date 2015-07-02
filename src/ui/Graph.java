@@ -31,16 +31,16 @@ public class Graph extends JPanel{
         public void setDrawn(Boolean draw){
             this.drawn = draw;
         }
-        Paint getPaint(){
+        public Paint getPaint(){
             return this.paint;
         }
-        boolean getDrawn(){
+        public boolean getDrawn(){
             return this.drawn;
         }
-        DataSource getSource(){
+        public DataSource getSource(){
             return source;
         }
-        String getName(){
+        public String getName(){
             return source.getName();
         }
     }

@@ -160,6 +160,9 @@ public class Context{
 	public String getTelemetryName(int id){
 		return telemetry.getTelemetryName(id);
 	}
+	public int getTelemetryCount(){
+		return telemetry.telemetryCount();
+	}
 	public void onConnection(){
 		sender.sendWaypointList();
 	}

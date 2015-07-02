@@ -58,7 +58,7 @@ public class TelemetryManager{
         labels = ResourceBundle.getBundle("telemetryLabels", context.locale);
 
         //build the first few telemetry locations up front
-        updateTelemetry(8, 0.0d);
+        updateTelemetry(6, 0.0d);
     }
     public String getTelemetryName(int index){
         String name;
