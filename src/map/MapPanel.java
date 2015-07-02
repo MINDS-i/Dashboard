@@ -588,13 +588,32 @@ public class MapPanel extends JPanel implements ContextViewer {
     }
     //-------------------------------------------------------------------------
     // helpers
+
+    private final static BufferedImage loadImg = new BufferedImage(1,1,
+                                                    BufferedImage.TYPE_INT_ARGB);
+    private void loadTile(TileCache c, TileServer ts, int x, int y, int zoom){
+        c.put(ts, x, y, zoom, loadImg);
+        Runnable load = new Runnable(){
+            public void run(){
+                final String url = getTileString(ts, x, y, zoom);
+                try {
+                    Image n = Toolkit.getDefaultToolkit().getImage(new URL(url));
+                    //if n is null, painter will try again
+                    c.put(ts, x, y, zoom, n);
+                    MapPanel.this.repaint();
+                } catch (Exception e) {
+                    System.err.println("failed to load url \"" + url + "\"");
+                }
+            }
+        };
+        (new Thread(load)).start();
+    }
+
     private static final class Painter {
         private final int zoom;
         private float transparency = 1F;
         private double scale = 1d;
         private final MapPanel mapPanel;
-        private final static BufferedImage loadImg = new BufferedImage(1,1,
-                                                        BufferedImage.TYPE_INT_ARGB);
 
         private Painter(MapPanel mapPanel, int zoom) {
             this.mapPanel = mapPanel;
@@ -681,27 +700,10 @@ public class MapPanel extends JPanel implements ContextViewer {
                 final TileCache cache = mapPanel.getCache();
                 final TileServer tileServer = mapPanel.getTileServer();
                 Image image = cache.get(tileServer, x, y, zoom);
-                if (image == null) {
-                    final int X = x;
-                    final int Y = y;
-                    cache.put(tileServer, x, y, zoom, loadImg);
-                    Runnable load = new Runnable(){
-                        public void run(){
-                            final String url = getTileString(tileServer, X, Y, zoom);
-                            try {
-                                Image n = Toolkit.getDefaultToolkit().getImage(new URL(url));
-                                //if n is null, painter will try again
-                                cache.put(tileServer, X, Y, zoom, n);
-                                mapPanel.repaint();
-                            } catch (Exception e) {
-                                System.err.println("failed to load url \"" + url + "\"");
-                            }
-                        }
-                    };
 
-                    (new Thread(load)).start();
-                }
-                if (image != null) {
+                if (image == null) {
+                    mapPanel.loadTile(cache, tileServer, x, y, zoom);
+                } else {
                     g.drawImage(image, dx, dy, mapPanel);
                     imageDrawn = true;
                 }
