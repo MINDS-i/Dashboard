@@ -25,7 +25,15 @@ class GraphConfigWindow{
 
         frame.add(container);
         frame.pack();
+        //frame.setVisible(true);
+    }
+
+    public void show(){
         frame.setVisible(true);
+    }
+
+    public void close(){
+        frame.dispose();
     }
 
     private JPanel buildSpinners(){

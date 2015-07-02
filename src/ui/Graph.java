@@ -49,6 +49,7 @@ public class Graph extends JPanel{
     private double xScale  =  1.0;
     private double yScale  = 20.0;
     private double yCenter =  0.0;
+    private GraphConfigWindow config;
     public List<DataConfig> getSources(){ return sources; }
     double getXScale() { return xScale; }
     double getYScale() { return yScale; }
@@ -70,6 +71,15 @@ public class Graph extends JPanel{
         //place configuration button
         this.setLayout(new FlowLayout(FlowLayout.LEADING));
         this.add(new JButton(configPopupAction));
+        this.addHierarchyListener(new HierarchyListener(){
+            public void hierarchyChanged(HierarchyEvent e){
+                if(isShowing()) return;
+                System.out.println("Component Hidden!");
+                if(config != null){
+                    config.close();
+                }
+            }
+        });
     }
 
     private class RefreshTimerTask extends TimerTask{
@@ -85,7 +95,10 @@ public class Graph extends JPanel{
         putValue(Action.SHORT_DESCRIPTION, text);
       }
       public void actionPerformed(ActionEvent e){
-        GraphConfigWindow config = new GraphConfigWindow(Graph.this);
+        if(config == null){
+            config = new GraphConfigWindow(Graph.this);
+        }
+        config.show();
       }
     };
 
