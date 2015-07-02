@@ -47,18 +47,9 @@ public class DataWindow implements ActionListener{
 
 		ArrayList<TableColumn> telem = new ArrayList<TableColumn>();
 		telem.add( new TableColumn(){
-			private ResourceBundle res = ResourceBundle.getBundle(
-													"telemetryLabels",
-													context.locale);
 			public String	getName(){ return "name"; }
 			public Object	getValueAt(int row){
-				String ans;
-				try{
-					ans = res.getString("t"+row);
-				} catch(MissingResourceException e) {
-					ans = new String("#"+row);
-				}
-				return ans;
+				return context.getTelemetryName(row);
 			}
 			public int		getRowCount(){ return 256; }
 			public Class	getDataClass(){ return String.class; }

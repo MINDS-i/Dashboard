@@ -76,12 +76,12 @@ class GraphConfigWindow{
 
         ArrayList<TableColumn> cols = new ArrayList<TableColumn>();
         cols.add( new TableColumn(){
-            public String   getName(){ return "#"; }
-            public Object   getValueAt(int row){ return row; }
-            public int      getRowCount(){ return 10000; }
-            public Class    getDataClass(){ return Integer.class; }
-            public boolean  isRowEditable(int row){ return false; }
-            public void     setValueAt(Object val, int row){;}
+            public String  getName(){ return "#"; }
+            public Object  getValueAt(int row){ return sources.get(row).getName(); }
+            public int     getRowCount(){ return sources.size(); }
+            public Class   getDataClass(){ return String.class; }
+            public boolean isRowEditable(int row){ return false; }
+            public void    setValueAt(Object val, int row){;}
         });
         cols.add( new TableColumn() {
             public String   getName(){ return "Graph?"; }

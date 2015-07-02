@@ -40,6 +40,9 @@ public class Graph extends JPanel{
         DataSource getSource(){
             return source;
         }
+        String getName(){
+            return source.getName();
+        }
     }
     private List<DataConfig> sources;
     private Timer refreshTimer;
@@ -164,10 +167,16 @@ public class Graph extends JPanel{
             public double get(double x){
                 return Math.sin(x*3.0f*Math.PI);
             }
+            public String getName(){
+                return "sine";
+            }
         };
         DataSource cos = new DataSource(){
             public double get(double x){
                 return Math.cos(x*3.0f*Math.PI);
+            }
+            public String getName(){
+                return "cosine";
             }
         };
         trialSources.add(sin);

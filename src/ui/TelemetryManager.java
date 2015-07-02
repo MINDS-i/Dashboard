@@ -2,11 +2,11 @@ package com.ui;
 
 import com.ui.DataSource;
 import com.ui.SampleSource;
+import com.Context;
 import java.util.*;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.text.DecimalFormat;
-
 
 public class TelemetryManager{
     private final static int DEFAULT_LOG_PERIOD = 250;
@@ -37,7 +37,9 @@ public class TelemetryManager{
     private List<Double>         telemetry;
     private Collection<Observer> observers;
     private List<DataSource>     streams;
-    public TelemetryManager(){
+    private Context              context;
+    private ResourceBundle       labels;
+    public TelemetryManager(Context context){
         telemetry = new ArrayList<Double>();
         observers = new ArrayList<Observer>();
         streams   = new ArrayList<DataSource>();
@@ -53,8 +55,19 @@ public class TelemetryManager{
           System.err.println(ex);
         }
 
+        labels = ResourceBundle.getBundle("telemetryLabels", context.locale);
+
         //build the first few telemetry locations up front
         updateTelemetry(8, 0.0d);
+    }
+    public String getTelemetryName(int index){
+        String name;
+        try{
+            name = labels.getString("t"+index);
+        } catch(Exception e) {
+            name = new String("# "+index);
+        }
+        return name;
     }
     public List<DataSource> getDataSources(){
         return streams;
@@ -63,7 +76,7 @@ public class TelemetryManager{
         if(id >= telemetry.size()){
             for(int i=telemetry.size(); i<=id; i++){
                 telemetry.add(0.0);
-                SampleSource newSource = new SampleSource();
+                SampleSource newSource = new SampleSource(getTelemetryName(i));
                 this.registerListener(i, newSource);
                 streams.add(newSource);
             }
@@ -78,7 +91,6 @@ public class TelemetryManager{
     public int telemetryCount(){
         return telemetry.size();
     }
-
     public void registerListener(int id, TelemetryListener tl){
         observers.add(new Observer(id,tl));
     }
