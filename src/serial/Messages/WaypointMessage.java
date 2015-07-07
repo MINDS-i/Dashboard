@@ -34,7 +34,7 @@ class WaypointMessage extends Message{
 	}
 	@Override
 	public boolean needsConfirm(){
-		return Serial.WAYPOINT_CONFIRM_REQ;
+		return true;
 	}
 	@Override
 	public String toString(){

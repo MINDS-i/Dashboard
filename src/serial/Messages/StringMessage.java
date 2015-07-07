@@ -20,7 +20,7 @@ class StringMessage extends Message{
     }
     @Override
     public boolean needsConfirm(){
-        return Serial.STRING_CONFIRM_REQ;
+        return false;
     }
     @Override
     public String toString(){

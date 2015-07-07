@@ -12,7 +12,7 @@ class DataMessage extends Message{
         int idata   = Float.floatToIntBits(data);
 
         content     = new byte[6];
-        content[0]  = Serial.buildMessageLabel(Serial.WAYPOINT_TYPE, type);
+        content[0]  = Serial.buildMessageLabel(Serial.DATA_TYPE, type);
         content[1]  = (byte) index;
         content[2]  = (byte)((idata>>24)&0xff);
         content[3]  = (byte)((idata>>16)&0xff);
@@ -23,7 +23,7 @@ class DataMessage extends Message{
     }
     @Override
     public boolean needsConfirm(){
-        return false;
+        return (msgType == Serial.SETTING_DATA);
     }
     @Override
     public String toString(){

@@ -21,7 +21,7 @@ public class WordMessage extends Message{
 	}
 	@Override
 	public boolean needsConfirm(){
-		return Serial.WAYPOINT_CONFIRM_REQ;
+		return false;
 	}
 	@Override
 	public String toString(){

@@ -27,8 +27,8 @@ public class Serial{
 	public static final byte CLEAR_CMD   = 0x3;
 	public static final byte DELETE_CMD  = 0x4;
 	//sync
-	public static final byte SYNC   = 0x00;
-	public static final byte RESYNC = 0x01;
+	public static final byte SYNC_REQUEST = 0x00;
+	public static final byte SYNC_RESPOND = 0x01;
 
 	public static final int LATITUDE	= 0;
 	public static final int LONGITUDE	= 1;
@@ -46,11 +46,6 @@ public class Serial{
 
 	public static final int MAX_CONFIRM_WAIT	= 2000; //in milliseconds
 	public static final int MAX_FAILURES		= 6;
-
-	public static final boolean STANDARD_CONFIRM_REQ = false;
-	public static final boolean SETTINGS_CONFIRM_REQ = true;
-	public static final boolean WAYPOINT_CONFIRM_REQ = true;
-	public static final boolean STRING_CONFIRM_REQ   = false;
 
 	public static final byte[] HEADER = {0x13, 0x37};
 	public static final byte[] FOOTER = {(byte)0x9A};

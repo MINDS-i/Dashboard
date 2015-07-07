@@ -5,7 +5,7 @@ import com.serial.Serial;
 import jssc.SerialPort;
 import jssc.SerialPortException;
 
-import java.util.Date;
+import java.util.*;
 
 public class Message{
 	protected byte[] content;
@@ -28,7 +28,7 @@ public class Message{
 		sent = date;
 	}
 	public boolean isConfirmedBy(int confirmation){
-		return ((short)confirmation == (short)confirmSum);
+		return ((confirmation&0xFFFF) == (confirmSum&0xFFFF));
 	}
 	public boolean isPastExpiration(Date now){
 		return (now.getTime()-sent.getTime()) > Serial.MAX_CONFIRM_WAIT;

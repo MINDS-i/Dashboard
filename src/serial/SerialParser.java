@@ -80,6 +80,12 @@ public class SerialParser implements SerialPortEventListener{
 								+ " subtype "
 								+ Serial.getSubtype(msg[0])
 								+"\n");
+			System.err.print("[");
+			for(int i=0; i<msg.length; i++){
+				System.err.print(  Integer.toHexString(msg[i]) );
+				System.err.print(",");
+			}
+			System.err.println("]");
 			return;
 		}
 		switch(type){
@@ -145,17 +151,17 @@ public class SerialParser implements SerialPortEventListener{
 		int subtype = Serial.getSubtype(msg[0]);
 		byte a = (byte)(msg[1]&0xff);
 		byte b = (byte)(msg[2]&0xff);
-		int join = ( (a<<8) | (b<<0) );
+		int join = ( ((int)(a<<8)&0xFF00) | ((int)(b&0xFF)) );
 		switch(subtype){
 			case Serial.CONFIRMATION:
 				context.sender.notifyOfConfirm(join);
 				break;
 			case Serial.SYNC_WORD:{
-					if(a == 0){ //resync to our sync
-						context.onConnection();
-					} else { //resync requested by sync
-						Message message = Message.syncMessage(Serial.RESYNC);
+					if(a == Serial.SYNC_REQUEST){
+						Message message = Message.syncMessage(Serial.SYNC_RESPOND);
 						context.sender.sendMessage(message);
+						context.onConnection();
+					} else if (a == Serial.SYNC_RESPOND) { //resync seen
 						context.onConnection();
 					}
 				}

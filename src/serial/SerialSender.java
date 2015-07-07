@@ -155,7 +155,7 @@ public class SerialSender{
 	}
 
 	public void sendSync(){
-		Message msg = Message.syncMessage(Serial.SYNC);
+		Message msg = Message.syncMessage(Serial.SYNC_REQUEST);
 		sendMessage(msg);
 	}
 }
