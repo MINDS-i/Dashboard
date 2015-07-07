@@ -83,15 +83,20 @@ public class Serial{
 	}
 
 	public static int getMsgType(byte input){
-		return (input&0x03);
+		return (input&0x0F);
 	}
 	public static int getSubtype(byte input){
-		return ((input>>2)&0x03);
+		return ((input>>4)&0x0F);
 	}
-	public static byte buildMessageLabel(int type, int subType, int length){
-		if(length	> 0xf) return 0;
-		if(type 	> 0x3) return 0;
-		if(subType	> 0x3) return 0;
-		return (byte) ((length<<4)|(subType<<2)|type);
+	public static byte buildMessageLabel(int type, int subType, int length){//deprecated
+		return buildMessageLabel(type, subType);
+	}
+	public static byte buildMessageLabel(int type, int subType){
+		if(type 	> 0xF) return 0;
+		if(subType	> 0xF) return 0;
+		return (byte) ((subType<<4)|type);
+	}
+	public static byte buildMessageLabel(int label){
+		return (byte) label;
 	}
 }
