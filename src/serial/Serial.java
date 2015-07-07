@@ -49,7 +49,7 @@ public class Serial{
 	public static final boolean WAYPOINT_CONFIRM_REQ	= true;
 
 	public static final byte[] HEADER = {0x13, 0x37};
-	public static final byte[] FOOTER = {0x7A };
+	public static final byte[] FOOTER = {(byte)0x9A };
 
 	public static final String WAYPOINT_DESCRIPTOR = "Waypoint ";
 	public static final String     DATA_DESCRIPTOR = "Data Msg ";

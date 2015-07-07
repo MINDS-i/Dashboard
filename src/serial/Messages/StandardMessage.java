@@ -40,7 +40,7 @@ public class StandardMessage extends Message{
 		return Serial.STANDARD_CONFIRM_REQ;
 	}
 	@Override
-	public String describeSelf(){
+	public String toString(){
 		switch(msgType){
 			case Serial.TELEMETRY_SUBTYPE:
 				return "Telemetry message ";

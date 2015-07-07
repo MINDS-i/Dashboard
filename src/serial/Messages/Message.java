@@ -53,7 +53,8 @@ public abstract class Message{
 	public boolean needsConfirm(){
 		return false;
 	}
-	public String describeSelf(){
+	@Override
+	public String toString(){
 		return "A message";
 	}
 }

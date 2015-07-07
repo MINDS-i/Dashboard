@@ -43,7 +43,7 @@ public class SerialSender{
 							if(msg.numberOfFailures() >= Serial.MAX_FAILURES){
 								i.remove();
 								System.err.println("Message Failed to send repeatedly; connection bad");
-								context.alert.displayMessage("Connection failed; Rover unware of "+msg.describeSelf()+"!");
+								context.alert.displayMessage("Connection failed; Rover unware of "+msg.toString()+"!");
 							} else {
 								resendMessage(msg);
 							}
@@ -85,9 +85,9 @@ public class SerialSender{
 
 				System.err.print("" + Integer.toHexString(msg.getConfirmSum())
 									+ " Sent "
-									+ msg.describeSelf()
+									+ msg.toString()
 									+ "\n" );
-				context.alert.displayMessage(msg.describeSelf()+" Sent");
+				context.alert.displayMessage(msg.toString()+" Sent");
 			} catch (SerialPortException ex){
 				System.err.println(ex.getMessage());
 				context.alert.displayMessage(ex.getMessage());
@@ -101,10 +101,10 @@ public class SerialSender{
 				msg.addFailure();
 				msg.send(context.port());
 				System.out.print(Integer.toHexString(msg.getConfirmSum()));
-				System.out.print(" resend of " + msg.describeSelf());
+				System.out.print(" resend of " + msg.toString());
 				System.out.println("");
 				context.alert.displayMessage(
-										"No response to "+msg.describeSelf()
+										"No response to "+msg.toString()
 									   +" resend #"+msg.numberOfFailures());
 			} catch (SerialPortException ex){
 				System.err.println(ex.getMessage());
@@ -123,7 +123,7 @@ public class SerialSender{
 				if(msg.isConfirmedBy(confirm)){
 					i.remove();
 					context.alert.displayMessage(
-						msg.describeSelf()+" Confirmed after "
+						msg.toString()+" Confirmed after "
 						+msg.numberOfFailures()+" tries");
 					break;
 				}

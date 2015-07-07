@@ -44,7 +44,7 @@ public class SettingsMessage extends Message{
 		return Serial.SETTINGS_CONFIRM_REQ;
 	}
 	@Override
-	public String describeSelf(){
+	public String toString(){
 		return "setting " + settingIndex;
 	}
 }

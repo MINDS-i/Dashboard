@@ -34,7 +34,7 @@ public class ProtocolMessage extends Message{
 		return false;
 	}
 	@Override
-	public String describeSelf(){
+	public String toString(){
 		switch(msgType){
 			case Serial.SYNC_SUBTYPE:
 				return "Sync Message ";

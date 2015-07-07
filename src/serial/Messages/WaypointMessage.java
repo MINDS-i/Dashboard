@@ -38,7 +38,7 @@ public class WaypointMessage extends Message{
 		return Serial.WAYPOINT_CONFIRM_REQ;
 	}
 	@Override
-	public String describeSelf(){
+	public String toString(){
 		return "Waypoint " + waypointIndex;
 	}
 }
