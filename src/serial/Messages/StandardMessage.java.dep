@@ -51,4 +51,5 @@ public class StandardMessage extends Message{
 		}
 		return "Bad Standard Message";
 	}
+
 }

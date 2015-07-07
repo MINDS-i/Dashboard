@@ -3,25 +3,33 @@ package com.serial;
 import jssc.SerialPort;
 
 public class Serial{
-	public static final int STANDARD_TYPE = 0;
-	public static final int SETTINGS_TYPE = 1;
-	public static final int WAYPOINT_TYPE = 2;
-	public static final int PROTOCOL_TYPE = 3;
-	//standard type
-	public static final int TELEMETRY_SUBTYPE = 0;
-	public static final int COMMAND_SUBTYPE   = 1;
+	public static final int WAYPOINT_TYPE  = 0x0;
+	public static final int DATA_TYPE      = 0x1;
+	public static final int WORD_TYPE      = 0x2;
+	public static final int STRING_TYPE    = 0x3;
 	//waypoint type
-	public static final int ADD_SUBTYPE    = 0;
-	public static final int ALTER_SUBTYPE  = 1;
-	public static final int DELETE_SUBTYPE = 2;
-	//settings type
-	public static final int SET_SUBTYPE  = 0;
-	public static final int POLL_SUBTYPE = 1;
-	//protocol type
-	public static final int SYNC_SUBTYPE      = 0;
-	public static final int CONFIRM_SUBTYPE   = 1;
-	public static final int SYNC_RESP_SUBTYPE = 2;
-	//telemetry tags
+	public static final int ADD_WAYPOINT   = 0x0;
+	public static final int ALTER_WAYPOINT = 0x1;
+	//data type
+	public static final int TELEMETRY_DATA = 0x0;
+	public static final int SETTING_DATA   = 0x1;
+	//word type
+	public static final int CONFIRMATION   = 0x0;
+	public static final int SYNC_WORD      = 0x1;
+	public static final int COMMAND_WORD   = 0x2;
+	//string type
+	public static final int ERROR_STRING   = 0x0;
+	public static final int STATE_STRING   = 0x1;
+	//commands
+	public static final byte ESTOP_CMD	= 0x0;
+	public static final byte TARGET_CMD	= 0x1;
+	public static final byte LOOPING_CMD = 0x2;
+	public static final byte CLEAR_CMD   = 0x3;
+	public static final byte DELETE_CMD  = 0x4;
+	//sync
+	public static final byte SYNC   = 0x00;
+	public static final byte RESYNC = 0x01;
+
 	public static final int LATITUDE	= 0;
 	public static final int LONGITUDE	= 1;
 	public static final int HEADING		= 2;
@@ -29,11 +37,6 @@ public class Serial{
 	public static final int ROLL		= 4;
 	public static final int SPEED		= 5;
 	public static final int VOLTAGE		= 6;
-	//commands
-	public static final int ESTOP_CMD	= 0;
-	public static final int TARGET_CMD	= 1;
-	public static final int LOOPING_CMD	= 2;
-	public static final int CLEAR_CMD	= 3;
 
 	public static final int	MAX_WAYPOINTS		= 64;
 	public static final int	MAX_SETTINGS		= 32;
@@ -44,18 +47,13 @@ public class Serial{
 	public static final int MAX_CONFIRM_WAIT	= 2000; //in milliseconds
 	public static final int MAX_FAILURES		= 6;
 
-	public static final boolean STANDARD_CONFIRM_REQ	= false;
-	public static final boolean SETTINGS_CONFIRM_REQ	= true;
-	public static final boolean WAYPOINT_CONFIRM_REQ	= true;
+	public static final boolean STANDARD_CONFIRM_REQ = false;
+	public static final boolean SETTINGS_CONFIRM_REQ = true;
+	public static final boolean WAYPOINT_CONFIRM_REQ = true;
+	public static final boolean STRING_CONFIRM_REQ   = false;
 
 	public static final byte[] HEADER = {0x13, 0x37};
 	public static final byte[] FOOTER = {(byte)0x9A};
-
-	public static final String WAYPOINT_DESCRIPTOR = "Waypoint ";
-	public static final String     DATA_DESCRIPTOR = "Data Msg ";
-	public static final String    CLEAR_DESCRIPTOR = "Clear List Command ";
-	public static final String  CONFIRM_DESCRIPTOR = "Msg Confirmation ";
-	public static final String  GENERIC_DESCRIPTOR = "Message ";
 
 	public static int fletcher16( byte[] message, int length){
 		int iterator = 0;

@@ -15,6 +15,7 @@ import jssc.SerialPortEvent;
 import java.util.Arrays;
 
 import java.awt.*;
+import java.nio.charset.StandardCharsets;
 
 public class SerialParser implements SerialPortEventListener{
 	Dashboard parent;
@@ -82,80 +83,19 @@ public class SerialParser implements SerialPortEventListener{
 			return;
 		}
 		switch(type){
-			case Serial.STANDARD_TYPE:
-				handleStandard(msg);
-				break;
-			case Serial.SETTINGS_TYPE:
-				handleSetting(msg);
-				break;
 			case Serial.WAYPOINT_TYPE:
 				handleWaypoint(msg);
 				break;
-			case Serial.PROTOCOL_TYPE:
-				handleProtocol(msg);
+			case Serial.DATA_TYPE:
+				handleData(msg);
+				break;
+			case Serial.WORD_TYPE:
+				handleWord(msg);
+				break;
+			case Serial.STRING_TYPE:
+				handleString(msg);
 				break;
 			default:
-				break;
-		}
-	}
-
-	private void handleStandard(byte[] msg){
-		int subtype = Serial.getSubtype(msg[0]);
-		switch(subtype){
-			case Serial.TELEMETRY_SUBTYPE:
-				int index = msg[1];
-				int tmp = (	((msg[2]&0xff)<<24)|
-							((msg[3]&0xff)<<16)|
-							((msg[4]&0xff)<< 8)|
-							((msg[5]&0xff)    ) );
-				float data = Float.intBitsToFloat(tmp);
-				context.setTelemetry(index, data);
-				break;
-			case Serial.COMMAND_SUBTYPE:
-				switch(msg[1]){
-					case Serial.TARGET_CMD:
-						//set dash target to msg[2]
-						context.waypoint.updateTarget(msg[2]);
-						break;
-					default:
-						break;
-				}
-				break;
-		}
-	}
-
-	private void handleProtocol(byte[] msg){
-		int subtype = Serial.getSubtype(msg[0]);
-		switch(subtype){
-			case Serial.SYNC_SUBTYPE:
-				Message message = new ProtocolMessage(Serial.SYNC_RESP_SUBTYPE);
-				context.sender.sendMessage(message);
-				context.onConnection();
-				break;
-			case Serial.SYNC_RESP_SUBTYPE:
-				context.onConnection();
-				break;
-			case Serial.CONFIRM_SUBTYPE:
-				int confirmation = ((msg[1]&0xff)<<8) | (msg[2]&0xff);
-				context.sender.notifyOfConfirm(confirmation);
-				break;
-		}
-	}
-
-	private void handleSetting(byte[] msg){
-		int subtype = Serial.getSubtype(msg[0]);
-		switch(subtype){
-			case Serial.SET_SUBTYPE:
-				int index = msg[1];
-				int tmp = (	((msg[2]&0xff)<<24)|
-							((msg[3]&0xff)<<16)|
-							((msg[4]&0xff)<< 8)|
-							((msg[5]&0xff)    ) );
-				float data = Float.intBitsToFloat(tmp);
-				context.inputSetting(index, data);
-				break;
-			case Serial.POLL_SUBTYPE:
-				context.sendSetting(msg[1]);
 				break;
 		}
 	}
@@ -175,16 +115,65 @@ public class SerialParser implements SerialPortEventListener{
 		float latitude	= Float.intBitsToFloat(tmpLat);
 		float longitude	= Float.intBitsToFloat(tmpLon);
 		switch(subtype){
-			case Serial.ADD_SUBTYPE:
+			case Serial.ADD_WAYPOINT:
 				context.waypoint.add(longitude, latitude, index);
 				break;
-			case Serial.ALTER_SUBTYPE:
+			case Serial.ALTER_WAYPOINT:
 				context.waypoint.get(index).setLocation(
 								new Point.Double(longitude, latitude));
 				break;
-			case Serial.DELETE_SUBTYPE:
-				context.waypoint.remove(index);
+		}
+	}
+	private void handleData(byte[] msg){
+		int subtype = Serial.getSubtype(msg[0]);
+		int index   = msg[1];
+		int tmpdata = (	((msg[2]&0xff)<<24)|
+						((msg[3]&0xff)<<16)|
+						((msg[4]&0xff)<< 8)|
+						((msg[5]&0xff)    ) );
+		float data  = Float.intBitsToFloat(tmpdata);
+		switch(subtype){
+			case Serial.TELEMETRY_DATA:
+				context.setTelemetry(index, data);
+				break;
+			case Serial.SETTING_DATA:
+				context.inputSetting(index, data);
 				break;
 		}
+	}
+	private void handleWord(byte[] msg){
+		int subtype = Serial.getSubtype(msg[0]);
+		byte a = (byte)(msg[1]&0xff);
+		byte b = (byte)(msg[2]&0xff);
+		int join = ( (a<<8) | (b<<0) );
+		switch(subtype){
+			case Serial.CONFIRMATION:
+				context.sender.notifyOfConfirm(join);
+				break;
+			case Serial.SYNC_WORD:{
+					if(a == 0){ //resync to our sync
+						context.onConnection();
+					} else { //resync requested by sync
+						Message message = Message.syncMessage(Serial.RESYNC);
+						context.sender.sendMessage(message);
+						context.onConnection();
+					}
+				}
+				break;
+			case Serial.COMMAND_WORD:
+				if(a == Serial.TARGET_CMD){
+					context.waypoint.updateTarget(b);
+				}
+				break;
+		}
+	}
+	private void handleString(byte[] msg){
+		int subtype = Serial.getSubtype(msg[0]);
+		byte[] buff = new byte[msg.length-3];
+		for(int i=1; i<msg.length-2; i++){
+			buff[i-1] = msg[i];
+		}
+		String data = new String(buff, StandardCharsets.US_ASCII);
+		context.alert.displayMessage(data);
 	}
 }

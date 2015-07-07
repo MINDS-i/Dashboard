@@ -40,7 +40,7 @@ public class WaypointList{
 			newDot.setAltitude(context.waypoint.get(index-1).getAltitude());
 		}
 		waypoints.insertElementAt(newDot, index);
-		sendWaypoint((byte)(index&0xff), Serial.ADD_SUBTYPE);
+		sendMessage(Message.addWaypoint( (byte)(index&0xff), newDot ));
 		context.waypointUpdated();
 	}
 	public void set(int index, Point.Double newPosition){
@@ -49,12 +49,12 @@ public class WaypointList{
 	public void set(int index, Point.Double newPosition, Short alt){
 		if(index < 0 || index >= waypoints.size()) return;
 		waypoints.get(index).setLocation(newPosition, alt);
-		sendWaypoint((byte)(index&0xff), Serial.ALTER_SUBTYPE);
+		sendMessage(Message.setWaypoint( (byte)(index&0xff), waypoints.get(index) ));
 		context.waypointUpdated();
 	}
 	public void remove(int index){
 		if(index < 0 || index >= waypoints.size()) return;
-		sendWaypoint((byte)(index&0xff), Serial.DELETE_SUBTYPE);
+		sendMessage(Message.deleteWaypoint( (byte)(index&0xff) ));
 		waypoints.remove(index);
 		context.waypointUpdated();
 	}
@@ -79,7 +79,7 @@ public class WaypointList{
 		sendLoopingStatus();
 	}
 	public void sendLoopingStatus(){
-		Message msg = new StandardMessage(Serial.LOOPING_CMD, (byte) ((isLooped)?1:0) );
+		Message msg = Message.setLooping((byte) ((isLooped)?1:0) );
         context.sender.sendMessage(msg);
 	}
 	public int getTarget(){
@@ -90,8 +90,8 @@ public class WaypointList{
 	}
 	public void setTarget(int target){ //updates and transmits the target waypoint
 		updateTarget(target);
-		Message msg = new StandardMessage(Serial.TARGET_CMD, (byte) target);
-        context.sender.sendMessage(msg);
+		Message msg = Message.setTarget((byte) target);
+		sendMessage(msg);
 	}
 	public void updateTarget(int target){ //sets the target waypoint
 		targetIndex = target;
@@ -101,17 +101,13 @@ public class WaypointList{
 		waypoints = newList;
 	}
 	private void sendDataMsg(int index){
-        if(context.sender != null){
-            Message msg = new StandardMessage((byte)index,
-            								context.upstreamSettings[index]);
-            context.sender.sendMessage(msg);
-        }
+        Message msg = Message.setSetting((byte)index,
+        								context.upstreamSettings[index]);
+        sendMessage(msg);
 	}
-	public void sendWaypoint(byte index, int type){
-		if(context.connected){
-		    Message msg = new WaypointMessage(
-		    			type, (byte)(index&0xff), waypoints.get(index));
-		    context.sender.sendMessage(msg);
+	private void sendMessage(Message msg){
+		if(context.sender != null){
+			context.sender.sendMessage(msg);
 		}
 	}
 }

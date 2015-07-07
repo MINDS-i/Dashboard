@@ -6,21 +6,19 @@ import com.serial.Messages.*;
 
 import java.util.Date;
 
-public class WaypointMessage extends Message{
+class WaypointMessage extends Message{
 	int msgType;
 	byte waypointIndex;
-	public WaypointMessage(int type, byte index, Dot dot){
+	public WaypointMessage(int subtype, byte index, Dot dot){
 		super();
-		msgType = type;
+		msgType = subtype;
 		waypointIndex = index;
 
 		int lat = Float.floatToIntBits((float)dot.getLatitude() );
 		int lon = Float.floatToIntBits((float)dot.getLongitude());
 
-		int length = 12;
-		content = new byte[length];
-		content[0] = Serial.buildMessageLabel( Serial.WAYPOINT_TYPE,
-												msgType, length);
+		content = new byte[12];
+		content[0]  = Serial.buildMessageLabel(Serial.WAYPOINT_TYPE, subtype);
 		content[1]  = (byte)((lat>>24)&0xff);
 		content[2]  = (byte)((lat>>16)&0xff);
 		content[3]  = (byte)((lat>>8 )&0xff);
@@ -40,6 +38,6 @@ public class WaypointMessage extends Message{
 	}
 	@Override
 	public String toString(){
-		return "Waypoint " + waypointIndex;
+		return "Waypoint " + waypointIndex + " ";
 	}
 }

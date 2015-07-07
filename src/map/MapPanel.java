@@ -1059,7 +1059,8 @@ public class MapPanel extends JPanel implements ContextViewer {
         public void mouseReleased(MouseEvent e) {
             handleDrag(e);
             if(downDot != -1){
-                context.waypoint.sendWaypoint((byte)downDot, Serial.ALTER_SUBTYPE);
+                //context.w
+                //context.waypoint.sendWaypoint((byte)downDot, Serial.ALTER_SUBTYPE);
             }
         }
 

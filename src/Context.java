@@ -135,7 +135,7 @@ public class Context{
 		toUpdate.remove(viewer);
 	}
 	public void sendSetting(int index){
-		Message msg = new SettingsMessage((byte)index, upstreamSettings[index]);
+		Message msg = Message.setSetting((byte)index, upstreamSettings[index]);
 		sender.sendMessage(msg);
 	}
 	public void setSetting(int index, float value){

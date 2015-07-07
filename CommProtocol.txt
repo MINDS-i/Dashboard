@@ -13,52 +13,41 @@ checksum - Two byte fletcher16 checksum of label+content
 footer   - the same on all messages, one byte = [0x9A]
 
 Types:
-Waypoint message:
+Waypoint message: 0x0
 	4 bytes latitude
 	4 bytes longitude
 	2 bytes accessory
 	1 byte  index
 	Subtypes:
-		Add: Add this waypoint to the list at specified index
-		Alter: Change the data of the waypoint at specified index
+		0x0 Add: Add this waypoint to the list at specified index
+		0x1 Alter: Change the data of the waypoint at specified index
 
-data message:
+data message: 0x1
 	1 byte index
 	4 bytes float
 	subtypes:
-		telemety: Packet contains a telemetry float with label index
-		set setting: Packet contains the value the indexed setting should be set to
+		0x0 telemety: Packet contains a telemetry float with label index
+		0x1 set setting: Packet contains the value the indexed setting should be set to
 
-checksum messages:
+word messages: 0x2
 	2 byte checksum
 	subtypes:
-		confirmation: packet contains the checksum of a message to confirm
-			its receipt
+		0x0 confirmation: packet contains the checksum of a received message
+		0x1 sync: first byte contains a sync/sync response token
+		0x2 command: first byte specifies a specific, one time command
 
-byte messages:
-	1 byte
-	subtypes:
-		setTargetTo: byte contains the index the drone should target
-		command: byte specifies a specific, one time command
-		sync: byte contains a sync/sync response token
-		deleteWaypoint: byte contains index of waypoint to be deleted
-
-string message:
+string message: 0x3
 	variable, null terminated string
 	subtypes:
-		error: string contains details of detected errors
-		state: string contains details of current state
+		0x0 error: string contains details of detected errors
+		0x1 state: string contains details of current state
 
-potential flaw: the subtype has taken the roll of the command type byte, but
-	has significantly fewer possible values (16)
-	A: make byte messages 2 byte messages
-		A1: merge with checksum mesages
-		A2: keep seperate from checksum messages
-		+ one fewer message type
-		- more data being send for most commands that isn't necessary
-	B: stay seperate
-		+ a long form command can be added later while maintaining compat
-		- could run out of command types
+Commands:
+	0x0 emergency stop:
+	0x1 target set:
+	0x2 looping set:
+	0x3 clear waypoints:
+	0x4 delete waypoint:
 
 Telemetry 5 bytes: label, 4 byte float
 set setting: 5 bytes label, 4 byte float

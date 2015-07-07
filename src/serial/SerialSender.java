@@ -134,7 +134,7 @@ public class SerialSender{
 	public void sendWaypointList(){
 		sendingWaypointList = true;
 		waypointListPosition = 0;
-		Message msg = new StandardMessage(Serial.CLEAR_CMD, (byte)0);
+		Message msg = Message.clearWaypoints();
 		sendMessage(msg);
 		advanceWaypointList(waypointListWaitingCode);
 	}
@@ -146,8 +146,7 @@ public class SerialSender{
 				context.waypoint.sendLoopingStatus();
 				return;
 			}
-			Message msg = new WaypointMessage(Serial.ADD_SUBTYPE,
-								(byte) waypointListPosition,
+			Message msg = Message.addWaypoint( (byte) waypointListPosition,
 								context.waypoint.get(waypointListPosition));
 			sendMessage(msg);
 			waypointListWaitingCode = msg.getConfirmSum();
@@ -156,7 +155,7 @@ public class SerialSender{
 	}
 
 	public void sendSync(){
-		Message msg = new ProtocolMessage(Serial.SYNC_SUBTYPE);
+		Message msg = Message.syncMessage(Serial.SYNC);
 		sendMessage(msg);
 	}
 }
