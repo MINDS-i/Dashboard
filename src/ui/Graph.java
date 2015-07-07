@@ -74,7 +74,6 @@ public class Graph extends JPanel{
         this.addHierarchyListener(new HierarchyListener(){
             public void hierarchyChanged(HierarchyEvent e){
                 if(isShowing()) return;
-                System.out.println("Component Hidden!");
                 if(config != null){
                     config.close();
                 }
@@ -129,11 +128,13 @@ public class Graph extends JPanel{
         //TODO start only drawing in invalidated boxes
 
         Graphics2D g = (Graphics2D) g2d.create();
+
         /*
         RenderingHints rh = new RenderingHints(
              RenderingHints.KEY_ANTIALIASING,
-             RenderingHints.VALUE_ANTIALIAS_ON);*/
-        //g.setRenderingHints(rh);
+             RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setRenderingHints(rh); */
+
         g.setPaint(data.getPaint());
 
         final DataSource source = data.getSource();
@@ -154,6 +155,39 @@ public class Graph extends JPanel{
         }
     }
 
+    private void drawLabels(Graphics2D g2d, List<DataConfig> dcs){
+        g2d = (Graphics2D) g2d.create();
+        FontMetrics metrics = g2d.getFontMetrics();
+        final int dropPoint = metrics.getDescent();
+        final int rowHeight = metrics.getHeight()+dropPoint;
+
+        final int RECT_BUFF = 2;
+        final int WALL_BUFF = 10;
+        final int TEXT_RISE = 5;
+
+        final int startX = WALL_BUFF;
+        final int startY = getHeight() - WALL_BUFF;
+
+        int dCount = 0;
+        for(int i = 0; i < dcs.size(); i++) {
+            final DataConfig dc = dcs.get(i);
+            if(dc.getDrawn() == false) continue;
+            final int left = startX;
+            final int bot  = startY - rowHeight * dCount;
+            dCount ++;
+            g2d.setPaint(dc.getPaint());
+
+            g2d.fillRect(left,
+                            bot-rowHeight - RECT_BUFF,
+                            rowHeight - RECT_BUFF,
+                            rowHeight - RECT_BUFF*2);
+
+            g2d.drawString(dc.getName(),
+                            left+rowHeight, bot-dropPoint-TEXT_RISE);
+        }
+        g2d.dispose();
+    }
+
     @Override
     public void paintComponent(Graphics g){
         super.paintComponent(g);
@@ -170,6 +204,7 @@ public class Graph extends JPanel{
         for(DataConfig data : sources){
             drawData(g2d, data);
         }
+        drawLabels(g2d, sources);
 
         //Foreground draw by swing calling PaintComponents
     }
