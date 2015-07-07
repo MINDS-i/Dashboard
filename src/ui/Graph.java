@@ -163,7 +163,7 @@ public class Graph extends JPanel{
 
         final int RECT_BUFF = 2;
         final int WALL_BUFF = 10;
-        final int TEXT_RISE = 5;
+        final int TEXT_RISE = RECT_BUFF + 3;
 
         final int startX = WALL_BUFF;
         final int startY = getHeight() - WALL_BUFF;
