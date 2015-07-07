@@ -138,10 +138,10 @@ public class Graph extends JPanel{
         g.setPaint(data.getPaint());
 
         final DataSource source = data.getSource();
-        final double width  = this.getWidth();
-        final double hh     = this.getHeight()/2;
-        final double scale  = hh/yScale;
-        final double center = hh + yCenter*scale;
+        final double width      = this.getWidth();
+        final double hh         = this.getHeight()/2;
+        final double scale      = hh/yScale;
+        final double center     = hh + yCenter*scale;
 
         int px = 0;
         int py = (int)hh;
