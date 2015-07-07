@@ -375,12 +375,7 @@ public class MapPanel extends JPanel implements ContextViewer {
     }
     //--------------------------------------------------------------------------
     //MINDSi waypoint managing code
-    public void updateRoverLatitude(double lat){
-        rover.setLatitude(lat);
-    }
-    public void updateRoverLongitude(double lng){
-        rover.setLongitude(lng);
-    }
+
     public int isOverDot(Point clk){
         for(int i=0; i<context.waypoint.size(); i++){
 /*            if(radialOverlap( computeScreenPosition(context.waypoint.get(i).getLocation()) , clk ,
@@ -506,6 +501,8 @@ public class MapPanel extends JPanel implements ContextViewer {
     }
 
     private void drawRover(Graphics g){
+        rover.setLatitude( context.getTelemetry(Serial.LATITUDE));
+        rover.setLongitude(context.getTelemetry(Serial.LONGITUDE));
         Point roverPoint = computeScreenPosition(rover.getLocation());
         drawImg(g, context.theme.roverImage, roverPoint);
     }
@@ -1059,8 +1056,7 @@ public class MapPanel extends JPanel implements ContextViewer {
         public void mouseReleased(MouseEvent e) {
             handleDrag(e);
             if(downDot != -1){
-                //context.w
-                //context.waypoint.sendWaypoint((byte)downDot, Serial.ALTER_SUBTYPE);
+                context.waypoint.sendUpdatedPosition(downDot);
             }
         }
 

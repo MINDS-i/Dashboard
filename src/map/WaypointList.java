@@ -43,6 +43,9 @@ public class WaypointList{
 		sendMessage(Message.addWaypoint( (byte)(index&0xff), newDot ));
 		context.waypointUpdated();
 	}
+	public void sendUpdatedPosition(int index){
+		sendMessage(Message.setWaypoint( (byte)(index&0xff), get(index) ));
+	}
 	public void set(int index, Point.Double newPosition){
 		set(index, newPosition, waypoints.get(index).getAltitude());
 	}
