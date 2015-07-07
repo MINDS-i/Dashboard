@@ -2,51 +2,94 @@
 fletcher16 checksum
 most significant byte on left
 2 byte confirm messages in response to certian messages; checksum of full message.
-ETB - end of transmission block - dec. 17, 0x17
-US - unit seperator - dec. 31, 0x1F
+messages constructed as
+Header, label, content, checksum, footer
 
-0x0* - 7  byte: tag, 32 bit fixed point, hash
-0x1* - 12 byte: tag, lat (32 bit), lon (32 bit), order, hash
-0x2* - 3  byte: tag, hash
-0x30 - 4  byte: confirmation hash, hash
-<tag> <a><b><c><d> <check><sum> <ETB><US>
-<tag> <l><a><t><t> <l><o><n><g> <order> <check><sum> <ETB><US>
-<tag> <action> <check><sum> <ETB><US>
+Header   - the same on all messages, two bytes = [0x13,0x37]
+label    - One byte, top 4 bits specify packet layout (type)
+                     bottom 4 bits are subtype/context
+content  - The content array; specifics depend on message type
+checksum - Two byte fletcher16 checksum of label+content
+footer   - the same on all messages, one byte = [0x9A]
 
-0x00 - latitude
-0x01 - longitude
-0x02 - heading
-0x03 - pitch
-0x04 - roll
-0x05 - speed
-0x06 - distance
+Types:
+Waypoint message:
+	4 bytes latitude
+	4 bytes longitude
+	2 bytes accessory
+	1 byte  index
+	Subtypes:
+		Add: Add this waypoint to the list at specified index
+		Alter: Change the data of the waypoint at specified index
 
-0x10 - add waypoint
-0x11 - change waypoint
-0x12 - delete waypoint
-0x13 - rover at waypoint
-0x14 - send rover to waypoint
+data message:
+	1 byte index
+	4 bytes float
+	subtypes:
+		telemety: Packet contains a telemetry float with label index
+		set setting: Packet contains the value the indexed setting should be set to
 
-0x21 - loop waypoints on
-0x22 - loop waypoints off
-0x23 - clear waypoint list
+checksum messages:
+	2 byte checksum
+	subtypes:
+		confirmation: packet contains the checksum of a message to confirm
+			its receipt
 
-------------------------------------------------------------
+byte messages:
+	1 byte
+	subtypes:
+		setTargetTo: byte contains the index the drone should target
+		command: byte specifies a specific, one time command
+		sync: byte contains a sync/sync response token
+		deleteWaypoint: byte contains index of waypoint to be deleted
 
-/* messages are minumum of 3 bytes, max of 19 bytes, constructed as
-	HEADER :(label[1 bytes] : data[length bytes] : checksum [2 bytes]): FOOTER
-	label = legth[4 bits] : subType[2 bits] : type[2 bits]
-	checksums calculated over everything except the checksum
-	types and subtypes listed as enums below.
-	some messages need confirmations, dictated by constants below
-	confirmation messages contain only the checksum of the entire message
-		being confirmed
+string message:
+	variable, null terminated string
+	subtypes:
+		error: string contains details of detected errors
+		state: string contains details of current state
 
-	sync messages can be sent or received
-	receiving a sync message should result in:
-		the sending of a sync message
-		the activation of any "on connection" commands
+potential flaw: the subtype has taken the roll of the command type byte, but
+	has significantly fewer possible values (16)
+	A: make byte messages 2 byte messages
+		A1: merge with checksum mesages
+		A2: keep seperate from checksum messages
+		+ one fewer message type
+		- more data being send for most commands that isn't necessary
+	B: stay seperate
+		+ a long form command can be added later while maintaining compat
+		- could run out of command types
 
-	the dashboard will send all waypoins "on connection"
-	the drone will upload settings "on connection"
-*/
+Telemetry 5 bytes: label, 4 byte float
+set setting: 5 bytes label, 4 byte float
+add Waypoint
+alter waypoint
+delete waypoint
+confirmation msg: 2 byte: one integer
+
+Command 2 bytes: label, data
+poll setting: 1 byte: index
+request sync: 0 byte: just label
+sync response: 0 byte: just label
+
+
+
+
+
+messages are minumum of 3 bytes, max of 19 bytes, constructed as
+HEADER :(label[1 bytes] : data[length bytes] : checksum [2 bytes]): FOOTER
+label = legth[4 bits] : subType[2 bits] : type[2 bits]
+checksums calculated over everything except the checksum
+types and subtypes listed as enums below.
+some messages need confirmations, dictated by constants below
+confirmation messages contain only the checksum of the entire message
+	being confirmed
+
+sync messages can be sent or received
+receiving a sync message should result in:
+	the sending of a sync message
+	the activation of any "on connection" commands
+
+the dashboard will send all waypoins "on connection"
+the drone will upload settings "on connection"
+

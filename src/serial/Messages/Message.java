@@ -11,12 +11,14 @@ public abstract class Message{
 	byte[]	content;
 	int		failCount;
 	int		checkSum;
+	byte[]  checkPair;
 	int		confirmSum;
 	Date	sent;
 	public Message(){
 		failCount	= 0;
 		checkSum	= 0;
 		confirmSum	= 0;
+		checkPair   = new byte[2];
 	}
 	public void sendTime(Date date){
 		sent = date;
@@ -39,15 +41,25 @@ public abstract class Message{
 	public void send(SerialPort port) throws SerialPortException {
 		port.writeBytes(Serial.HEADER);
 		port.writeBytes(content);
+		port.writeBytes(checkPair);
 		port.writeBytes(Serial.FOOTER);
 		sent = new Date();
 	}
+	private byte[] concat(byte[] a, byte[] b){
+		byte[] c = new byte[a.length+b.length];
+		for(int i=0; i< a.length; i++){
+			c[i] = a[i];
+		}
+		for(int i=0; i< b.length; i++){
+			c[i+a.length] = b[i];
+		}
+		return c;
+	}
 	protected void buildChecksum(){
-		int pos = content.length - 2;
-		checkSum		= Serial.fletcher16(content, pos);
-		content[pos+0]	= (byte)(checkSum>>8);
-		content[pos+1]	= (byte)(checkSum&0xff);
-		confirmSum  	= Serial.fletcher16(content, content.length  )&0xffff;
+		checkSum		= Serial.fletcher16( content );
+		checkPair[0]	= (byte)(checkSum>>8);
+		checkPair[1]	= (byte)(checkSum&0xff);
+		confirmSum  	= Serial.fletcher16( concat(content,checkPair) )&0xffff;
 	}
 	//these should be overridden
 	public boolean needsConfirm(){

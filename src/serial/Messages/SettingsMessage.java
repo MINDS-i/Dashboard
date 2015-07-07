@@ -10,17 +10,19 @@ public class SettingsMessage extends Message{
 	int msgType;
 	int settingIndex;
 	public SettingsMessage(int index){
+		super();
 		msgType = Serial.POLL_SUBTYPE;
 		settingIndex = index;
 
 		int length	= 2;
-		content		= new byte[length+2];
+		content		= new byte[length];
 		content[0]	= Serial.buildMessageLabel( Serial.SETTINGS_TYPE,
 												msgType, length);
 		content[1]  = (byte) index;
 		buildChecksum();
 	}
 	public SettingsMessage(int index, float value){
+		super();
 		msgType = Serial.SET_SUBTYPE;
 		settingIndex = index;
 
@@ -29,7 +31,7 @@ public class SettingsMessage extends Message{
 		int num = Float.floatToIntBits(value);
 
 		int length	= 8;
-		content		= new byte[length+2];
+		content		= new byte[length];
 		content[0]	= Serial.buildMessageLabel( Serial.SETTINGS_TYPE,
 												msgType, length);
 		content[1]	= (byte) index;

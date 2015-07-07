@@ -9,11 +9,12 @@ import java.util.Date;
 public class ProtocolMessage extends Message{
 	int msgType;
 	public ProtocolMessage(int type, int confirmationSum){
+		super();
 		// for now this will ignore type
 		msgType = Serial.CONFIRM_SUBTYPE;
 
 		int length	= 3;
-		content		= new byte[length+2];
+		content		= new byte[length];
 		content[0]	= Serial.buildMessageLabel( Serial.PROTOCOL_TYPE,
 												msgType, length);
 		content[1]	= (byte)((confirmationSum >> 8) & 0xff);
@@ -21,10 +22,11 @@ public class ProtocolMessage extends Message{
 		buildChecksum();
 	}
 	public ProtocolMessage(int type){ //sync message
+		super();
 		msgType = type;
 
 		int length	= 1;
-		content 	= new byte[length+2];
+		content 	= new byte[length];
 		content[0]	= Serial.buildMessageLabel( Serial.PROTOCOL_TYPE,
 												msgType, length);
 		buildChecksum();

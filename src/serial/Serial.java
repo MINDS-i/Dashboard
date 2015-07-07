@@ -37,7 +37,7 @@ public class Serial{
 
 	public static final int	MAX_WAYPOINTS		= 64;
 	public static final int	MAX_SETTINGS		= 32;
-	public static final int	MAX_TELEMETRY		= 8;
+	public static final int	MAX_TELEMETRY		= 256;
 	public static final int	BAUD				= SerialPort.BAUDRATE_9600;
 	public static final int	U16_FIXED_POINT		= 256;
 
@@ -49,7 +49,7 @@ public class Serial{
 	public static final boolean WAYPOINT_CONFIRM_REQ	= true;
 
 	public static final byte[] HEADER = {0x13, 0x37};
-	public static final byte[] FOOTER = {(byte)0x9A };
+	public static final byte[] FOOTER = {(byte)0x9A};
 
 	public static final String WAYPOINT_DESCRIPTOR = "Waypoint ";
 	public static final String     DATA_DESCRIPTOR = "Data Msg ";
@@ -73,6 +73,10 @@ public class Serial{
 		aSum = (aSum & 0xff) + (aSum >> 8);
 		bSum = (bSum & 0xff) + (bSum >> 8);
 		return (int) ( ((bSum)<<8)|(aSum) );
+	}
+
+	public static int fletcher16( byte[] message ){
+		return fletcher16(message, message.length);
 	}
 
 	public static boolean fletcher(byte[] message, int length){

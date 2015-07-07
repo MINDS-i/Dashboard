@@ -10,6 +10,7 @@ public class WaypointMessage extends Message{
 	int msgType;
 	byte waypointIndex;
 	public WaypointMessage(int type, byte index, Dot dot){
+		super();
 		msgType = type;
 		waypointIndex = index;
 
@@ -17,7 +18,7 @@ public class WaypointMessage extends Message{
 		int lon = Float.floatToIntBits((float)dot.getLongitude());
 
 		int length = 12;
-		content = new byte[length+2];
+		content = new byte[length];
 		content[0] = Serial.buildMessageLabel( Serial.WAYPOINT_TYPE,
 												msgType, length);
 		content[1]  = (byte)((lat>>24)&0xff);

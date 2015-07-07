@@ -9,12 +9,13 @@ import java.util.Date;
 public class StandardMessage extends Message{
 	int msgType;
 	public StandardMessage(int tLabel, float value){
+		super();
 		msgType = Serial.TELEMETRY_SUBTYPE;
 
 		int num = Float.floatToIntBits(value);
 
 		int length	= 8;
-		content		= new byte[length+2];
+		content		= new byte[length];
 		content[0]	= Serial.buildMessageLabel(Serial.STANDARD_TYPE,
 													msgType, length);
 		content[1]	= (byte) tLabel;
@@ -25,10 +26,11 @@ public class StandardMessage extends Message{
 		buildChecksum();
 	}
 	public StandardMessage(int cmd, byte data){
+		super();
 		msgType = Serial.COMMAND_SUBTYPE;
 
 		int length	= 3;
-		content 	= new byte[length+2];
+		content 	= new byte[length];
 		content[0]	= Serial.buildMessageLabel(Serial.STANDARD_TYPE,
 													msgType, length);
 		content[1]	= (byte) cmd;
