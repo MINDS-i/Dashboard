@@ -122,9 +122,6 @@ public class SerialSender{
 				Message msg = i.next();
 				if(msg.isConfirmedBy(confirm)){
 					i.remove();
-					context.alert.displayMessage(
-						msg.toString()+" Confirmed after "
-						+msg.numberOfFailures()+" tries");
 					break;
 				}
 			}

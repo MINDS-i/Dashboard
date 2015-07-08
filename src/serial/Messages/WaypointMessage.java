@@ -38,6 +38,6 @@ class WaypointMessage extends Message{
 	}
 	@Override
 	public String toString(){
-		return "Waypoint " + waypointIndex + " ";
+		return "Waypoint " + waypointIndex + " Message";
 	}
 }

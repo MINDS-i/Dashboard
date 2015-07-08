@@ -8,6 +8,8 @@ import com.serial.Messages.*;
 import com.ui.*;
 import com.xml;
 import java.io.*;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import jssc.SerialPort;
 import jssc.SerialPortException;
@@ -22,7 +24,7 @@ public class Context{
 	public Theme		theme;
 	public WaypointList	waypoint;
 	public float		upstreamSettings[] = new float[Serial.MAX_SETTINGS];
-
+	public PrintStream  log;
 
 	public TelemetryManager telemetry;
 
@@ -49,6 +51,15 @@ public class Context{
 			} catch (Exception e) {}
 		}
 		loadLocale();
+
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("HH-mm_MM-dd_yyyyGG");
+        String time = sdf.format(cal.getTime());
+        try {
+        	log = new PrintStream("log/"+time+".log");
+        } catch (Exception e){
+        	System.err.println("Cannot save log file");
+        }
 	}
 	public void toggleLocale(){
 		String current = (String) props.get("subject");
@@ -94,7 +105,10 @@ public class Context{
 		port      = serialPort;
 		theme     = new Theme(locale);
 		telemetry = new TelemetryManager(this);
-		if(alertPanel != null) alertPanel.setTheme(theme);
+		if(alertPanel != null) {
+			alertPanel.setTheme(theme);
+			alertPanel.logTo(log);
+		}
 	}
 	public void updatePort(SerialPort newPort) throws SerialPortException{
 		closePort();

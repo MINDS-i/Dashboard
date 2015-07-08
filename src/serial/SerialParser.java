@@ -180,6 +180,6 @@ public class SerialParser implements SerialPortEventListener{
 			buff[i-1] = msg[i];
 		}
 		String data = new String(buff, StandardCharsets.US_ASCII);
-		context.alert.displayMessage(data);
+		context.alert.displayMessage("Rover: "+data);
 	}
 }

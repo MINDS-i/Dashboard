@@ -27,6 +27,10 @@ class DataMessage extends Message{
     }
     @Override
     public String toString(){
-        return "data message";
+        switch(msgType){
+            case Serial.TELEMETRY_DATA: return "Telemetry Message";
+            case Serial.SETTING_DATA: return "Settings Change";
+        }
+        return "Data Message";
     }
 }

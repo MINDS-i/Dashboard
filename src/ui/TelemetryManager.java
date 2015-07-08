@@ -45,10 +45,10 @@ public class TelemetryManager{
         streams   = new ArrayList<DataSource>();
         try{
             Calendar cal = Calendar.getInstance();
-            SimpleDateFormat sdf = new SimpleDateFormat("HH-mm_MM-DD_yyyyGG");
+            SimpleDateFormat sdf = new SimpleDateFormat("HH-mm_MM-dd_yyyyGG");
             String time = sdf.format(cal.getTime());
 
-            FileWriter fileWriter = new FileWriter("log/"+time+".log", false);
+            FileWriter fileWriter = new FileWriter("log/"+time+".telem", false);
             logFile = new BufferedWriter(fileWriter);
             setLogPeriod(DEFAULT_LOG_PERIOD);
         } catch (IOException ex) {

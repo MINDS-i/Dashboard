@@ -9,7 +9,8 @@ import javax.imageio.*;
 import javax.swing.*;
 import java.awt.FontMetrics;
 import java.awt.font.*;
-
+import java.util.*;
+import java.io.*;
 
 public class AlertPanel extends JPanel {
 	private final static int NUM_LINES = 8;
@@ -17,9 +18,10 @@ public class AlertPanel extends JPanel {
 	private int lineHeight;
 	private FontMetrics metrics;
 	private String[] messages = new String[NUM_LINES];
+	private PrintStream log;
 
 	public AlertPanel(){
-		this.setPreferredSize(new Dimension(4000,200)); //cheap fix for autoscaling
+		this.setPreferredSize(new Dimension(4000000,200)); //cheap fix for autoscaling
 		setOpaque(false);
 		for(int i=0; i<NUM_LINES; i++) messages[i]="";
 		displayMessage("Welcome!");
@@ -32,6 +34,10 @@ public class AlertPanel extends JPanel {
 
 	public void setTheme(Theme theme){
 		this.theme = theme;
+	}
+
+	public void logTo(PrintStream log){
+		this.log = log;
 	}
 
 	private Font getMessageFont(){
@@ -93,6 +99,7 @@ public class AlertPanel extends JPanel {
 			messages[i] = messages[i-1];
 		}
 		messages[0] = msg;
+		if(log != null) log.println(msg);
 		repaint();
 	}
 

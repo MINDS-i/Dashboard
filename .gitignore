@@ -1,4 +1,5 @@
 *.log
+*.telem
 *.class
 log.txt
 DashBoard.jar
