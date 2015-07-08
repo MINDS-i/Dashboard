@@ -23,7 +23,7 @@ public class SerialParser implements SerialPortEventListener{
 	byte[] buffer;
 	byte bufPos = 0;
 	Context context;
-	static int BUFLEN = 25;
+	static int BUFLEN = 128;
 
 	public SerialParser(Context cxt){
 		context = cxt;
