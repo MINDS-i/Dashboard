@@ -27,8 +27,10 @@ public class DataWindow implements ActionListener{
 	private static final int WINDOW_X = 300;
 	private static final int WINDOW_Y = 500;
 
-	private static final Dimension telemBoxDim   = new Dimension(300, 180);
-	private static final Dimension settingBoxDim = new Dimension(300, 300);
+	private static final Dimension telemBoxPref   = new Dimension(300, 180);
+	private static final Dimension telemBoxMax    = new Dimension(Integer.MAX_VALUE, 180);
+	private static final Dimension settingBoxPref = new Dimension(300, 300);
+	private static final Dimension settingBoxMax  = new Dimension(Integer.MAX_VALUE, 300);
 
 	ColumnTableModel setModel;
 	ColumnTableModel telModel;
@@ -130,10 +132,10 @@ public class DataWindow implements ActionListener{
 		setTable	= new JTable(setModel);
 		setScroll	= new JScrollPane(setTable);
 
-		telScroll.setMaximumSize(  telemBoxDim);
-		telScroll.setPreferredSize(telemBoxDim);
-		setScroll.setMaximumSize(  settingBoxDim);
-		setScroll.setPreferredSize(settingBoxDim);
+		telScroll.setMaximumSize(  telemBoxMax);
+		telScroll.setPreferredSize(telemBoxPref);
+		setScroll.setMaximumSize(  settingBoxMax);
+		setScroll.setPreferredSize(settingBoxPref);
 
 		//improve preferred size interface
 		javax.swing.table.TableColumn col;
@@ -149,20 +151,10 @@ public class DataWindow implements ActionListener{
                 setDetail(setTable.getSelectedRow());
             }
         });
-/*        JTextPane dBox = new JTextPane();
-        dBox.setBorder(BorderFactory.createLineBorder(Color.gray));
-        //dBox.setColumns(20);
-        //dBox.setLineWrap(true);
-        //dBox.setWrapStyleWord(true);
-        descriptionBox = dBox;*/
 
         JTextPane dBox = new JTextPane();
         dBox.setBorder(BorderFactory.createLineBorder(Color.gray));
         dBox.setContentType("text/html");
-        //dBox.setMaximumSize(new Dimension(200,20000000));
-        //dBox.setColumns(20);
-        //dBox.setLineWrap(true);
-        //dBox.setWrapStyleWord(true);
         descriptionBox = dBox;
 
 		constructLogPane();
