@@ -129,6 +129,7 @@ public class SerialSender{
 	}
 
 	public void sendWaypointList(){
+		context.alert.displayMessage("Sending waypoint list");
 		sendingWaypointList = true;
 		waypointListPosition = 0;
 		Message msg = Message.clearWaypoints();

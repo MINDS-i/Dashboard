@@ -24,6 +24,9 @@ import java.util.PropertyResourceBundle;
 public class DataWindow implements ActionListener{
 	public static final long PERIOD = 200; //update period in MS
 
+	private static final int WINDOW_X = 300;
+	private static final int WINDOW_Y = 500;
+
 	ColumnTableModel setModel;
 	ColumnTableModel telModel;
 	Context 		 context;
@@ -39,10 +42,10 @@ public class DataWindow implements ActionListener{
 	public DataWindow(Context cxt){
 		context = cxt;
 		frame = new JFrame("Telemetry");
-		panel = new JPanel();
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-    	frame.setLayout(new FlowLayout());
-    	frame.setVisible(true);
+		frame.setSize(WINDOW_X,WINDOW_Y);
+    	//frame.setLayout(new BoxLayout(frame,BoxLayout.PAGE_AXIS));
+		panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 
 		ArrayList<TableColumn> telem = new ArrayList<TableColumn>();
@@ -141,11 +144,20 @@ public class DataWindow implements ActionListener{
                 setDetail(setTable.getSelectedRow());
             }
         });
-        JTextArea dBox = new JTextArea();
+/*        JTextPane dBox = new JTextPane();
         dBox.setBorder(BorderFactory.createLineBorder(Color.gray));
-        dBox.setColumns(20);
-        dBox.setLineWrap(true);
-        dBox.setWrapStyleWord(true);
+        //dBox.setColumns(20);
+        //dBox.setLineWrap(true);
+        //dBox.setWrapStyleWord(true);
+        descriptionBox = dBox;*/
+
+        JTextPane dBox = new JTextPane();
+        dBox.setBorder(BorderFactory.createLineBorder(Color.gray));
+        dBox.setContentType("text/html");
+        //dBox.setMaximumSize(new Dimension(200,20000000));
+        //dBox.setColumns(20);
+        //dBox.setLineWrap(true);
+        //dBox.setWrapStyleWord(true);
         descriptionBox = dBox;
 
 		constructLogPane();
@@ -153,8 +165,11 @@ public class DataWindow implements ActionListener{
     	panel.add(telScroll);
     	panel.add(setScroll);
     	panel.add(descriptionBox);
+    	panel.add(Box.createVerticalGlue());
+
     	frame.add(panel);
     	frame.pack();
+    	frame.setVisible(true);
     	startUpdateTimer();
 	}
 	private void constructLogPane(){
