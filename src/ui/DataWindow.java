@@ -25,12 +25,14 @@ public class DataWindow implements ActionListener{
 	public static final long PERIOD = 200; //update period in MS
 
 	private static final int WINDOW_X = 300;
-	private static final int WINDOW_Y = 500;
+	private static final int WINDOW_Y = 560;
 
-	private static final Dimension telemBoxPref   = new Dimension(300, 180);
-	private static final Dimension telemBoxMax    = new Dimension(Integer.MAX_VALUE, 180);
+	private static final Dimension telemBoxPref   = new Dimension(300, 140);
+	private static final Dimension telemBoxMax    = new Dimension(Integer.MAX_VALUE, 140);
 	private static final Dimension settingBoxPref = new Dimension(300, 300);
 	private static final Dimension settingBoxMax  = new Dimension(Integer.MAX_VALUE, 300);
+	private static final Dimension descriptionMin = new Dimension(300, 80);
+	private static final Dimension descriptionPref= new Dimension(300, 120);
 
 	ColumnTableModel setModel;
 	ColumnTableModel telModel;
@@ -121,8 +123,6 @@ public class DataWindow implements ActionListener{
 			}
 		});
 
-
-
 		JTable telTable, setTable;
 		JScrollPane telScroll, setScroll;
 		telModel	= new ColumnTableModel(telem);
@@ -134,10 +134,13 @@ public class DataWindow implements ActionListener{
 
 		telScroll.setMaximumSize(  telemBoxMax);
 		telScroll.setPreferredSize(telemBoxPref);
+		telScroll.setMinimumSize(  telemBoxPref);
+
 		setScroll.setMaximumSize(  settingBoxMax);
 		setScroll.setPreferredSize(settingBoxPref);
+		setScroll.setMinimumSize(  settingBoxPref);
 
-		//improve preferred size interface
+		//TODO improve preferred size interface
 		javax.swing.table.TableColumn col;
 		col = telTable.getColumn(telem.get(0).getName());
 		col.setPreferredWidth(10);
@@ -155,6 +158,8 @@ public class DataWindow implements ActionListener{
         JTextPane dBox = new JTextPane();
         dBox.setBorder(BorderFactory.createLineBorder(Color.gray));
         dBox.setContentType("text/html");
+        dBox.setMinimumSize(descriptionMin);
+        dBox.setPreferredSize(descriptionPref);
         descriptionBox = dBox;
 
 		constructLogPane();
