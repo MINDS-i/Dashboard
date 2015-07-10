@@ -27,6 +27,9 @@ public class DataWindow implements ActionListener{
 	private static final int WINDOW_X = 300;
 	private static final int WINDOW_Y = 500;
 
+	private static final Dimension telemBoxDim   = new Dimension(300, 180);
+	private static final Dimension settingBoxDim = new Dimension(300, 300);
+
 	ColumnTableModel setModel;
 	ColumnTableModel telModel;
 	Context 		 context;
@@ -127,8 +130,10 @@ public class DataWindow implements ActionListener{
 		setTable	= new JTable(setModel);
 		setScroll	= new JScrollPane(setTable);
 
-		telScroll.setPreferredSize(new Dimension(120, 160));
-		setScroll.setPreferredSize(new Dimension(120, 300));
+		telScroll.setMaximumSize(  telemBoxDim);
+		telScroll.setPreferredSize(telemBoxDim);
+		setScroll.setMaximumSize(  settingBoxDim);
+		setScroll.setPreferredSize(settingBoxDim);
 
 		//improve preferred size interface
 		javax.swing.table.TableColumn col;
