@@ -15,35 +15,6 @@ import java.util.TimerTask;
 import java.util.List;
 
 public class Graph extends JPanel{
-
-    class DataConfig{
-        DataSource  source;
-        Paint       paint;
-        boolean     drawn;
-        public DataConfig(DataSource s){
-            this.source = s;
-            this.drawn = false;
-            this.paint = (Paint) Color.BLACK;
-        }
-        public void setPaint(Paint p){
-            this.paint = p;
-        }
-        public void setDrawn(Boolean draw){
-            this.drawn = draw;
-        }
-        public Paint getPaint(){
-            return this.paint;
-        }
-        public boolean getDrawn(){
-            return this.drawn;
-        }
-        public DataSource getSource(){
-            return source;
-        }
-        public String getName(){
-            return source.getName();
-        }
-    }
     private List<DataConfig> sources;
     private Timer refreshTimer;
     private double xScale  =  1.0;
@@ -79,6 +50,11 @@ public class Graph extends JPanel{
                 }
             }
         });
+
+        MouseAdapter mouseAdapter = new MouseHandler();
+        this.addMouseListener(mouseAdapter);
+        this.addMouseMotionListener(mouseAdapter);
+        this.addMouseWheelListener(mouseAdapter);
     }
 
     private class RefreshTimerTask extends TimerTask{
@@ -111,7 +87,7 @@ public class Graph extends JPanel{
 
         final int hh = height/2;
         final int dy = height/hlines;
-        final int center = (int) (yCenter*(hh/yScale)) + hh;
+        final int center = (int) (yCenter + hh);
 
         for(int y=dy; y<height/2; y+=dy){
             g.drawLine(0,center+y,width,center+y);
@@ -141,17 +117,17 @@ public class Graph extends JPanel{
         final double width      = this.getWidth();
         final double hh         = this.getHeight()/2;
         final double scale      = hh/yScale;
-        final double center     = hh + yCenter*scale;
+        final double center     = hh + yCenter;
 
         int px = 0;
         int py = (int)hh;
         for(int x=0; x<width; x++){
             final double xPos = (1.0d-xScale) + xScale * (((double)x) / width);
-            final int d = (int) (source.get(xPos)*scale + center);
+            final int y = (int) (source.get(xPos)*scale + center);
 
-            g.drawLine(x, d, px, py);
+            g.drawLine(x, y, px, py);
             px = x;
-            py = d;
+            py = y;
         }
     }
 
@@ -213,7 +189,7 @@ public class Graph extends JPanel{
         List<DataSource> trialSources = new ArrayList<DataSource>();
         DataSource sin = new DataSource(){
             public double get(double x){
-                return Math.sin(x*3.0f*Math.PI);
+                return 20.0*Math.sin(x*3.0f*Math.PI);
             }
             public String getName(){
                 return "sine";
@@ -221,7 +197,7 @@ public class Graph extends JPanel{
         };
         DataSource cos = new DataSource(){
             public double get(double x){
-                return Math.cos(x*3.0f*Math.PI);
+                return 20.0*Math.cos(x*3.0f*Math.PI);
             }
             public String getName(){
                 return "cosine";
@@ -236,6 +212,11 @@ public class Graph extends JPanel{
         f.pack();
         f.setVisible(true);
 
+        //turn on all the test data sources
+        for(DataConfig source : g.getSources()){
+            source.setDrawn(true);
+        }
+
         while(true){
             try {
                 Thread.sleep(1000);
@@ -243,7 +224,84 @@ public class Graph extends JPanel{
                 e.printStackTrace();
             }
         }
+    }
 
+    class DataConfig{
+        DataSource  source;
+        Paint       paint;
+        boolean     drawn;
+        public DataConfig(DataSource source, Boolean drawn){
+            this.source = source;
+            this.drawn = drawn;
+            this.paint = (Paint) Color.BLACK;
+        }
+        public DataConfig(DataSource s){
+            this(s, false);
+        }
+        public void setPaint(Paint p){
+            this.paint = p;
+        }
+        public void setDrawn(Boolean draw){
+            this.drawn = draw;
+        }
+        public Paint getPaint(){
+            return this.paint;
+        }
+        public boolean getDrawn(){
+            return this.drawn;
+        }
+        public DataSource getSource(){
+            return source;
+        }
+        public String getName(){
+            return source.getName();
+        }
+    }
+
+    class MouseHandler extends MouseAdapter{
+        private Point dragPoint = null;
+        @Override
+        public void mousePressed(MouseEvent e){
+            switch(e.getButton()){
+                case MouseEvent.BUTTON1:
+                    dragPoint = e.getPoint();
+                    break;
+                case MouseEvent.BUTTON2:
+                    break;
+                case MouseEvent.BUTTON3:
+                    break;
+                default:
+                    break;
+            }
+        }
+        @Override
+        public void mouseDragged(MouseEvent e){
+            if(dragPoint != null){
+                final int dx = e.getPoint().x - dragPoint.x;
+                final int dy = e.getPoint().y - dragPoint.y;
+                Graph g = Graph.this;
+                final double dv = ((double)dy);
+                g.setYCenter( g.getYCenter() + dv );
+
+                double xs = ((double)dx)/((double)Graph.this.getWidth());
+                xs += g.getXScale();
+                xs = Math.max( Math.min(xs, 1.0), 0.0);
+                g.setXScale( xs );
+
+                dragPoint = e.getPoint();
+            }
+        }
+        @Override
+        public void mouseReleased(MouseEvent e){
+            dragPoint = null;
+        }
+        @Override
+        public void mouseWheelMoved(MouseWheelEvent e){
+            final double ZOOM_FACTOR = 0.05;
+            double d = e.getPreciseWheelRotation();
+            Graph g = Graph.this;
+            g.setYScale( d*ZOOM_FACTOR*g.getYScale() + g.getYScale() );
+        }
     }
 
 }
