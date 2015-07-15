@@ -15,6 +15,7 @@ import java.util.TimerTask;
 import java.util.List;
 
 public class Graph extends JPanel{
+    private final static boolean AA_ON = false; //anti-aliasing render hint
     private List<DataConfig> sources;
     private Timer refreshTimer;
     private double xScale  =  1.0;
@@ -105,11 +106,12 @@ public class Graph extends JPanel{
 
         Graphics2D g = (Graphics2D) g2d.create();
 
-        /*
-        RenderingHints rh = new RenderingHints(
-             RenderingHints.KEY_ANTIALIASING,
-             RenderingHints.VALUE_ANTIALIAS_ON);
-        g.setRenderingHints(rh); */
+        if(AA_ON){
+            RenderingHints rh = new RenderingHints(
+                 RenderingHints.KEY_ANTIALIASING,
+                 RenderingHints.VALUE_ANTIALIAS_ON);
+            g.setRenderingHints(rh);
+        }
 
         g.setPaint(data.getPaint());
 
@@ -123,7 +125,7 @@ public class Graph extends JPanel{
         int py = (int)hh;
         for(int x=0; x<width; x++){
             final double xPos = (1.0d-xScale) + xScale * (((double)x) / width);
-            final int y = (int) (source.get(xPos)*scale + center);
+            final int y = (int) (-source.get(xPos)*scale + center);
 
             g.drawLine(x, y, px, py);
             px = x;
