@@ -15,21 +15,23 @@ import java.util.TimerTask;
 import java.util.List;
 
 public class Graph extends JPanel{
-    private final static int NUM_HORZ_RULES = 3; //creates 2^NUM_VERT_RULES horizontal rulers
+    private final static int RULER_XOFF = 10;
+    private final static int RULER_YOFF =  2;
+    private final static int REPAINT_INTERVAL = 50; //milliseconds
+    private final static int NUM_HORZ_RULES = 4; //creates 2^NUM_VERT_RULES horizontal rulers
+    private final static int NUM_VERT_RULES = 16; //creates x evenly spaces vertical rulers
     private final static boolean AA_ON = false; //anti-aliasing render hint
+    private final static double XSCALE_MAX = 1.00;
+    private final static double XSCALE_MIN = 0.05;
 
     private List<DataConfig> sources;
     private Timer refreshTimer;
-    private double xScale  =  1.0;
-    private double yScale  = 20.0;
-    private double yCenter =  0.0;
     private GraphConfigWindow config;
+    private double xScale  = XSCALE_MAX; //how much of the data's x range to display
+    private double yScale  = 20.0; //scale of data per half graph height
+    private double yCenter =  0.0; //pixel offset for where 0 line should be
 
     List<DataConfig> getSources(){ return sources; }
-    double getXScale() { return xScale; }
-    double getYScale() { return yScale; }
-    double getYCenter(){ return yCenter;}
-
     void setXScale(double s) {
         xScale = s;
         if(config != null) config.graphConfigsUpdated();
@@ -42,6 +44,9 @@ public class Graph extends JPanel{
         yCenter= s;
         if(config != null) config.graphConfigsUpdated();
     }
+    double getXScale() { return xScale; }
+    double getYScale() { return yScale; }
+    double getYCenter(){ return yCenter;}
 
     /*
     clean up graph logic
@@ -56,11 +61,13 @@ public class Graph extends JPanel{
 
         //repaint at regular interval
         refreshTimer = new Timer();
-        refreshTimer.scheduleAtFixedRate(new RefreshTimerTask(), 0, 50);
+        refreshTimer.scheduleAtFixedRate(new RefreshTimerTask(), 0, REPAINT_INTERVAL);
 
         //place configuration button
         this.setLayout(new FlowLayout(FlowLayout.LEADING));
         this.add(new JButton(configPopupAction));
+
+        //close config window if the graph is closed
         this.addHierarchyListener(new HierarchyListener(){
             public void hierarchyChanged(HierarchyEvent e){
                 if(isShowing()) return;
@@ -70,7 +77,8 @@ public class Graph extends JPanel{
             }
         });
 
-        MouseAdapter mouseAdapter = new MouseHandler();
+        //turn on graph mouse listener
+        MouseAdapter mouseAdapter = new GraphMouseHandler();
         this.addMouseListener(mouseAdapter);
         this.addMouseMotionListener(mouseAdapter);
         this.addMouseWheelListener(mouseAdapter);
@@ -100,90 +108,83 @@ public class Graph extends JPanel{
     public void paintComponent(Graphics g){
         super.paintComponent(g);
 
+        //find data->pixel conversion constants
         final Graphics2D g2d = (Graphics2D) g;
-        final int width  = this.getWidth();
-        final int height = this.getHeight();
+        final double      hh = getHeight()/2;
+        final double   scale = -hh/yScale;
+        final double  center =  hh+yCenter;
 
         //Draw background
         g2d.setPaint(Color.BLACK);
-        drawGrid(g2d, width, height, 16, 10);
+        drawGrid(g2d, scale, center);
 
         //Draw graph elements
         for(DataConfig data : sources){
-            drawData(g2d, data);
+            if(data.getDrawn())
+                drawData(g2d, data, scale, center, xScale);
         }
         drawLabels(g2d, sources);
 
         //Foreground draw by swing calling PaintComponents
     }
 
-    private void drawGrid(Graphics2D g2d, int width,  int height,
-                                          int wlines, int hlines){
+    private void drawGrid(Graphics2D g2d, double scale, double center){
         Graphics2D g = (Graphics2D) g2d.create();
 
-        final double horzRuleScale = Math.getExponent(yScale) - NUM_HORZ_RULES;
-        final double horzRuleDelta = Math.pow(2, horzRuleScale);
-        final int    hh = height/2;
-        final double scale  = hh/yScale;
-        final double center = hh+yCenter;
         /**
          * data*scale + center = pixel
+         * (pixel - center) / scale = data
+         * 0 is the top of the screen, height is the bottom
          */
-        final double maxDataVal = (((double)hh) - yCenter) * yScale / ((double)hh);
-        final double minDataVal = -center/scale;
+        final double maxDataVal = (0.0-center)/scale;
+        final double minDataVal = (getHeight()-center)/scale;
+        final double horzRuleScale = Math.getExponent(maxDataVal-minDataVal) - NUM_HORZ_RULES;
+        final double horzRuleDelta = Math.pow(2, horzRuleScale);
         final double minRule = minDataVal - (minDataVal%horzRuleDelta);
 
         //horizontal rules
         g.setStroke(new BasicStroke(1));
         g.setColor(Color.LIGHT_GRAY);
-        for(double r = minRule; r< maxDataVal; r+=horzRuleDelta){
+        for(double r = minRule; r<maxDataVal; r+=horzRuleDelta){
             final int pY = (int)(r * scale + center);
-            g.drawLine(0,pY,width,pY);
-            g.drawString(""+(-r+0.0), 10, pY-2); //adding zero prevents "-0.0"
+            g.drawLine(0,pY,getWidth(),pY);
+            g.drawString(""+r, RULER_XOFF, pY-RULER_YOFF);
         }
 
         //vertical rules
         g.setStroke(new BasicStroke(1));
         g.setColor(Color.LIGHT_GRAY);
-        final int dx = width/wlines;
-        for(int x=0; x<width; x+=(width/wlines)){
-            g.drawLine(x,0,x,height);
+        final int dx = getWidth()/NUM_VERT_RULES;
+        for(int x=0; x<getWidth(); x+=dx){
+            g.drawLine(x,0,x,getHeight());
         }
 
+        //bold 0 line
         g.setStroke(new BasicStroke(3));
         g.setColor(Color.BLACK);
-        g.drawLine(0, (int)center, width, (int)center); //bold 0 line
+        g.drawLine(0, (int)center, getWidth(), (int)center); //bold 0 line
 
         g.dispose();
     }
 
-    private void drawData(Graphics2D g2d, DataConfig data){
-        if(!data.getDrawn()) return;
-
-        //TODO start only drawing in invalidated boxes
-
+    private void drawData(Graphics2D g2d, DataConfig data, double scale, double center, double xWidth){
         Graphics2D g = (Graphics2D) g2d.create();
-
         if(AA_ON){
             RenderingHints rh = new RenderingHints(
                  RenderingHints.KEY_ANTIALIASING,
                  RenderingHints.VALUE_ANTIALIAS_ON);
             g.setRenderingHints(rh);
         }
-
         g.setPaint(data.getPaint());
 
         final DataSource source = data.getSource();
         final double width      = this.getWidth();
-        final double hh         = this.getHeight()/2;
-        final double scale      = hh/yScale;
-        final double center     = hh + yCenter;
 
         int px = 0;
-        int py = (int)hh;
+        int py = 0;
         for(int x=0; x<width; x++){
-            final double xPos = (1.0d-xScale) + xScale * (((double)x) / width);
-            final int y = (int) (-source.get(xPos)*scale + center);
+            final double xPos = (1.0d-xWidth) + xWidth * (((double)x) / width);
+            final int y = (int) (source.get(xPos)*scale + center);
 
             g.drawLine(x, y, px, py);
             px = x;
@@ -226,6 +227,7 @@ public class Graph extends JPanel{
         g2d.dispose();
     }
 
+    //main method for quicker manual testing
     public static void main(String[] args) {
         List<DataSource> trialSources = new ArrayList<DataSource>();
         DataSource sin = new DataSource(){
@@ -299,7 +301,7 @@ public class Graph extends JPanel{
         }
     }
 
-    class MouseHandler extends MouseAdapter{
+    class GraphMouseHandler extends MouseAdapter{
         private Point dragPoint = null;
         @Override
         public void mousePressed(MouseEvent e){
@@ -318,17 +320,17 @@ public class Graph extends JPanel{
         @Override
         public void mouseDragged(MouseEvent e){
             if(dragPoint != null){
-                final int dx = e.getPoint().x - dragPoint.x;
-                final int dy = e.getPoint().y - dragPoint.y;
-                Graph g = Graph.this;
-                final double dv = ((double)dy);
-                g.setYCenter( g.getYCenter() + dv );
-
-                double xs = ((double)dx)/((double)Graph.this.getWidth());
+                final Graph   g = Graph.this;
+                final double dx = e.getPoint().x - dragPoint.x;
+                final double dy = e.getPoint().y - dragPoint.y;
+                //scale x drag motion by width, use it to alter the graph x scale
+                double xs = dx/((double)Graph.this.getWidth());
                 xs += g.getXScale();
-                xs = Math.max( Math.min(xs, 1.0), 0.05);
+                xs = Math.max( Math.min(xs, XSCALE_MAX), XSCALE_MIN);
                 g.setXScale( xs );
-
+                //pan the y axis by delta y
+                g.setYCenter( g.getYCenter() + dy );
+                //save current point for delta calculations
                 dragPoint = e.getPoint();
             }
         }
