@@ -128,9 +128,15 @@ public class Graph extends JPanel{
         //Foreground draw by swing calling PaintComponents
     }
 
+    private double pow2(int exp){
+        int abs = Math.abs(exp);
+        double output = (double)(1 << abs);
+        if(exp < 0) return 1.0 / output;
+        return output;
+    }
+
     private void drawGrid(Graphics2D g2d, double scale, double center){
         Graphics2D g = (Graphics2D) g2d.create();
-
         /**
          * data*scale + center = pixel
          * (pixel - center) / scale = data
@@ -138,8 +144,8 @@ public class Graph extends JPanel{
          */
         final double maxDataVal = (0.0-center)/scale;
         final double minDataVal = (getHeight()-center)/scale;
-        final double horzRuleScale = Math.getExponent(maxDataVal-minDataVal) - NUM_HORZ_RULES;
-        final double horzRuleDelta = Math.pow(2, horzRuleScale);
+        final int    horzRuleScale = Math.getExponent(maxDataVal-minDataVal) - NUM_HORZ_RULES;
+        final double horzRuleDelta = pow2(horzRuleScale);
         final double minRule = minDataVal - (minDataVal%horzRuleDelta);
 
         //horizontal rules
@@ -346,5 +352,4 @@ public class Graph extends JPanel{
             g.setYScale( d*ZOOM_FACTOR*g.getYScale() + g.getYScale() );
         }
     }
-
 }
