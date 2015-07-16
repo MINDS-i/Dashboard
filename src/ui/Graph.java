@@ -185,7 +185,6 @@ public class Graph extends JPanel{
 
         final DataSource source = data.getSource();
         final double width      = this.getWidth();
-
         int px = 0;
         int py = 0;
         for(int x=0; x<width; x++){
@@ -231,48 +230,6 @@ public class Graph extends JPanel{
                             left+rowHeight, bot-dropPoint-TEXT_RISE);
         }
         g2d.dispose();
-    }
-
-    //main method for quicker manual testing
-    public static void main(String[] args) {
-        List<DataSource> trialSources = new ArrayList<DataSource>();
-        DataSource sin = new DataSource(){
-            public double get(double x){
-                return 20.0*Math.sin(x*3.0f*Math.PI);
-            }
-            public String getName(){
-                return "sine";
-            }
-        };
-        DataSource cos = new DataSource(){
-            public double get(double x){
-                return 20.0*Math.cos(x*3.0f*Math.PI);
-            }
-            public String getName(){
-                return "cosine";
-            }
-        };
-        trialSources.add(sin);
-        trialSources.add(cos);
-
-        Graph g = new Graph(trialSources);
-        JFrame f = new JFrame("graphTest");
-        f.add(g);
-        f.pack();
-        f.setVisible(true);
-
-        //turn on all the test data sources
-        for(DataConfig source : g.getSources()){
-            source.setDrawn(true);
-        }
-
-        while(f.isShowing()){
-            try {
-                Thread.sleep(1000);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     class DataConfig{
@@ -350,6 +307,48 @@ public class Graph extends JPanel{
             double d = e.getPreciseWheelRotation();
             Graph g = Graph.this;
             g.setYScale( d*ZOOM_FACTOR*g.getYScale() + g.getYScale() );
+        }
+    }
+
+    //main method for quicker manual testing
+    public static void main(String[] args) {
+        List<DataSource> trialSources = new ArrayList<DataSource>();
+        DataSource sin = new DataSource(){
+            public double get(double x){
+                return 20.0*Math.sin(x*3.0f*Math.PI);
+            }
+            public String getName(){
+                return "sine";
+            }
+        };
+        DataSource cos = new DataSource(){
+            public double get(double x){
+                return 20.0*Math.cos(x*3.0f*Math.PI);
+            }
+            public String getName(){
+                return "cosine";
+            }
+        };
+        trialSources.add(sin);
+        trialSources.add(cos);
+
+        Graph g = new Graph(trialSources);
+        JFrame f = new JFrame("graphTest");
+        f.add(g);
+        f.pack();
+        f.setVisible(true);
+
+        //turn on all the test data sources
+        for(DataConfig source : g.getSources()){
+            source.setDrawn(true);
+        }
+
+        while(f.isShowing()){
+            try {
+                Thread.sleep(1000);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 }
