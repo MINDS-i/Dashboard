@@ -15,6 +15,9 @@ import java.util.TimerTask;
 import java.util.List;
 
 public class Graph extends JPanel{
+    private final static int NUM_HORZ_RULES = 2; //creates 2^NUM_VERT_RULES horizontal rulers
+
+
     private final static boolean AA_ON = false; //anti-aliasing render hint
     private List<DataConfig> sources;
     private Timer refreshTimer;
@@ -81,22 +84,42 @@ public class Graph extends JPanel{
     private void drawGrid(Graphics2D g2d, int width,  int height,
                                           int wlines, int hlines){
         Graphics2D g = (Graphics2D) g2d.create();
+
+        final double horzRuleScale = Math.getExponent(yScale) - NUM_HORZ_RULES;
+        final double horzRuleDelta = Math.pow(2, horzRuleScale);
+        final int    hh = height/2;
+        final double scale  = hh/yScale;
+        final double center = hh+yCenter;
+
+        /*
+            -center/scale = data @ pixel 0
+
+            data = ((hh - yCenter) * yscale) / hh
+        */
+
+        final double maxDataVal = (((double)hh) - yCenter) * yScale / ((double)hh);
+        final double minDataVal = -center/scale;
+        final double minRule = minDataVal - (minDataVal%horzRuleDelta);
+
+        //horizontal rules
+        g.setStroke(new BasicStroke(1));
+        g.setColor(Color.LIGHT_GRAY);
+        for(double r = minRule; r< maxDataVal; r+=horzRuleDelta){
+            final int pY = (int)(r * scale + center);
+            g.drawLine(0,pY,width,pY);
+        }
+
+        //vertical rules
+        g.setStroke(new BasicStroke(1));
+        g.setColor(Color.LIGHT_GRAY);
         final int dx = width/wlines;
         for(int x=0; x<width; x+=(width/wlines)){
             g.drawLine(x,0,x,height);
         }
 
-        final int hh = height/2;
-        final int dy = height/hlines;
-        final int center = (int) (yCenter + hh);
-
-        for(int y=dy; y<height/2; y+=dy){
-            g.drawLine(0,center+y,width,center+y);
-            g.drawLine(0,center-y,width,center-y);
-        }
-
         g.setStroke(new BasicStroke(3));
-        g.drawLine(0, center, width, center); //bold 0 line
+        g.setColor(Color.BLACK);
+        g.drawLine(0, (int)center, width, (int)center); //bold 0 line
     }
 
     private void drawData(Graphics2D g2d, DataConfig data){
@@ -287,7 +310,7 @@ public class Graph extends JPanel{
 
                 double xs = ((double)dx)/((double)Graph.this.getWidth());
                 xs += g.getXScale();
-                xs = Math.max( Math.min(xs, 1.0), 0.0);
+                xs = Math.max( Math.min(xs, 1.0), 0.05);
                 g.setXScale( xs );
 
                 dragPoint = e.getPoint();
