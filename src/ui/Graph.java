@@ -15,23 +15,38 @@ import java.util.TimerTask;
 import java.util.List;
 
 public class Graph extends JPanel{
-    private final static int NUM_HORZ_RULES = 2; //creates 2^NUM_VERT_RULES horizontal rulers
-
-
+    private final static int NUM_HORZ_RULES = 3; //creates 2^NUM_VERT_RULES horizontal rulers
     private final static boolean AA_ON = false; //anti-aliasing render hint
+
     private List<DataConfig> sources;
     private Timer refreshTimer;
     private double xScale  =  1.0;
     private double yScale  = 20.0;
     private double yCenter =  0.0;
     private GraphConfigWindow config;
-    public List<DataConfig> getSources(){ return sources; }
+
+    List<DataConfig> getSources(){ return sources; }
     double getXScale() { return xScale; }
     double getYScale() { return yScale; }
     double getYCenter(){ return yCenter;}
-    void setXScale(double s) { xScale = s; }
-    void setYScale(double s) { yScale = s; }
-    void setYCenter(double s){ yCenter= s; }
+
+    void setXScale(double s) {
+        xScale = s;
+        if(config != null) config.graphConfigsUpdated();
+    }
+    void setYScale(double s) {
+        yScale = s;
+        if(config != null) config.graphConfigsUpdated();
+    }
+    void setYCenter(double s){
+        yCenter= s;
+        if(config != null) config.graphConfigsUpdated();
+    }
+
+    /*
+    clean up graph logic
+    add data/pixel units to parameters
+    */
 
     public Graph(List<DataSource> inputSources){
         sources = new ArrayList<DataConfig>();
@@ -81,6 +96,27 @@ public class Graph extends JPanel{
       }
     };
 
+    @Override
+    public void paintComponent(Graphics g){
+        super.paintComponent(g);
+
+        final Graphics2D g2d = (Graphics2D) g;
+        final int width  = this.getWidth();
+        final int height = this.getHeight();
+
+        //Draw background
+        g2d.setPaint(Color.BLACK);
+        drawGrid(g2d, width, height, 16, 10);
+
+        //Draw graph elements
+        for(DataConfig data : sources){
+            drawData(g2d, data);
+        }
+        drawLabels(g2d, sources);
+
+        //Foreground draw by swing calling PaintComponents
+    }
+
     private void drawGrid(Graphics2D g2d, int width,  int height,
                                           int wlines, int hlines){
         Graphics2D g = (Graphics2D) g2d.create();
@@ -90,13 +126,9 @@ public class Graph extends JPanel{
         final int    hh = height/2;
         final double scale  = hh/yScale;
         final double center = hh+yCenter;
-
-        /*
-            -center/scale = data @ pixel 0
-
-            data = ((hh - yCenter) * yscale) / hh
-        */
-
+        /**
+         * data*scale + center = pixel
+         */
         final double maxDataVal = (((double)hh) - yCenter) * yScale / ((double)hh);
         final double minDataVal = -center/scale;
         final double minRule = minDataVal - (minDataVal%horzRuleDelta);
@@ -107,6 +139,7 @@ public class Graph extends JPanel{
         for(double r = minRule; r< maxDataVal; r+=horzRuleDelta){
             final int pY = (int)(r * scale + center);
             g.drawLine(0,pY,width,pY);
+            g.drawString(""+(-r+0.0), 10, pY-2); //adding zero prevents "-0.0"
         }
 
         //vertical rules
@@ -120,6 +153,8 @@ public class Graph extends JPanel{
         g.setStroke(new BasicStroke(3));
         g.setColor(Color.BLACK);
         g.drawLine(0, (int)center, width, (int)center); //bold 0 line
+
+        g.dispose();
     }
 
     private void drawData(Graphics2D g2d, DataConfig data){
@@ -154,6 +189,8 @@ public class Graph extends JPanel{
             px = x;
             py = y;
         }
+
+        g.dispose();
     }
 
     private void drawLabels(Graphics2D g2d, List<DataConfig> dcs){
@@ -189,27 +226,6 @@ public class Graph extends JPanel{
         g2d.dispose();
     }
 
-    @Override
-    public void paintComponent(Graphics g){
-        super.paintComponent(g);
-
-        final Graphics2D g2d = (Graphics2D) g;
-        final int width  = this.getWidth();
-        final int height = this.getHeight();
-
-        //Draw background
-        g2d.setPaint(Color.BLACK);
-        drawGrid(g2d, width, height, 16, 10);
-
-        //Draw graph elements
-        for(DataConfig data : sources){
-            drawData(g2d, data);
-        }
-        drawLabels(g2d, sources);
-
-        //Foreground draw by swing calling PaintComponents
-    }
-
     public static void main(String[] args) {
         List<DataSource> trialSources = new ArrayList<DataSource>();
         DataSource sin = new DataSource(){
@@ -242,7 +258,7 @@ public class Graph extends JPanel{
             source.setDrawn(true);
         }
 
-        while(true){
+        while(f.isShowing()){
             try {
                 Thread.sleep(1000);
             } catch (Exception e) {

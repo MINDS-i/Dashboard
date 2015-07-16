@@ -12,6 +12,9 @@ class GraphConfigWindow{
     private Graph  subject; //the graph to configure
     private JFrame frame;
     private int closeupIndex;
+    private JSpinner xScaleSpinner;
+    private JSpinner yScaleSpinner;
+    private JSpinner yCenterSpinner;
 
     public GraphConfigWindow(Graph subject){
         this.subject = subject;
@@ -25,7 +28,6 @@ class GraphConfigWindow{
 
         frame.add(container);
         frame.pack();
-        //frame.setVisible(true);
     }
 
     public void show(){
@@ -36,13 +38,19 @@ class GraphConfigWindow{
         frame.dispose();
     }
 
+    public void graphConfigsUpdated(){
+        xScaleSpinner.setValue( subject.getXScale() );
+        yScaleSpinner.setValue( subject.getYScale() );
+        yCenterSpinner.setValue( subject.getYCenter() );
+    }
+
     private JPanel buildSpinners(){
         JPanel spinnerPanel = new JPanel();
 
         //X scale spinner
         SpinnerNumberModel xScaleM = new SpinnerNumberModel(subject.getXScale(),
                                                            0.01, 1.0, 0.1);
-        JSpinner xScaleSpinner = new JSpinner(xScaleM);
+        xScaleSpinner = new JSpinner(xScaleM);
         xScaleSpinner.addChangeListener(new ChangeListener(){
             public void stateChanged(ChangeEvent e){
                 subject.setXScale(xScaleM.getNumber().doubleValue());
@@ -52,7 +60,7 @@ class GraphConfigWindow{
         //Y scale spinner
         SpinnerNumberModel yScaleM = new SpinnerNumberModel(subject.getYScale(),
                                                            0.01, 10000.0, 0.25);
-        JSpinner yScaleSpinner = new JSpinner(yScaleM);
+        yScaleSpinner = new JSpinner(yScaleM);
         yScaleSpinner.addChangeListener(new ChangeListener(){
             public void stateChanged(ChangeEvent e){
                 subject.setYScale(yScaleM.getNumber().doubleValue());
@@ -62,7 +70,7 @@ class GraphConfigWindow{
         //Y center spinner
         SpinnerNumberModel yCenterM = new SpinnerNumberModel(subject.getYCenter(),
                                                             -10000.0, 10000.0, 0.5);
-        JSpinner yCenterSpinner = new JSpinner(yCenterM);
+        yCenterSpinner = new JSpinner(yCenterM);
         yCenterSpinner.addChangeListener(new ChangeListener(){
             public void stateChanged(ChangeEvent e){
                 subject.setYCenter(yCenterM.getNumber().doubleValue());
