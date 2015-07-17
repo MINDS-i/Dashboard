@@ -21,15 +21,15 @@ public class Serial{
 	public static final int ERROR_STRING   = 0x0;
 	public static final int STATE_STRING   = 0x1;
 	//commands
-	public static final byte ESTOP_CMD	= 0x0;
-	public static final byte TARGET_CMD	= 0x1;
-	public static final byte LOOPING_CMD = 0x2;
-	public static final byte CLEAR_CMD   = 0x3;
-	public static final byte DELETE_CMD  = 0x4;
+	public static final byte ESTOP_CMD	  = 0x0;
+	public static final byte TARGET_CMD	  = 0x1;
+	public static final byte LOOPING_CMD  = 0x2;
+	public static final byte CLEAR_CMD    = 0x3;
+	public static final byte DELETE_CMD   = 0x4;
 	//sync
 	public static final byte SYNC_REQUEST = 0x00;
 	public static final byte SYNC_RESPOND = 0x01;
-
+	//telemetry IDs
 	public static final int LATITUDE	= 0;
 	public static final int LONGITUDE	= 1;
 	public static final int HEADING		= 2;
