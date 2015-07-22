@@ -18,16 +18,16 @@ import java.awt.*;
 import java.nio.charset.StandardCharsets;
 
 public class SerialParser implements SerialPortEventListener{
+	Context context;
 	Dashboard parent;
 	SerialSender sender;
 	byte[] buffer;
-	byte bufPos = 0;
-	Context context;
-	static int BUFLEN = 256;
+	int bufPos = 0;
+	static final int BUFLEN = 256;
 
 	public SerialParser(Context cxt){
 		context = cxt;
-		buffer = new byte[BUFLEN];
+		buffer  = new byte[BUFLEN];
 	}
 
 	public void updatePort(){
