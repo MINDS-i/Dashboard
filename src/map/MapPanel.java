@@ -18,6 +18,7 @@ import com.serial.*;
 import com.serial.Messages.*;
 import com.ContextViewer;
 import com.Context;
+import com.ui.TelemetryListener;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -126,6 +127,21 @@ public class MapPanel extends JPanel implements ContextViewer {
 
         setZoom(zoom);
         setMapPosition(mapPosition);
+
+        cxt.telemetry.registerListener(Serial.LATITUDE, new TelemetryListener(){
+            public void update(double data){
+                rover.setLatitude( data );
+                //MapPanel.this.repaint();
+                //disable repaint on latitude change
+                //so it only changes once per new coordinate
+            }
+        });
+        cxt.telemetry.registerListener(Serial.LONGITUDE, new TelemetryListener(){
+            public void update(double data){
+                rover.setLongitude( data );
+                MapPanel.this.repaint();
+            }
+        });
     }
 
     public void waypointUpdate(){
@@ -501,8 +517,6 @@ public class MapPanel extends JPanel implements ContextViewer {
     }
 
     private void drawRover(Graphics g){
-        rover.setLatitude( context.getTelemetry(Serial.LATITUDE));
-        rover.setLongitude(context.getTelemetry(Serial.LONGITUDE));
         Point roverPoint = computeScreenPosition(rover.getLocation());
         drawImg(g, context.theme.roverImage, roverPoint);
     }
