@@ -28,7 +28,7 @@ public class Graph extends JPanel{
     private Timer refreshTimer;
     private GraphConfigWindow config;
     private double xScale  = XSCALE_MAX; //how much of the data's x range to display
-    private double yScale  = 20.0; //scale of data per half graph height
+    private double yScale  = 40.0; //scale of data per half graph height
     private double yCenter =  0.0; //pixel offset for where 0 line should be
 
     List<DataConfig> getSources(){ return sources; }
@@ -44,9 +44,9 @@ public class Graph extends JPanel{
         yCenter= s;
         if(config != null) config.graphConfigsUpdated();
     }
-    double getXScale() { return xScale; }
-    double getYScale() { return yScale; }
-    double getYCenter(){ return yCenter;}
+    double getXScale() { return xScale;  }
+    double getYScale() { return yScale;  }
+    double getYCenter(){ return yCenter; }
 
     /*
     clean up graph logic
@@ -110,9 +110,8 @@ public class Graph extends JPanel{
 
         //find data->pixel conversion constants
         final Graphics2D g2d = (Graphics2D) g;
-        final double      hh = getHeight()/2;
-        final double   scale = -hh/yScale;
-        final double  center =  hh+yCenter;
+        final double   scale =-getHeight()/yScale;
+        final double  center = getHeight()/2+scale*-yCenter;
 
         //Draw background
         g2d.setPaint(Color.BLACK);
@@ -292,7 +291,8 @@ public class Graph extends JPanel{
                 xs = Math.max( Math.min(xs, XSCALE_MAX), XSCALE_MIN);
                 g.setXScale( xs );
                 //pan the y axis by delta y
-                g.setYCenter( g.getYCenter() + dy );
+                final double dyunit = (dy/g.getHeight()) * g.getYScale();
+                g.setYCenter( g.getYCenter() + dyunit );
                 //save current point for delta calculations
                 dragPoint = e.getPoint();
             }
@@ -303,7 +303,7 @@ public class Graph extends JPanel{
         }
         @Override
         public void mouseWheelMoved(MouseWheelEvent e){
-            final double ZOOM_FACTOR = 0.05;
+            final double ZOOM_FACTOR = 0.025;
             double d = e.getPreciseWheelRotation();
             Graph g = Graph.this;
             g.setYScale( d*ZOOM_FACTOR*g.getYScale() + g.getYScale() );
