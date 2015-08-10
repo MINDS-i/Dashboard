@@ -22,6 +22,8 @@ public class SystemConfigWindow{
 
         container.add(new JButton(toggleLocale));
 
+        container.add(new RadioConfigScreen());
+
         /*
         Change radio config / baud rate?
         */
