@@ -82,21 +82,12 @@ public class Dashboard implements Runnable {
 
     SerialEventListener connectActions = new SerialEventListener(){
       public void connectionEstablished(SerialPort port){
-        try {
-          context.updatePort(port);
-        } catch (Exception ex) {
-          System.err.print(ex.getMessage());
-        }
+        context.updatePort(port);
         context.alert.displayMessage("Port opened");
         context.sender.sendSync();
       }
       public void disconnectRequest(){
-        try{
-          context.closePort();
-        } catch(Exception ex){
-          System.err.println(ex.getMessage());
-          context.alert.displayMessage(ex.getMessage());
-        }
+        context.closePort();
         context.alert.displayMessage("Serial Port Closed");
         resetData();
       }

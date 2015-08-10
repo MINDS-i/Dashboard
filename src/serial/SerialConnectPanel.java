@@ -101,6 +101,20 @@ public class SerialConnectPanel extends JPanel {
 
     private boolean disconnectSerial(){
         listener.disconnectRequest();
+
+        final SerialPort portToClose = connectedPort;
+        Runnable close = new Runnable(){
+            public void run(){
+                try{
+                    portToClose.closePort();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        if(portToClose != null)
+            (new Thread(close)).start();
+
         connectedPort = null;
         dropDown.setEnabled(true);
         refreshButton.setEnabled(true);

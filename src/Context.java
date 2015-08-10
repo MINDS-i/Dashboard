@@ -110,28 +110,15 @@ public class Context{
 			alertPanel.logTo(log);
 		}
 	}
-	public void updatePort(SerialPort newPort) throws SerialPortException{
+	public void updatePort(SerialPort newPort){
 		closePort();
 		port = newPort;
 		sender.start();
 		parser.updatePort();
 		connected = true;
 	}
-	public void closePort() throws SerialPortException{
+	public void closePort() {
 		sender.stop();
-		final SerialPort portToClose = port;
-		Runnable close = new Runnable(){
-			public void run(){
-				try{
-					portToClose.closePort();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		};
-		if(port != null)
-			(new Thread(close)).start();
-
 		port = null;
 		connected = false;
 	}
