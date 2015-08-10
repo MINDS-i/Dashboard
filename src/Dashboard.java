@@ -5,6 +5,8 @@ import com.map.WaypointList;
 import com.serial.Serial;
 import com.serial.SerialParser;
 import com.serial.SerialSender;
+import com.serial.SerialConnectPanel;
+import com.serial.SerialEventListener;
 import com.ui.*;
 import java.awt.*;
 import java.awt.Dimension;
@@ -31,10 +33,6 @@ import jssc.SerialPortList;
 public class Dashboard implements Runnable {
   final static String dataLabels[] = {"Lat:", "Lng:", "Dir:", "Ptc:",
                                               "Rol:", "MPH:", "Vcc:" };
-  JPanel serialPanel;
-  JButton refreshButton;
-  JButton connectButton;
-  JComboBox dropDown;
   RotatePanel sideGauge;
   RotatePanel topGauge;
   RotatePanel frontGauge;
@@ -82,47 +80,28 @@ public class Dashboard implements Runnable {
     f.setIconImage(context.theme.appIcon);//roverTop);
     f.setTitle("MINDS-i dashboard");
 
-    Action refreshAction = new AbstractAction(){
-      {
-        String text = "Refresh";
-        putValue(Action.SHORT_DESCRIPTION, text);
-        putValue(Action.SMALL_ICON, new ImageIcon(context.theme.refreshImage));
+    SerialEventListener connectActions = new SerialEventListener(){
+      public void connectionEstablished(SerialPort port){
+        try {
+          context.updatePort(port);
+        } catch (Exception ex) {
+          System.err.print(ex.getMessage());
+        }
+        context.alert.displayMessage("Port opened");
+        context.sender.sendSync();
       }
-      public void actionPerformed(ActionEvent e) {
-        dropDown.removeAllItems();
-        AddSerialList(dropDown);
-        serialPanel.updateUI();
+      public void disconnectRequest(){
+        try{
+          context.closePort();
+        } catch(Exception ex){
+          System.err.println(ex.getMessage());
+          context.alert.displayMessage(ex.getMessage());
+        }
+        context.alert.displayMessage("Serial Port Closed");
+        resetData();
       }
     };
-    Action connectAction = new AbstractAction(){
-      {
-        String text = "Connect";
-        putValue(Action.NAME, text);
-        putValue(Action.SHORT_DESCRIPTION, text);
-      }
-      public void actionPerformed(ActionEvent e){
-        if (context.connected == false){
-          if(connectSerial())
-            putValue(Action.NAME, "Disconnect");
-        }
-        else {
-          if(disconnectSerial())
-            putValue(Action.NAME, "Connect");
-        }
-      }
-    };
-
-    serialPanel = new JPanel(new FlowLayout());
-    refreshButton = new JButton(refreshAction);
-    connectButton = new JButton(connectAction);
-    dropDown = new JComboBox();
-    AddSerialList(dropDown);
-    refreshButton.setToolTipText("Refresh");
-    connectButton.setToolTipText("Attempt connection");
-    serialPanel.add(refreshButton);
-    serialPanel.add(dropDown);
-    serialPanel.add(connectButton);
-    serialPanel.setOpaque(false);
+    JPanel serialPanel = new SerialConnectPanel(connectActions);
 
     mapPanel = new MapPanel(  context,
                               new Point(628,1211),
@@ -131,7 +110,6 @@ public class Dashboard implements Runnable {
                               makeDashPanel(),
                               context.alert);
     mapPanel.setVgap(-45);
-    serialPanel.setOpaque(false);
 
     f.add(mapPanel);
     f.pack();
@@ -139,66 +117,6 @@ public class Dashboard implements Runnable {
     f.setVisible(true);
 
     loading.dispose();
-  }
-
-  private void AddSerialList(JComboBox box){
-    String[] portNames = SerialPortList.getPortNames();
-    for(int i = 0; i < portNames.length; i++){
-        box.addItem(portNames[i]);
-    }
-  }
-
-  private boolean connectSerial(){
-    if(dropDown.getSelectedItem() == null) return false;
-
-    SerialPort serialPort = new SerialPort((String)dropDown.getSelectedItem());
-
-    try{
-      serialPort.openPort();
-    } catch (SerialPortException ex){
-      System.err.println(ex.getMessage());
-      context.alert.displayMessage("Port not available");
-      return false;
-    }
-
-    try{
-      serialPort.setParams(    Serial.BAUD,
-                           SerialPort.DATABITS_8,
-                           SerialPort.STOPBITS_1,
-                           SerialPort.PARITY_NONE);
-      serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN |
-                                    SerialPort.FLOWCONTROL_RTSCTS_OUT);
-      System.err.println("Flow Control mode: "+serialPort.getFlowControlMode());
-
-      context.updatePort(serialPort);
-      context.alert.displayMessage("Port opened");
-      context.sender.sendSync();
-
-      refreshButton.setEnabled(false);
-      dropDown.setEnabled(false);
-    } catch(SerialPortException ex){
-      System.err.println(ex.getMessage());
-      context.alert.displayMessage(ex.getMessage());
-      context.alert.displayMessage("Connection Failed");
-      return false;
-    }
-    return true;
-  }
-
-  private boolean disconnectSerial(){
-    try{
-      context.closePort();
-    } catch(Exception ex){
-      System.err.println(ex.getMessage());
-      context.alert.displayMessage(ex.getMessage());
-      return false;
-    }
-
-    dropDown.setEnabled(true);
-    refreshButton.setEnabled(true);
-    context.alert.displayMessage("Serial Port Closed");
-    resetData();
-    return true;
   }
 
   private JPanel makeDashPanel(){
