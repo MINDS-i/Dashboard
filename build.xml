@@ -43,6 +43,15 @@
         </java>
     </target>
 
+    <target name="radio" depends="compile">
+        <java classname="com.ui.RadioConfigScreen">
+            <classpath>
+                <pathelement location="${outputDir}"/>
+                <pathelement location="lib/jssc.jar"/>
+            </classpath>
+        </java>
+    </target>
+
     <target name="nine" depends="compile">
         <java classname="com.ui.ninePatch.NinePatch">
             <classpath path="${outputDir}"/>
