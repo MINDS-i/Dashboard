@@ -20,7 +20,13 @@ public class SystemConfigWindow{
         JPanel container = new JPanel();
         container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
 
-        container.add(new JButton(toggleLocale));
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(new JButton(toggleLocale));
+        container.add(buttonPanel);
+
+        JPanel lpanel = new JPanel();
+        lpanel.add(new JLabel("---- Radio Configuration ----"));
+        container.add(lpanel);
 
         container.add(new RadioConfigScreen());
 
