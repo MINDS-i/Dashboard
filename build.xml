@@ -39,7 +39,10 @@
 
     <target name="graph" depends="compile">
         <java classname="com.ui.Graph">
-            <classpath path="${outputDir}"/>
+            <classpath>
+                <pathelement location="${outputDir}"/>
+                <pathelement location="/usr/lib/jvm/java-8-jdk/lib/visualvm/profiler/lib/jfluid-server.jar"/>
+            </classpath>
         </java>
     </target>
 
