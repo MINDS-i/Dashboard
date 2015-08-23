@@ -4,6 +4,7 @@ import com.ui.DataSource;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.*;
 import javax.imageio.*;
 import javax.swing.*;
 import java.awt.FontMetrics;
@@ -120,7 +121,8 @@ public class Graph extends JPanel{
         //Draw graph elements
         for(DataConfig data : sources){
             if(data.getDrawn())
-                drawData(g2d, data, scale, center, xScale);
+                drawData(g2d, data, (float) scale, (float) center, (float) xScale);
+                //drawData(g2d, data, scale, center, xScale);
         }
         drawLabels(g2d, sources);
 
@@ -172,7 +174,8 @@ public class Graph extends JPanel{
         g.dispose();
     }
 
-    private void drawData(Graphics2D g2d, DataConfig data, double scale, double center, double xWidth){
+    private void drawData(Graphics2D g2d, DataConfig data,
+                          float scale, float center, float xWidth){
         Graphics2D g = (Graphics2D) g2d.create();
         if(AA_ON){
             RenderingHints rh = new RenderingHints(
@@ -182,18 +185,19 @@ public class Graph extends JPanel{
         }
         g.setPaint(data.getPaint());
 
-        final DataSource source = data.getSource();
-        final double width      = this.getWidth();
-        int px = 0;
-        int py = 0;
-        for(int x=0; x<width; x++){
-            final double xPos = (1.0d-xWidth) + xWidth * (((double)x) / width);
-            final int y = (int) (source.get(xPos)*scale + center);
 
-            g.drawLine(x, y, px, py);
-            px = x;
-            py = y;
+        final DataSource source = data.getSource();
+        final float width       = (float) this.getWidth();
+        GeneralPath dataShape  = new GeneralPath();
+        dataShape.moveTo(0,0);
+
+        for(int x=0; x<width; x++){
+            final float xPos = (1.0f-xWidth) + xWidth * (((float)x) / width);
+            final float y = (float) (source.get(xPos)*scale + center);
+            dataShape.lineTo(x, y);
         }
+
+        g.draw(dataShape);
 
         g.dispose();
     }
