@@ -87,7 +87,7 @@ class GraphConfigWindow{
         return spinnerPanel;
     }
 
-    private JPanel buildSourceTable(){
+    private JComponent buildSourceTable(){
         List<Graph.DataConfig> sources = subject.getSources();
 
         ArrayList<TableColumn> cols = new ArrayList<TableColumn>();
@@ -114,17 +114,19 @@ class GraphConfigWindow{
 
         ColumnTableModel colModel = new ColumnTableModel(cols);
         JTable table = new JTable(colModel);
-        JPanel tablePanel = new JPanel();
         JScrollPane pane = new JScrollPane(table);
         table.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
         public void valueChanged(ListSelectionEvent event) {
                 setCloseup(sources.get(table.getSelectedRow()));
             }
         });
-
-        tablePanel.add(pane);
-
-        return tablePanel;
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        table.setFillsViewportHeight(true);
+        table.setPreferredScrollableViewportSize(new Dimension(200, 120));
+        pane.setBorder(BorderFactory.createCompoundBorder(
+                         BorderFactory.createEmptyBorder(5, 10, 5,10),
+                         BorderFactory.createLineBorder(Color.BLACK)  ));
+        return pane;
     }
 
     private SpinnerNumberModel strokeModel;
