@@ -13,18 +13,21 @@ import java.util.*;
 import java.io.*;
 
 public class AlertPanel extends JPanel {
+	private final static int REC_LINE_LEN = 80;
 	private final static int NUM_LINES = 8;
 	private Theme theme;
 	private int lineHeight;
 	private FontMetrics metrics;
 	private String[] messages = new String[NUM_LINES];
 	private PrintStream log;
+	private boolean fontUpdated = true;
 
 	public AlertPanel(){
-		this.setPreferredSize(new Dimension(4000000,200)); //cheap fix for autoscaling
+		//this.setPreferredSize(new Dimension(4000000,200)); //cheap fix for autoscaling
 		setOpaque(false);
-		for(int i=0; i<NUM_LINES; i++) messages[i]="";
+		for(int i=0; i<NUM_LINES; i++) messages[i]="##";
 		displayMessage("Welcome!");
+		updateDim();
 	}
 
 	public AlertPanel(Theme theme){
@@ -34,12 +37,16 @@ public class AlertPanel extends JPanel {
 
 	public void setTheme(Theme theme){
 		this.theme = theme;
+		updateDim();
 	}
 
 	public void logTo(PrintStream log){
 		this.log = log;
 	}
 
+	private void updateDim(){
+		fontUpdated = true;
+	}
 	private Font getMessageFont(){
 		if(theme != null && theme.alertFont != null)
 			return theme.alertFont;
@@ -61,6 +68,13 @@ public class AlertPanel extends JPanel {
 
 		metrics = g.getFontMetrics();
 		final int rowHeight = metrics.getHeight();
+
+		//use number of lines and 80 char length to calculate preferred size
+		if(fontUpdated){
+			setPreferredSize(new Dimension(REC_LINE_LEN*metrics.charWidth('W'),
+										   NUM_LINES*metrics.getHeight()));
+			fontUpdated = false;
+		}
 
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
