@@ -115,9 +115,11 @@ public class MapPanel extends JPanel implements ContextViewer {
         setLayout(border);
 
         waypointPanel = new WaypointPanel(context, this);
+        JPanel west = contain(waypointPanel);
 
-        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+/*        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         add(contain(waypointPanel));
+        add(Box.createGlue());
           JPanel middle = new JPanel();
           middle.setOpaque(false);
           middle.setLayout(new BoxLayout(middle, BoxLayout.Y_AXIS));
@@ -125,7 +127,29 @@ public class MapPanel extends JPanel implements ContextViewer {
           middle.add(south);
           middle.setMinimumSize(new Dimension(0,0));
         add(middle);
-        add(contain(east));
+        add(Box.createGlue());
+        add(contain(east));*/
+
+        GroupLayout layout = new GroupLayout(this);
+        this.setLayout(layout);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(west)
+                    .addComponent(north)
+                    .addComponent(east))
+                .addComponent(south)
+            );
+        layout.setVerticalGroup(
+            layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addComponent(west)
+                    .addComponent(north)
+                    .addComponent(east))
+                .addComponent(south)
+            );
 
         setZoom(zoom);
         setMapPosition(mapPosition);

@@ -25,11 +25,10 @@ public class AlertPanel extends JPanel {
 	public AlertPanel(){
 		//this.setPreferredSize(new Dimension(4000000,200)); //cheap fix for autoscaling
 		setOpaque(false);
-		for(int i=0; i<NUM_LINES; i++) messages[i]="##";
+		for(int i=0; i<NUM_LINES; i++) messages[i]="################################################################################";
 		displayMessage("Welcome!");
 		updateDim();
 	}
-
 	public AlertPanel(Theme theme){
 		this();
 		this.theme = theme;
