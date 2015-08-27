@@ -115,15 +115,17 @@ public class MapPanel extends JPanel implements ContextViewer {
         setLayout(border);
 
         waypointPanel = new WaypointPanel(context, this);
-        centerPanel.setLayout(new BorderLayout());
-        if(north != null) centerPanel.add(Contain(north),BorderLayout.NORTH);
-        if(south != null) centerPanel.add(Contain(south),BorderLayout.SOUTH);
-        centerPanel.setOpaque(false);
 
-        add(centerPanel, BorderLayout.CENTER);
-        add(Contain(waypointPanel),BorderLayout.WEST);
-        if(east != null)
-            add(Contain(east),BorderLayout.EAST);
+        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+        add(contain(waypointPanel));
+          JPanel middle = new JPanel();
+          middle.setOpaque(false);
+          middle.setLayout(new BoxLayout(middle, BoxLayout.Y_AXIS));
+          middle.add(north);
+          middle.add(south);
+          middle.setMinimumSize(new Dimension(0,0));
+        add(middle);
+        add(contain(east));
 
         setZoom(zoom);
         setMapPosition(mapPosition);
@@ -1141,7 +1143,7 @@ public class MapPanel extends JPanel implements ContextViewer {
     }
     //-------------------------------------------------------------------------
     // utils
-    public static JPanel Contain(JPanel input){ //total hack
+    public static JPanel contain(JPanel input){ //total hack
         JPanel tmp = new JPanel();
         tmp.add(input);
         tmp.setOpaque(false);
