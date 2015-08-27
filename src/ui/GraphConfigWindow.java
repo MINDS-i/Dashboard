@@ -150,9 +150,7 @@ class GraphConfigWindow{
         colorPicker = new JColorChooser(Color.BLACK);
         colorPicker.setPreviewPanel(new JPanel());
         colorPicker.getSelectionModel().addChangeListener(updateListener);
-
-        //panel.add(lineStroke);
-        panel.add(colorPicker);
+        panel.add(colorPicker.getChooserPanels()[0]);
 
         return panel;
     }
@@ -163,6 +161,7 @@ class GraphConfigWindow{
     }
 
     private void updateCloseupPaint(){
+        if(closeupData == null) return;
         closeupData.setPaint( (Paint) colorPicker.getColor() );
     }
 
