@@ -114,12 +114,12 @@ class GraphConfigWindow{
 
         ColumnTableModel colModel = new ColumnTableModel(cols);
         JTable table = new JTable(colModel);
-        JScrollPane pane = new JScrollPane(table);
         table.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
         public void valueChanged(ListSelectionEvent event) {
                 setCloseup(sources.get(table.getSelectedRow()));
             }
         });
+        JScrollPane pane = new JScrollPane(table);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         table.setFillsViewportHeight(true);
         table.setPreferredScrollableViewportSize(new Dimension(200, 120));

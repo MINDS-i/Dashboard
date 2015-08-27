@@ -183,6 +183,9 @@ public class RadioConfigScreen extends JPanel{
         scp.showBaudSelector(true);
         settingTable = makeSettingTable();
         JScrollPane sScroll = new JScrollPane(settingTable);
+        sScroll.setBorder(BorderFactory.createCompoundBorder(
+                            BorderFactory.createEmptyBorder(5, 10, 5,10),
+                            BorderFactory.createLineBorder(Color.BLACK)  ));
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(new JButton(loadDefualtsAction));
         buttonPanel.add(new JButton(saveAction));
@@ -246,7 +249,11 @@ public class RadioConfigScreen extends JPanel{
             }
         });
         ColumnTableModel setModel    = new ColumnTableModel(setCols);
-        return new JTable(setModel);
+        JTable table = new JTable(setModel);
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        table.setFillsViewportHeight(true);
+        table.setPreferredScrollableViewportSize(new Dimension(200, 120));
+        return table;
     }
 
 
