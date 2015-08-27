@@ -12,6 +12,7 @@ import java.awt.FlowLayout;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
+import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
 import javax.swing.text.*;
@@ -32,7 +33,7 @@ public class DataWindow implements ActionListener{
 	private static final Dimension settingBoxPref = new Dimension(300, 300);
 	private static final Dimension settingBoxMax  = new Dimension(Integer.MAX_VALUE, 300);
 	private static final Dimension descriptionMin = new Dimension(300, 80);
-	private static final Dimension descriptionPref= new Dimension(300, 120);
+	private static final Dimension descriptionPref= new Dimension(300, 200);
 
 	ColumnTableModel setModel;
 	ColumnTableModel telModel;
@@ -132,6 +133,11 @@ public class DataWindow implements ActionListener{
 		setTable	= new JTable(setModel);
 		setScroll	= new JScrollPane(setTable);
 
+		telTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		telTable.setFillsViewportHeight(true);
+		setTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		setTable.setFillsViewportHeight(true);
+
 		telScroll.setMaximumSize(  telemBoxMax);
 		telScroll.setPreferredSize(telemBoxPref);
 		telScroll.setMinimumSize(  telemBoxPref);
@@ -139,6 +145,12 @@ public class DataWindow implements ActionListener{
 		setScroll.setMaximumSize(  settingBoxMax);
 		setScroll.setPreferredSize(settingBoxPref);
 		setScroll.setMinimumSize(  settingBoxPref);
+
+		Border tableBorders = BorderFactory.createCompoundBorder(
+                                BorderFactory.createEmptyBorder(5, 5, 5, 5),
+                                BorderFactory.createLineBorder(Color.BLACK)  );
+		setScroll.setBorder(tableBorders);
+		telScroll.setBorder(tableBorders);
 
 		//TODO improve preferred size interface
 		javax.swing.table.TableColumn col;
@@ -160,6 +172,8 @@ public class DataWindow implements ActionListener{
         dBox.setContentType("text/html");
         dBox.setMinimumSize(descriptionMin);
         dBox.setPreferredSize(descriptionPref);
+        //dBox.setBorder(tableBorders);
+        dBox.setOpaque(false);
         descriptionBox = dBox;
 
 		constructLogPane();
