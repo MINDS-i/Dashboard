@@ -103,7 +103,7 @@ public class DataWindow implements ActionListener{
 			public String	getName(){ return "Setting"; }
 			public Object	getValueAt(int row) {
 				float val = context.upstreamSettings[row];
-				return "  "+val;
+				return " "+val;
 			}
 			public int		getRowCount(){ return context.upstreamSettings.length; }
 			public Class	getDataClass(){ return String.class; }
@@ -154,12 +154,10 @@ public class DataWindow implements ActionListener{
 
 		//TODO improve preferred size interface
 		javax.swing.table.TableColumn col;
-		col = telTable.getColumn(telem.get(0).getName());
-		col.setPreferredWidth(10);
 		col = telTable.getColumn(telem.get(1).getName());
-		col.setPreferredWidth(10);
-		col = setTable.getColumn(settings.get(0).getName());
-		col.setPreferredWidth(10);
+		col.setPreferredWidth(1);
+		col = setTable.getColumn(settings.get(1).getName());
+		col.setPreferredWidth(1);
 
         setTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
         public void valueChanged(ListSelectionEvent event) {
