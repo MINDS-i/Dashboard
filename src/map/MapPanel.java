@@ -116,40 +116,13 @@ public class MapPanel extends JPanel implements ContextViewer {
 
         waypointPanel = new WaypointPanel(context, this);
         JPanel west = contain(waypointPanel);
+        east = contain(east);
 
-/*        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-        add(contain(waypointPanel));
-        add(Box.createGlue());
-          JPanel middle = new JPanel();
-          middle.setOpaque(false);
-          middle.setLayout(new BoxLayout(middle, BoxLayout.Y_AXIS));
-          middle.add(north);
-          middle.add(south);
-          middle.setMinimumSize(new Dimension(0,0));
-        add(middle);
-        add(Box.createGlue());
-        add(contain(east));*/
-
-        GroupLayout layout = new GroupLayout(this);
-        this.setLayout(layout);
-        layout.setAutoCreateGaps(true);
-        layout.setAutoCreateContainerGaps(true);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(GroupLayout.Alignment.CENTER)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(west)
-                    .addComponent(north)
-                    .addComponent(east))
-                .addComponent(south)
-            );
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                    .addComponent(west)
-                    .addComponent(north)
-                    .addComponent(east))
-                .addComponent(south)
-            );
+        add(south);
+        south.setLayout(new BorderLayout());
+        south.add(west,  BorderLayout.WEST);
+        south.add(east,  BorderLayout.EAST);
+        south.add(north, BorderLayout.CENTER);
 
         setZoom(zoom);
         setMapPosition(mapPosition);

@@ -33,6 +33,9 @@ import jssc.SerialPortList;
 public class Dashboard implements Runnable {
   final static String dataLabels[] = {"Lat:", "Lng:", "Dir:", "Ptc:",
                                               "Rol:", "MPH:", "Vcc:" };
+  final static int START_WIDTH  = 820;
+  final static int START_HEIGHT = 820;
+
   RotatePanel sideGauge;
   RotatePanel topGauge;
   RotatePanel frontGauge;
@@ -95,7 +98,7 @@ public class Dashboard implements Runnable {
     JPanel serialPanel = new SerialConnectPanel(connectActions);
 
     mapPanel = new MapPanel(  context,
-                              new Point(628,1211),
+                              new Point(475,1100),
                               4,
                               serialPanel,
                               makeDashPanel(),
@@ -104,7 +107,7 @@ public class Dashboard implements Runnable {
 
     f.add(mapPanel);
     f.pack();
-    f.setSize(800, 650);
+    f.setSize(START_WIDTH, START_HEIGHT);
     f.setVisible(true);
 
     loading.dispose();
