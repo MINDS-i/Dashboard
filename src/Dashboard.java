@@ -8,6 +8,7 @@ import com.serial.SerialSender;
 import com.serial.SerialConnectPanel;
 import com.serial.SerialEventListener;
 import com.ui.*;
+import com.ui.ninePatch.*;
 import java.awt.*;
 import java.awt.Dimension;
 import java.awt.event.*;
@@ -31,37 +32,27 @@ import jssc.SerialPortException;
 import jssc.SerialPortList;
 
 public class Dashboard implements Runnable {
-  final static String dataLabels[] = {"Lat:", "Lng:", "Dir:", "Ptc:",
-                                              "Rol:", "MPH:", "Vcc:" };
-  final static int START_WIDTH  = 820;
-  final static int START_HEIGHT = 820;
-
-  RotatePanel sideGauge;
-  RotatePanel topGauge;
-  RotatePanel frontGauge;
-
-  Collection<DataLabel> displays;
-
-  Frame loading;
-  static final int[] dataBorderSize = {15,18,46,18};//top,left,bottom,right
-  JFrame f;
-  Context context;
-  MapPanel mapPanel;
+  private static final int START_WIDTH  = 820; //default window width
+  private static final int START_HEIGHT = 820; //default window height
+  private static final int[] dataBorderSize = {15,18,46,18};//top,left,bottom,right
+  private static final String dataLabels[] = {"Lat:", "Lng:", "Dir:", "Ptc:",
+                                                      "Rol:", "MPH:", "Vcc:" };
+  private Collection<DataLabel> displays = new ArrayList<DataLabel>(dataLabels.length);
+  private Context context = new Context();
 
   @Override
   public void run() {
     try{
+      //setup a loading frame
       BufferedImage logo = ImageIO.read(new File("./data/startup-logo.png"));
-      loading = new Frame("MINDS-i Loading Box");
+      JFrame loading = new JFrame("MINDS-i Loading Box");
       loading.setUndecorated(true);
       loading.setBackground(new Color(0,0,0,0));
       loading.add(new JLabel(new ImageIcon(logo)));
       loading.pack();
       loading.setSize(540,216);
-      //loading.setLocationRelativeTo(null);
       loading.setVisible(true);
-
-      context = new Context();
+      //initialize the major classes into the context
       context.give(this,
                    new AlertPanel(),
                    new SerialSender(context),
@@ -69,15 +60,18 @@ public class Dashboard implements Runnable {
                    new WaypointList(context),
                    null //serialPort
                    );
-      context.alert.setFont(context.theme.text);
+      //build the UI - set alert font
       InitUI();
+      context.alert.setFont(context.theme.text);
+      //remove loading window
+      loading.dispose();
     } catch (IOException e) {
-      DisplayError((Exception)e);
+      displayErrorPopup((Exception)e);
     }
   }
 
   private void InitUI(){
-    f = new JFrame("MINDS-i Dashboard");
+    JFrame f = new JFrame("MINDS-i Dashboard");
     f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     f.setVisible(false);
     f.setIconImage(context.theme.appIcon);//roverTop);
@@ -97,7 +91,7 @@ public class Dashboard implements Runnable {
     };
     JPanel serialPanel = new SerialConnectPanel(connectActions);
 
-    mapPanel = new MapPanel(  context,
+    MapPanel mapPanel = new MapPanel(  context,
                               new Point(475,1100),
                               4,
                               serialPanel,
@@ -109,51 +103,41 @@ public class Dashboard implements Runnable {
     f.pack();
     f.setSize(START_WIDTH, START_HEIGHT);
     f.setVisible(true);
-
-    loading.dispose();
   }
 
   private JPanel makeDashPanel(){
-    Color orange = new Color(255,155,30);
-    sideGauge  = new RotatePanel(context.theme.roverSide,
-                                 context.theme.gaugeBackground,
-                                 context.theme.gaugeGlare);
-    topGauge   = new RotatePanel(context.theme.roverTop,
-                                 context.theme.gaugeBackground,
-                                 context.theme.gaugeGlare);
-    frontGauge = new RotatePanel(context.theme.roverFront,
-                                 context.theme.gaugeBackground,
-                                 context.theme.gaugeGlare);
+    RotatePanel sideGauge  = new RotatePanel(context.theme.roverSide,
+                                             context.theme.gaugeBackground,
+                                             context.theme.gaugeGlare);
+    RotatePanel topGauge   = new RotatePanel(context.theme.roverTop,
+                                             context.theme.gaugeBackground,
+                                             context.theme.gaugeGlare);
+    RotatePanel frontGauge = new RotatePanel(context.theme.roverFront,
+                                             context.theme.gaugeBackground,
+                                             context.theme.gaugeGlare);
     context.telemetry.registerListener(Serial.HEADING, topGauge);
     context.telemetry.registerListener(Serial.PITCH, sideGauge);
     context.telemetry.registerListener(Serial.ROLL, frontGauge);
 
-
     BackgroundPanel dataPanel = new BackgroundPanel(context.theme.gaugeSquare);
-    GridBagConstraints c = new GridBagConstraints();
-    JPanel dashPanel = new JPanel();
-
     dataPanel.setBorder(new EmptyBorder(dataBorderSize[0],
                                         dataBorderSize[1],
                                         dataBorderSize[2],
                                         dataBorderSize[3]) );
     dataPanel.setLayout(new BoxLayout(dataPanel, BoxLayout.PAGE_AXIS));
-
-
-
-    displays = new ArrayList<DataLabel>();
+    dataPanel.setOpaque(false);
     for(int i=0; i<dataLabels.length; i++){
       DataLabel label = new DataLabel(dataLabels[i]);
       context.telemetry.registerListener(i, label);
-      label.setForeground(orange);
+      label.setForeground(context.theme.textColor);
       label.setFont(context.theme.text);
       dataPanel.add(label);
     }
 
-    dataPanel.setOpaque(false);
-
+    JPanel dashPanel = new JPanel();
     dashPanel.setLayout(new GridBagLayout());
     dashPanel.setOpaque(false);
+    GridBagConstraints c = new GridBagConstraints();
     c.gridy = 1;
     dashPanel.add(dataPanel,c);
     c.gridy = 2;
@@ -172,7 +156,7 @@ public class Dashboard implements Runnable {
     }
   }
 
-  public static void DisplayError(Exception e){
+  public static void displayErrorPopup(Exception e){
     final JFrame errorFrame = new JFrame("Data");
     errorFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     errorFrame.setLayout(new FlowLayout());

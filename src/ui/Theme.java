@@ -85,7 +85,7 @@ public class Theme{
             panelPatch = new NinePatch(panelCenter, panelWalls, panelJoints);
 
         } catch(IOException|FontFormatException e){
-            Dashboard.DisplayError(e);
+            Dashboard.displayErrorPopup(e);
         }
 	}
 	public JButton makeButton(){
