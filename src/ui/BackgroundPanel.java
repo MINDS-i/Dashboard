@@ -10,14 +10,14 @@ public class BackgroundPanel extends JPanel{
   private BufferedImage background;
   public BackgroundPanel(BufferedImage image){
     background = image;
-    this.setPreferredSize(new Dimension(background.getWidth(this),
-                            background.getHeight(this)));
+    this.setPreferredSize(new Dimension(background.getWidth(),
+                                        background.getHeight()));
   }
   @Override
   public void paintComponent(Graphics g) {
     super.paintComponent(g);
-    int iw = background.getWidth(this);
-    int ih = background.getHeight(this);
+    int iw = background.getWidth();
+    int ih = background.getHeight();
     if (iw < 0 || ih < 0) return;
 
     for (int x = 0; x < getWidth(); x += iw) {
