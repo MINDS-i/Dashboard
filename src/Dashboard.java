@@ -50,7 +50,6 @@ public class Dashboard implements Runnable {
       loading.setBackground(new Color(0,0,0,0));
       loading.add(new JLabel(new ImageIcon(logo)));
       loading.pack();
-      loading.setSize(540,216);
       loading.setVisible(true);
       //initialize the major classes into the context
       context.give(this,
