@@ -35,25 +35,22 @@ public class DataWindow implements ActionListener{
 	private static final Dimension descriptionMin = new Dimension(300, 80);
 	private static final Dimension descriptionPref= new Dimension(300, 200);
 
-	ColumnTableModel setModel;
-	ColumnTableModel telModel;
-	Context 		 context;
-	final JFrame 	 frame;
-	java.util.Timer  update;
-	JPanel 		  	 logPanel;
-	JPanel 		  	 panel;
-	JScrollPane 	 scroll;
-	JTextField	  	 logInput;
-	Graph			 graph;
-	JTextComponent	 descriptionBox;
+	private JTable telTable, setTable;
+	private ColumnTableModel setModel;
+	private ColumnTableModel telModel;
+	private Context 		 context;
+	private java.util.Timer  update;
+	private JPanel 		  	 logPanel;
+	private JTextField	  	 logInput;
+	private JTextComponent	 descriptionBox;
 
 	public DataWindow(Context cxt){
 		context = cxt;
-		frame = new JFrame("Telemetry");
+		JFrame frame = new JFrame("Telemetry");
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setSize(WINDOW_X,WINDOW_Y);
     	//frame.setLayout(new BoxLayout(frame,BoxLayout.PAGE_AXIS));
-		panel = new JPanel();
+		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 
 		ArrayList<TableColumn> telem = new ArrayList<TableColumn>();
@@ -124,7 +121,7 @@ public class DataWindow implements ActionListener{
 			}
 		});
 
-		JTable telTable, setTable;
+		//JTable telTable, setTable;
 		JScrollPane telScroll, setScroll;
 		telModel	= new ColumnTableModel(telem);
 		telTable	= new JTable(telModel);
@@ -191,7 +188,7 @@ public class DataWindow implements ActionListener{
 		logPanel.setLayout(new FlowLayout());
 		JLabel label = new JLabel("Set logging period (ms)");
 
-		logInput = new JTextField();
+		JTextField logInput = new JTextField();
 		logInput.addActionListener(this);
 		logInput.setText(Integer.toString(context.telemetry.getLogPeriod()));
 		logInput.setColumns(8);
@@ -222,6 +219,8 @@ public class DataWindow implements ActionListener{
 					if(context.connected){
 						telModel.fireTableRowsUpdated(0, Serial.MAX_TELEMETRY);
 						setModel.fireTableRowsUpdated(0, Serial.MAX_SETTINGS);
+						telTable.invalidate();
+						setTable.invalidate();
 					}
 				}
 			}, PERIOD, PERIOD);
