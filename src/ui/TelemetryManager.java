@@ -57,8 +57,16 @@ public class TelemetryManager{
 
         labels = ResourceBundle.getBundle("telemetryLabels", context.locale);
 
-        //build the first few telemetry locations up front
-        updateTelemetry(6, 0.0d);
+        //Update the last named telemetry to get streams built for the
+        // predefined telemetry indecies
+        int lastNamedIndex = 0;
+        while(true){
+            int next = lastNamedIndex + 1;
+            if(labels.containsKey("t"+next)) lastNamedIndex = next;
+            else break;
+        }
+        System.out.println(lastNamedIndex);
+        updateTelemetry(lastNamedIndex, 0.0d);
     }
     public String getTelemetryName(int index){
         String name;
