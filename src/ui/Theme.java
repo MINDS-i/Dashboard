@@ -34,6 +34,7 @@ public class Theme{
   	public Font alertFont;
   	public NinePatch buttonPatch;
   	public NinePatch panelPatch;
+    public NinePatch screenPatch;
   	public Color textColor;
 	public Theme(Locale locale){
 		ResourceBundle res = ResourceBundle.getBundle("resources", locale);
@@ -60,6 +61,7 @@ public class Theme{
 			appIcon          = ImageIO.read(new File("./data/app-icon.png"));
             buttonPatch      = NinePatch.loadFrom(Paths.get("./data/nP/button"));
             panelPatch       = NinePatch.loadFrom(Paths.get("./data/nP/display"));
+            screenPatch      = NinePatch.loadFrom(Paths.get("./data/nP/screen"));
         } catch(IOException|FontFormatException e){
             Dashboard.displayErrorPopup(e);
         }

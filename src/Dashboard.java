@@ -36,7 +36,7 @@ public class Dashboard implements Runnable {
   private static final int START_HEIGHT = 820; //default window height
   private static final int[] dataBorderSize = {15,18,46,18};//top,left,bottom,right
   private static final String dataLabels[] = {"Lat:", "Lng:", "Dir:", "Ptc:",
-                                                      "Rol:", "MPH:", "Vcc:" };
+                                              "Rol:", "MPH:", "Vcc:", "Amp:" };
   private Collection<DataLabel> displays = new ArrayList<DataLabel>(dataLabels.length);
   private Context context = new Context();
 
@@ -118,7 +118,7 @@ public class Dashboard implements Runnable {
     context.telemetry.registerListener(Serial.PITCH, sideGauge);
     context.telemetry.registerListener(Serial.ROLL, frontGauge);
 
-    BackgroundPanel dataPanel = new BackgroundPanel(context.theme.gaugeSquare);
+    NinePatchPanel dataPanel = new NinePatchPanel(context.theme.screenPatch);
     dataPanel.setBorder(new EmptyBorder(dataBorderSize[0],
                                         dataBorderSize[1],
                                         dataBorderSize[2],
