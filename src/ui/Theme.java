@@ -33,6 +33,8 @@ public class Theme{
   	public Font text;
   	public Font alertFont;
   	public NinePatch buttonPatch;
+    public NinePatch buttonHover;
+    public NinePatch buttonPress;
   	public NinePatch panelPatch;
     public NinePatch screenPatch;
   	public Color textColor;
@@ -60,6 +62,8 @@ public class Theme{
 			alertFont        = null;
 			appIcon          = ImageIO.read(new File("./data/app-icon.png"));
             buttonPatch      = NinePatch.loadFrom(Paths.get("./data/nP/button"));
+            buttonHover      = NinePatch.loadFrom(Paths.get("./data/nP/buttonHovered"));
+            buttonPress      = NinePatch.loadFrom(Paths.get("./data/nP/buttonPressed"));
             panelPatch       = NinePatch.loadFrom(Paths.get("./data/nP/display"));
             screenPatch      = NinePatch.loadFrom(Paths.get("./data/nP/screen"));
         } catch(IOException|FontFormatException e){
@@ -68,7 +72,8 @@ public class Theme{
 	}
 	public JButton makeButton(){
 		NinePatchButton bt = new NinePatchButton(buttonPatch);
-		//bt.setHoverPatch(panelPatch);
+		bt.setHoverPatch(buttonHover);
+        bt.setPressedPatch(buttonPress);
 		return bt;
 	}
 	public JButton makeButton(Action a){
