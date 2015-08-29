@@ -9,9 +9,7 @@ public class NinePatchButton extends JButton{
     private NinePatch normal;
     private NinePatch pressed;
     private NinePatch hover;
-    /**
-     * Add a second NinePatch for the hovered and/or pressed version of the button
-     */
+
     public NinePatchButton(NinePatch normal){
         super();
         this.normal = normal;
@@ -30,8 +28,7 @@ public class NinePatchButton extends JButton{
     private void configure(){
         setOpaque(false);
         setBorderPainted(false);
-
-
+        setMinimumSize(normal.minimumSize());
     }
     public void setHoverPatch(NinePatch hover){
         this.hover = hover;

@@ -14,13 +14,15 @@ import com.ui.BackgroundPanel;
 import com.ui.ninePatch.NinePatchPanel;
 
 public class NinePatch{
-    private final BufferedImage center;
-    private enum Walls{ TOP, LEFT, RIGHT, BOTTOM }
-    private enum Corner{ TOP_LEFT, TOP_RIGHT, LOWER_LEFT, LOWER_RIGHT }
-    private final EnumMap<Walls, BufferedImage> walls
-                    = new EnumMap<Walls, BufferedImage>(Walls.class);
-    private final EnumMap<Corner, BufferedImage> joint
-                    = new EnumMap<Corner, BufferedImage>(Corner.class);
+    private final BufferedImage middle;
+    private final BufferedImage topBorder;
+    private final BufferedImage leftBorder;
+    private final BufferedImage rightBorder;
+    private final BufferedImage bottomBorder;
+    private final BufferedImage topLeft;
+    private final BufferedImage topRight;
+    private final BufferedImage bottomLeft;
+    private final BufferedImage bottomRight;
 
     static BufferedImage copyRotated(BufferedImage bi, double rotation){
         //paramaterize rotation
@@ -72,50 +74,53 @@ public class NinePatch{
     }
 
     private NinePatch(){
-        center = null;
+        middle       = null;
+        topBorder    = null;
+        leftBorder   = null;
+        rightBorder  = null;
+        bottomBorder = null;
+        topLeft      = null;
+        topRight     = null;
+        bottomLeft   = null;
+        bottomRight  = null;
     }
     public NinePatch(BufferedImage center, BufferedImage wall, BufferedImage corner){
-        this.center = center;
-
-        this.walls.put(Walls.TOP, copyFlipped(wall, Flip.IDENTITY));
-        this.walls.put(Walls.LEFT, copyRotated(wall, -90));
-        this.walls.put(Walls.RIGHT, copyRotated(wall, 90));
-        this.walls.put(Walls.BOTTOM, copyFlipped(wall, Flip.VERTICAL));
-
-        this.joint.put(Corner.TOP_LEFT, copyFlipped(corner, Flip.IDENTITY));
-        this.joint.put(Corner.TOP_RIGHT, copyFlipped(corner, Flip.HORIZONTAL));
-        this.joint.put(Corner.LOWER_LEFT, copyFlipped(corner, Flip.VERTICAL));
-        this.joint.put(Corner.LOWER_RIGHT, copyFlipped(corner, Flip.BOTH));
+        middle       = center;
+        topBorder    = copyFlipped(wall, Flip.IDENTITY);
+        leftBorder   = copyRotated(wall, -90);
+        rightBorder  = copyRotated(wall, 90);
+        bottomBorder = copyFlipped(wall, Flip.VERTICAL);
+        topLeft      = copyFlipped(corner, Flip.IDENTITY);
+        topRight     = copyFlipped(corner, Flip.HORIZONTAL);
+        bottomLeft   = copyFlipped(corner, Flip.VERTICAL);
+        bottomRight  = copyFlipped(corner, Flip.BOTH);
     }
     public NinePatch(BufferedImage center,
                      BufferedImage topWall,
                      BufferedImage sideWall,
                      BufferedImage corner){
-        this.center = center;
-
-        this.walls.put(Walls.LEFT,  copyFlipped(sideWall, Flip.IDENTITY));
-        this.walls.put(Walls.RIGHT, copyFlipped(sideWall, Flip.BOTH));
-
-        this.walls.put(Walls.TOP,    copyFlipped(topWall, Flip.IDENTITY));
-        this.walls.put(Walls.BOTTOM, copyFlipped(topWall, Flip.BOTH));
-
-        this.joint.put(Corner.TOP_LEFT, copyFlipped(corner, Flip.IDENTITY));
-        this.joint.put(Corner.TOP_RIGHT, copyFlipped(corner, Flip.HORIZONTAL));
-        this.joint.put(Corner.LOWER_LEFT, copyFlipped(corner, Flip.VERTICAL));
-        this.joint.put(Corner.LOWER_RIGHT, copyFlipped(corner, Flip.BOTH));
+        middle       = center;
+        leftBorder   = copyFlipped(sideWall, Flip.IDENTITY);
+        rightBorder  = copyFlipped(sideWall, Flip.BOTH);
+        topBorder    = copyFlipped(topWall, Flip.IDENTITY);
+        bottomBorder = copyFlipped(topWall, Flip.BOTH);
+        topLeft      = copyFlipped(corner, Flip.IDENTITY);
+        topRight     = copyFlipped(corner, Flip.HORIZONTAL);
+        bottomLeft   = copyFlipped(corner, Flip.VERTICAL);
+        bottomRight  = copyFlipped(corner, Flip.BOTH);
     }
     public NinePatch(BufferedImage center, BufferedImage[] walls, BufferedImage[] corners){
-        this.center = center;
-        this.walls.put(Walls.TOP, walls[0]);
-        this.walls.put(Walls.LEFT, walls[1]);
-        this.walls.put(Walls.RIGHT, walls[2]);
-        this.walls.put(Walls.BOTTOM, walls[3]);
-
-        this.joint.put(Corner.TOP_LEFT, corners[0]);
-        this.joint.put(Corner.TOP_RIGHT, corners[1]);
-        this.joint.put(Corner.LOWER_LEFT, corners[2]);
-        this.joint.put(Corner.LOWER_RIGHT, corners[3]);
+        middle       = center;
+        topBorder    = walls[0];
+        leftBorder   = walls[1];
+        rightBorder  = walls[2];
+        bottomBorder = walls[3];
+        topLeft      = corners[0];
+        topRight     = corners[1];
+        bottomLeft   = corners[2];
+        bottomRight  = corners[3];
     }
+
     public static NinePatch loadFrom(Path dir) throws IOException {
         BufferedImage center = ImageIO.read(dir.resolve("Middle.png").toFile());
         BufferedImage[] walls = new BufferedImage[]{
@@ -131,75 +136,64 @@ public class NinePatch{
         return new NinePatch(center, walls, joints);
     }
 
+    public Dimension minimumSize(){
+        //widest left corner + widest right corner
+        int width = Math.max(topLeft.getWidth(), bottomLeft.getWidth()) +
+                    Math.max(topRight.getWidth(), bottomRight.getWidth());
+        //tallest top corner + tallest bottom corner
+        int height = Math.max(topLeft.getHeight(), topRight.getHeight()) +
+                     Math.max(bottomLeft.getHeight(), bottomRight.getHeight());
+        return new Dimension(width, height);
+    }
+
     public BufferedImage getImage(int width, int height){
-        BufferedImage me = new BufferedImage(width, height, center.getType());
+        BufferedImage me = new BufferedImage(width, height, middle.getType());
         Graphics2D g2d = me.createGraphics();
         paintIn(g2d, width, height);
         g2d.dispose();
         return me;
     }
+
     public void paintIn(Graphics g, int width, int height){
         Graphics2D g2d = (Graphics2D) g;
-
-        final int cornerWidth    = joint.get(Corner.TOP_LEFT).getWidth();
-        final int cornerHeight   = joint.get(Corner.TOP_LEFT).getHeight();
-        final int vertWallHeight = walls.get(Walls.TOP).getHeight();
-        final int vertWallWidth  = walls.get(Walls.TOP).getWidth();
-        final int horzWallHeight = walls.get(Walls.LEFT).getHeight();
-        final int horzWallWidth  = walls.get(Walls.LEFT).getWidth();
-        final int vertCenterThickness = center.getHeight();
-        final int horzCenterThickness = center.getWidth();
-
-        final int right = width  - cornerWidth;
-        final int base  = height - cornerHeight;
-        final int bottomDrawPoint = height - vertWallHeight;
-        final int rightDrawPoint  = width  - horzWallWidth;
-
-        class Texture{
-            private Graphics2D g;
-            Texture(Graphics2D g2d, BufferedImage bi){
-                g = (Graphics2D) g2d.create();
-                g.setPaint(new TexturePaint(bi,
-                                new Rectangle2D.Float(0f, 0f,
-                                    (float)bi.getWidth(), (float)bi.getHeight())));
-            }
-            void draw(int x1, int y1, int x2, int y2){
-                g.fillRect(x1, y1, x2-x1, y2-y1);
-            }
-            void dispose() { g.dispose(); }
-        }
-
-
-        Texture centerFill = new Texture(g2d,center);
-        //main center rectangle through left/right wall holes
-        centerFill.draw(cornerWidth, vertWallHeight, right, bottomDrawPoint);
-        //fill eclipsed body section on the left
-        centerFill.draw(horzWallWidth, cornerHeight, cornerWidth, base);
-        //fill eclipsed body section on the right
-        centerFill.draw(right, cornerHeight, rightDrawPoint, base);
-        centerFill.dispose();
-
-        //draw horizontal walls
-        for(int x = cornerWidth; x<right; x+=horzWallHeight){
-            g.drawImage(walls.get(Walls.TOP),    x,               0, null);
-            g.drawImage(walls.get(Walls.BOTTOM), x, bottomDrawPoint, null);
-        }
-
-        //draw vertical walls
-        for(int y = cornerHeight; y<base; y+=vertWallWidth){
-            g.drawImage(walls.get(Walls.LEFT),               0, y, null);
-            g.drawImage(walls.get(Walls.RIGHT), rightDrawPoint, y, null);
-        }
+        //fill between walls
+        paintTexture(g2d,middle,
+                     leftBorder.getWidth(), topBorder.getHeight(),
+                     width-rightBorder.getWidth(), height-bottomBorder.getHeight() );
 
         //draw four corners
-        final BufferedImage tl = joint.get(Corner.TOP_LEFT);
-        g.drawImage(tl, 0, 0,null);
-        final BufferedImage tr = joint.get(Corner.TOP_RIGHT);
-        g.drawImage(tr , width-tr.getWidth(),    0,null);
-        final BufferedImage ll = joint.get(Corner.LOWER_LEFT);
-        g.drawImage(ll, 0, height-ll.getHeight(), null);
-        final BufferedImage lr = joint.get(Corner.LOWER_RIGHT);
-        g.drawImage(lr, width-lr.getWidth(), height-lr.getHeight(), null);
+        g.drawImage(topLeft, 0, 0,null);
+        g.drawImage(topRight , width-topRight.getWidth(),    0,null);
+        g.drawImage(bottomLeft, 0, height-bottomLeft.getHeight(), null);
+        g.drawImage(bottomRight, width-bottomRight.getWidth(), height-bottomRight.getHeight(), null);
+
+        //draw walls
+        paintTexture(g2d, leftBorder,
+                     0, topLeft.getHeight(),
+                     leftBorder.getWidth(), height-bottomLeft.getHeight());
+
+        paintTexture(g2d, rightBorder,
+                     width-rightBorder.getWidth(), topRight.getHeight(),
+                     width, height-bottomRight.getHeight());
+
+        paintTexture(g2d, topBorder,
+                     topLeft.getWidth(), 0,
+                     width-topRight.getWidth(), topBorder.getHeight());
+
+        paintTexture(g2d, bottomBorder,
+                     bottomLeft.getWidth(), height-bottomBorder.getHeight(),
+                     width-bottomRight.getWidth(), height);
+    }
+
+    private void paintTexture(Graphics2D g, BufferedImage bi,
+                             int x1, int y1, int x2, int y2  ){
+        Graphics2D g2d = (Graphics2D) g.create();
+        g2d.translate(x1, y1);
+        g2d.setPaint(new TexturePaint(bi,
+                        new Rectangle2D.Float(0f, 0f,
+                            (float)bi.getWidth(), (float)bi.getHeight())));
+        g2d.fillRect(0,0,x2-x1,y2-y1);
+        g2d.dispose();
     }
 
     public static void main(String[] args) {
@@ -234,30 +228,18 @@ public class NinePatch{
                 c1, c2, c3, c4
             };
 
-            BufferedImage buttonCenter = ImageIO.read(new File("./data/nP/display/Middle.png"));
-            BufferedImage[] buttonWalls = new BufferedImage[]{
-                ImageIO.read(new File("./data/nP/display/TopBorder.png")),
-                ImageIO.read(new File("./data/nP/display/LeftBorder.png")),
-                ImageIO.read(new File("./data/nP/display/RightBorder.png")),
-                ImageIO.read(new File("./data/nP/display/BottomBorder.png")) };
-            BufferedImage[] buttonJoints = new BufferedImage[]{
-                ImageIO.read(new File("./data/nP/display/TopLeft.png")),
-                ImageIO.read(new File("./data/nP/display/TopRight.png")),
-                ImageIO.read(new File("./data/nP/display/BottomLeft.png")),
-                ImageIO.read(new File("./data/nP/display/BottomRight.png")) };
-
             test3 = new NinePatch(center, edge, corner);
             test4 = new NinePatch(spiral, vertGreenGrad, horzGreenGrad, c1);
             test9 = new NinePatch(spiral, walls, corners);
             testOdd = new NinePatch(oddCenter, oddVert, oddHorz, oddCorner);
-            testButton = new NinePatch(buttonCenter, buttonWalls, buttonJoints);
+            testButton = NinePatch.loadFrom(Paths.get("./data/nP/screen"));
         } catch (Exception e){
             e.printStackTrace();
         }
 
         JPanel layoutPanel = new JPanel();
         JComponent[] panels = new JComponent[]{
-            new NinePatchPanel(test3)
+             new NinePatchPanel(test3)
             ,new NinePatchPanel(test4)
             ,new NinePatchPanel(test9)
             ,new BackgroundPanel(test9.getImage(200,200))
@@ -270,11 +252,12 @@ public class NinePatch{
             layoutPanel.add(panel);
         }
 
+        //f.add(new NinePatchPanel(testButton));
         f.add(layoutPanel);
         f.pack();
         f.setVisible(true);
 
-        while(true){
+        while(f.isShowing()){
             try {
                 Thread.sleep(1000);
             } catch (Exception e) {

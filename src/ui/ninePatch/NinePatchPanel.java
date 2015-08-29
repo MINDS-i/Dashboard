@@ -10,6 +10,7 @@ public class NinePatchPanel extends JPanel{
         super();
         this.np = np;
         setOpaque(false);
+        setMinimumSize(np.minimumSize());
     }
     @Override
     public void paintComponent(Graphics g) {
