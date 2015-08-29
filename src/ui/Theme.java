@@ -1,16 +1,18 @@
 package com.ui;
 
 import com.Dashboard;
+import com.ui.ninePatch.NinePatch;
+import com.ui.ninePatch.NinePatchButton;
+
 import java.awt.*;
 import java.awt.image.*;
 import java.io.*;
+import java.nio.file.*;
 import java.util.Locale;
-import java.util.ResourceBundle;
 import java.util.PropertyResourceBundle;
+import java.util.ResourceBundle;
 import javax.imageio.*;
 import javax.swing.*;
-import com.ui.ninePatch.NinePatchButton;
-import com.ui.ninePatch.NinePatch;
 
 //POD class for theme elements
 public class Theme{
@@ -55,35 +57,9 @@ public class Theme{
 			number           = number.deriveFont(36f);
 			textColor        = new Color(255,155,30);
 			alertFont        = null;
-
-			appIcon = ImageIO.read(new File("./data/app-icon.png"));
-
-			BufferedImage buttonCenter = ImageIO.read(new File("./data/nP/button/center.png"));
-            BufferedImage[] buttonWalls = new BufferedImage[]{
-                ImageIO.read(new File("./data/nP/button/top.png")),
-                ImageIO.read(new File("./data/nP/button/left.png")),
-                ImageIO.read(new File("./data/nP/button/right.png")),
-                ImageIO.read(new File("./data/nP/button/bottom.png")) };
-            BufferedImage[] buttonJoints = new BufferedImage[]{
-                ImageIO.read(new File("./data/nP/button/topLeft.png")),
-                ImageIO.read(new File("./data/nP/button/topRight.png")),
-                ImageIO.read(new File("./data/nP/button/lowerLeft.png")),
-                ImageIO.read(new File("./data/nP/button/lowerRight.png")) };
-            buttonPatch = new NinePatch(buttonCenter, buttonWalls, buttonJoints);
-
-            BufferedImage panelCenter = ImageIO.read(new File("./data/nP/display/Middle.png"));
-            BufferedImage[] panelWalls = new BufferedImage[]{
-                ImageIO.read(new File("./data/nP/display/TopBorder.png")),
-                ImageIO.read(new File("./data/nP/display/LeftBorder.png")),
-                ImageIO.read(new File("./data/nP/display/RightBorder.png")),
-                ImageIO.read(new File("./data/nP/display/BottomBorder.png")) };
-            BufferedImage[] panelJoints = new BufferedImage[]{
-                ImageIO.read(new File("./data/nP/display/TopLeft.png")),
-                ImageIO.read(new File("./data/nP/display/TopRight.png")),
-                ImageIO.read(new File("./data/nP/display/BottomLeft.png")),
-                ImageIO.read(new File("./data/nP/display/BottomRight.png")) };
-            panelPatch = new NinePatch(panelCenter, panelWalls, panelJoints);
-
+			appIcon          = ImageIO.read(new File("./data/app-icon.png"));
+            buttonPatch      = NinePatch.loadFrom(Paths.get("./data/nP/button"));
+            panelPatch       = NinePatch.loadFrom(Paths.get("./data/nP/display"));
         } catch(IOException|FontFormatException e){
             Dashboard.displayErrorPopup(e);
         }

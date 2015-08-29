@@ -2,13 +2,13 @@ package com.ui.ninePatch;
 
 import java.awt.*;
 import java.awt.FontMetrics;
+import java.awt.geom.*;
 import java.awt.image.*;
-//import java.awt.image.AffineTransformOp
+import java.io.*;
+import java.nio.file.*;
 import java.util.*;
 import javax.imageio.*;
 import javax.swing.*;
-import java.awt.geom.*;
-import java.io.*;
 
 import com.ui.BackgroundPanel;
 import com.ui.ninePatch.NinePatchPanel;
@@ -116,6 +116,21 @@ public class NinePatch{
         this.joint.put(Corner.LOWER_LEFT, corners[2]);
         this.joint.put(Corner.LOWER_RIGHT, corners[3]);
     }
+    public static NinePatch loadFrom(Path dir) throws IOException {
+        BufferedImage center = ImageIO.read(dir.resolve("Middle.png").toFile());
+        BufferedImage[] walls = new BufferedImage[]{
+            ImageIO.read(dir.resolve("TopBorder.png").toFile()),
+            ImageIO.read(dir.resolve("LeftBorder.png").toFile()),
+            ImageIO.read(dir.resolve("RightBorder.png").toFile()),
+            ImageIO.read(dir.resolve("BottomBorder.png").toFile()) };
+        BufferedImage[] joints = new BufferedImage[]{
+            ImageIO.read(dir.resolve("TopLeft.png").toFile()),
+            ImageIO.read(dir.resolve("TopRight.png").toFile()),
+            ImageIO.read(dir.resolve("BottomLeft.png").toFile()),
+            ImageIO.read(dir.resolve("BottomRight.png").toFile()) };
+        return new NinePatch(center, walls, joints);
+    }
+
     public BufferedImage getImage(int width, int height){
         BufferedImage me = new BufferedImage(width, height, center.getType());
         Graphics2D g2d = me.createGraphics();
@@ -164,20 +179,7 @@ public class NinePatch{
         centerFill.draw(right, cornerHeight, rightDrawPoint, base);
         centerFill.dispose();
 
-/*        Texture topWall = new Texture(g2d, walls.get(Walls.TOP));
-        topWall.draw(cornerWidth, 0, right, vertWallHeight);
-        topWall.dispose();
-
-        Texture bottomWall = new Texture(g2d, walls.get(Walls.BOTTOM));
-        bottomWall.draw(cornerWidth, bottomDrawPoint, right, bottomDrawPoint+vertWallHeight);
-        bottomWall.dispose();*/
-
-        //(new Texture(g2d, walls.get(Walls.TOP))).draw(cornerWidth, 0, right, horzWallHeight);
-        //(new Texture(g2d, walls.get(Walls.TOP))).draw(cornerWidth, 0, right, horzWallHeight);
-        //(new Texture(g2d, walls.get(Walls.TOP))).draw(cornerWidth, 0, right, horzWallHeight);
-
         //draw horizontal walls
-
         for(int x = cornerWidth; x<right; x+=horzWallHeight){
             g.drawImage(walls.get(Walls.TOP),    x,               0, null);
             g.drawImage(walls.get(Walls.BOTTOM), x, bottomDrawPoint, null);
@@ -231,18 +233,6 @@ public class NinePatch{
             BufferedImage[] corners = new BufferedImage[]{
                 c1, c2, c3, c4
             };
-
-/*            BufferedImage buttonCenter = ImageIO.read(new File("./data/nP/blueButton/center.png"));
-            BufferedImage[] buttonWalls = new BufferedImage[]{
-                ImageIO.read(new File("./data/nP/blueButton/top.png")),
-                ImageIO.read(new File("./data/nP/blueButton/left.png")),
-                ImageIO.read(new File("./data/nP/blueButton/right.png")),
-                ImageIO.read(new File("./data/nP/blueButton/bottom.png")) };
-            BufferedImage[] buttonJoints = new BufferedImage[]{
-                ImageIO.read(new File("./data/nP/blueButton/topLeft.png")),
-                ImageIO.read(new File("./data/nP/blueButton/topRight.png")),
-                ImageIO.read(new File("./data/nP/blueButton/lowerLeft.png")),
-                ImageIO.read(new File("./data/nP/blueButton/lowerRight.png")) };*/
 
             BufferedImage buttonCenter = ImageIO.read(new File("./data/nP/display/Middle.png"));
             BufferedImage[] buttonWalls = new BufferedImage[]{
