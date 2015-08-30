@@ -73,6 +73,52 @@ public class SerialConnectPanel extends JPanel {
         baudSelect.setVisible(show);
     }
 
+    /*
+        Sometimes serial port actions can block for many seconds, so connect and
+        disconnect are run off the UI thread. These functions control the four
+        states and prevent multiple port actions from racing eachother
+    */
+
+    private boolean inProgress = false;
+    private void connect(){
+        if(inProgress){
+            System.err.println("Connect command issued while a change was in Progress");
+            return;
+        }
+        refreshButton.setEnabled(false);
+        dropDown.setEnabled(false);
+        connectButton.setEnabled(false);
+        connectButton.setText("Connecting");
+        inProgress = true;
+        (new Thread(connectSerial)).start();
+    }
+    private void connectDone(){
+        refreshButton.setEnabled(false);
+        dropDown.setEnabled(false);
+        connectButton.setEnabled(true);
+        connectButton.setText("Disconnect");
+        inProgress = false;
+    }
+    private void disconnect(){
+        if(inProgress){
+            System.err.println("Connect command issued while a change was in Progress");
+            return;
+        }
+        refreshButton.setEnabled(false);
+        dropDown.setEnabled(false);
+        connectButton.setEnabled(false);
+        connectButton.setText("Disconnecting");
+        inProgress = true;
+        (new Thread(disconnectSerial)).start();
+    }
+    private void disconnectDone(){
+        refreshButton.setEnabled(true);
+        dropDown.setEnabled(true);
+        connectButton.setEnabled(true);
+        connectButton.setText("Connect");
+        inProgress = false;
+    }
+
     Action refreshAction = new AbstractAction(){
         {
             String text = "Refresh";
@@ -80,24 +126,10 @@ public class SerialConnectPanel extends JPanel {
             putValue(Action.SHORT_DESCRIPTION, text);
         }
         public void actionPerformed(ActionEvent e) {
+            if(inProgress) return;
             dropDown.removeAllItems();
             addSerialList(dropDown);
             SerialConnectPanel.this.updateUI();
-        }
-    };
-    Action connectAction = new AbstractAction(){
-        {
-        String text = "Connect";
-        putValue(Action.NAME, text);
-        putValue(Action.SHORT_DESCRIPTION, text);
-        }
-        public void actionPerformed(ActionEvent e){
-            if (connectedPort == null){
-                if(connectSerial()) putValue(Action.NAME, "Disconnect");
-            }
-            else {
-                if(disconnectSerial()) putValue(Action.NAME, "Connect");
-            }
         }
     };
 
@@ -108,58 +140,58 @@ public class SerialConnectPanel extends JPanel {
         }
     }
 
-    private boolean connectSerial(){
-
-        if(dropDown.getSelectedItem() == null) return false;
-
-        SerialPort serialPort = new SerialPort((String)dropDown.getSelectedItem());
-
-        try{
-            serialPort.openPort();
-        } catch (SerialPortException ex){
-            System.err.println(ex.getMessage());
-            return false;
+    Action connectAction = new AbstractAction(){
+        {
+        String text = "Connect";
+        putValue(Action.NAME, text);
+        putValue(Action.SHORT_DESCRIPTION, text);
         }
-
-        try{
-            if(baudSelect.isVisible()){
-                baudRate = ((BaudRate)baudSelect.getSelectedItem()).id;
-            }
-            serialPort.setParams(baudRate,              SerialPort.DATABITS_8,
-                                 SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
-            serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN |
-                                          SerialPort.FLOWCONTROL_RTSCTS_OUT);
-            refreshButton.setEnabled(false);
-            dropDown.setEnabled(false);
-        } catch(SerialPortException ex){
-            System.err.println(ex.getMessage());
-            return false;
+        public void actionPerformed(ActionEvent e){
+            if (connectedPort == null) connect();
+            else disconnect();
         }
-        connectedPort = serialPort;
-        listener.connectionEstablished(serialPort);
+    };
 
-        return true;
-    }
+    private Runnable connectSerial = new Runnable(){
+        public void run(){
+            if(dropDown.getSelectedItem() == null) return;
 
-    private boolean disconnectSerial(){
-        listener.disconnectRequest();
+            SerialPort serialPort = new SerialPort((String)dropDown.getSelectedItem());
 
-        final SerialPort portToClose = connectedPort;
-        Runnable close = new Runnable(){
-            public void run(){
-                try{
-                    portToClose.closePort();
-                } catch (Exception e) {
-                    e.printStackTrace();
+            try{
+                serialPort.openPort();
+
+                if(baudSelect.isVisible()){
+                    baudRate = ((BaudRate)baudSelect.getSelectedItem()).id;
                 }
-            }
-        };
-        if(portToClose != null)
-            (new Thread(close)).start();
 
-        connectedPort = null;
-        dropDown.setEnabled(true);
-        refreshButton.setEnabled(true);
-        return true;
-    }
+                serialPort.setParams(baudRate,              SerialPort.DATABITS_8,
+                                     SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+                serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN |
+                                              SerialPort.FLOWCONTROL_RTSCTS_OUT);
+            } catch(SerialPortException ex){
+                System.err.println(ex.getMessage());
+                return;
+            }
+
+            connectedPort = serialPort;
+            listener.connectionEstablished(serialPort);
+            connectDone();
+        }
+    };
+
+    private Runnable disconnectSerial = new Runnable(){
+        public void run(){
+            listener.disconnectRequest();
+
+            try{
+                connectedPort.closePort();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            connectedPort = null;
+            disconnectDone();
+        }
+    };
 }
