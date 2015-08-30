@@ -162,18 +162,22 @@ public class RadioConfigScreen extends JPanel{
 
 
 
-
-
-    TelemRadio radio = new TelemRadio();
-    JTable settingTable = null;
+    private JButton defsButton;
+    private JButton saveButton;
+    private TelemRadio radio = new TelemRadio();
+    private JTable settingTable = null;
     SerialEventListener sel = new SerialEventListener(){
         public void connectionEstablished(SerialPort newConnection){
             radio = new TelemRadio(newConnection);
             settingTable.invalidate();
+            defsButton.setEnabled(true);
+            saveButton.setEnabled(true);
         }
         public void disconnectRequest(){
             radio = new TelemRadio();
             settingTable.invalidate();
+            defsButton.setEnabled(false);
+            saveButton.setEnabled(false);
         }
     };
 
@@ -187,8 +191,12 @@ public class RadioConfigScreen extends JPanel{
                             BorderFactory.createEmptyBorder(5, 10, 5,10),
                             BorderFactory.createLineBorder(Color.BLACK)  ));
         JPanel buttonPanel = new JPanel();
-        buttonPanel.add(new JButton(loadDefualtsAction));
-        buttonPanel.add(new JButton(saveAction));
+        defsButton = new JButton(loadDefualtsAction);
+        saveButton = new JButton(saveAction);
+        defsButton.setEnabled(false);
+        saveButton.setEnabled(false);
+        buttonPanel.add(defsButton);
+        buttonPanel.add(saveButton);
         add(scp);
         add(sScroll);
         add(buttonPanel);
