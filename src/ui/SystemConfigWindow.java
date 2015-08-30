@@ -9,9 +9,13 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.colorchooser.AbstractColorChooserPanel;
 import javax.swing.event.*;
+import javax.swing.text.*;
 
 public class SystemConfigWindow{
     private Context context;
+    protected static final String COPY_RIGHT_TEXT = "Map Tiles Courtesy of MapQuest" +
+        "\nStreet Data from OpenStreetMap\nPortions Courtesy NASA/JPL-Caltech" +
+        " and\nU.S. Depart. of Agriculture, Farm Service Agency";
 
     public SystemConfigWindow(Context cxt){
         this.context = cxt;
@@ -30,9 +34,19 @@ public class SystemConfigWindow{
 
         container.add(new RadioConfigScreen());
 
-        /*
-        Change radio config / baud rate?
-        */
+        container.add(Box.createRigidArea(new Dimension(0,10)));
+
+        JTextPane copyRights = new JTextPane();
+        Font tmp = copyRights.getFont();
+        copyRights.setFont( tmp.deriveFont(9f) );
+        copyRights.setOpaque(false);
+        StyledDocument doc = copyRights.getStyledDocument();
+        SimpleAttributeSet center = new SimpleAttributeSet();
+        StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
+        doc.setParagraphAttributes(0, doc.getLength(), center, false);
+
+        copyRights.setText(COPY_RIGHT_TEXT);
+        container.add(copyRights);
 
         frame.add(container);
         frame.pack();

@@ -30,9 +30,6 @@ class WaypointPanel extends NinePatchPanel implements ContextViewer{
 	protected static final int MOVE_STEP = 32;
 	protected static final int BDR_SIZE = 25;
 	protected static final String NO_WAYPOINT_MSG = "N / A";
-	protected static final String COPY_RIGHT_TEXT = "Map Tiles Courtesy of MapQuest" +
-		"\nStreet Data from OpenStreetMap\nPortions Courtesy NASA/JPL-Caltech" +
-		"and U.S. Depart. of Agriculture, Farm Service Agency";
 	private int selectedWaypoint = 0;
 	private Context context;
 	private MapPanel map;
@@ -104,7 +101,7 @@ class WaypointPanel extends NinePatchPanel implements ContextViewer{
 
 		//make all the buttons
 		JButton tileButton 	= theme.makeButton(nextTileServer);
-		JButton dataPanel 	= theme.makeButton(openDataPanel);//theme.makeButton(openDataPanel);
+		JButton dataPanel 	= theme.makeButton(openDataPanel);
 		JButton graphButton = theme.makeButton(buildGraph);
 		JButton reTarget 	= theme.makeButton(reTargetRover);
 		JButton looping 	= theme.makeButton(toggleLooping);
@@ -171,23 +168,13 @@ class WaypointPanel extends NinePatchPanel implements ContextViewer{
 			editorPanels.add(panel);
 		}
 
-		JPanel waypointOptions = new JPanel(new FlowLayout());
+											//rows, cols, hgap, vgap
+		JPanel waypointOptions = new JPanel(new GridLayout(2,2,5,5));
 		waypointOptions.setOpaque(false);
 		waypointOptions.add(theme.makeButton(newWaypoint));
 		waypointOptions.add(theme.makeButton(interpretLocationAction));
-
-		JPanel saveload = new JPanel(new FlowLayout());
-		saveload.setOpaque(false);
-		saveload.add(theme.makeButton(saveWaypoints));
-		saveload.add(theme.makeButton(loadWaypoints));
-
-		JTextArea copyRights = new JTextArea();
-		Font tmp = copyRights.getFont();
-		copyRights.setFont( tmp.deriveFont(7f) );
-		copyRights.setOpaque(false);
-		copyRights.setLineWrap(true);
-		copyRights.setBorder(new EmptyBorder(0,0,0,0));
-		copyRights.setText(COPY_RIGHT_TEXT);
+		waypointOptions.add(theme.makeButton(saveWaypoints));
+		waypointOptions.add(theme.makeButton(loadWaypoints));
 
 		add(config);
 		add(Box.createRigidArea(space));
@@ -202,12 +189,12 @@ class WaypointPanel extends NinePatchPanel implements ContextViewer{
 		add(selector);
 		add(Box.createRigidArea(space));
 		for(JPanel panel : editorPanels){ add(panel); }
+		add(Box.createRigidArea(space));
 		add(waypointOptions);
+		add(Box.createRigidArea(space));
 		add(reTarget);
 		add(Box.createRigidArea(space));
 		add(looping);
-		add(saveload);
-		add(copyRights);
 	}
 
 	private double fixedToDouble(int i){
