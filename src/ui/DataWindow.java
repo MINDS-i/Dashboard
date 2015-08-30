@@ -44,8 +44,25 @@ public class DataWindow implements ActionListener{
 	private JTextField	  	 logInput;
 	private JTextComponent	 descriptionBox;
 
+	private class Setting{
+		String name;
+		String description;
+		float  min;
+		float  max;
+		float  def;
+		Setting(String name, String description, float min, float max, float def){
+			this.name        = name;
+			this.description = description;
+			this.min         = min;
+			this.max         = max;
+			this.def         = def;
+		}
+	}
+	java.util.List<Setting> settingData = new ArrayList<Setting>();
+
 	public DataWindow(Context cxt){
 		context = cxt;
+    	loadSettingData();
 		JFrame frame = new JFrame("Telemetry");
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setSize(WINDOW_X,WINDOW_Y);
@@ -78,18 +95,11 @@ public class DataWindow implements ActionListener{
 
 		ArrayList<TableColumn> settings = new ArrayList<TableColumn>();
 		settings.add( new TableColumn(){
-			private ResourceBundle res = ResourceBundle.getBundle(
-													"settingLabels",
-													context.locale);
 			public String	getName(){ return "name"; }
 			public Object	getValueAt(int row){
-				String ans;
-				try{
-					ans = res.getString("s"+row);
-				} catch(MissingResourceException e) {
-					ans = new String("#"+row);
-				}
-				return ans;
+				if(row < settingData.size())
+					return settingData.get(row).name;
+				return "#"+row;
 			}
 			public int		getRowCount(){ return 256; }
 			public Class	getDataClass(){ return String.class; }
@@ -149,7 +159,6 @@ public class DataWindow implements ActionListener{
 		setScroll.setBorder(tableBorders);
 		telScroll.setBorder(tableBorders);
 
-		//TODO improve preferred size interface
 		javax.swing.table.TableColumn col;
 		col = telTable.getColumn(telem.get(1).getName());
 		col.setPreferredWidth(1);
@@ -196,19 +205,35 @@ public class DataWindow implements ActionListener{
 		logPanel.add(label);
 		logPanel.add(logInput);
 	}
-	private void setDetail(int row){
-		ResourceBundle res = ResourceBundle.getBundle( "settingLabels",
-														context.locale);
-		String detail;
-		try{
-			detail = res.getString("long"+row);
-		} catch (Exception e) {
-			detail = "";
-		}
-		if(descriptionBox != null){
-			descriptionBox.setText(detail);
-		}
+	private void loadSettingData(){
+		ResourceBundle res = ResourceBundle.getBundle( "settingLabels", context.locale);
+		int curSet = 0;
+		while(true){
+			String nameRequest = "s"+curSet;
+			String descRequest = "long"+curSet;
+			if(!res.containsKey(nameRequest)) break;
 
+			String nameResponse = "";
+			String descResponse = "";
+			try{
+				nameResponse = res.getString(nameRequest);
+			} catch (Exception e) { }
+			try{
+				descResponse = res.getString(descRequest);
+			} catch (Exception e) { }
+
+			Setting found = new Setting(nameResponse, descResponse, 0,0,0);
+			settingData.add(found);
+			curSet++;
+		}
+	}
+	private void setDetail(int row){
+		String detail;
+		if(row < settingData.size())
+			detail = settingData.get(row).description;
+		else
+			detail = "";
+		if(descriptionBox != null) descriptionBox.setText(detail);
 	}
 	private void startUpdateTimer(){
     	update = new java.util.Timer();
