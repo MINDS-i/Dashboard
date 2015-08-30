@@ -80,7 +80,7 @@ public class SerialConnectPanel extends JPanel {
     */
     private static final String BUTTON_CONNECTING    = "Connecting";
     private static final String BUTTON_CONNECTED     = "Disconnect";
-    private static final String BUTTON_DISCONNECTING = "Disableing";
+    private static final String BUTTON_DISCONNECTING = "Disabling ";
     private static final String BUTTON_DISCONNECTED  = " Connect  ";
     private boolean inProgress = false;
     private void connect(){
