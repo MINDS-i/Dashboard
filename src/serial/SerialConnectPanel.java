@@ -78,7 +78,10 @@ public class SerialConnectPanel extends JPanel {
         disconnect are run off the UI thread. These functions control the four
         states and prevent multiple port actions from racing eachother
     */
-
+    private static final String BUTTON_CONNECTING    = "Connecting";
+    private static final String BUTTON_CONNECTED     = "Disconnect";
+    private static final String BUTTON_DISCONNECTING = "Disableing";
+    private static final String BUTTON_DISCONNECTED  = " Connect  ";
     private boolean inProgress = false;
     private void connect(){
         if(inProgress){
@@ -88,7 +91,7 @@ public class SerialConnectPanel extends JPanel {
         refreshButton.setEnabled(false);
         dropDown.setEnabled(false);
         connectButton.setEnabled(false);
-        connectButton.setText("Connecting");
+        connectButton.setText(BUTTON_CONNECTING);
         inProgress = true;
         (new Thread(connectSerial)).start();
     }
@@ -96,7 +99,7 @@ public class SerialConnectPanel extends JPanel {
         refreshButton.setEnabled(false);
         dropDown.setEnabled(false);
         connectButton.setEnabled(true);
-        connectButton.setText("Disconnect");
+        connectButton.setText(BUTTON_CONNECTED);
         inProgress = false;
     }
     private void disconnect(){
@@ -107,7 +110,7 @@ public class SerialConnectPanel extends JPanel {
         refreshButton.setEnabled(false);
         dropDown.setEnabled(false);
         connectButton.setEnabled(false);
-        connectButton.setText("Disconnecting");
+        connectButton.setText(BUTTON_DISCONNECTING);
         inProgress = true;
         (new Thread(disconnectSerial)).start();
     }
@@ -115,7 +118,7 @@ public class SerialConnectPanel extends JPanel {
         refreshButton.setEnabled(true);
         dropDown.setEnabled(true);
         connectButton.setEnabled(true);
-        connectButton.setText("Connect");
+        connectButton.setText(BUTTON_DISCONNECTED);
         inProgress = false;
     }
 
@@ -142,7 +145,7 @@ public class SerialConnectPanel extends JPanel {
 
     Action connectAction = new AbstractAction(){
         {
-        String text = "Connect";
+        String text = BUTTON_DISCONNECTED;
         putValue(Action.NAME, text);
         putValue(Action.SHORT_DESCRIPTION, text);
         }
