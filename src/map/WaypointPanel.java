@@ -139,7 +139,7 @@ class WaypointPanel extends NinePatchPanel implements ContextViewer{
 			}
 		}
 		ArrayList<EditBoxSpec> editorBoxes = new ArrayList<EditBoxSpec>();
-		ResourceBundle res = ResourceBundle.getBundle("settingLabels", context.locale);
+		ResourceBundle res = ResourceBundle.getBundle("resources", context.locale);
 		latitude  = new JTextField();
 		longitude = new JTextField();
 		altitude  = new JTextField();

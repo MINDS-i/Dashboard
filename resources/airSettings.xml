@@ -1,0 +1,143 @@
+<?xml version="1.0" ?>
+<settingList>
+    <setting index="0" name="Output period" min="5000" max="10000" def="6500">
+        <![CDATA[
+Period in milliseconds between sensor/ESC updates<br>
+This value should be between 5000 (200Hz) and 10000(100Hz)<br>
+Controls how often the sensors are polled and the control signal is updated
+Higher speeds will decrease the processing time left for other tasks
+        ]]>
+    </setting>
+    <setting index="1" name="Inertial update Fac" min="0" max="1.0" def="0.0038">
+        <![CDATA[
+Factor used during sensor update step. Should be between 0.0 and 1.0 <br>
+A value of 0.0 flies completely based on the best estimate and gyroscope <br>
+As the value approaches 1.0, the quad increasingly uses the accel/mag measurement <br>
+to stabilize. This should generally be very low, only using the accel/mag to correct <br>
+error in the gyro model
+        ]]>
+    </setting>
+    <setting index="2" name="Gyro compensation Fac" min="0" max="1.0" def="0.99999">
+        <![CDATA[
+Term on exponential running average of the accel/mag's corrections to the gyro <br>
+must be between 0.0 (average of only latest value) <br>
+and 1.0 (average of only historic values) <br>
+Normally very close to 1.0
+        ]]>
+    </setting>
+    <setting index="3" name="Tilt/Thrust Compensation" min="0" max="0" def="0">
+        <![CDATA[
+Not currently implemented
+        ]]>
+    </setting>
+    <setting index="4" name="Att P Term" min="0" max="+inf" def="0.250">
+        <![CDATA[
+Attitude Stabilization P term<br>
+Control proportional to current error.<br>
+Generally the main driver of PID control.<br>
+Higher P makes reaction quicker, but increases overshoot and degrades stability.
+        ]]>
+    </setting>
+    <setting index="5" name="Att I Term" min="0" max="+inf" def="0.000">
+        <![CDATA[
+Attitude Stabilization I term<br>
+Used to eliminate steady state error, too much I can increase overshoot and degrade stability.
+        ]]>
+    </setting>
+    <setting index="6" name="Att D Term" min="0" max="+inf" def="0.003">
+        <![CDATA[
+Attitude Stabilization D term<br>
+D Will dampen the output by predicting the future quadcopter position with linear extrapolation.<br>
+It will decrease overshoot and decrease settling time, but can cause new oscillations if set too high.
+        ]]>
+    </setting>
+    <setting index="7" name="Att VP Term" min="0" max="+inf" def="5.00">
+        <![CDATA[
+P term on attitude Velocity control loop <br>
+Higher values will make stabilization more aggressive.
+        ]]>
+    </setting>
+    <setting index="8" name="Att VI Term" min="0" max="+inf" def="0">
+        <![CDATA[
+I term on attitude Velocity control loop <br>
+Higher values increase response to drifting and unevent weight <br>\
+Too high can cause instability and oscillations
+        ]]>
+    </setting>
+    <setting index="9" name="Att VD Term" min="0" max="+inf" def="0.17">
+        <![CDATA[
+D term on attitude Velocity control loop <br>
+Can be used to dampen oscillations and increase P's ceiling
+        ]]>
+    </setting>
+    <setting index="10" name="Yaw P Term" min="0" max="+inf" def="1.0">
+        <![CDATA[
+Yaw Stabilization P term<br>
+        ]]>
+    </setting>
+    <setting index="11" name="Yaw I Term" min="0" max="+inf" def="0.0">
+        <![CDATA[
+Yaw Stabilization I term<br>
+        ]]>
+    </setting>
+    <setting index="12" name="Yaw D Term" min="0" max="+inf" def="0.0">
+        <![CDATA[
+Yaw Stabilization D term<br>
+        ]]>
+    </setting>
+    <setting index="13" name="Yaw V Term" min="0" max="+inf" def="8.00">
+        <![CDATA[
+Yaw stabilization V term<br>
+        ]]>
+    </setting>
+    <setting index="14" name="Hover Throttle" min="0" max="1.0" def="0.40">
+        <![CDATA[
+Raw output throttle necessary to hover (used for throttle stick centering)<br>
+Used in the RC radio throttle stick curve equation. When the throttle stick in at 50%,
+This is what the quad's final output throttle will be at.
+        ]]>
+    </setting>
+    <setting index="15" name="Throttle Linearity" min="0" max="1.0" def="0.37">
+        <![CDATA[
+Affects radio throttle curve linearity<br>
+A Value of 0.5 is as linear as possible around the hover throttle<br>
+A Value of 0.0 is heavily curved for fine control around the hover point<br>
+A value of 1.0 is heavily curved for more sensitivity<br>
+A value slightly under 0.5 tends to work best (0.37 is default)
+        ]]>
+    </setting>
+    <setting index="16" name="Barometer HalfLife" min="0" max="0" def="0">
+        <![CDATA[
+        ]]>
+    </setting>
+    <setting index="17" name="Altitude Hold P" min="0" max="0" def="0">
+        <![CDATA[
+        ]]>
+    </setting>
+    <setting index="18" name="Altitude Hold I" min="0" max="0" def="0">
+        <![CDATA[
+        ]]>
+    </setting>
+    <setting index="19" name="Altitude Hold D" min="0" max="0" def="0">
+        <![CDATA[
+        ]]>
+    </setting>
+    <setting index="20" name="Altitude Hold V" min="0" max="0" def="0">
+        <![CDATA[
+        ]]>
+    </setting>
+    <setting index="50" name="ACCL_X_SHFT" min="0" max="1" def="0"/>
+    <setting index="51" name="ACCL_Y_SHFT" min="0" max="1" def="0"/>
+    <setting index="52" name="ACCL_Z_SHFT" min="0" max="1" def="0"/>
+    <setting index="53" name="ACCL_X_SCLR" min="0" max="1" def="0"/>
+    <setting index="54" name="ACCL_Y_SCLR" min="0" max="1" def="0"/>
+    <setting index="55" name="ACCL_Z_SCLR" min="0" max="1" def="0"/>
+    <setting index="56" name="MAG_X_SHFT " min="0" max="1" def="0"/>
+    <setting index="57" name="MAG_Y_SHFT " min="0" max="1" def="0"/>
+    <setting index="58" name="MAG_Z_SHFT " min="0" max="1" def="0"/>
+    <setting index="59" name="MAG_X_SCLR " min="0" max="1" def="0"/>
+    <setting index="60" name="MAG_Y_SCLR " min="0" max="1" def="0"/>
+    <setting index="61" name="MAG_Z_SCLR " min="0" max="1" def="0"/>
+    <setting index="62" name="CALIB_VER  " min="0" max="1" def="0"/>
+    <setting index="63" name="STORAGE_VER" min="0" max="1" def="0"/>
+</settingList>

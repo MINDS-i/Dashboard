@@ -1,0 +1,101 @@
+<?xml version="1.0" ?>
+<settingList>
+    <setting index="0" name="line gravity " min="0" max="1" def="0.50">
+        <![CDATA[
+Defines how strongly the rover should attempt to return to the original course between waypoints, verses the direct path from its current location to the target<br>
+Should be a value between 0.0 and 1.0
+        ]]>
+    </setting>
+    <setting index="1" name="steer throw  " min="0" max="90" def="45">
+        <![CDATA[
+The number of degrees that rover will turn its wheels when it needs to turn its most extreme amount
+        ]]>
+    </setting>
+    <setting index="2" name="steer style  " min="0" max="2" def="2">
+        <![CDATA[
+switches between arctangent of error steering (0) <br>
+square of error steering (1) <br>
+and proportional to error steering (2)
+        ]]>
+    </setting>
+    <setting index="3" name="steer scalar " min="0" max="+inf" def="1">
+        <![CDATA[
+Multiplier that determines how aggressively to steer
+        ]]>
+    </setting>
+    <setting index="4" name="min fwd speed" min="0" max="+inf" def="1">
+        <![CDATA[
+minimum forward driving speed in MPH
+        ]]>
+    </setting>
+    <setting index="5" name="max fwd speed" min="0" max="+inf" def="6.0">
+        <![CDATA[
+maximum forward driving speed in MPH
+        ]]>
+    </setting>
+    <setting index="6" name="rev str throw" min="0" max="90" def="20">
+        <![CDATA[
+How far to turn the wheels when backing away from an obstacle
+        ]]>
+    </setting>
+    <setting index="7" name="reverse speed" min="-inf" max="0" def="-1.5">
+        <![CDATA[
+speed in MPH to drive in reverse
+        ]]>
+    </setting>
+    <setting index="8" name="ping factor  " min="1" max="+inf" def="1400">
+        <![CDATA[
+Factor to determine how strongly obstacles effect the rover's course <br>
+Larger numbers correspond to larger effects from obstacles
+        ]]>
+    </setting>
+    <setting index="9" name="coast time   " min="0" max="+inf" def="1500">
+        <![CDATA[
+Time in milliseconds to coast before reversing when an obstacle is encountered
+        ]]>
+    </setting>
+    <setting index="10" name="min rev time " min="0" max="+inf" def="800">
+        <![CDATA[
+minimum time in milliseconds to reverse away from an obstacle
+        ]]>
+    </setting>
+    <setting index="11" name="Cruise P     " min="0" max="+inf" def="0.05">
+        <![CDATA[
+P term in cruise control PID loop
+        ]]>
+    </setting>
+    <setting index="12" name="Cruise I     " min="0" max="+inf" def="0.1">
+        <![CDATA[
+I term in cruise control PID loop
+        ]]>
+    </setting>
+    <setting index="13" name="Cruise D     " min="0" max="+inf" def="0.0">
+        <![CDATA[
+D term in cruise control PID loop
+        ]]>
+    </setting>
+    <setting index="14" name="Tire Diameter" min="0" max="+inf" def="5.85">
+        <![CDATA[
+Tire Diameter in inches, used to calculate MPH
+        ]]>
+    </setting>
+    <setting index="15" name="Steer Center " min="0" max="180" def="90">
+        <![CDATA[
+Center point in degrees corresponding to driving straight
+        ]]>
+    </setting>
+    <setting index="50" name="ACCL_X_SHFT" min="0" max="1" def="0"/>
+    <setting index="51" name="ACCL_Y_SHFT" min="0" max="1" def="0"/>
+    <setting index="52" name="ACCL_Z_SHFT" min="0" max="1" def="0"/>
+    <setting index="53" name="ACCL_X_SCLR" min="0" max="1" def="0"/>
+    <setting index="54" name="ACCL_Y_SCLR" min="0" max="1" def="0"/>
+    <setting index="55" name="ACCL_Z_SCLR" min="0" max="1" def="0"/>
+    <setting index="56" name="MAG_X_SHFT " min="0" max="1" def="0"/>
+    <setting index="57" name="MAG_Y_SHFT " min="0" max="1" def="0"/>
+    <setting index="58" name="MAG_Z_SHFT " min="0" max="1" def="0"/>
+    <setting index="59" name="MAG_X_SCLR " min="0" max="1" def="0"/>
+    <setting index="60" name="MAG_Y_SCLR " min="0" max="1" def="0"/>
+    <setting index="61" name="MAG_Z_SCLR " min="0" max="1" def="0"/>
+    <setting index="62" name="CALIB_VER  " min="0" max="1" def="0"/>
+    <setting index="63" name="STORAGE_VER" min="0" max="1" def="0"/>
+</settingList>

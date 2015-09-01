@@ -8,6 +8,7 @@ import com.serial.Messages.*;
 import com.ui.*;
 import com.xml;
 import java.io.*;
+import java.nio.file.*;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -124,6 +125,10 @@ public class Context{
 	}
 	public SerialPort port(){
 		return port;
+	}
+	public Path getSettingsDescriptionFile() throws MissingResourceException {
+		ResourceBundle res = ResourceBundle.getBundle("resources", locale);
+		return Paths.get(res.getString("settings_spec"));
 	}
 	public void waypointUpdated(){
 		Iterator it = toUpdate.iterator();
