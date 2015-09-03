@@ -207,12 +207,19 @@ public class DataWindow implements ActionListener{
 	}
 
 	private void setDetail(int row){
-		String detail;
-		if(row < context.settingList.size())
-			detail = context.settingList.get(row).getDescription();
-		else
-			detail = "";
-		if(descriptionBox != null) descriptionBox.setText(detail);
+		StringBuilder detail = new StringBuilder();
+		if(row >= 0 && row < context.settingList.size()){
+			Setting set = context.settingList.get(row);
+			detail.append("min: ");
+			detail.append(set.getMin());
+			detail.append(" max: ");
+			detail.append(set.getMax());
+			detail.append(" default: ");
+			detail.append(set.getDefault());
+			detail.append("<br><hr>");
+			detail.append(set.getDescription());
+		}
+		if(descriptionBox != null) descriptionBox.setText(detail.toString());
 	}
 	private void startUpdateTimer(){
     	update = new java.util.Timer();
