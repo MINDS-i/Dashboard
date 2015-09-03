@@ -54,11 +54,10 @@ public class Graph extends JPanel{
     clean up graph logic
     add data/pixel units to parameters
     */
-
-    public Graph(List<DataSource> inputSources){
+    public Graph(List<DataSource> inputSources, boolean defaultState){
         sources = new ArrayList<DataConfig>();
         for(DataSource source : inputSources){
-            sources.add(new DataConfig(source));
+            sources.add(new DataConfig(source, defaultState));
         }
 
         //repaint at regular interval
@@ -340,16 +339,11 @@ public class Graph extends JPanel{
         trialSources.add(sin);
         trialSources.add(cos);
 
-        Graph g = new Graph(trialSources);
+        Graph g = new Graph(trialSources, true);
         JFrame f = new JFrame("graphTest");
         f.add(g);
         f.pack();
         f.setVisible(true);
-
-        //turn on all the test data sources
-        for(DataConfig source : g.getSources()){
-            source.setDrawn(true);
-        }
 
         while(f.isShowing()){
             try {

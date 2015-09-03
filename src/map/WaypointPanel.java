@@ -377,7 +377,7 @@ class WaypointPanel extends NinePatchPanel implements ContextViewer{
 			putValue(Action.NAME, text);
 		}
 		public void actionPerformed(ActionEvent e){
-			Graph graph = new Graph(context.telemetry.getDataSources());
+			Graph graph = new Graph(context.telemetry.getDataSources(), false);
 			graph.setPreferredSize(new Dimension(500, 300));
 			JFrame gFrame = new JFrame("Telemetry Graph");
 			gFrame.add(graph);
