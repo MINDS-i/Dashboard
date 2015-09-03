@@ -3,6 +3,7 @@ package com;
 import com.ContextViewer;
 import com.Dashboard;
 import com.map.*;
+import com.remote.SettingList;
 import com.serial.*;
 import com.serial.Messages.*;
 import com.ui.*;
@@ -24,8 +25,8 @@ public class Context{
 	public SerialSender	sender;
 	public Theme		theme;
 	public WaypointList	waypoint;
-	public float		upstreamSettings[] = new float[Serial.MAX_SETTINGS];
 	public PrintStream  log;
+	public SettingList  settingList;
 
 	public TelemetryManager telemetry;
 
@@ -98,14 +99,15 @@ public class Context{
 						SerialParser serialParser,
 						WaypointList waypointList,
 						SerialPort   serialPort){
-		dash      = dashboard;
-		alert     = alertPanel;
-		sender    = serialSender;
-		parser    = serialParser;
-		waypoint  = waypointList;
-		port      = serialPort;
-		theme     = new Theme(locale);
-		telemetry = new TelemetryManager(this);
+		dash        = dashboard;
+		alert       = alertPanel;
+		sender      = serialSender;
+		parser      = serialParser;
+		waypoint    = waypointList;
+		port        = serialPort;
+		theme       = new Theme(locale);
+		telemetry   = new TelemetryManager(this);
+		settingList = new SettingList(this);
 		if(alertPanel != null) {
 			alertPanel.setTheme(theme);
 			alertPanel.logTo(log);
@@ -130,33 +132,30 @@ public class Context{
 		ResourceBundle res = ResourceBundle.getBundle("resources", locale);
 		return Paths.get(res.getString("settings_spec"));
 	}
+
 	public void waypointUpdated(){
 		Iterator it = toUpdate.iterator();
 		while(it.hasNext()) ((ContextViewer)it.next()).waypointUpdate();
 	}
+	//register viewer of waypoint list
 	public void registerViewer(ContextViewer viewer){
 		toUpdate.add(viewer);
 	}
+	//remove viewer of waypoint list
 	public void removeViewer(ContextViewer viewer){
 		toUpdate.remove(viewer);
 	}
+
 	public void sendSetting(int index){
-		Message msg = Message.setSetting((byte)index, upstreamSettings[index]);
-		sender.sendMessage(msg);
+		settingList.pushSetting(index);
 	}
 	public void setSetting(int index, float value){
-		if(index < 0 || index >= upstreamSettings.length) return;
-		upstreamSettings[index] = value;
-		sendSetting(index);
-	}
-	public void inputSetting(int index, float value){
-		if(index < 0 || index >= upstreamSettings.length) return;
-		upstreamSettings[index] = value;
+		settingList.pushSetting(index, value);
 	}
 	public void setSettingQuiet(int index, float value){
-		if(index < 0 || index >= upstreamSettings.length) return;
-		upstreamSettings[index] = value;
+		settingList.updateSettingVal(index, value);
 	}
+
 	public void setTelemetry(int id, float value){
 		telemetry.updateTelemetry(id, (double)value);
 	}

@@ -3,7 +3,7 @@ import com.Dashboard;
 import com.serial.*;
 import com.Context;
 import com.ui.Graph;
-
+import com.remote.*;
 import com.ui.TableColumn;
 import com.ui.ColumnTableModel;
 
@@ -21,8 +21,6 @@ import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
 import javax.swing.text.*;
-import javax.xml.stream.*;
-
 
 //import settings labels from properties
 
@@ -48,38 +46,15 @@ public class DataWindow implements ActionListener{
 	private JTextField	  	 logInput;
 	private JTextComponent	 descriptionBox;
 
-	private class Setting{
-		String name;
-		String description;
-		float  min;
-		float  max;
-		float  def;
-		Setting(){
-			this.name        = "";
-			this.description = "";
-			this.min         = 0;
-			this.max         = 0;
-			this.def         = 0;
-		}
-		Setting(String name, String description, float min, float max, float def){
-			this.name        = name;
-			this.description = description;
-			this.min         = min;
-			this.max         = max;
-			this.def         = def;
-		}
-	}
-	java.util.List<Setting> settingData = new ArrayList<Setting>();
-
 	public DataWindow(Context cxt){
 		context = cxt;
-    	loadSettingData();
 		JFrame frame = new JFrame("Telemetry");
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setSize(WINDOW_X,WINDOW_Y);
-    	//frame.setLayout(new BoxLayout(frame,BoxLayout.PAGE_AXIS));
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+
+		final SettingList settingList = context.settingList;
 
 		ArrayList<TableColumn> telem = new ArrayList<TableColumn>();
 		telem.add( new TableColumn(){
@@ -108,11 +83,11 @@ public class DataWindow implements ActionListener{
 		settings.add( new TableColumn(){
 			public String	getName(){ return "name"; }
 			public Object	getValueAt(int row){
-				if(row < settingData.size())
-					return settingData.get(row).name;
+				if(row < settingList.size())
+					return settingList.get(row).getName();
 				return "#"+row;
 			}
-			public int		getRowCount(){ return 256; }
+			public int		getRowCount(){ return settingList.size(); }
 			public Class	getDataClass(){ return String.class; }
 			public boolean	isRowEditable(int row){ return false; }
 			public void		setValueAt(Object val, int row){ ; }
@@ -120,21 +95,24 @@ public class DataWindow implements ActionListener{
 		settings.add( new TableColumn(){
 			public String	getName(){ return "Setting"; }
 			public Object	getValueAt(int row) {
-				float val = context.upstreamSettings[row];
+				float val = settingList.get(row).getVal();
 				return " "+val;
 			}
-			public int		getRowCount(){ return context.upstreamSettings.length; }
+			public int		getRowCount(){ return settingList.size(); }
 			public Class	getDataClass(){ return String.class; }
 			public boolean	isRowEditable(int row){ return true; }
 			public void		setValueAt(Object val, int row){
 				if(val.getClass()==Float.class){
-					context.setSetting(row,(Float)val);
+					settingList.pushSetting(row,(Float)val);
 					System.out.println("Setting New Value "+(Float)val);
 				} else if(val.getClass()==String.class){
 					try{
 						Float newVal = new Float((String)val);
-						context.setSetting(row,newVal);
-						System.out.println("Setting New Value "+newVal);
+						if(settingList.get(row).outsideOfBounds(newVal)){
+            				JFrame mf = new JFrame("Warning");
+							JOptionPane.showMessageDialog(mf, "Caution: new value is outside of logical bounds");
+						}
+						settingList.pushSetting(row,newVal);
 					} catch(Exception e) {
 						System.out.println("Bad new value");
 					}
@@ -216,96 +194,11 @@ public class DataWindow implements ActionListener{
 		logPanel.add(label);
 		logPanel.add(logInput);
 	}
-	/*
-	private void loadSettingData(){
-		ResourceBundle res = ResourceBundle.getBundle( "settingLabels", context.locale);
-		int curSet = 0;
-		while(true){
-			String nameRequest = "s"+curSet;
-			String descRequest = "long"+curSet;
-			if(!res.containsKey(nameRequest)) break;
-
-			String nameResponse = "";
-			String descResponse = "";
-			try{
-				nameResponse = res.getString(nameRequest);
-			} catch (Exception e) { }
-			try{
-				descResponse = res.getString(descRequest);
-			} catch (Exception e) { }
-
-			Setting found = new Setting(nameResponse, descResponse, 0,0,0);
-			settingData.add(found);
-			curSet++;
-		}
-	} */
-	private float getFloat(XMLStreamReader reader, String label){
-		String raw = reader.getAttributeValue(null,label);
-		if(raw == null) return 0.0f;
-		//strip whitespace
-		raw.replaceAll("\\s","");
-		//parse
-		if(raw.equals("+inf")) 		 return Float.POSITIVE_INFINITY;
-		else if (raw.equals("-inf")) return Float.NEGATIVE_INFINITY;
-		else 						 return Float.valueOf(raw);
-	}
-
-	private void loadSettingData(){
-		settingData.clear();
-		for(int i=0; i<context.upstreamSettings.length; i++){
-			settingData.add(new Setting("#"+i, "", 0, 0, 0));
-		}
-
-		try{
-			File xmlFile = context.getSettingsDescriptionFile().toFile();
-			System.out.println(xmlFile);
-			FileReader input = new FileReader(xmlFile);
-			XMLInputFactory factory = XMLInputFactory.newInstance();
-			XMLStreamReader reader  = factory.createXMLStreamReader(input);
-
-			Setting tmp = null;
-			StringBuilder str = new StringBuilder();
-			while(reader.hasNext()){
-				int event = reader.next();
-				switch(event){
-					case XMLStreamConstants.START_ELEMENT:
-						if(!reader.getLocalName().equals("setting")) continue;
-						int index = Integer.valueOf(reader.getAttributeValue(null,"index"));
-						if(index >= settingData.size()){
-							System.err.println("Setting doc has index outside of bounds");
-							continue;
-						}
-						tmp = settingData.get(index);
-						tmp.name = reader.getAttributeValue(null,"name");
-						tmp.min  = getFloat(reader,"min");
-						tmp.max  = getFloat(reader,"max");
-						tmp.def  = getFloat(reader,"def");
-						break;
-					case XMLStreamConstants.CHARACTERS:
-						if(tmp != null)
-							str.append(reader.getText());
-						break;
-					case XMLStreamConstants.END_ELEMENT:
-						if(tmp != null) {
-							tmp.description = str.toString();
-							settingData.add(tmp);
-							str = new StringBuilder();
-						}
-						tmp = null;
-						break;
-					default: break;
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-	}
 
 	private void setDetail(int row){
 		String detail;
-		if(row < settingData.size())
-			detail = settingData.get(row).description;
+		if(row < context.settingList.size())
+			detail = context.settingList.get(row).getDescription();
 		else
 			detail = "";
 		if(descriptionBox != null) descriptionBox.setText(detail);

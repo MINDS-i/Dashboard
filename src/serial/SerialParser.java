@@ -143,7 +143,7 @@ public class SerialParser implements SerialPortEventListener{
 				context.setTelemetry(index, data);
 				break;
 			case Serial.SETTING_DATA:
-				context.inputSetting(index, data);
+				context.setSettingQuiet(index, data);
 				break;
 		}
 	}

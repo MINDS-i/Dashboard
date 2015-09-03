@@ -103,11 +103,6 @@ public class WaypointList{
 	public void swap(Vector<Dot> newList){
 		waypoints = newList;
 	}
-	private void sendDataMsg(int index){
-        Message msg = Message.setSetting((byte)index,
-        								context.upstreamSettings[index]);
-        sendMessage(msg);
-	}
 	private void sendMessage(Message msg){
 		if(context.sender != null){
 			context.sender.sendMessage(msg);
