@@ -20,7 +20,7 @@ public class DataLabel extends JLabel implements TelemetryListener{
     out.append(suffix);
 
     int finalWidth = Math.min(out.length(), maxWidth);
-    setText(disp);
+    setText(out.substring(0,finalWidth));
   }
   public DataLabel(String prefix, double dat, String units){
     label    = prefix;
