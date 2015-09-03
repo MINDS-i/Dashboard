@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import javax.swing.colorchooser.AbstractColorChooserPanel;
 
 class GraphConfigWindow{
+    private static final Dimension SPINNER_SIZE = new Dimension(80,20);
     private Graph  subject; //the graph to configure
     private JFrame frame;
     private int closeupIndex;
@@ -51,6 +52,7 @@ class GraphConfigWindow{
         SpinnerNumberModel xScaleM = new SpinnerNumberModel(subject.getXScale(),
                                                            0.01, 1.0, 0.1);
         xScaleSpinner = new JSpinner(xScaleM);
+        xScaleSpinner.setPreferredSize(SPINNER_SIZE);
         xScaleSpinner.addChangeListener(new ChangeListener(){
             public void stateChanged(ChangeEvent e){
                 subject.setXScale(xScaleM.getNumber().doubleValue());
@@ -59,8 +61,11 @@ class GraphConfigWindow{
 
         //Y scale spinner
         SpinnerNumberModel yScaleM = new SpinnerNumberModel(subject.getYScale(),
-                                                           0.01, 10000.0, 0.25);
+                                                           0.0,
+                                                           Double.MAX_VALUE,
+                                                           0.25);
         yScaleSpinner = new JSpinner(yScaleM);
+        yScaleSpinner.setPreferredSize(SPINNER_SIZE);
         yScaleSpinner.addChangeListener(new ChangeListener(){
             public void stateChanged(ChangeEvent e){
                 subject.setYScale(yScaleM.getNumber().doubleValue());
@@ -69,8 +74,11 @@ class GraphConfigWindow{
 
         //Y center spinner
         SpinnerNumberModel yCenterM = new SpinnerNumberModel(subject.getYCenter(),
-                                                            -10000.0, 10000.0, 0.5);
+                                                            -Double.MAX_VALUE,
+                                                            Double.MAX_VALUE,
+                                                            0.5);
         yCenterSpinner = new JSpinner(yCenterM);
+        yCenterSpinner.setPreferredSize(SPINNER_SIZE);
         yCenterSpinner.addChangeListener(new ChangeListener(){
             public void stateChanged(ChangeEvent e){
                 subject.setYCenter(yCenterM.getNumber().doubleValue());
