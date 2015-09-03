@@ -11,45 +11,45 @@ public class DataLabel extends JLabel implements TelemetryListener{
   private String label;
   private String suffix;
   private double data;
+  private int maxWidth;
   private void updateText(){
-    String dataString = ((data >= 0)? " " : "") + String.format("%f", data);
-    setText(label + dataString + suffix);
+    StringBuilder out = new StringBuilder();
+    out.append(label);
+    out.append((data >= 0)? " " : "-");
+    out.append(String.format("%f", Math.abs(data)));
+    out.append(suffix);
+
+    int finalWidth = Math.min(out.length(), maxWidth);
+    setText(disp);
   }
   public DataLabel(String prefix, double dat, String units){
-    label = prefix;
-    data = dat;
-    suffix = units;
+    label    = prefix;
+    data     = dat;
+    suffix   = units;
+    maxWidth = Integer.MAX_VALUE;
     updateText();
   }
-
   public DataLabel(String prefix, String units){
-    label = prefix;
-    data = 0.;
-    suffix = units;
-    updateText();
+    this(prefix, 0.0, units);
   }
-
   public DataLabel(String prefix){
-    label = prefix;
-    data = 0.;
-    suffix = new String();
+    this(prefix, 0.0, "");
+  }
+  public void setMaxLength(int ml){
+    maxWidth = ml;
+  }
+  public void update(double data){
+    this.data = data;
     updateText();
   }
-  public void update(double dat){
-    data = dat;
-    updateText();
-  }
-
   public void setLabel(String prefix){
     label = prefix;
     updateText();
   }
-
   public void setUnits(String units){
     suffix = units;
     updateText();
   }
-
   public double getData(){
     return data;
   }

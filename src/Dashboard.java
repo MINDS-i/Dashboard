@@ -127,6 +127,7 @@ public class Dashboard implements Runnable {
     dataPanel.setOpaque(false);
     for(int i=0; i<dataLabels.length; i++){
       DataLabel label = new DataLabel(dataLabels[i]);
+      label.setMaxLength(13);
       context.telemetry.registerListener(i, label);
       label.setForeground(context.theme.textColor);
       label.setFont(context.theme.text);
