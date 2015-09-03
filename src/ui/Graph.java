@@ -1,6 +1,7 @@
 package com.ui;
 
-import com.ui.DataSource;
+import com.ui.DataSource
+;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -68,13 +69,11 @@ public class Graph extends JPanel{
         this.setLayout(new FlowLayout(FlowLayout.LEADING));
         this.add(new JButton(configPopupAction));
 
-        //close config window if the graph is closed
+        //call back when the window is clased
         this.addHierarchyListener(new HierarchyListener(){
             public void hierarchyChanged(HierarchyEvent e){
                 if(isShowing()) return;
-                if(config != null){
-                    config.close();
-                }
+                onClose();
             }
         });
 
@@ -83,6 +82,11 @@ public class Graph extends JPanel{
         this.addMouseListener(mouseAdapter);
         this.addMouseMotionListener(mouseAdapter);
         this.addMouseWheelListener(mouseAdapter);
+    }
+
+    private void onClose(){
+        if(config != null) config.close();
+        if(refreshTimer != null) refreshTimer.cancel();
     }
 
     private class RefreshTimerTask extends TimerTask{

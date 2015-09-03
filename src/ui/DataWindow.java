@@ -9,6 +9,7 @@ import com.ui.ColumnTableModel;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.*;
 import java.awt.FlowLayout;
 import java.io.*;
 import java.nio.file.*;
@@ -53,6 +54,14 @@ public class DataWindow implements ActionListener{
 		frame.setSize(WINDOW_X,WINDOW_Y);
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+
+        //call back when the window is clased
+        frame.addHierarchyListener(new HierarchyListener(){
+            public void hierarchyChanged(HierarchyEvent e){
+                if(frame.isShowing()) return;
+                onClose();
+            }
+        });
 
 		final SettingList settingList = context.settingList;
 
@@ -180,6 +189,9 @@ public class DataWindow implements ActionListener{
     	frame.pack();
     	frame.setVisible(true);
     	startUpdateTimer();
+	}
+	private void onClose(){
+		if(update != null) update.cancel();
 	}
 	private void constructLogPane(){
 		logPanel = new JPanel();
