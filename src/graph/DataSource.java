@@ -1,4 +1,4 @@
-package com.ui;
+package com.graph;
 
 import java.awt.Paint;
 

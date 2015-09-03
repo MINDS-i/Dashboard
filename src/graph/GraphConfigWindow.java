@@ -1,6 +1,8 @@
-package com.ui;
+package com.graph;
 
-import com.ui.Graph;
+import com.table.ColumnTableModel;
+import com.table.TableColumn;
+
 import javax.swing.*;
 import java.awt.*;
 import javax.swing.event.*;

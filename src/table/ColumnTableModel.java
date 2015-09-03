@@ -1,18 +1,12 @@
-package com.ui;
-import com.Dashboard;
-import com.serial.*;
-import com.Context;
-import com.ui.TableColumn;
+package com.table;
 
-//import java.awt.*;
-import java.awt.FlowLayout;
 import java.awt.event.*;
+import java.awt.FlowLayout;
+import java.lang.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
-
-import java.lang.*;
 
 public class ColumnTableModel extends AbstractTableModel{
 	private List<TableColumn> columns;

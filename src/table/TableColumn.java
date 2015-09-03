@@ -1,4 +1,4 @@
-package com.ui;
+package com.table;
 
 public interface TableColumn{
 	public String	getName();

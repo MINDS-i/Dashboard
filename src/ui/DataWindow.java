@@ -4,8 +4,8 @@ import com.serial.*;
 import com.Context;
 import com.ui.Graph;
 import com.remote.*;
-import com.ui.TableColumn;
-import com.ui.ColumnTableModel;
+import com.table.TableColumn;
+import com.table.ColumnTableModel;
 
 import java.awt.*;
 import java.awt.event.*;

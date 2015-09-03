@@ -1,7 +1,4 @@
-package com.ui;
-
-import com.ui.DataSource
-;
+package com.graph;
 
 import java.awt.*;
 import java.awt.event.*;

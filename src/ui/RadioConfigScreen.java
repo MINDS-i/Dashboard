@@ -9,8 +9,8 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.util.*;
 import java.nio.charset.Charset;
-import com.ui.TableColumn;
-import com.ui.ColumnTableModel;
+import com.table.TableColumn;
+import com.table.ColumnTableModel;
 
 public class RadioConfigScreen extends JPanel{
 

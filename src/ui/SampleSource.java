@@ -1,6 +1,6 @@
 package com.ui;
 
-import com.ui.DataSource;
+import com.graph.DataSource;
 import java.util.List;
 import java.util.ArrayList;
 import java.awt.Paint;
