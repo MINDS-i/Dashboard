@@ -38,12 +38,19 @@
     </target>
 
     <target name="graph" depends="compile">
-        <java classname="com.ui.Graph">
+        <java classname="com.graph.Graph">
             <classpath>
                 <pathelement location="${outputDir}"/>
                 <pathelement location="/usr/lib/jvm/java-8-jdk/lib/visualvm/profiler/lib/jfluid-server.jar"/>
             </classpath>
         </java>
+    </target>
+
+    <target name="export_graph" depends="compile">
+        <jar destfile="graph.jar">
+            <fileset dir="${outputDir}" includes="com/graph/*" />
+            <fileset dir="${outputDir}" includes="com/table/*" />
+        </jar>
     </target>
 
     <target name="radio" depends="compile">
