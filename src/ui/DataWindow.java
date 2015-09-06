@@ -54,13 +54,13 @@ public class DataWindow implements ActionListener{
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 
-        //call back when the window is clased
-        frame.addHierarchyListener(new HierarchyListener(){
-            public void hierarchyChanged(HierarchyEvent e){
-                if(frame.isShowing()) return;
-                onClose();
-            }
-        });
+        frame.addWindowListener(new java.awt.event.WindowAdapter() {
+		    @Override
+		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+		    	System.out.println("Data window closed");
+		        onClose();
+		    }
+		});
 
 		final SettingList settingList = context.settingList;
 

@@ -57,10 +57,6 @@ public class Graph extends JPanel{
             sources.add(new DataConfig(source, defaultState));
         }
 
-        //repaint at regular interval
-        refreshTimer = new Timer();
-        refreshTimer.scheduleAtFixedRate(new RefreshTimerTask(), 0, REPAINT_INTERVAL);
-
         //place configuration button
         this.setLayout(new FlowLayout(FlowLayout.LEADING));
         this.add(new JButton(configPopupAction));
@@ -68,10 +64,16 @@ public class Graph extends JPanel{
         //call back when the window is clased
         this.addHierarchyListener(new HierarchyListener(){
             public void hierarchyChanged(HierarchyEvent e){
-                if(isShowing()) return;
-                onClose();
+                boolean showing_changed = (e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0;
+                if(showing_changed & !isShowing()){
+                    onClose();
+                }
             }
         });
+
+        //repaint at regular interval
+        refreshTimer = new Timer();
+        refreshTimer.scheduleAtFixedRate(new RefreshTimerTask(), 0, REPAINT_INTERVAL);
 
         //turn on graph mouse listener
         MouseAdapter mouseAdapter = new GraphMouseHandler();
@@ -81,6 +83,7 @@ public class Graph extends JPanel{
     }
 
     private void onClose(){
+        System.out.println("Closing graph");
         if(config != null) config.close();
         if(refreshTimer != null) refreshTimer.cancel();
     }
