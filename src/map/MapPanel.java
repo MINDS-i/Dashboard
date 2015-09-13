@@ -37,6 +37,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Vector;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Comparator;
+import java.util.Collections;
 import javax.imageio.*;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
@@ -49,7 +52,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.SAXException;
 
-public class MapPanel extends JPanel implements ContextViewer {
+public class MapPanel extends JPanel implements ContextViewer, CoordinateTransform {
     private static final TileServer[] TILESERVERS = {
         new TileServer("http://otile1.mqcdn.com/tiles/1.0.0/sat/", 18),
         new TileServer("http://otile1.mqcdn.com/tiles/1.0.0/map/", 18),
@@ -140,7 +143,193 @@ public class MapPanel extends JPanel implements ContextViewer {
                 MapPanel.this.repaint();
             }
         });
+
+
+
+
+
+
+
+
+
+
+
+        addLayer(new MapLayer(){
+            public int getZ() {
+                return 0;
+            }
+            public boolean onClick(Point pixel, Point2D map){
+                System.out.println("Click at "+pixel);
+                return false;
+            }
+            public void paint(Graphics g, CoordinateTransform t){
+                Point2D[] tests = new Point2D[]{
+                    new Point2D.Double(  2.0,  48.0), //eiffel tower
+                    new Point2D.Double(-74.0,  40.0), //statue of liberty
+                    new Point2D.Double( 12.0,  41.0), //Coliseum
+                    new Point2D.Double(  0.0,   0.0)  //origin
+                };
+                for(Point2D p : tests){
+                    Point2D pix = t.toPixels(p);
+                    Point tmp = new Point((int)pix.getX(), (int) pix.getY());
+                    drawImg(g, context.theme.waypointSelected, tmp);
+                }
+            }
+            public boolean onPress(Point pixel, Point2D map){
+                System.out.println("Press at "+pixel);
+                return false;
+            }
+            public void onDrag(Point pixel, Point2D map){
+                System.out.println("Drag at "+pixel);
+            }
+            public void onRelease(Point pixel, Point2D map){
+                System.out.println("Release at "+pixel);
+            }
+        });
+        MouseLayerListener mll = new MouseLayerListener();
+        addMouseListener(mll);
+        addMouseMotionListener(mll);
     }
+
+
+
+    private List<MapLayer> layers = new ArrayList<MapLayer>();
+
+    public void addLayer(MapLayer l){
+        layers.add(l);
+        Collections.sort(layers, new Comparator<MapLayer>(){
+            @Override
+            public int compare(MapLayer a, MapLayer b){
+                return a.getZ() - b.getZ();
+            }
+        });
+        //sort collection by z index
+        for(MapLayer ml : layers){
+            System.out.println(ml.getZ());
+        }
+    }
+    private void drawLayers(Graphics g){
+        Graphics gAbs = g.create();
+        gAbs.translate(-mapPosition.x, -mapPosition.y);
+        for(MapLayer l : layers){
+            l.paint(gAbs, MapPanel.this);
+        }
+        gAbs.dispose();
+    }
+
+    private class MouseLayerListener extends MouseAdapter {
+        MapLayer active = null;
+        public void mouseClicked(MouseEvent e) {
+            Point c = e.getPoint();
+            Point2D coord = toCoordinates(new Point2D.Double(c.getX(), c.getY()));
+            for(int i = layers.size()-1; i >= 0; i--){
+                MapLayer here = layers.get(i);
+                if(here.onClick(c, coord)) return;
+            }
+        }
+        public void mousePressed(MouseEvent e) {
+            active = null;
+            Point c = e.getPoint();
+            Point2D coord = toCoordinates(new Point2D.Double(c.getX(), c.getY()));
+            for(int i = layers.size()-1; i >= 0; i--){
+                MapLayer here = layers.get(i);
+                if(here.onPress(c, coord)){
+                    active = here;
+                    return;
+                }
+            }
+        }
+        public void mouseDragged(MouseEvent e) {
+            if(active != null){
+                Point c = e.getPoint();
+                Point2D coord = toCoordinates(new Point2D.Double(c.getX(), c.getY()));
+                active.onDrag(c, coord);
+            }
+        }
+        public void mouseReleased(MouseEvent e) {
+            if(active != null){
+                Point c = e.getPoint();
+                Point2D coord = toCoordinates(new Point2D.Double(c.getX(), c.getY()));
+                active.onRelease(c, coord);
+            }
+        }
+    }
+
+
+
+    public Point2D toPixels(Point2D p){
+        Point2D f = (Point2D) p.clone();
+        double scale = TILE_SIZE * (1 << (getZoom()-1));
+        double lon   = Math.toRadians(p.getX());
+        double lat   = Math.toRadians(p.getY());
+        double x = ((lon + Math.PI) / Math.PI) * scale;
+        double y = (1 -
+                       Math.log(
+                           Math.tan(lat) + 1 / Math.cos(lat)
+                       ) / Math.PI
+                   ) * scale;
+        f.setLocation(x,y);
+        return f;
+    }
+    public Point2D toCoordinates(Point2D p){
+        Point2D f = (Point2D) p.clone();
+        double scale = TILE_SIZE * (1 << (getZoom()-1));
+        double x     = p.getX() / scale;
+        double y     = p.getY() / scale;
+        double lon   = x * 180 - 180;
+        double lat   = Math.toDegrees(
+                           Math.atan(
+                               Math.sinh(
+                                   Math.PI * (1 - y)
+                               )
+                           )
+                       );
+        f.setLocation(lon,lat);
+        return f;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public void waypointUpdate(){
         repaint();
@@ -594,6 +783,7 @@ public class MapPanel extends JPanel implements ContextViewer {
         } finally {
             g.dispose();
         }
+        drawLayers(gOrig);//TEMPORARY
     }
     //-------------------------------------------------------------------------
     // helpers
