@@ -19,6 +19,8 @@ import com.ContextViewer;
 import com.Context;
 import com.ui.TelemetryListener;
 
+import com.layer.*;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
@@ -154,15 +156,15 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
 
 
 
-        addLayer(new MapLayer(){
+        mll.add(new Layer(){
             public int getZ() {
                 return 0;
             }
-            public boolean onClick(Point pixel, Point2D map){
+            public boolean onClick(Point pixel){
                 System.out.println("Click at "+pixel);
                 return false;
             }
-            public void paint(Graphics g, CoordinateTransform t){
+            public void paint(Graphics g){
                 Point2D[] tests = new Point2D[]{
                     new Point2D.Double(  2.0,  48.0), //eiffel tower
                     new Point2D.Double(-74.0,  40.0), //statue of liberty
@@ -170,90 +172,29 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
                     new Point2D.Double(  0.0,   0.0)  //origin
                 };
                 for(Point2D p : tests){
-                    Point2D pix = t.toPixels(p);
+                    Point2D pix = MapPanel.this.toPixels(p);
                     Point tmp = new Point((int)pix.getX(), (int) pix.getY());
                     drawImg(g, context.theme.waypointSelected, tmp);
                 }
             }
-            public boolean onPress(Point pixel, Point2D map){
+            public boolean onPress(Point pixel){
                 System.out.println("Press at "+pixel);
                 return false;
             }
-            public void onDrag(Point pixel, Point2D map){
+            public void onDrag(Point pixel){
                 System.out.println("Drag at "+pixel);
             }
-            public void onRelease(Point pixel, Point2D map){
+            public void onRelease(Point pixel){
                 System.out.println("Release at "+pixel);
             }
         });
-        MouseLayerListener mll = new MouseLayerListener();
         addMouseListener(mll);
         addMouseMotionListener(mll);
     }
 
+    private LayerManager mll = new LayerManager();
 
 
-    private List<MapLayer> layers = new ArrayList<MapLayer>();
-
-    public void addLayer(MapLayer l){
-        layers.add(l);
-        Collections.sort(layers, new Comparator<MapLayer>(){
-            @Override
-            public int compare(MapLayer a, MapLayer b){
-                return a.getZ() - b.getZ();
-            }
-        });
-        //sort collection by z index
-        for(MapLayer ml : layers){
-            System.out.println(ml.getZ());
-        }
-    }
-    private void drawLayers(Graphics g){
-        Graphics gAbs = g.create();
-        gAbs.translate(-mapPosition.x, -mapPosition.y);
-        for(MapLayer l : layers){
-            l.paint(gAbs, MapPanel.this);
-        }
-        gAbs.dispose();
-    }
-
-    private class MouseLayerListener extends MouseAdapter {
-        MapLayer active = null;
-        public void mouseClicked(MouseEvent e) {
-            Point c = e.getPoint();
-            Point2D coord = toCoordinates(new Point2D.Double(c.getX(), c.getY()));
-            for(int i = layers.size()-1; i >= 0; i--){
-                MapLayer here = layers.get(i);
-                if(here.onClick(c, coord)) return;
-            }
-        }
-        public void mousePressed(MouseEvent e) {
-            active = null;
-            Point c = e.getPoint();
-            Point2D coord = toCoordinates(new Point2D.Double(c.getX(), c.getY()));
-            for(int i = layers.size()-1; i >= 0; i--){
-                MapLayer here = layers.get(i);
-                if(here.onPress(c, coord)){
-                    active = here;
-                    return;
-                }
-            }
-        }
-        public void mouseDragged(MouseEvent e) {
-            if(active != null){
-                Point c = e.getPoint();
-                Point2D coord = toCoordinates(new Point2D.Double(c.getX(), c.getY()));
-                active.onDrag(c, coord);
-            }
-        }
-        public void mouseReleased(MouseEvent e) {
-            if(active != null){
-                Point c = e.getPoint();
-                Point2D coord = toCoordinates(new Point2D.Double(c.getX(), c.getY()));
-                active.onRelease(c, coord);
-            }
-        }
-    }
 
 
 
@@ -783,7 +724,12 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         } finally {
             g.dispose();
         }
-        drawLayers(gOrig);//TEMPORARY
+
+        //TEMPORARY
+        g = (Graphics2D) gOrig.create();
+        g.translate(-mapPosition.x, -mapPosition.y);
+        mll.draw(g);
+        g.dispose();
     }
     //-------------------------------------------------------------------------
     // helpers
