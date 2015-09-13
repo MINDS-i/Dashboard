@@ -322,7 +322,6 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         return tileServer;
     }
 
-
     public boolean isUseAnimations() {
         return useAnimations;
     }
@@ -500,23 +499,6 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         setMapPosition(p.x - getWidth() / 2, p.y - getHeight() / 2);
     }
 
-    public Point.Double getLongitudeLatitude(Point position) {
-        return new Point.Double(
-                position2lon(position.x, getZoom()),
-                position2lat(position.y, getZoom()));
-    }
-
-    public Point computePosition(Point.Double coords) {
-        int x = lon2position(coords.x, getZoom());
-        int y = lat2position(coords.y, getZoom());
-        return new Point(x, y);
-    }
-
-    public Point computeScreenPosition(Point.Double coords){
-        int x = lon2position(coords.x, getZoom()) - mapPosition.x;
-        int y = lat2position(coords.y, getZoom()) - mapPosition.y;
-        return new Point(x,y);
-    }
     //--------------------------------------------------------------------------
     //MINDSi waypoint managing code
 
