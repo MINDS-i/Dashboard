@@ -81,7 +81,6 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
     private WaypointPanel waypointPanel;
     private BorderLayout border = new BorderLayout();
     private TileCache cache = new TileCache();
-    private Stats stats = new Stats();
     private JPanel centerPanel = new JPanel();
 
     protected double smoothScale = 1.0D;
@@ -329,10 +328,6 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         this.useAnimations = useAnimations;
     }
 
-    public Stats getStats() {
-        return stats;
-    }
-
     public Point getMapPosition() {
         return new Point(mapPosition.x, mapPosition.y);
     }
@@ -496,7 +491,6 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
     //Painting functions
 
     private void paintInternal(Graphics2D g) {
-        stats.reset();
         long t0 = System.currentTimeMillis();
 
         if (smoothPosition != null) {
@@ -528,7 +522,6 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         }
 
         long t1 = System.currentTimeMillis();
-        stats.dt = t1 - t0;
     }
 
     private void drawScaledRect(Graphics2D g, int cx, int cy, double f, double scale) {
@@ -758,18 +751,6 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
                 return;
             dt = getDt();
             timer.stop();
-        }
-    }
-
-    private static class Stats {
-        private int tileCount;
-        private long dt;
-        private Stats() {
-            reset();
-        }
-        private void reset() {
-            tileCount = 0;
-            dt = 0;
         }
     }
 
