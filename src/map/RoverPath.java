@@ -25,12 +25,6 @@ class RoverPath implements Layer, ContextViewer {
     private WaypointPanel waypointPanel;
     private Dot rover = new Dot();
 
-    //do the thing to update rover position
-    //decouple from waypointPanel
-    //clean up point drag code
-    //gut mapPanel
-    //refresh map
-
     RoverPath(Context c, CoordinateTransform cT, WaypointPanel wP) {
         context = c;
         mapTransform = cT;
