@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -811,10 +810,6 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         tmp.add(input);
         tmp.setOpaque(false);
         return tmp;
-    }
-
-    public static String format(double d) {
-        return String.format("%.5f", d);
     }
 
     public static double getN(int y, int z) {
