@@ -54,32 +54,23 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.SAXException;
 
 public class MapPanel extends JPanel implements ContextViewer, CoordinateTransform {
+    private static final int TILE_SIZE = 256;
+    private static final int CACHE_SIZE = 64;
     private static final TileServer[] TILESERVERS = {
         new TileServer("http://otile1.mqcdn.com/tiles/1.0.0/sat/", 18),
         new TileServer("http://otile1.mqcdn.com/tiles/1.0.0/map/", 18),
     };
-
-    private static final int PREFERRED_WIDTH = 320;
-    private static final int PREFERRED_HEIGHT = 200;
-
-    private static final int TILE_SIZE = 256;
-    private static final int CACHE_SIZE = 64;
-
-    private Dimension mapSize = new Dimension(0, 0);
-    private Point mapPosition = new Point(0, 0);
-    private int zoom;
-    private DragListener mouseListener = new DragListener();
-
     private TileServer tileServer = TILESERVERS[0];
-
-    private WaypointPanel waypointPanel;
-    private BorderLayout border = new BorderLayout();
     private TileCache cache = new TileCache();
-    private JPanel centerPanel = new JPanel();
 
-    private LayerManager mll = new LayerManager();
+    private int zoom;
+    private Point mapPosition = new Point(0, 0);
 
-    private Context context;
+    private Context       context;
+    private BorderLayout  border = new BorderLayout();
+    private DragListener  mouseListener = new DragListener();
+    private LayerManager  mll = new LayerManager();
+    private WaypointPanel waypointPanel;
 
     public MapPanel(Context cxt) {
         this(cxt, new Point(8282, 5179), 6, null, null, null);
@@ -308,6 +299,26 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         int ytile = (int) Math.floor((1 - Math.log(Math.tan(Math.toRadians(lat)) + 1 / Math.cos(Math.toRadians(lat))) / Math.PI) / 2 * (1 << zoom));
         return getTileString(tileServer, xtile, ytile, zoom);
     }
+
+    private final static BufferedImage loadImg = new BufferedImage(1,1,
+                                                    BufferedImage.TYPE_INT_ARGB);
+    private void loadTile(TileCache c, TileServer ts, int x, int y, int zoom){
+        c.put(ts, x, y, zoom, loadImg);
+        Runnable load = new Runnable(){
+            public void run(){
+                final String url = getTileString(ts, x, y, zoom);
+                try {
+                    Image n = Toolkit.getDefaultToolkit().getImage(new URL(url));
+                    //if n is null, painter will try again
+                    c.put(ts, x, y, zoom, n);
+                    MapPanel.this.repaint();
+                } catch (Exception e) {
+                    System.err.println("failed to load url \"" + url + "\"");
+                }
+            }
+        };
+        (new Thread(load)).start();
+    }
 //end tileserver code
 
     public Point getMapPosition() {
@@ -340,8 +351,6 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
             return;
         int oldZoom = this.zoom;
         this.zoom = Math.min(getTileServer().getMaxZoom(), zoom);
-        mapSize.width = getXMax();
-        mapSize.height = getYMax();
         firePropertyChange("zoom", oldZoom, zoom);
     }
 
@@ -433,38 +442,13 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         Graphics2D g = (Graphics2D) gOrig.create();
         try {
             paintInternal(g);
+            mll.draw(g);
         } finally {
             g.dispose();
         }
-
-        //TEMPORARY
-        g = (Graphics2D) gOrig.create();
-        //g.translate(-mapPosition.x, -mapPosition.y);
-        mll.draw(g);
-        g.dispose();
     }
     //-------------------------------------------------------------------------
     // helpers
-
-    private final static BufferedImage loadImg = new BufferedImage(1,1,
-                                                    BufferedImage.TYPE_INT_ARGB);
-    private void loadTile(TileCache c, TileServer ts, int x, int y, int zoom){
-        c.put(ts, x, y, zoom, loadImg);
-        Runnable load = new Runnable(){
-            public void run(){
-                final String url = getTileString(ts, x, y, zoom);
-                try {
-                    Image n = Toolkit.getDefaultToolkit().getImage(new URL(url));
-                    //if n is null, painter will try again
-                    c.put(ts, x, y, zoom, n);
-                    MapPanel.this.repaint();
-                } catch (Exception e) {
-                    System.err.println("failed to load url \"" + url + "\"");
-                }
-            }
-        };
-        (new Thread(load)).start();
-    }
 
     private static final class Painter {
         private final int zoom;
