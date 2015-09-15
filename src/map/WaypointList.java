@@ -17,6 +17,7 @@ public class WaypointList{
 	private Context context;
 	private boolean isLooped;
 	private int targetIndex;
+
 	public WaypointList(Context cxt){
 		context = cxt;
 	}

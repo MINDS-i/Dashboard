@@ -18,12 +18,12 @@ import com.serial.Messages.*;
 import com.ContextViewer;
 import com.Context;
 import com.ui.TelemetryListener;
-
 import com.layer.*;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -34,14 +34,14 @@ import java.net.URLEncoder;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Vector;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Comparator;
-import java.util.Collections;
 import javax.imageio.*;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
@@ -68,10 +68,6 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
     private static final int TILE_SIZE = 256;
     private static final int CACHE_SIZE = 64;
     private static final int MAGNIFIER_SIZE = 100;
-
-    private static final Color ACTIVE_LINE_FILL =  new Color(1.f,1.f,0.f,1f);
-    private static final Color PATH_LINE_FILL   =  new Color(0f,0f,0f, 1f);
-    private static final Color LINE_BORDER      =  new Color(.5f,.5f,.5f,0f);
 
     private Dimension mapSize = new Dimension(0, 0);
     private Point mapPosition = new Point(0, 0);
@@ -109,9 +105,6 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
                                                               JPanel south) {
         context = cxt;
         context.registerViewer(this);
-        addMouseListener(mouseListener);
-        addMouseMotionListener(mouseListener);
-        addMouseWheelListener(mouseListener);
 
         border.setVgap(-20);
         setOpaque(true);
@@ -155,49 +148,25 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
 
 
 
-
-        mll.add(new Layer(){
-            public int getZ() {
-                return 0;
-            }
-            public boolean onClick(Point pixel){
-                System.out.println("Click at "+pixel);
-                return false;
-            }
-            public void paint(Graphics g){
-                Point2D[] tests = new Point2D[]{
-                    new Point2D.Double(  2.0,  48.0), //eiffel tower
-                    new Point2D.Double(-74.0,  40.0), //statue of liberty
-                    new Point2D.Double( 12.0,  41.0), //Coliseum
-                    new Point2D.Double(  0.0,   0.0)  //origin
-                };
-                for(Point2D p : tests){
-                    Point2D pix = MapPanel.this.toPixels(p);
-                    Point tmp = new Point((int)pix.getX(), (int) pix.getY());
-                    drawImg(g, context.theme.waypointSelected, tmp);
-                }
-            }
-            public boolean onPress(Point pixel){
-                System.out.println("Press at "+pixel);
-                return false;
-            }
-            public void onDrag(Point pixel){
-                System.out.println("Drag at "+pixel);
-            }
-            public void onRelease(Point pixel){
-                System.out.println("Release at "+pixel);
-            }
-        });
+        mll.add(new RoverPath(context, this, waypointPanel));
+        mll.add(mouseListener);
+        addMouseWheelListener(mouseListener);
         addMouseListener(mll);
         addMouseMotionListener(mll);
     }
 
     private LayerManager mll = new LayerManager();
 
+    Point add(Point a, Point b){
+        return new Point(a.x+b.x, a.y+b.y);
+    }
 
 
 
-
+    /**
+     * Transforms a (lonitude,latitude) point to absolute (x,y) pixels
+     * Will return an instance of the same class as the argument p
+     */
     public Point2D toPixels(Point2D p){
         Point2D f = (Point2D) p.clone();
         double scale = TILE_SIZE * (1 << (getZoom()-1));
@@ -212,6 +181,10 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         f.setLocation(x,y);
         return f;
     }
+    /**
+     * Transforms absolute (x,y) pixels to (lonitude,latitude)
+     * Will return an instance of the same class as the argument p
+     */
     public Point2D toCoordinates(Point2D p){
         Point2D f = (Point2D) p.clone();
         double scale = TILE_SIZE * (1 << (getZoom()-1));
@@ -228,9 +201,23 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         f.setLocation(lon,lat);
         return f;
     }
-
-
-
+    /**
+     * Transforms absolute (lon,lat) to the pixel position in the current screen
+     */
+    public Point2D screenPosition(Point2D p){
+        Point2D absPix = toPixels(p);
+        Point2D f = (Point2D) p.clone();
+        f.setLocation(absPix.getX() - mapPosition.x, absPix.getY() - mapPosition.y);
+        return f;
+    }
+    /**
+     * Transforms pixel position relative current screen to absolute (lon,lat)
+     */
+    public Point2D mapPosition(Point2D p){
+        Point2D f = (Point2D) p.clone();
+        f.setLocation(p.getX() + mapPosition.x, p.getY() + mapPosition.y);
+        return toCoordinates(f);
+    }
 
 
 
@@ -483,10 +470,6 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         return TILE_SIZE * getYTileCount();
     }
 
-    public Point getCursorPosition() {
-        return new Point(mapPosition.x + mouseListener.mouseCoords.x, mapPosition.y + mouseListener.mouseCoords.y);
-    }
-
     public Point getTile(Point position) {
         return new Point((int) Math.floor(((double) position.x) / TILE_SIZE),(int) Math.floor(((double) position.y) / TILE_SIZE));
     }
@@ -499,153 +482,14 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         setMapPosition(p.x - getWidth() / 2, p.y - getHeight() / 2);
     }
 
-    //--------------------------------------------------------------------------
-    //MINDSi waypoint managing code
-
-    public int isOverDot(Point clk){
-        for(int i=0; i<context.waypoint.size(); i++){
-/*            if(radialOverlap( computeScreenPosition(context.waypoint.get(i).getLocation()) , clk ,
-                                                 context.theme.waypointImage.getWidth()/2 )){
-                return i;
-            }*/
-            Point dot = computeScreenPosition(context.waypoint.get(i).getLocation());
-            if (Math.abs(clk.x-dot.x-1) > context.theme.waypointImage.getWidth ()/2) continue;
-            if (Math.abs(clk.y-dot.y-1) > context.theme.waypointImage.getHeight()/2) continue;
-            return i;
-        }
-        return -1;
+    public Point computeScreenPosition(Point.Double coords){
+        int x = lon2position(coords.x, getZoom()) - mapPosition.x;
+        int y = lat2position(coords.y, getZoom()) - mapPosition.y;
+        return new Point(x,y);
     }
 
-    public int isOverLine(Point p){
-        if(context.waypoint.size()<2) return -1;
-        Point prevPoint = computeScreenPosition(rover.getLocation());
-        for(int i=0; i<context.waypoint.size(); i++){
-            Point thisPoint = computeScreenPosition(
-                                context.waypoint.get(i).getLocation());
-            if( distFromLine(prevPoint, thisPoint, p) < 8 ){
-                return i;
-            }
-            prevPoint = thisPoint;
-        }
-        return -1;
-    }
-
-    public int distFromLine(Point a, Point b, Point idp){
-        float abSlope = (a.y-b.y)/(a.x-b.x+.0000001f);
-        float abYCept = a.y - abSlope*a.x;
-        float perpSlope = (a.x-b.x)/(b.y-a.y+.0000001f);
-        float perpYCept = idp.y - perpSlope*idp.x;
-        float interceptX = (abYCept - perpYCept) / (perpSlope-abSlope+.0000001f);
-        float interceptY = perpSlope*interceptX + perpYCept;
-        if( a.x > b.x && a.x > interceptX && interceptX > b.x){
-            return (int) Math.floor(
-                            Math.sqrt( (interceptX-idp.x)*(interceptX-idp.x) +
-                                       (interceptY-idp.y)*(interceptY-idp.y) ));
-        } else if ( b.x > a.x && b.x > interceptX && interceptX > a.x){
-            return (int) Math.floor(
-                            Math.sqrt( (interceptX-idp.x)*(interceptX-idp.x) +
-                                       (interceptY-idp.y)*(interceptY-idp.y) ));
-        } else {
-            return Integer.MAX_VALUE;
-        }
-    }
-
-    public boolean radialOverlap(Point a, Point b, int maxDist){
-        return ( Math.sqrt( (a.x-b.x)*(a.x-b.x) + (a.y-b.y)*(a.y-b.y) ) < maxDist);
-    }
     //--------------------------------------------------------------------------
     //Painting functions
-    public void paintLine(Graphics g, Point pointA, Point pointB, Color fill){
-        final int WIDTH = 10;
-        Graphics2D g2d = (Graphics2D) g.create();
-        RenderingHints hints = g2d.getRenderingHints();
-        hints.put(
-            RenderingHints.KEY_ANTIALIASING,
-            RenderingHints.VALUE_ANTIALIAS_ON);
-        hints.put(
-            RenderingHints.KEY_TEXT_ANTIALIASING,
-            RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        hints.put(
-            RenderingHints.KEY_FRACTIONALMETRICS,
-            RenderingHints.VALUE_FRACTIONALMETRICS_ON);
-        hints.put(
-            RenderingHints.KEY_RENDERING,
-            RenderingHints.VALUE_RENDER_QUALITY);
-        g2d.setRenderingHints(hints);
-        try{
-            g2d.translate(pointB.x, pointB.y);
-            double angle = Math.atan2(pointA.y-pointB.y, pointA.x-pointB.x);
-            g2d.rotate(angle);
-            int w = (int)Math.sqrt((Math.abs(pointA.x-pointB.x)*Math.abs(pointA.x-pointB.x))+
-                                    (Math.abs(pointA.y-pointB.y)*Math.abs(pointA.y-pointB.y)));
-            g2d.setPaint(new GradientPaint(0, 0, fill,
-                                                 0,
-                                                 -(WIDTH/2),
-                                                 LINE_BORDER,
-                                                 true));
-            g2d.fillRect(0, -(WIDTH/2), w, WIDTH);
-        } finally {
-            g2d.dispose();
-        }
-    }
-
-    private void paintDots(Graphics g) {
-        if(context.waypoint.size()!=0){
-            drawLines(g);
-            drowRoverLine(g);
-            drawPoints(g);
-        }
-        drawRover(g);
-    }
-
-    private void drawLines(Graphics g){
-        Point n = null;
-        Point l = null;
-        Iterator itr = context.waypoint.iterator();
-        while(itr.hasNext()){
-            n = computeScreenPosition( ((Dot)itr.next()).getLocation() );
-            if(l!=null) paintLine(g, n, l, PATH_LINE_FILL);
-            l = n;
-        }
-        if(context.waypoint.isLooped()){
-            n = computeScreenPosition( context.waypoint.get(0).getLocation() );
-            paintLine(g, n, l, PATH_LINE_FILL);
-        }
-    }
-
-    private void drawPoints(Graphics g){
-        Point tmp;
-        Iterator itr = context.waypoint.iterator();
-        int i=0;
-        while(itr.hasNext()){
-            tmp = computeScreenPosition( ((Dot)itr.next()).getLocation() );
-            if(i++==waypointPanel.getSelectedWaypoint())
-                drawImg(g, context.theme.waypointSelected, tmp);
-            else
-                drawImg(g, context.theme.waypointImage, tmp);
-        }
-    }
-
-    private void drawRover(Graphics g){
-        Point roverPoint = computeScreenPosition(rover.getLocation());
-        drawImg(g, context.theme.roverImage, roverPoint);
-    }
-
-    private void drowRoverLine(Graphics g){
-        if(context.waypoint.getTarget() >= context.waypoint.size()) {
-            System.err.println("roverTarget out of Bounds");
-            return;
-        }
-        Point n = computeScreenPosition( rover.getLocation() );
-        Point l = computeScreenPosition( context.waypoint.getTargetWaypoint().getLocation() );
-        paintLine(g, n, l, ACTIVE_LINE_FILL);
-    }
-
-    private void drawImg(Graphics g, BufferedImage img, Point loc){
-        g.translate(-img.getWidth()/2, -img.getHeight()/2);
-        g.drawImage( img , loc.x, loc.y, this);
-        g.translate( img.getWidth()/2, img.getHeight()/2);
-    }
 
     private void paintInternal(Graphics2D g) {
         stats.reset();
@@ -679,7 +523,6 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
             painter.paint(g, position, null);
         }
 
-        paintDots(g);
         long t1 = System.currentTimeMillis();
         stats.dt = t1 - t0;
     }
@@ -709,7 +552,7 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
 
         //TEMPORARY
         g = (Graphics2D) gOrig.create();
-        g.translate(-mapPosition.x, -mapPosition.y);
+        //g.translate(-mapPosition.x, -mapPosition.y);
         mll.draw(g);
         g.dispose();
     }
@@ -1126,116 +969,53 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         }
     }
 
-    private class DragListener extends MouseAdapter implements MouseMotionListener, MouseWheelListener {
-        private Point mouseCoords;
-        private Point downCoords;
-        private Point downPosition;
-        private int downDot;
-        private boolean hasMoved;
+    private class DragListener implements Layer, MouseWheelListener {
+        private Point downCoords = null;
+        private Point downPosition = null;
 
-        public DragListener() {
-            mouseCoords = new Point();
-            downCoords = null;
-            downPosition = null;
-            magnifyRegion = null;
-            downDot = -1;
+        public int getZ(){
+            return -1;
         }
 
-        public void mousePressed(MouseEvent e) {
+        public boolean onClick(MouseEvent e){
+            return false;
+        }
+
+        public boolean onPress(MouseEvent e) {
             downCoords = e.getPoint();
             downPosition = getMapPosition();
-            downDot = isOverDot(new Point(mouseCoords.x, mouseCoords.y));
-            hasMoved = false;
-            if (e.getButton() == MouseEvent.BUTTON1) {
-                magnifyRegion = null;
-            } else if (e.getButton() == MouseEvent.BUTTON3) {
-                int cx = getCursorPosition().x;
-                int cy = getCursorPosition().y;
-                magnifyRegion = new Rectangle(cx - MAGNIFIER_SIZE / 2, cy - MAGNIFIER_SIZE / 2, MAGNIFIER_SIZE, MAGNIFIER_SIZE);
-                repaint();
-            }
-            if(downDot != -1) waypointPanel.setSelectedWaypoint(downDot);
+            return true;
         }
 
-        public void mouseDragged(MouseEvent e) {
-            handlePosition(e);
+        public void onDrag(MouseEvent e) {
             handleDrag(e);
-            hasMoved = true;
         }
 
         private void handleDrag(MouseEvent e) {
-            if (downDot != -1){
-                Point.Double point = new Point.Double(position2lon(getCursorPosition().x, getZoom()),
-                                        position2lat(getCursorPosition().y, getZoom()));
-                context.waypoint.get(downDot).setLocation(point);
-                repaint();
-                waypointPanel.updateDisplay();
-            } else if (downCoords != null) {
+            if (downCoords != null) {
                 int tx = downCoords.x - e.getX();
                 int ty = downCoords.y - e.getY();
                 setMapPosition(downPosition.x + tx, downPosition.y + ty);
                 repaint();
-            } else if (magnifyRegion != null) {
-                int cx = getCursorPosition().x;
-                int cy = getCursorPosition().y;
-                magnifyRegion = new Rectangle(cx - MAGNIFIER_SIZE / 2, cy - MAGNIFIER_SIZE / 2, MAGNIFIER_SIZE, MAGNIFIER_SIZE);
-                repaint();
             }
         }
 
-        public void mouseReleased(MouseEvent e) {
+        public void onRelease(MouseEvent e) {
             handleDrag(e);
-            if(downDot != -1){
-                context.waypoint.sendUpdatedPosition(downDot);
-            }
-        }
-
-        public void mouseClicked(MouseEvent e) {
-            if (e.getButton() == MouseEvent.BUTTON1) {
-
-                if(downDot == -1){
-                    Point.Double point = new Point.Double(position2lon(getCursorPosition().x, getZoom()), position2lat(getCursorPosition().y, getZoom()));
-                    int tmp = isOverLine(new Point(mouseCoords.x, mouseCoords.y));
-                    if(tmp==-1) {
-                        context.waypoint.add(new Dot(point));
-                        waypointPanel.setSelectedWaypoint(context.waypoint.size()-1);
-                    }
-                    else{
-                        context.waypoint.add(new Dot(point), tmp);
-                        waypointPanel.setSelectedWaypoint(tmp);
-                    }
-                }
-
-            } else if (e.getButton() == MouseEvent.BUTTON3) {
-                if( downDot != -1 ) context.waypoint.remove(downDot);
-
-            } else if (e.getButton() == MouseEvent.BUTTON2) {
-                setCenterPosition(getCursorPosition());
-                repaint();
-            }
-        }
-
-        public void mouseMoved(MouseEvent e) {
-            handlePosition(e);
-        }
-
-        public void mouseExited(MouseEvent e) {
-        }
-
-        public void mouseEntered(MouseEvent me) {
-            super.mouseEntered(me);
-        }
-
-        private void handlePosition(MouseEvent e) {
-            mouseCoords = e.getPoint();
+            downCoords = null;
         }
 
         public void mouseWheelMoved(MouseWheelEvent e) {
             int rotation = e.getWheelRotation();
+            Point mouseCoords = e.getPoint();
             if (rotation < 0)
                 zoomInAnimated(new Point(mouseCoords.x, mouseCoords.y));
             else
                 zoomOutAnimated(new Point(mouseCoords.x, mouseCoords.y));
+        }
+
+        public void paint(Graphics g){
+
         }
     }
 
