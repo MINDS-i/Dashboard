@@ -480,12 +480,6 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         setMapPosition(p.x - getWidth() / 2, p.y - getHeight() / 2);
     }
 
-    public Point computeScreenPosition(Point.Double coords){
-        int x = lon2position(coords.x, getZoom()) - mapPosition.x;
-        int y = lat2position(coords.y, getZoom()) - mapPosition.y;
-        return new Point(x,y);
-    }
-
     //--------------------------------------------------------------------------
     //Painting functions
 
@@ -803,58 +797,11 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         }
     }
 
-    //-------------------------------------------------------------------------
-    // utils
     public static JPanel contain(JPanel input){ //total hack
         JPanel tmp = new JPanel();
         tmp.add(input);
         tmp.setOpaque(false);
         return tmp;
-    }
-
-    public static double getN(int y, int z) {
-        double n = Math.PI - (2.0 * Math.PI * y) / Math.pow(2.0, z);
-        return n;
-    }
-
-    public static double position2lon(int x, int z) {
-        double xmax = TILE_SIZE * (1 << z);
-        return x / xmax * 360.0 - 180;
-    }
-
-    public static double position2lat(int y, int z) {
-        double ymax = TILE_SIZE * (1 << z);
-        return Math.toDegrees(Math.atan(Math.sinh(Math.PI - (2.0 * Math.PI * y) / ymax)));
-    }
-
-    public static double tile2lon(int x, int z) {
-        return x / Math.pow(2.0, z) * 360.0 - 180;
-    }
-
-    public static double tile2lat(int y, int z) {
-        return Math.toDegrees(Math.atan(Math.sinh(Math.PI - (2.0 * Math.PI * y) / Math.pow(2.0, z))));
-    }
-
-    public static int lon2position(double lon, int z) {
-        double xmax = TILE_SIZE * (1 << z);
-        return (int) Math.floor((lon + 180) / 360 * xmax);
-    }
-
-    public static int lat2position(double lat, int z) {
-        double ymax = TILE_SIZE * (1 << z);
-        return (int) Math.floor((1 - Math.log(Math.tan(Math.toRadians(lat)) + 1 / Math.cos(Math.toRadians(lat))) / Math.PI) / 2 * ymax);
-    }
-
-    private static void drawBackground(Graphics2D g, int width, int height) {
-        Color color1 = Color.black;
-        Color color2 = new Color(0x30, 0x30, 0x30);
-        color1 = new Color(0xc0, 0xc0, 0xc0);
-        color2 = new Color(0xe0, 0xe0, 0xe0);
-        Composite oldComposite = g.getComposite();
-        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.75f));
-        g.setPaint(new GradientPaint(0, 0, color1, 0, height, color2));
-        g.fillRoundRect(0, 0, width, height, 4, 4);
-        g.setComposite(oldComposite);
     }
 }
 
