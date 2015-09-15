@@ -6,18 +6,18 @@ import java.awt.image.BufferedImage;
 import java.awt.Point;
 
 public class Dot{
-	Point.Double location;
+	Point2D location;
 	short altitude;
 	int status;
 	public Dot(){
 		location = new Point.Double(0,0);
 		altitude = 0;
 	}
-	public Dot(Point.Double l, short alt){
+	public Dot(Point2D l, short alt){
 		location = l;
 		altitude = alt;
 	}
-	public Dot(Point.Double l){
+	public Dot(Point2D l){
 		location = l;
 		altitude = 0;
 	}
@@ -29,10 +29,10 @@ public class Dot{
 		location = new Point.Double(lng,lat);
 		altitude = alt;
 	}
-	public void setLocation(Point.Double l){
+	public void setLocation(Point2D l){
 		location = l;
 	}
-	public void setLocation(Point.Double l, short alt){
+	public void setLocation(Point2D l, short alt){
 		location = l;
 		altitude = alt;
 	}
@@ -45,14 +45,14 @@ public class Dot{
 	public void setAltitude(short alt){
 		altitude = alt;
 	}
-	public Point.Double getLocation(){
+	public Point2D getLocation(){
 		return location;
 	}
 	public double getLongitude(){
-		return location.x;
+		return location.getX();
 	}
 	public double getLatitude(){
-		return location.y;
+		return location.getY();
 	}
 	public short getAltitude(){
 		return altitude;
