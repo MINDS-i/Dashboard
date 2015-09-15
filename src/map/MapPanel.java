@@ -9,49 +9,21 @@
  ******************************************************************************/
 
 package com.map;
-import com.Dashboard;
-import com.map.Dot;
-import com.map.TileServer;
-import com.map.WaypointPanel;
-import com.serial.*;
-import com.serial.Messages.*;
 import com.ContextViewer;
 import com.Context;
-import com.ui.TelemetryListener;
 import com.layer.*;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
-import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
 import java.net.URL;
-import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.Vector;
 import javax.imageio.*;
 import javax.swing.*;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
-import javax.swing.text.html.HTMLDocument;
-import javax.swing.text.html.HTMLEditorKit;
-import javax.swing.text.html.StyleSheet;
-import javax.xml.parsers.SAXParserFactory;
-import org.xml.sax.Attributes;
-import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.SAXException;
 
 public class MapPanel extends JPanel implements ContextViewer, CoordinateTransform {
     private static final int TILE_SIZE = 256;
@@ -175,7 +147,7 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
     }
     //End code for ContextViewep interface
 
-//TileServer code
+    //TileServer code
     private void testTileServer(TileServer server){
         String urlstring = getTileString(tileServer, 1, 1, 1);
         try {
@@ -212,8 +184,7 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
 
     public void nextTileServer() {
         int index = Arrays.asList(TILESERVERS).indexOf(getTileServer());
-        if (index == -1)
-            return;
+        if (index == -1) return;
         setTileServer(TILESERVERS[(index + 1) % TILESERVERS.length]);
         repaint();
     }
