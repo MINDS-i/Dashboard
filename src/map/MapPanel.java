@@ -64,13 +64,11 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
 
     private static final int TILE_SIZE = 256;
     private static final int CACHE_SIZE = 64;
-    private static final int MAGNIFIER_SIZE = 100;
 
     private Dimension mapSize = new Dimension(0, 0);
     private Point mapPosition = new Point(0, 0);
     private int zoom;
     private DragListener mouseListener = new DragListener();
-    private Rectangle magnifyRegion;
 
     private TileServer tileServer = TILESERVERS[0];
 
@@ -533,12 +531,6 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
                         paintTile(g, dx-dI, dy+dJ, cx-i, cy+j);
                         paintTile(g, dx-dI, dy-dJ, cx-i, cy-j);
                     }
-                }
-
-                if (getScale() == 1d && mapPanel.magnifyRegion != null) {
-                    Rectangle magnifyRegion = new Rectangle(mapPanel.magnifyRegion);
-                    magnifyRegion.translate(-mapPosition.x, -mapPosition.y);
-                    g.setColor(Color.yellow);
                 }
             } finally {
                 g.dispose();
