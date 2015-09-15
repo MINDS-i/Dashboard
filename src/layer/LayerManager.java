@@ -34,18 +34,16 @@ public class LayerManager extends MouseAdapter{
     //mouse adapter code
     Layer active = null;
     public void mouseClicked(MouseEvent e) {
-        Point c = e.getPoint();
         for(int i = layers.size()-1; i >= 0; i--){
             Layer here = layers.get(i);
-            if(here.onClick(c)) return;
+            if(here.onClick(e)) return;
         }
     }
     public void mousePressed(MouseEvent e) {
         active = null;
-        Point c = e.getPoint();
         for(int i = layers.size()-1; i >= 0; i--){
             Layer here = layers.get(i);
-            if(here.onPress(c)){
+            if(here.onPress(e)){
                 active = here;
                 return;
             }
@@ -53,14 +51,12 @@ public class LayerManager extends MouseAdapter{
     }
     public void mouseDragged(MouseEvent e) {
         if(active != null){
-            Point c = e.getPoint();
-            active.onDrag(c);
+            active.onDrag(e);
         }
     }
     public void mouseReleased(MouseEvent e) {
         if(active != null){
-            Point c = e.getPoint();
-            active.onRelease(c);
+            active.onRelease(e);
         }
     }
 }
