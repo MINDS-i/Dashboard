@@ -1,6 +1,9 @@
 package com.map;
 
 import com.Context;
+import com.ContextViewer;
+import com.serial.Serial;
+import com.ui.TelemetryListener;
 import com.layer.Layer;
 
 import java.awt.*;
@@ -10,7 +13,7 @@ import java.awt.image.*;
 import java.util.*;
 import javax.swing.*;
 
-class RoverPath implements Layer {
+class RoverPath implements Layer, ContextViewer {
     private static final Color ACTIVE_LINE_FILL = new Color(1.f,1.f,0.f,1f);
     private static final Color PATH_LINE_FILL   = new Color(0f,0f,0f, 1f);
     private static final Color LINE_BORDER      = new Color(.5f,.5f,.5f,0f);
@@ -32,6 +35,18 @@ class RoverPath implements Layer {
         context = c;
         mapTransform = cT;
         waypointPanel = wP;
+
+        context.registerViewer(this);
+        context.telemetry.registerListener(Serial.LATITUDE, new TelemetryListener(){
+            public void update(double data){
+                rover.setLatitude( data );
+            }
+        });
+        context.telemetry.registerListener(Serial.LONGITUDE, new TelemetryListener(){
+            public void update(double data){
+                rover.setLongitude( data );
+            }
+        });
     }
 
     public int getZ() {
@@ -40,6 +55,10 @@ class RoverPath implements Layer {
 
     public void paint(Graphics g){
         paintDots(g);
+    }
+
+    public void waypointUpdate(){
+        //direct parent to repaint?
     }
 
     public boolean onClick(MouseEvent e){
@@ -60,12 +79,10 @@ class RoverPath implements Layer {
                 context.waypoint.add(new Dot(point), line);
                 waypointPanel.setSelectedWaypoint(line);
             }
-            context.waypointUpdated();
             return true;
         } else if ((e.getButton() == MouseEvent.BUTTON3) && (underneith != -1)) {
             //right click on top of a point
             context.waypoint.remove(underneith);
-            context.waypointUpdated();
             return true;
         }
         return false;
@@ -76,6 +93,7 @@ class RoverPath implements Layer {
         downDot = isOverDot(pixel, context.theme.waypointImage);
         if(downDot != -1) {
             waypointPanel.setSelectedWaypoint(downDot);
+            context.waypointUpdated();
             return true;
         }
         return false;
