@@ -89,7 +89,8 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
     private int smoothOffset = 0;
     private Point smoothPosition, smoothPivot;
 
-    private Dot rover = new Dot();
+    private LayerManager mll = new LayerManager();
+
     private Context context;
 
     public MapPanel(Context cxt) {
@@ -124,30 +125,6 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         setZoom(zoom);
         setMapPosition(mapPosition);
 
-        cxt.telemetry.registerListener(Serial.LATITUDE, new TelemetryListener(){
-            public void update(double data){
-                rover.setLatitude( data );
-                //MapPanel.this.repaint();
-                //disable repaint on latitude change
-                //so it only changes once per new coordinate
-            }
-        });
-        cxt.telemetry.registerListener(Serial.LONGITUDE, new TelemetryListener(){
-            public void update(double data){
-                rover.setLongitude( data );
-                MapPanel.this.repaint();
-            }
-        });
-
-
-
-
-
-
-
-
-
-
         mll.add(new RoverPath(context, this, waypointPanel));
         mll.add(mouseListener);
         addMouseWheelListener(mouseListener);
@@ -155,14 +132,7 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         addMouseMotionListener(mll);
     }
 
-    private LayerManager mll = new LayerManager();
-
-    Point add(Point a, Point b){
-        return new Point(a.x+b.x, a.y+b.y);
-    }
-
-
-
+    //Code for CoordinateTransform interface
     /**
      * Transforms a (lonitude,latitude) point to absolute (x,y) pixels
      * Will return an instance of the same class as the argument p
@@ -218,51 +188,15 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         f.setLocation(p.getX() + mapPosition.x, p.getY() + mapPosition.y);
         return toCoordinates(f);
     }
+    //End Code for CoordinateTransform interface
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    //Code for ContextViewer interface
     public void waypointUpdate(){
         repaint();
     }
+    //End code for ContextViewep interface
 
+//TileServer code
     private void testTileServer(TileServer server){
         String urlstring = getTileString(tileServer, 1, 1, 1);
         try {
@@ -312,17 +246,87 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
     public boolean isUseAnimations() {
         return useAnimations;
     }
+    public TileCache getCache() {
+        return cache;
+    }
+
+        private static class Tile {
+        private final String key;
+        public final int x, y, z;
+        public Tile(String tileServer, int x, int y, int z) {
+            this.key = tileServer;
+            this.x = x;
+            this.y = y;
+            this.z = z;
+        }
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((key == null) ? 0 : key.hashCode());
+            result = prime * result + x;
+            result = prime * result + y;
+            result = prime * result + z;
+            return result;
+        }
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            Tile other = (Tile) obj;
+            if (key == null) {
+                if (other.key != null)
+                    return false;
+            } else if (!key.equals(other.key))
+                return false;
+            if (x != other.x)
+                return false;
+            if (y != other.y)
+                return false;
+            if (z != other.z)
+                return false;
+            return true;
+        }
+
+    }
+
+    private static class TileCache {
+        private LinkedHashMap<Tile,Image> map = new LinkedHashMap<Tile,Image>(CACHE_SIZE, 0.75f, true) {
+            protected boolean removeEldestEntry(java.util.Map.Entry<Tile,Image> eldest) {
+                boolean remove = size() > CACHE_SIZE;
+                return remove;
+            }
+        };
+        public void put(TileServer tileServer, int x, int y, int z, Image image) {
+            map.put(new Tile(tileServer.getURL(), x, y, z), image);
+        }
+        public Image get(TileServer tileServer, int x, int y, int z) {
+            //return map.get(new Tile(x, y, z));
+            Image image = map.get(new Tile(tileServer.getURL(), x, y, z));
+            return image;
+        }
+        public int getSize() {
+            return map.size();
+        }
+    }
+
+    public static String getTileString(TileServer tileServer, int xtile, int ytile, int zoom) {
+        String number = ("" + zoom + "/" + xtile + "/" + ytile);
+        String url = tileServer.getURL() + number + ".png";
+        return url;
+    }
+
+    public static String getTileNumber(TileServer tileServer, double lat, double lon, int zoom) {
+        int xtile = (int) Math.floor((lon + 180) / 360 * (1 << zoom));
+        int ytile = (int) Math.floor((1 - Math.log(Math.tan(Math.toRadians(lat)) + 1 / Math.cos(Math.toRadians(lat))) / Math.PI) / 2 * (1 << zoom));
+        return getTileString(tileServer, xtile, ytile, zoom);
+    }
+//end tileserver code
 
     public void setUseAnimations(boolean useAnimations) {
         this.useAnimations = useAnimations;
-    }
-
-    public WaypointPanel getWaypointPanel() {
-        return waypointPanel;
-    }
-
-    public TileCache getCache() {
-        return cache;
     }
 
     public Stats getStats() {
@@ -757,68 +761,6 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         }
     }
 
-    private static class Tile {
-        private final String key;
-        public final int x, y, z;
-        public Tile(String tileServer, int x, int y, int z) {
-            this.key = tileServer;
-            this.x = x;
-            this.y = y;
-            this.z = z;
-        }
-        public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result = prime * result + ((key == null) ? 0 : key.hashCode());
-            result = prime * result + x;
-            result = prime * result + y;
-            result = prime * result + z;
-            return result;
-        }
-        public boolean equals(Object obj) {
-            if (this == obj)
-                return true;
-            if (obj == null)
-                return false;
-            if (getClass() != obj.getClass())
-                return false;
-            Tile other = (Tile) obj;
-            if (key == null) {
-                if (other.key != null)
-                    return false;
-            } else if (!key.equals(other.key))
-                return false;
-            if (x != other.x)
-                return false;
-            if (y != other.y)
-                return false;
-            if (z != other.z)
-                return false;
-            return true;
-        }
-
-    }
-
-    private static class TileCache {
-        private LinkedHashMap<Tile,Image> map = new LinkedHashMap<Tile,Image>(CACHE_SIZE, 0.75f, true) {
-            protected boolean removeEldestEntry(java.util.Map.Entry<Tile,Image> eldest) {
-                boolean remove = size() > CACHE_SIZE;
-                return remove;
-            }
-        };
-        public void put(TileServer tileServer, int x, int y, int z, Image image) {
-            map.put(new Tile(tileServer.getURL(), x, y, z), image);
-        }
-        public Image get(TileServer tileServer, int x, int y, int z) {
-            //return map.get(new Tile(x, y, z));
-            Image image = map.get(new Tile(tileServer.getURL(), x, y, z));
-            return image;
-        }
-        public int getSize() {
-            return map.size();
-        }
-    }
-
     private static class Stats {
         private int tileCount;
         private long dt;
@@ -1044,12 +986,6 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         return tmp;
     }
 
-    public static String getTileString(TileServer tileServer, int xtile, int ytile, int zoom) {
-        String number = ("" + zoom + "/" + xtile + "/" + ytile);
-        String url = tileServer.getURL() + number + ".png";
-        return url;
-    }
-
     public static String format(double d) {
         return String.format("%.5f", d);
     }
@@ -1085,12 +1021,6 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
     public static int lat2position(double lat, int z) {
         double ymax = TILE_SIZE * (1 << z);
         return (int) Math.floor((1 - Math.log(Math.tan(Math.toRadians(lat)) + 1 / Math.cos(Math.toRadians(lat))) / Math.PI) / 2 * ymax);
-    }
-
-    public static String getTileNumber(TileServer tileServer, double lat, double lon, int zoom) {
-        int xtile = (int) Math.floor((lon + 180) / 360 * (1 << zoom));
-        int ytile = (int) Math.floor((1 - Math.log(Math.tan(Math.toRadians(lat)) + 1 / Math.cos(Math.toRadians(lat))) / Math.PI) / 2 * (1 << zoom));
-        return getTileString(tileServer, xtile, ytile, zoom);
     }
 
     private static void drawBackground(Graphics2D g, int width, int height) {
