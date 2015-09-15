@@ -942,22 +942,6 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         }
     }
 
-    private final class MapLayout implements LayoutManager {
-
-        public void addLayoutComponent(String name, Component comp) {
-        }
-        public void removeLayoutComponent(Component comp) {
-        }
-        public Dimension minimumLayoutSize(Container parent) {
-            return new Dimension(1, 1);
-        }
-        public Dimension preferredLayoutSize(Container parent) {
-            return new Dimension(PREFERRED_WIDTH, PREFERRED_HEIGHT);
-        }
-        public void layoutContainer(Container parent) {
-            int width = parent.getWidth();
-        }
-    }
     //-------------------------------------------------------------------------
     // utils
     public static JPanel contain(JPanel input){ //total hack
@@ -1015,8 +999,6 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         g.fillRoundRect(0, 0, width, height, 4, 4);
         g.setComposite(oldComposite);
     }
-
-
 }
 
 
