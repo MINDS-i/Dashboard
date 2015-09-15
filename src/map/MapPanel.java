@@ -538,16 +538,10 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         }
 
         private void paintTile(Graphics2D g, int dx, int dy, int x, int y) {
-            boolean DEBUG = false;
-            boolean DRAW_IMAGES = true;
-            boolean DRAW_OUT_OF_BOUNDS = false;
-
-            boolean imageDrawn = false;
             int xTileCount = 1 << zoom;
             int yTileCount = 1 << zoom;
             boolean tileInBounds = x >= 0 && x < xTileCount && y >= 0 && y < yTileCount;
-            boolean drawImage = DRAW_IMAGES && tileInBounds;
-            if (drawImage) {
+            if (tileInBounds) {
                 final TileCache cache = mapPanel.getCache();
                 final TileServer tileServer = mapPanel.getTileServer();
                 Image image = cache.get(tileServer, x, y, zoom);
@@ -556,15 +550,7 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
                     mapPanel.loadTile(cache, tileServer, x, y, zoom);
                 } else {
                     g.drawImage(image, dx, dy, mapPanel);
-                    imageDrawn = true;
                 }
-            }
-            if (DEBUG && (!imageDrawn && (tileInBounds || DRAW_OUT_OF_BOUNDS))) {
-                g.setColor(Color.blue);
-                g.fillRect(dx + 4, dy + 4, TILE_SIZE - 8, TILE_SIZE - 8);
-                g.setColor(Color.gray);
-                String s = "T " + x + ", " + y + (!tileInBounds ? " #" : "");
-                g.drawString(s, dx + 4+ 8, dy + 4 + 12);
             }
         }
     }
