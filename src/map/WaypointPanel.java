@@ -230,7 +230,7 @@ class WaypointPanel extends NinePatchPanel implements ContextViewer{
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			map.zoomInAnimated(new Point(map.getWidth() / 2, map.getHeight() / 2));
+			map.zoomIn(new Point(map.getWidth() / 2, map.getHeight() / 2));
 		}
 	};
 	private Action zoomOutAction = new AbstractAction() {
@@ -241,7 +241,7 @@ class WaypointPanel extends NinePatchPanel implements ContextViewer{
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			map.zoomOutAnimated(new Point(map.getWidth() / 2, map.getHeight() / 2));
+			map.zoomOut(new Point(map.getWidth() / 2, map.getHeight() / 2));
 		}
 	};
 	private Action nextTileServer = new AbstractAction() {

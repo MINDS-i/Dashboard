@@ -62,8 +62,6 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
     private static final int PREFERRED_WIDTH = 320;
     private static final int PREFERRED_HEIGHT = 200;
 
-    private static final int ANIMATION_FPS = 15, ANIMATION_DURARTION_MS = 500;
-
     private static final int TILE_SIZE = 256;
     private static final int CACHE_SIZE = 64;
     private static final int MAGNIFIER_SIZE = 100;
@@ -72,7 +70,6 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
     private Point mapPosition = new Point(0, 0);
     private int zoom;
     private DragListener mouseListener = new DragListener();
-    private Animation animation;
     private Rectangle magnifyRegion;
 
     private TileServer tileServer = TILESERVERS[0];
@@ -81,11 +78,6 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
     private BorderLayout border = new BorderLayout();
     private TileCache cache = new TileCache();
     private JPanel centerPanel = new JPanel();
-
-    protected double smoothScale = 1.0D;
-    private boolean useAnimations = false;
-    private int smoothOffset = 0;
-    private Point smoothPosition, smoothPivot;
 
     private LayerManager mll = new LayerManager();
 
@@ -241,14 +233,11 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         return tileServer;
     }
 
-    public boolean isUseAnimations() {
-        return useAnimations;
-    }
     public TileCache getCache() {
         return cache;
     }
 
-        private static class Tile {
+    private static class Tile {
         private final String key;
         public final int x, y, z;
         public Tile(String tileServer, int x, int y, int z) {
@@ -323,10 +312,6 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
     }
 //end tileserver code
 
-    public void setUseAnimations(boolean useAnimations) {
-        this.useAnimations = useAnimations;
-    }
-
     public Point getMapPosition() {
         return new Point(mapPosition.x, mapPosition.y);
     }
@@ -370,64 +355,6 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
     public void setHgap(int gap){
         border.setHgap(gap);
         repaint();
-    }
-
-    public void zoomInAnimated(Point pivot) {
-        if (!useAnimations) {
-            zoomIn(pivot);
-            return;
-        }
-        if (animation != null)
-            return;
-        mouseListener.downCoords = null;
-        animation = new Animation(AnimationType.ZOOM_IN, ANIMATION_FPS, ANIMATION_DURARTION_MS) {
-            protected void onComplete() {
-                smoothScale = 1.0d;
-                smoothPosition = smoothPivot = null;
-                smoothOffset = 0;
-                animation = null;
-                repaint();
-            }
-            protected void onFrame() {
-                smoothScale = 1.0 + getFactor();
-                repaint();
-            }
-
-        };
-        smoothPosition = new Point(mapPosition.x, mapPosition.y);
-        smoothPivot = new Point(pivot.x, pivot.y);
-        smoothOffset = -1;
-        zoomIn(pivot);
-        animation.run();
-    }
-
-    public void zoomOutAnimated(Point pivot) {
-        if (!useAnimations) {
-            zoomOut(pivot);
-            return;
-        }
-        if (animation != null)
-            return;
-        mouseListener.downCoords = null;
-        animation = new Animation(AnimationType.ZOOM_OUT, ANIMATION_FPS, ANIMATION_DURARTION_MS) {
-            protected void onComplete() {
-                smoothScale = 1.0d;
-                smoothPosition = smoothPivot = null;
-                smoothOffset = 0;
-                animation = null;
-                repaint();
-            }
-            protected void onFrame() {
-                smoothScale = 1 - .5 * getFactor();
-                repaint();
-            }
-
-        };
-        smoothPosition = new Point(mapPosition.x, mapPosition.y);
-        smoothPivot = new Point(pivot.x, pivot.y);
-        smoothOffset = 1;
-        zoomOut(pivot);
-        animation.run();
     }
 
     public void zoomIn(Point pivot) {
@@ -484,37 +411,9 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
     //Painting functions
 
     private void paintInternal(Graphics2D g) {
-        long t0 = System.currentTimeMillis();
-
-        if (smoothPosition != null) {
-            {
-                Point position = getMapPosition();
-                Painter painter = new Painter(this, getZoom());
-                painter.paint(g, position, null);
-            }
-            Point position = new Point(smoothPosition.x, smoothPosition.y);
-            Painter painter = new Painter(this, getZoom() + smoothOffset);
-            painter.setScale(smoothScale);
-
-            float t = (float) (animation == null ? 1f : 1 - animation.getFactor());
-            painter.setTransparency(t);
-            painter.paint(g, position, smoothPivot);
-            if (animation != null && animation.getType() == AnimationType.ZOOM_IN) {
-                int cx = smoothPivot.x, cy = smoothPivot.y;
-                drawScaledRect(g, cx, cy, animation.getFactor(), 1 + animation.getFactor());
-            } else if (animation != null && animation.getType() == AnimationType.ZOOM_OUT) {
-                int cx = smoothPivot.x, cy = smoothPivot.y;
-                drawScaledRect(g, cx, cy, animation.getFactor(), 2 - animation.getFactor());
-            }
-        }
-
-        if (smoothPosition == null) {
-            Point position = getMapPosition();
-            Painter painter = new Painter(this, getZoom());
-            painter.paint(g, position, null);
-        }
-
-        long t1 = System.currentTimeMillis();
+        Point position = getMapPosition();
+        Painter painter = new Painter(this, getZoom());
+        painter.paint(g, position, null);
     }
 
     private void drawScaledRect(Graphics2D g, int cx, int cy, double f, double scale) {
@@ -678,75 +577,6 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         }
     }
 
-    private enum AnimationType {
-        ZOOM_IN, ZOOM_OUT
-    }
-
-    private static abstract class Animation implements ActionListener {
-
-        private final AnimationType type;
-        private final Timer timer;
-        private long t0 = -1L;
-        private long dt;
-        private final long duration;
-
-        public Animation(AnimationType type, int fps, long duration) {
-            this.type = type;
-            this.duration = duration;
-            int delay = 1000 / fps;
-            timer = new Timer(delay, this);
-            timer.setCoalesce(true);
-            timer.setInitialDelay(0);
-        }
-
-        public AnimationType getType() {
-            return type;
-        }
-
-        protected abstract void onComplete();
-
-        protected abstract void onFrame();
-
-        public double getFactor() {
-            return (double) getDt() / getDuration();
-        }
-
-        public void actionPerformed(ActionEvent e) {
-            if (getDt() >= duration) {
-                kill();
-                onComplete();
-                return;
-            }
-            onFrame();
-        }
-
-        public long getDuration() {
-            return duration;
-        }
-
-        public long getDt() {
-            if (!timer.isRunning())
-                return dt;
-            long now = System.currentTimeMillis();
-            if (t0 < 0)
-                t0 = now;
-            return now - t0 + dt;
-        }
-
-        public void run() {
-            if (timer.isRunning())
-                return;
-            timer.start();
-        }
-
-        public void kill() {
-            if (!timer.isRunning())
-                return;
-            dt = getDt();
-            timer.stop();
-        }
-    }
-
     private class DragListener implements Layer, MouseWheelListener {
         private Point downCoords = null;
         private Point downPosition = null;
@@ -787,9 +617,9 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
             int rotation = e.getWheelRotation();
             Point mouseCoords = e.getPoint();
             if (rotation < 0)
-                zoomInAnimated(new Point(mouseCoords.x, mouseCoords.y));
+                zoomIn(new Point(mouseCoords.x, mouseCoords.y));
             else
-                zoomOutAnimated(new Point(mouseCoords.x, mouseCoords.y));
+                zoomOut(new Point(mouseCoords.x, mouseCoords.y));
         }
 
         public void paint(Graphics g){
