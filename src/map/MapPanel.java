@@ -67,6 +67,7 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         JPanel west = contain(waypointPanel);
         east = contain(east);
 
+        if(south == null) south = new JPanel();
         add(south);
         south.setLayout(new BorderLayout());
         south.add(west,  BorderLayout.WEST);
@@ -189,11 +190,11 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         repaint();
     }
 
-    public TileServer getTileServer() {
+    TileServer getTileServer() {
         return tileServer;
     }
 
-    public TileCache getCache() {
+    TileCache getCache() {
         return cache;
     }
 

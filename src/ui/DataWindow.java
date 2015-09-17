@@ -237,6 +237,7 @@ public class DataWindow implements ActionListener{
 			}, PERIOD, PERIOD);
 	}
 	public void actionPerformed(ActionEvent evt) {
+		if(logInput == null) return;
 	    String inputText = logInput.getText();
 	    int input;
 	    try {
