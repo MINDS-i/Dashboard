@@ -1,5 +1,8 @@
 package com.map;
 
+import java.awt.geom.Point2D;
+import java.awt.Graphics2D;
+
 interface MapSource {
     /**
      * Instructs the map source to clear any cache it map have, to free up
