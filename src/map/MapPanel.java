@@ -60,6 +60,8 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         context = cxt;
         context.registerViewer(this);
 
+        mapSource.addRepaintListener(this);
+
         border.setVgap(-20);
         setOpaque(true);
         setBackground(new Color(0xc0, 0xc0, 0xc0));
@@ -376,42 +378,11 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         return new Point((int) Math.floor(((double) position.x) / TILE_SIZE),(int) Math.floor(((double) position.y) / TILE_SIZE));
     }
 
-/*    public Point getCenterPosition() {
-        return new Point(mapPosition.x + getWidth() / 2, mapPosition.y + getHeight() / 2);
-    }
-
-    public void setCenterPosition(Point p) {
-        setMapPosition(p.x - getWidth() / 2, p.y - getHeight() / 2);
-    }*/
-
-    //--------------------------------------------------------------------------
-    //Painting functions
-
-/*    private void paintInternal(Graphics2D g) {
-        Point position = getMapPosition();
-        Painter painter = new Painter(this, getZoom());
-        painter.paint(g, position, null);
-    }
-*/
-/*    private void drawScaledRect(Graphics2D g, int cx, int cy, double f, double scale) {
-        AffineTransform oldTransform = g.getTransform();
-        g.translate(cx, cy);
-        g.scale(scale, scale);
-        g.translate(-cx, -cy);
-        int c = 0x80 + (int) Math.floor(f * 0x60);
-        if (c < 0) c = 0;
-        else if (c > 255) c = 255;
-        Color color = new Color(c, c, c);
-        g.setColor(color);
-        g.drawRect(cx - 40, cy - 30, 80, 60);
-        g.setTransform(oldTransform);
-    }*/
-
-    protected void paintComponent(Graphics gOrig) {
+    @Override
+    public void paintComponent(Graphics gOrig) {
         super.paintComponent(gOrig);
         Graphics2D g = (Graphics2D) gOrig.create();
         try {
-            //paintInternal(g);
             mapSource.paint(g,
                             mapPosition,
                             TILE_SIZE * (1 << (getZoom()-1)),
@@ -421,97 +392,6 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         } finally {
             g.dispose();
         }
-    }
-    //-------------------------------------------------------------------------
-    // helpers
-
-    private static final class Painter {
-        private final int zoom;
-        private float transparency = 1F;
-        private double scale = 1d;
-        private final MapPanel mapPanel;
-
-        private Painter(MapPanel mapPanel, int zoom) {
-            this.mapPanel = mapPanel;
-            this.zoom = zoom;
-        }
-
-        public float getTransparency() {
-            return transparency;
-        }
-
-        public void setTransparency(float transparency) {
-            this.transparency = transparency;
-        }
-
-        public double getScale() {
-            return scale;
-        }
-
-        public void setScale(double scale) {
-            this.scale = scale;
-        }
-
-/*        private void paint(Graphics2D gOrig, Point mapPosition, Point scalePosition) {
-            Graphics2D g = (Graphics2D) gOrig.create();
-            try {
-                if (getTransparency() < 1f && getTransparency() >= 0f) {
-                    g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, transparency));
-                }
-
-                if (getScale() != 1d) {
-                    AffineTransform xform = new AffineTransform();
-                    xform.translate(scalePosition.x, scalePosition.y);
-                    xform.scale(scale, scale);
-                    xform.translate(-scalePosition.x, -scalePosition.y);
-                    g.transform(xform);
-                    g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-                                    RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-                }
-                int width = mapPanel.getWidth();
-                int height = mapPanel.getHeight();
-                int x0 = (int) Math.floor(((double) mapPosition.x) / TILE_SIZE);
-                int y0 = (int) Math.floor(((double) mapPosition.y) / TILE_SIZE);
-                int x1 = (int) Math.ceil(((double) mapPosition.x + width) / TILE_SIZE);
-                int y1 = (int) Math.ceil(((double) mapPosition.y + height) / TILE_SIZE);
-
-                int nTx = (int) Math.ceil( ((double)x1-x0)/2 );
-                int nTy = (int) Math.ceil( ((double)y1-y0)/2 );
-                int  cx = x0 + nTx-1;
-                int  cy = y0 + nTy-1;
-                int  dx = x0 * TILE_SIZE - mapPosition.x + (nTx-1)*TILE_SIZE;
-                int  dy = y0 * TILE_SIZE - mapPosition.y + (nTy-1)*TILE_SIZE;
-                for(int i = 0; i <= nTx; i++){
-                    int dI = i*TILE_SIZE;
-                    for(int j = 0; j <= nTy; j++){
-                        int dJ = j*TILE_SIZE;
-                        paintTile(g, dx+dI, dy-dJ, cx+i, cy-j);
-                        paintTile(g, dx+dI, dy+dJ, cx+i, cy+j);
-                        paintTile(g, dx-dI, dy+dJ, cx-i, cy+j);
-                        paintTile(g, dx-dI, dy-dJ, cx-i, cy-j);
-                    }
-                }
-            } finally {
-                g.dispose();
-            }
-        }
-
-        private void paintTile(Graphics2D g, int dx, int dy, int x, int y) {
-            int xTileCount = 1 << zoom;
-            int yTileCount = 1 << zoom;
-            boolean tileInBounds = x >= 0 && x < xTileCount && y >= 0 && y < yTileCount;
-            if (tileInBounds) {
-                final TileCache cache = mapPanel.getCache();
-                final TileServer tileServer = mapPanel.getTileServer();
-                Image image = cache.get(tileServer, x, y, zoom);
-
-                if (image == null) {
-                    mapPanel.loadTile(cache, tileServer, x, y, zoom);
-                } else {
-                    g.drawImage(image, dx, dy, mapPanel);
-                }
-            }
-        }*/
     }
 
     private class DragListener implements Layer, MouseWheelListener {
@@ -567,7 +447,7 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         }
     }
 
-    public static JPanel contain(JPanel input){ //total hack
+    public static JPanel contain(JPanel input){
         JPanel tmp = new JPanel();
         tmp.add(input);
         tmp.setOpaque(false);

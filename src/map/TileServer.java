@@ -10,26 +10,26 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.imageio.*;
 import javax.swing.*;
 
-class TileServer implements MapSource{
+class TileServer implements MapSource {
     private static final int TILE_SIZE = 256;
     private static final int MAX_Z = 18; //max zoom level
     private static final int MAX_X = (1 << MAX_Z) / TILE_SIZE;
     private static final int MAX_Y = (1 << MAX_Z) / TILE_SIZE;
-    private static final int CACHE_SIZE = 64;
+    private static final int CACHE_SIZE = 256;
     //maximum number of concurrent tile load requests
-    private static final int CC_REQUEST = 1;
+    private static final int CC_REQUEST = 4;
+    private static final int CLEAN_NUM  = 16;
+    private static final int Z_PRIORITY = 6;
+    private static final Image dummyTile = new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB);
 
-    private final static Image dummyTile = new BufferedImage(1,1,
-                                                   BufferedImage.TYPE_INT_ARGB);
-
+    private java.util.List<Component> repaintListeners = new LinkedList<Component>();
+    private Map<TileTag, Image>     cache = new HashMap<TileTag, Image>(CACHE_SIZE+1, 1.0f);
     private final String rootURL;
-    private Queue<Image> oldTiles = new LinkedList<Image>();
-    private Queue<TileTag> requestedTiles = new LinkedList<TileTag>();
-    private Map<TileTag, Image> cache = new ConcurrentHashMap<TileTag, Image>(
-                                        CACHE_SIZE+1, 1.0f, CC_REQUEST);
+    private TileTag centerTag;
 
     TileServer(String url){
         this.rootURL = url;
@@ -37,9 +37,6 @@ class TileServer implements MapSource{
 
     public void clear(){
         cache.clear();
-        oldTiles.clear();
-        requestedTiles.clear();
-        //kill off load threads
     }
 
     public void paint(Graphics2D gd, Point2D center, int scale, int width, int height){
@@ -48,7 +45,7 @@ class TileServer implements MapSource{
         //pixel positions of latitude and longitude center point
         int sLon = (int)((center.getX()+90.0) * (double)scale / 180.0) - (width / 2);
         int sLat = (int)((center.getY()+90.0) * (double)scale / 180.0) - (height/ 2);
-        //cow/col index of the top left corner
+        //cow/col Base - index of the top left corner
         int rowB = sLon/TILE_SIZE;
         int colB = sLat/TILE_SIZE;
         //X,Y coordinate that top left corner tile should be displayed at
@@ -58,20 +55,19 @@ class TileServer implements MapSource{
         int tcw  = ((width -minX)/TILE_SIZE)+1;
         int tch  = ((height-minY)/TILE_SIZE)+1;
 
-        /*
-        System.out.println("minX "+minX+" minY "+minY);
-        Image img = pollImage(new TileTag(rowB, colB, zoom));
-        g2d.drawImage(img, minX, minY, null);
-        */
-
         for(int row = 0; row < tcw; row++){
             for(int col = 0; col < tch; col++){
                 Image img = pollImage(new TileTag(row+rowB, col+colB, zoom));
                 g2d.drawImage(img, minX+row*TILE_SIZE, minY + col*TILE_SIZE,null);
             }
         }
-
         g2d.dispose();
+
+        TileTag newCenterTag = new TileTag(rowB + tcw/2, colB + tch/2, zoom);
+        if(!newCenterTag.equals(centerTag)){
+            centerTag = newCenterTag;
+            launchTileLoader(centerTag, tcw, tch);
+        }
     }
 
     Image pollImage(TileTag target){
@@ -79,31 +75,198 @@ class TileServer implements MapSource{
         Image tile = cache.get(target);
         if(tile != null) return tile;
 
-        loadTile(target);
-        //requestedTiles.add(target);
-        //if not cached, return dummy
-        //  add URL to request queue
-        //  make sure load threads are spun up
         return dummyTile;
     }
 
-    private void loadTile(TileTag target){
-        Runnable load = new Runnable(){
-            public void run(){
-                try {
-                    Image img = Toolkit.getDefaultToolkit().getImage(target.getURL());
-                    cache.put(target, img);
-                    System.out.println("Loaded "+target);
-                } catch (Exception e) {
-                    System.err.println("failed to load tlie "+target);
-                }
-            }
-        };
-        (new Thread(load)).start();
+    private Thread tileLoader = null;
+    private void launchTileLoader(TileTag center, int width, int height){
+        if(tileLoader != null) {
+            tileLoader.interrupt();
+            //tileLoader.join();
+        }
+        tileLoader = new TileLoader(centerTag, width, height);
+        tileLoader.start();
     }
 
-    class TileTag{
-        int x,y,z;
+    /**
+     * Remove the CLEAN_NUM furthest tiles from the cache to make space
+     */
+    private void cleanTiles(){
+        TileTag[] loaded = cache.keySet().toArray(new TileTag[]{});
+        Arrays.sort(loaded, new TileDistCmp(centerTag, TileDistCmp.FURTHEST));
+        for(int i=0; i<CLEAN_NUM; i++){
+            cache.remove(loaded[i]);
+        }
+    }
+    /**
+     * Add given tile as image to the cache
+     */
+    private synchronized void addTile(TileTag tag, Image tile){
+        if(cache.size() >= CACHE_SIZE){
+            cleanTiles();
+        }
+        cache.put(tag, tile);
+    }
+    /**
+     * Add listener to be repainted if the viewed map ever changes
+     */
+    public void addRepaintListener(Component c){
+        repaintListeners.add(c);
+    }
+
+    public void removeRepaintListener(Component c){
+        repaintListeners.remove(c);
+    }
+
+    private void contentChanged(){
+        for(Component c : repaintListeners){
+            c.repaint();
+        }
+    }
+    /**
+     * Tile loader thread
+     * This will load all the tiles around ref given width and height, as well
+     * as all the tiles one level below that, in the order specified by the
+     * TileDistCmp comparator
+     */
+    private class TileLoader extends Thread {
+        private AtomicInteger helpers = new AtomicInteger();
+        java.util.List<TileTag> toLoad = new ArrayList<TileTag>(64);
+        final TileTag ref;
+        final int width;
+        final int height;
+        TileLoader(TileTag ref, int width, int height){
+            this.ref = ref;
+            this.width = width;
+            this.height = height;
+        }
+        public void run(){
+            try{
+                int hw = (width +1)/2;
+                int hh = (height+1)/2;
+                for(int row=-hw; row<hw; row++){
+                    for(int col=-hh; col<hh; col++){
+                        enqueueAround(new TileTag(ref.x+row, ref.y+col, ref.z));
+                    }
+                }
+                if(interrupted()) return;
+                Collections.sort(toLoad, new TileDistCmp(ref, TileDistCmp.CLOSEST));
+                for(TileTag t : toLoad) {
+                    if(interrupted()) return;
+                    load(t);
+                }
+            } catch (Exception e) {
+
+            }
+        }
+        void enqueueAround(TileTag tag){
+            enqueue(tag);
+            enqueue(new TileTag(tag.x*2+0, tag.y*2+0, tag.z+1));
+            enqueue(new TileTag(tag.x*2+0, tag.y*2+1, tag.z+1));
+            enqueue(new TileTag(tag.x*2+1, tag.y*2+0, tag.z+1));
+            enqueue(new TileTag(tag.x*2+1, tag.y*2+1, tag.z+1));
+        }
+        void enqueue(TileTag tag){
+            if(!cache.containsKey(tag)) toLoad.add(tag);
+        }
+        void load(TileTag tag){
+            // if available helper thread, launch it
+            // otherwise, block to get image
+
+            System.out.println(this.hashCode()+" is loading "+tag);
+
+            if (!(helpers.get() >= CC_REQUEST)) {
+                (new Helper(new LoadTile(tag))).start();
+            } else {
+                (new LoadTile(tag)).run();
+            }
+            //(new LoadTile(tag)).run();
+        }
+        private class Helper extends Thread {
+            Helper(Runnable r){
+                super(r);
+            }
+            @Override
+            public void run(){
+                helpers.incrementAndGet();
+                super.run();
+                helpers.decrementAndGet();
+            }
+        }
+    }
+    /**
+     * Runnable for fetching a given TileTag and putting it in the cache
+     */
+    private class LoadTile implements Runnable{
+        final TileTag target;
+        LoadTile(TileTag target){
+            this.target = target;
+        }
+        public void run(){
+            try {
+                Image img = ImageIO.read(target.getURL(rootURL));
+                addTile(target, img);
+            } catch (Exception e) {
+                System.err.println("failed to load "+target);
+            } finally {
+                contentChanged();
+            }
+        }
+    }
+    /**
+     * Compares two TileTags based on which one is closer to the given tag
+     * Z axis is weighten using Z_PRIORITY
+     * This should allow components to select the tags most/least important
+     * to the viewer based on their current viewport into the map
+     */
+    static class TileDistCmp implements Comparator<TileTag>{
+        static final int FURTHEST = -1;
+        static final int CLOSEST  =  1;
+        final TileTag ref;
+        final int dir;
+        TileDistCmp(TileTag reference, int direction){
+            ref = reference;
+            dir = direction;
+        }
+        TileTag onRefZoom(TileTag n){
+            int zdiff = ref.z - n.z;
+            if (zdiff == 0) {
+                return n;
+            } else if (zdiff > 0) {
+                //n is more zoomed out than ref
+                int fact = (1 << zdiff);
+                int newX = n.x * fact;
+                int newY = n.y * fact;
+                return new TileTag(newX, newY, ref.z);
+            } else { //zdiff < 0
+                //n is more zoomed in than ref
+                int fact = (1 << -zdiff);
+                int newX = n.x / fact;
+                int newY = n.x / fact;
+                return new TileTag(newX, newY, ref.z);
+            }
+        }
+        int xyDiff(TileTag a, TileTag b){
+            TileTag newA = onRefZoom(a);
+            TileTag newB = onRefZoom(b);
+            int adiff = Math.abs(ref.x - newA.x) + Math.abs(ref.y - newA.y);
+            int bdiff = Math.abs(ref.x - newB.x) + Math.abs(ref.y - newB.y);
+            return adiff - bdiff;
+        }
+        public int compare(TileTag a, TileTag b){
+            int xydiff = xyDiff(a, b);
+            int azdiff = Math.abs(ref.z - a.z);
+            int bzdiff = Math.abs(ref.z - b.z);
+            return dir * (xydiff + Z_PRIORITY * (azdiff - bzdiff));
+        }
+    }
+    /**
+     * TileTag contains refereces to x,y,z coordinates, defining equals
+     * and hash code appropriately, and generating url's for standard
+     * web-mercator protocols
+     */
+    static class TileTag{
+        final int x,y,z;
         TileTag(int x, int y, int z){
             this.x = x;
             this.y = y;
@@ -127,7 +290,7 @@ class TileServer implements MapSource{
                 return false;
             return true;
         }
-        URL getURL() {
+        URL getURL(String rootURL) {
             StringBuilder sb = new StringBuilder(rootURL);
             sb.append("/");
             sb.append(z);
@@ -155,5 +318,35 @@ class TileServer implements MapSource{
             sb.append(z);
             return sb.toString();
         }
+    }
+    /**
+     * small set of tests for TileDistCmp and TileTag
+     */
+    private void testTileDist(){
+        TileTag ref = new TileTag(4, 4, 3);
+        Comparator<TileTag> cmp = new TileDistCmp(ref, TileDistCmp.CLOSEST);
+
+        System.out.println("Hello from test Tile Dist Test");
+        System.out.println(cmp.compare(new TileTag(4,4,3), ref)); // 0
+        System.out.println(cmp.compare(new TileTag(0,4,3), ref)); // 4
+        System.out.println(cmp.compare(new TileTag(4,0,3), ref)); // 4
+        System.out.println(cmp.compare(new TileTag(2,2,2), ref)); // 4
+        System.out.println(cmp.compare(new TileTag(8,8,4), ref)); // 4
+
+        TileTag[] test = new TileTag[]{
+            new TileTag(5,4,3),
+            new TileTag(4,3,3),
+            new TileTag(5,8,7),
+            new TileTag(4,5,3),
+            new TileTag(3,4,3),
+            new TileTag(5,8,2),
+            new TileTag(4,4,3),
+            new TileTag(5,5,3),
+            new TileTag(5,8,3)
+        };
+
+        Arrays.sort(test, cmp);
+
+        for(TileTag t : test) System.out.println(t);
     }
 }

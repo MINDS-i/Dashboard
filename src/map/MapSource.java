@@ -2,6 +2,7 @@ package com.map;
 
 import java.awt.geom.Point2D;
 import java.awt.Graphics2D;
+import java.awt.Component;
 
 interface MapSource {
     /**
@@ -17,4 +18,14 @@ interface MapSource {
      *     will try to approximate scale as best as possible
      */
     void paint(Graphics2D g, Point2D center, int scale, int width, int height);
+    /**
+     * Add a component c to the list of components that should repaint
+     * when this mapSource changes its contents
+     */
+    void addRepaintListener(Component c);
+    /**
+     * Remove a component c from the list of components that should repaint
+     * when this mapSource changes its content
+     */
+    void removeRepaintListener(Component c);
 }
