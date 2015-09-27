@@ -17,6 +17,8 @@ import javax.swing.*;
 class TileServer implements MapSource {
     //Number of pixels a tile takes up
     private static final int TILE_SIZE = 256;
+    //Minimum index any tile can have on Z
+    private static final int MIN_Z = 2;
     //Maximum index any tile can have on Z
     private static final int MAX_Z = 18;
     //Maximum index any tile can have on X
@@ -26,13 +28,15 @@ class TileServer implements MapSource {
     //Maximum number of tiles to keep in the cache at any given moment
     private static final int CACHE_SIZE = 256;
     //maximum number of concurrent tile load requests
-    private static final int CC_REQUEST   = 4;
+    private static final int CC_REQUEST = 8;
     //How many tiles to remove from the cache whenever a sweep is done
-    private static final int CLEAN_NUM    = 16;
+    private static final int CLEAN_NUM  = 16;
     //Ratio of lateral to vertical tile priority
-    private static final int Z_PRIORITY   = 6;
-    //Number of offscreen tiles around the margins to try and load
-    private static final int MARGIN_TILES = 2;
+    private static final int Z_PRIORITY = 6;
+    //rings of offscreen tiles around the margins to try and load
+    private static final int CUR_ZOOM_MARGIN  = 1;
+    //rings of offscreen tiles on the next zoom to try and load
+    private static final int NEXT_ZOOM_MARGIN = 0;
     //Dummy image to render when a tile that has not loaded is requested
     private static final Image dummyTile = new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB);
 
@@ -147,11 +151,14 @@ class TileServer implements MapSource {
      * TileDistCmp comparator
      */
     private class TileLoader extends Thread {
-        private AtomicInteger helpers = new AtomicInteger();
-        java.util.List<TileTag> toLoad = new ArrayList<TileTag>(64);
         final TileTag ref;
         final int width;
         final int height;
+        boolean stop = false;
+        int numToLoad;
+        AtomicInteger loadIndex = new AtomicInteger(0);
+        AtomicInteger finishedHelpers = new AtomicInteger(0);
+        java.util.List<TileTag> toLoad = new ArrayList<TileTag>(CACHE_SIZE);
         TileLoader(TileTag ref, int width, int height){
             this.ref = ref;
             this.width = width;
@@ -159,75 +166,82 @@ class TileServer implements MapSource {
         }
         public void run(){
             try{
-                int hw = ((width +1)/2) + MARGIN_TILES;
-                int hh = ((height+1)/2) + MARGIN_TILES;
+    long st = System.nanoTime();
+                //enqueue all the tiles on this zoom level by view+margin
+                int hw = ((width +1)/2) + CUR_ZOOM_MARGIN;
+                int hh = ((height+1)/2) + CUR_ZOOM_MARGIN;
                 for(int row=-hw; row<hw; row++){
                     for(int col=-hh; col<hh; col++){
-                        enqueueAround(new TileTag(ref.x+row, ref.y+col, ref.z));
+                        enqueue(new TileTag(ref.x+row, ref.y+col, ref.z));
                     }
                 }
                 if(interrupted()) return;
-                Collections.sort(toLoad, new TileDistCmp(ref, TileDistCmp.CLOSEST));
-                for(TileTag t : toLoad) {
-                    if(interrupted()) return;
-                    load(t);
+                //enqueue all the tiles on the next zoom level by view+margin
+                hw = ((width +1)/2) + NEXT_ZOOM_MARGIN;
+                hh = ((height+1)/2) + NEXT_ZOOM_MARGIN;
+                for(int row=-hw; row<hw; row++){
+                    for(int col=-hh; col<hh; col++){
+                        enqueueBeneath(new TileTag(ref.x+row, ref.y+col, ref.z));
+                    }
                 }
+                if(interrupted()) return;
+
+                //sort queue by distance from current view
+                Collections.sort(toLoad, new TileDistCmp(ref, TileDistCmp.CLOSEST));
+                if(interrupted()) return;
+
+                //Set up and wait for the loading threads
+                numToLoad = Math.min(toLoad.size(), CACHE_SIZE);
+                for(int i=0; i<CC_REQUEST; i++) (new Helper()).start();
+                while(finishedHelpers.get() != CC_REQUEST){
+                    try{ Thread.sleep(50); }
+                    catch(Exception e){ stop = true; }
+                }
+
+    long et = System.nanoTime();
+    double ns = et-st;
+    double mspt = (ns/numToLoad)/1000000.0d;
+    if(!stop) System.out.println(numToLoad+" Tiles at "+mspt+" mspt");
             } catch (Exception e) {
 
             }
         }
-        void enqueueAround(TileTag tag){
-            enqueue(tag);
+        void enqueueBeneath(TileTag tag){
             enqueue(new TileTag(tag.x*2+0, tag.y*2+0, tag.z+1));
             enqueue(new TileTag(tag.x*2+0, tag.y*2+1, tag.z+1));
             enqueue(new TileTag(tag.x*2+1, tag.y*2+0, tag.z+1));
             enqueue(new TileTag(tag.x*2+1, tag.y*2+1, tag.z+1));
         }
         void enqueue(TileTag tag){
-            if(!cache.containsKey(tag)) toLoad.add(tag);
-        }
-        void load(TileTag tag){
-            // if available helper thread, launch it
-            // otherwise, block to get image
-
-            System.out.println(this.hashCode()+" is loading "+tag);
-
-            if (!(helpers.get() >= CC_REQUEST)) {
-                (new Helper(new LoadTile(tag))).start();
-            } else {
-                (new LoadTile(tag)).run();
-            }
-            //(new LoadTile(tag)).run();
+            if(tag.valid() && !cache.containsKey(tag)) toLoad.add(tag);
         }
         private class Helper extends Thread {
-            Helper(Runnable r){
-                super(r);
-            }
             @Override
             public void run(){
-                helpers.incrementAndGet();
-                super.run();
-                helpers.decrementAndGet();
+                while(true){
+                    int index = loadIndex.getAndIncrement();
+                    if(index >= numToLoad || TileLoader.this.stop){
+                        finishedHelpers.incrementAndGet();
+                        break;
+                    }
+                    TileTag next = toLoad.get(index);
+                    loadTile(next);
+                }
             }
         }
     }
     /**
-     * Runnable for fetching a given TileTag and putting it in the cache
+     * Method for fetching a given TileTag and putting it in the cache
      */
-    private class LoadTile implements Runnable{
-        final TileTag target;
-        LoadTile(TileTag target){
-            this.target = target;
-        }
-        public void run(){
-            try {
-                Image img = ImageIO.read(target.getURL(rootURL));
-                addTile(target, img);
-            } catch (Exception e) {
-                System.err.println("failed to load "+target);
-            } finally {
-                contentChanged();
-            }
+    private void loadTile(TileTag target){
+        try {
+            Image img = ImageIO.read(target.getURL(rootURL));
+            addTile(target, img);
+            //System.err.println("loaded "+target);
+        } catch (Exception e) {
+            System.err.println("failed to load "+target);
+        } finally {
+            contentChanged();
         }
     }
     /**
@@ -306,6 +320,12 @@ class TileServer implements MapSource {
             if (x != other.x || y != other.y || z != other.z)
                 return false;
             return true;
+        }
+        //check if a tile is within the coordinate bounds
+        boolean valid(){
+            return z >= MIN_Z && z <= MAX_Z    &&
+                   x >=     0 && x <  (1 << z) &&
+                   y >=     0 && y <  (1 << z)   ;
         }
         URL getURL(String rootURL) {
             StringBuilder sb = new StringBuilder(rootURL);
