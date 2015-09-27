@@ -15,19 +15,29 @@ import javax.imageio.*;
 import javax.swing.*;
 
 class TileServer implements MapSource {
+    //Number of pixels a tile takes up
     private static final int TILE_SIZE = 256;
-    private static final int MAX_Z = 18; //max zoom level
+    //Maximum index any tile can have on Z
+    private static final int MAX_Z = 18;
+    //Maximum index any tile can have on X
     private static final int MAX_X = (1 << MAX_Z) / TILE_SIZE;
+    //Maximum index any tile can have on Y
     private static final int MAX_Y = (1 << MAX_Z) / TILE_SIZE;
+    //Maximum number of tiles to keep in the cache at any given moment
     private static final int CACHE_SIZE = 256;
     //maximum number of concurrent tile load requests
-    private static final int CC_REQUEST = 4;
-    private static final int CLEAN_NUM  = 16;
-    private static final int Z_PRIORITY = 6;
+    private static final int CC_REQUEST   = 4;
+    //How many tiles to remove from the cache whenever a sweep is done
+    private static final int CLEAN_NUM    = 16;
+    //Ratio of lateral to vertical tile priority
+    private static final int Z_PRIORITY   = 6;
+    //Number of offscreen tiles around the margins to try and load
+    private static final int MARGIN_TILES = 2;
+    //Dummy image to render when a tile that has not loaded is requested
     private static final Image dummyTile = new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB);
 
     private java.util.List<Component> repaintListeners = new LinkedList<Component>();
-    private Map<TileTag, Image>     cache = new HashMap<TileTag, Image>(CACHE_SIZE+1, 1.0f);
+    private Map<TileTag, Image> cache = new HashMap<TileTag, Image>(CACHE_SIZE+1, 1.0f);
     private final String rootURL;
     private TileTag centerTag;
 
@@ -36,6 +46,9 @@ class TileServer implements MapSource {
     }
 
     public void clear(){
+        if(tileLoader != null) {
+            tileLoader.interrupt();
+        }
         cache.clear();
     }
 
@@ -113,11 +126,15 @@ class TileServer implements MapSource {
     public void addRepaintListener(Component c){
         repaintListeners.add(c);
     }
-
+    /**
+     * Remove listener to be repainted if the viewed map ever changes
+     */
     public void removeRepaintListener(Component c){
         repaintListeners.remove(c);
     }
-
+    /**
+     * Notify listeners that the current map view may have changed
+     */
     private void contentChanged(){
         for(Component c : repaintListeners){
             c.repaint();
@@ -142,8 +159,8 @@ class TileServer implements MapSource {
         }
         public void run(){
             try{
-                int hw = (width +1)/2;
-                int hh = (height+1)/2;
+                int hw = ((width +1)/2) + MARGIN_TILES;
+                int hh = ((height+1)/2) + MARGIN_TILES;
                 for(int row=-hw; row<hw; row++){
                     for(int col=-hh; col<hh; col++){
                         enqueueAround(new TileTag(ref.x+row, ref.y+col, ref.z));
