@@ -27,14 +27,7 @@ import javax.swing.*;
 
 public class MapPanel extends JPanel implements ContextViewer, CoordinateTransform {
     private static final int TILE_SIZE = 256;
-/*
-    private static final int CACHE_SIZE = 64;
-    private static final TileServer[] TILESERVERS = {
-        new TileServer("http://otile1.mqcdn.com/tiles/1.0.0/sat/", 18),
-        new TileServer("http://otile1.mqcdn.com/tiles/1.0.0/map/", 18),
-    };
-    private TileServer tileServer = TILESERVERS[0];
-    private TileCache cache = new TileCache();*/
+
     private MapSource mapSource = new TileServer("http://otile1.mqcdn.com/tiles/1.0.0/sat");
 
     private int zoom;
@@ -131,9 +124,11 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
      * Transforms absolute (lon,lat) to the pixel position in the current screen
      */
     public Point2D screenPosition(Point2D p){
-        Point2D absPix = toPixels(p);
+        Point2D pPix = toPixels(p);
+        Point2D cPix = toPixels(mapPosition);
         Point2D f = (Point2D) p.clone();
-        //f.setLocation(absPix.getX() - mapPosition.x, absPix.getY() - mapPosition.y);
+        f.setLocation(pPix.getX() - cPix.getX() +  getWidth()/2,
+                      pPix.getY() - cPix.getY() + getHeight()/2 );
         return f;
     }
     /**
@@ -156,149 +151,6 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
 
     public void nextTileServer() {
     }
- /*   private void testTileServer(TileServer server){
-        String urlstring = getTileString(tileServer, 1, 1, 1);
-        try {
-            URL url = new URL(urlstring);
-            Object content = url.getContent();
-        } catch (Exception e) {
-            tileServer.setBroken(true);
-            JOptionPane.showMessageDialog(
-                SwingUtilities.getWindowAncestor(MapPanel.this),
-                "The tileserver \"" + getTileServer().getURL() + "\" could not be reached.\r\nCheck internet connection",
-                "TileServer not reachable.", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private void checkTileServers() {
-        for (TileServer server : TILESERVERS) {
-            final TileServer s = server;
-            Runnable tileTestRunner = new Runnable() {
-                public void run() {
-                    testTileServer(s);
-                }
-            };
-            SwingUtilities.invokeLater(tileTestRunner);
-        }
-    }
-
-    public void setTileServer(TileServer tileServer) {
-        if(this.tileServer == tileServer)
-            return;
-        this.tileServer = tileServer;
-        while (getZoom() > tileServer.getMaxZoom())
-            zoomOut(new Point(getWidth() / 2, getHeight() / 2));
-    }
-
-    public void nextTileServer() {
-        int index = Arrays.asList(TILESERVERS).indexOf(getTileServer());
-        if (index == -1) return;
-        setTileServer(TILESERVERS[(index + 1) % TILESERVERS.length]);
-        repaint();
-    }
-
-    TileServer getTileServer() {
-        return tileServer;
-    }
-
-    TileCache getCache() {
-        return cache;
-    }
-
-    private static class Tile {
-        private final String key;
-        public final int x, y, z;
-        public Tile(String tileServer, int x, int y, int z) {
-            this.key = tileServer;
-            this.x = x;
-            this.y = y;
-            this.z = z;
-        }
-        public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result = prime * result + ((key == null) ? 0 : key.hashCode());
-            result = prime * result + x;
-            result = prime * result + y;
-            result = prime * result + z;
-            return result;
-        }
-        public boolean equals(Object obj) {
-            if (this == obj)
-                return true;
-            if (obj == null)
-                return false;
-            if (getClass() != obj.getClass())
-                return false;
-            Tile other = (Tile) obj;
-            if (key == null) {
-                if (other.key != null)
-                    return false;
-            } else if (!key.equals(other.key))
-                return false;
-            if (x != other.x)
-                return false;
-            if (y != other.y)
-                return false;
-            if (z != other.z)
-                return false;
-            return true;
-        }
-
-    }
-
-    private static class TileCache {
-        private LinkedHashMap<Tile,Image> map = new LinkedHashMap<Tile,Image>(CACHE_SIZE, 0.75f, true) {
-            protected boolean removeEldestEntry(java.util.Map.Entry<Tile,Image> eldest) {
-                boolean remove = size() > CACHE_SIZE;
-                return remove;
-            }
-        };
-        public void put(TileServer tileServer, int x, int y, int z, Image image) {
-            map.put(new Tile(tileServer.getURL(), x, y, z), image);
-        }
-        public Image get(TileServer tileServer, int x, int y, int z) {
-            //return map.get(new Tile(x, y, z));
-            Image image = map.get(new Tile(tileServer.getURL(), x, y, z));
-            return image;
-        }
-        public int getSize() {
-            return map.size();
-        }
-    }
-
-    public static String getTileString(TileServer tileServer, int xtile, int ytile, int zoom) {
-        String number = ("" + zoom + "/" + xtile + "/" + ytile);
-        String url = tileServer.getURL() + number + ".png";
-        return url;
-    }
-
-    public static String getTileNumber(TileServer tileServer, double lat, double lon, int zoom) {
-        int xtile = (int) Math.floor((lon + 180) / 360 * (1 << zoom));
-        int ytile = (int) Math.floor((1 - Math.log(Math.tan(Math.toRadians(lat)) + 1 / Math.cos(Math.toRadians(lat))) / Math.PI) / 2 * (1 << zoom));
-        return getTileString(tileServer, xtile, ytile, zoom);
-    }
-
-    private final static BufferedImage loadImg = new BufferedImage(1,1,
-                                                    BufferedImage.TYPE_INT_ARGB);
-    private void loadTile(TileCache c, TileServer ts, int x, int y, int zoom){
-        c.put(ts, x, y, zoom, loadImg);
-        Runnable load = new Runnable(){
-            public void run(){
-                final String url = getTileString(ts, x, y, zoom);
-                try {
-                    Image n = Toolkit.getDefaultToolkit().getImage(new URL(url));
-                    //if n is null, painter will try again
-                    c.put(ts, x, y, zoom, n);
-                    MapPanel.this.repaint();
-                } catch (Exception e) {
-                    System.err.println("failed to load url \"" + url + "\"");
-                }
-            }
-        };
-        (new Thread(load)).start();
-    }*/
-//end tileserver code
 
     public Point2D getMapPosition() {
         return (Point2D) mapPosition.clone();

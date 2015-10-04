@@ -28,15 +28,15 @@ class TileServer implements MapSource {
     //Maximum number of tiles to keep in the cache at any given moment
     private static final int CACHE_SIZE = 256;
     //maximum number of concurrent tile load requests
-    private static final int CC_REQUEST = 8;
+    private static final int CC_REQUEST = 12;
     //How many tiles to remove from the cache whenever a sweep is done
     private static final int CLEAN_NUM  = 16;
     //Ratio of lateral to vertical tile priority
     private static final int Z_PRIORITY = 6;
     //rings of offscreen tiles around the margins to try and load
-    private static final int CUR_ZOOM_MARGIN  = 1;
+    private static final int CUR_ZOOM_MARGIN  = 2;
     //rings of offscreen tiles on the next zoom to try and load
-    private static final int NEXT_ZOOM_MARGIN = 0;
+    private static final int NEXT_ZOOM_MARGIN =-1;
     //maximum percentage to zoom a tile before shrinking the layer below instead
     private static final float ZOOM_CROSSOVER = 1.35f;
     //Dummy image to render when a tile that has not loaded is requested
@@ -112,8 +112,10 @@ class TileServer implements MapSource {
         }
         g2d.dispose();
 
+        System.out.println(zoom);
         TileTag newCenterTag = new TileTag(rowB + wit/2, colB + hit/2, zoom);
         if(!newCenterTag.equals(centerTag)){
+            System.out.println("New center tag");
             centerTag = newCenterTag;
             launchTileLoader(centerTag, wit, hit);
         }
@@ -272,7 +274,9 @@ class TileServer implements MapSource {
         } catch (Exception e) {
             System.err.println("failed to load "+target);
         } finally {
-            contentChanged();
+            //don't repaint for prefetched tiles
+            if(target.z == centerTag.z)
+                contentChanged();
         }
     }
     /**
