@@ -37,6 +37,8 @@ class TileServer implements MapSource {
     private static final int CUR_ZOOM_MARGIN  = 1;
     //rings of offscreen tiles on the next zoom to try and load
     private static final int NEXT_ZOOM_MARGIN = 0;
+    //maximum percentage to zoom a tile before shrinking the layer below instead
+    private static final float ZOOM_CROSSOVER = 1.35f;
     //Dummy image to render when a tile that has not loaded is requested
     private static final Image dummyTile = new BufferedImage(TILE_SIZE,TILE_SIZE,
                                                      BufferedImage.TYPE_INT_ARGB);
@@ -62,57 +64,62 @@ class TileServer implements MapSource {
         int rscale = scale/TILE_SIZE;
         int zoom   = 31 - Integer.numberOfLeadingZeros(rscale);
         int escale = (1 << zoom);
-        float zerr = 1.0f + (((float)rscale - escale) / (float) escale);
+        float zfix = 1.0f + (((float)rscale - escale) / (float) escale);
 
-        if(zerr >= 1.35f){
+        if(zfix >= ZOOM_CROSSOVER){
             zoom   += 1;
             escale *= 2;
-            zerr   /= 2;
+            zfix   /= 2;
         }
 
-        int ewidth  = (int) ((float)width /zerr);
-        int eheight = (int) ((float)height/zerr);
+        int ewidth  = (int) ((float)width /zfix);
+        int eheight = (int) ((float)height/zfix);
 
         g2d.translate((width / 2), (height/ 2));
-        g2d.scale(zerr, zerr);
+        g2d.scale(zfix, zfix);
         g2d.translate(-(ewidth / 2), -(eheight/ 2));
         g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
                     RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
                     //RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
+        /**
+         * From here on, the graphics object is mapped so that if we draw
+         * around the center of an ewidth by eheight screen normally, it will
+         * fit in the orginal screen size zoomed correctly
+         */
+
         //normalized coordinates of the central lat/son
         float nlon = ((float)(center.getX()+90.0f)/180.0f);
         float nlat = ((float)(center.getY()+90.0f)/180.0f);
         //pixel positions of top left point from lat/lon
-        int sLon = (int)((float)escale * TILE_SIZE * nlon) - (ewidth /2);
-        int sLat = (int)((float)escale * TILE_SIZE * nlat) - (eheight/2);
-        //cow/col Base - index of the top left corner
+        int sLon = (int)(escale * TILE_SIZE * nlon) - (ewidth /2);
+        int sLat = (int)(escale * TILE_SIZE * nlat) - (eheight/2);
+        //row/col Base index in the top left corner
         int rowB = sLon/TILE_SIZE;
         int colB = sLat/TILE_SIZE;
-        //X,Y coordinate that top left corner tile should be displayed at
-        int minX = -(sLon - rowB*TILE_SIZE);
-        int minY = -(sLat - colB*TILE_SIZE);
-        //number of tiles along width/height
-        int tcw  = ((ewidth -minX)/TILE_SIZE)+1;
-        int tch  = ((eheight-minY)/TILE_SIZE)+1;
+        //X,Y shifts to keep the view in alignment
+        int xalign = -(sLon - rowB*TILE_SIZE);
+        int yalign = -(sLat - colB*TILE_SIZE);
+        //with/height in tiles
+        int wit  = ((ewidth -xalign)/TILE_SIZE)+1;
+        int hit  = ((eheight-yalign)/TILE_SIZE)+1;
 
-        for(int row = 0; row < tcw; row++){
-            for(int col = 0; col < tch; col++){
+        for(int row = 0; row < wit; row++){
+            for(int col = 0; col < hit; col++){
                 Image img = pollImage(new TileTag(row+rowB, col+colB, zoom));
-                g2d.drawImage(img, minX+row*TILE_SIZE, minY + col*TILE_SIZE,null);
+                g2d.drawImage(img, xalign+row*TILE_SIZE, yalign + col*TILE_SIZE,null);
             }
         }
         g2d.dispose();
 
-        TileTag newCenterTag = new TileTag(rowB + tcw/2, colB + tch/2, zoom);
+        TileTag newCenterTag = new TileTag(rowB + wit/2, colB + hit/2, zoom);
         if(!newCenterTag.equals(centerTag)){
             centerTag = newCenterTag;
-            launchTileLoader(centerTag, tcw, tch);
+            launchTileLoader(centerTag, wit, hit);
         }
     }
 
     Image pollImage(TileTag target){
-        //return image from cache
         Image tile = cache.get(target);
         if(tile != null) return tile;
 
