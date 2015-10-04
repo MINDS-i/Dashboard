@@ -78,7 +78,7 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         south.add(east,  BorderLayout.EAST);
         south.add(north, BorderLayout.CENTER);
 
-        setZoom(zoom);
+        setZoom(TILE_SIZE * (1 << zoom));
         //setMapPosition(mapPosition);
 
         mll.add(new RoverPath(context, this, waypointPanel));
@@ -95,7 +95,7 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
      */
     public Point2D toPixels(Point2D p){
         Point2D f = (Point2D) p.clone();
-        double scale = TILE_SIZE * (1 << (getZoom()-1));
+        double scale = zoom;
         double lon   = Math.toRadians(p.getX());
         double lat   = Math.toRadians(p.getY());
         double x = ((lon + Math.PI) / Math.PI) * scale;
@@ -113,7 +113,7 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
      */
     public Point2D toCoordinates(Point2D p){
         Point2D f = (Point2D) p.clone();
-        double scale = TILE_SIZE * (1 << (getZoom()-1));
+        double scale = zoom;
         double x     = p.getX() / scale;
         double y     = p.getY() / scale;
         double lon   = x * 180 - 180;
@@ -341,37 +341,37 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
             return;*/
         int dx = pivot.x;
         int dy = pivot.y;
-        setZoom(getZoom() + 1);
+        setZoom((getZoom()*12)/11);
         //Point mapPosition = getMapPosition();
         //setMapPosition(mapPosition.x * 2 + dx, mapPosition.y * 2 + dy);
         repaint();
     }
 
     public void zoomOut(Point pivot) {
-        if (getZoom() <= 1)
+        if (getZoom() <= 2*TILE_SIZE)//screen width
             return;
         int dx = pivot.x;
         int dy = pivot.y;
-        setZoom(getZoom() - 1);
+        setZoom((getZoom()*11)/12);
         //Point mapPosition = getMapPosition();
         //setMapPosition((mapPosition.x - dx) / 2, (mapPosition.y - dy) / 2);
         repaint();
     }
 
     public int getXTileCount() {
-        return (1 << zoom);
+        return zoom/TILE_SIZE;
     }
 
     public int getYTileCount() {
-        return (1 << zoom);
+        return zoom/TILE_SIZE;
     }
 
     public int getXMax() {
-        return TILE_SIZE * getXTileCount();
+        return zoom;
     }
 
     public int getYMax() {
-        return TILE_SIZE * getYTileCount();
+        return zoom;
     }
 
     public Point getTile(Point position) {
@@ -385,7 +385,7 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         try {
             mapSource.paint(g,
                             mapPosition,
-                            TILE_SIZE * (1 << (getZoom()-1)),
+                            zoom,
                             getWidth(),
                             getHeight() );
             mll.draw(g);

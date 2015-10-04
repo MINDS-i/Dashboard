@@ -38,8 +38,8 @@ class TileServer implements MapSource {
     //rings of offscreen tiles on the next zoom to try and load
     private static final int NEXT_ZOOM_MARGIN = 0;
     //Dummy image to render when a tile that has not loaded is requested
-    private static final Image dummyTile = new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB);
-
+    private static final Image dummyTile = new BufferedImage(TILE_SIZE,TILE_SIZE,
+                                                     BufferedImage.TYPE_INT_ARGB);
     private java.util.List<Component> repaintListeners = new LinkedList<Component>();
     private Map<TileTag, Image> cache = new HashMap<TileTag, Image>(CACHE_SIZE+1, 1.0f);
     private final String rootURL;
@@ -58,19 +58,43 @@ class TileServer implements MapSource {
 
     public void paint(Graphics2D gd, Point2D center, int scale, int width, int height){
         Graphics2D g2d = (Graphics2D) gd.create();
-        int zoom = 31 - Integer.numberOfLeadingZeros(scale / TILE_SIZE);
-        //pixel positions of latitude and longitude center point
-        int sLon = (int)((center.getX()+90.0) * (double)scale / 180.0) - (width / 2);
-        int sLat = (int)((center.getY()+90.0) * (double)scale / 180.0) - (height/ 2);
+
+        int rscale = scale/TILE_SIZE;
+        int zoom   = 31 - Integer.numberOfLeadingZeros(rscale);
+        int escale = (1 << zoom);
+        float zerr = 1.0f + (((float)rscale - escale) / (float) escale);
+
+        if(zerr >= 1.35f){
+            zoom   += 1;
+            escale *= 2;
+            zerr   /= 2;
+        }
+
+        int ewidth  = (int) ((float)width /zerr);
+        int eheight = (int) ((float)height/zerr);
+
+        g2d.translate((width / 2), (height/ 2));
+        g2d.scale(zerr, zerr);
+        g2d.translate(-(ewidth / 2), -(eheight/ 2));
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                    RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+                    //RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+
+        //normalized coordinates of the central lat/son
+        float nlon = ((float)(center.getX()+90.0f)/180.0f);
+        float nlat = ((float)(center.getY()+90.0f)/180.0f);
+        //pixel positions of top left point from lat/lon
+        int sLon = (int)((float)escale * TILE_SIZE * nlon) - (ewidth /2);
+        int sLat = (int)((float)escale * TILE_SIZE * nlat) - (eheight/2);
         //cow/col Base - index of the top left corner
         int rowB = sLon/TILE_SIZE;
         int colB = sLat/TILE_SIZE;
         //X,Y coordinate that top left corner tile should be displayed at
-        int minX = -sLon%TILE_SIZE;
-        int minY = -sLat%TILE_SIZE;
+        int minX = -(sLon - rowB*TILE_SIZE);
+        int minY = -(sLat - colB*TILE_SIZE);
         //number of tiles along width/height
-        int tcw  = ((width -minX)/TILE_SIZE)+1;
-        int tch  = ((height-minY)/TILE_SIZE)+1;
+        int tcw  = ((ewidth -minX)/TILE_SIZE)+1;
+        int tch  = ((eheight-minY)/TILE_SIZE)+1;
 
         for(int row = 0; row < tcw; row++){
             for(int col = 0; col < tch; col++){
@@ -206,6 +230,7 @@ class TileServer implements MapSource {
 
             }
         }
+        //enqueue the 4 tiles on the next zoom level, beneath the argument
         void enqueueBeneath(TileTag tag){
             enqueue(new TileTag(tag.x*2+0, tag.y*2+0, tag.z+1));
             enqueue(new TileTag(tag.x*2+0, tag.y*2+1, tag.z+1));
@@ -237,7 +262,6 @@ class TileServer implements MapSource {
         try {
             Image img = ImageIO.read(target.getURL(rootURL));
             addTile(target, img);
-            //System.err.println("loaded "+target);
         } catch (Exception e) {
             System.err.println("failed to load "+target);
         } finally {
