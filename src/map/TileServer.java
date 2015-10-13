@@ -92,14 +92,14 @@ class TileServer implements MapSource {
         float nlon = ((float)(center.getX()+90.0f)/180.0f);
         float nlat = ((float)(center.getY()+90.0f)/180.0f);
         //pixel positions of top left point from lat/lon
-        int sLon = (int)(escale * TILE_SIZE * nlon) - (ewidth /2);
-        int sLat = (int)(escale * TILE_SIZE * nlat) - (eheight/2);
+        float sLon = (escale * TILE_SIZE * nlon) - (ewidth /2);
+        float sLat = (escale * TILE_SIZE * nlat) - (eheight/2);
         //row/col Base index in the top left corner
-        int rowB = sLon/TILE_SIZE;
-        int colB = sLat/TILE_SIZE;
+        int rowB = (int)(sLon/TILE_SIZE);
+        int colB = (int)(sLat/TILE_SIZE);
         //X,Y shifts to keep the view in alignment
-        int xalign = -(sLon - rowB*TILE_SIZE);
-        int yalign = -(sLat - colB*TILE_SIZE);
+        int xalign = (int) -(sLon - rowB*TILE_SIZE);
+        int yalign = (int) -(sLat - colB*TILE_SIZE);
         //with/height in tiles
         int wit  = ((ewidth -xalign)/TILE_SIZE)+1;
         int hit  = ((eheight-yalign)/TILE_SIZE)+1;
