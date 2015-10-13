@@ -38,7 +38,7 @@ class TileServer implements MapSource {
     //rings of offscreen tiles on the next zoom to try and load
     private static final int NEXT_ZOOM_MARGIN =-1;
     //maximum percentage to zoom a tile before shrinking the layer below instead
-    private static final float ZOOM_CROSSOVER = 1.35f;
+    private static final float ZOOM_CROSSOVER = 1.30f;
     //Dummy image to render when a tile that has not loaded is requested
     private static final Image dummyTile = new BufferedImage(TILE_SIZE,TILE_SIZE,
                                                      BufferedImage.TYPE_INT_ARGB);
@@ -61,26 +61,25 @@ class TileServer implements MapSource {
     public void paint(Graphics2D gd, Point2D center, int scale, int width, int height){
         Graphics2D g2d = (Graphics2D) gd.create();
 
-        int rscale = scale/TILE_SIZE;
-        int zoom   = 31 - Integer.numberOfLeadingZeros(rscale);
-        int escale = (1 << zoom);
-        float zfix = 1.0f + (((float)rscale - escale) / (float) escale);
+        int recs = scale/TILE_SIZE;
+        int zoom = 31 - Integer.numberOfLeadingZeros(recs);
+        int effs = (1 << zoom);
+        float zfix = 1.0f + ((recs-effs)/(float)effs);
 
         if(zfix >= ZOOM_CROSSOVER){
-            zoom   += 1;
-            escale *= 2;
-            zfix   /= 2;
+            zoom += 1;
+            effs *= 2;
+            zfix /= 2.0f;
         }
 
-        int ewidth  = (int) ((float)width /zfix);
-        int eheight = (int) ((float)height/zfix);
+        float ewidth  = (width /zfix);
+        float eheight = (height/zfix);
 
-        g2d.translate((width / 2), (height/ 2));
+        g2d.translate((width / 2.0f), (height/ 2.0f));
         g2d.scale(zfix, zfix);
-        g2d.translate(-(ewidth / 2), -(eheight/ 2));
+        g2d.translate(-(ewidth / 2.0f), -(eheight/ 2.0f));
         g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-                    RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
-                    //RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                    RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
         /**
          * From here on, the graphics object is mapped so that if we draw
@@ -92,17 +91,17 @@ class TileServer implements MapSource {
         float nlon = ((float)(center.getX()+90.0f)/180.0f);
         float nlat = ((float)(center.getY()+90.0f)/180.0f);
         //pixel positions of top left point from lat/lon
-        float sLon = (escale * TILE_SIZE * nlon) - (ewidth /2);
-        float sLat = (escale * TILE_SIZE * nlat) - (eheight/2);
+        float sLon = (effs * TILE_SIZE * nlon) - (ewidth /2.0f);
+        float sLat = (effs * TILE_SIZE * nlat) - (eheight/2.0f);
         //row/col Base index in the top left corner
         int rowB = (int)(sLon/TILE_SIZE);
         int colB = (int)(sLat/TILE_SIZE);
         //X,Y shifts to keep the view in alignment
         int xalign = (int) -(sLon - rowB*TILE_SIZE);
         int yalign = (int) -(sLat - colB*TILE_SIZE);
-        //with/height in tiles
-        int wit  = ((ewidth -xalign)/TILE_SIZE)+1;
-        int hit  = ((eheight-yalign)/TILE_SIZE)+1;
+        //width/height in tiles
+        int wit  = (((int)ewidth -xalign)/TILE_SIZE)+1;
+        int hit  = (((int)eheight-yalign)/TILE_SIZE)+1;
 
         for(int row = 0; row < wit; row++){
             for(int col = 0; col < hit; col++){
