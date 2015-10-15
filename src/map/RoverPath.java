@@ -172,7 +172,6 @@ class RoverPath implements Layer, ContextViewer {
 
     private void drawRover(Graphics g){
         Point2D roverPoint = mapTransform.screenPosition(rover.getLocation());
-        System.out.println(roverPoint);
         drawImg(g, context.theme.roverImage, roverPoint);
     }
 

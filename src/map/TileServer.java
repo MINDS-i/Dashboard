@@ -49,7 +49,6 @@ class TileServer implements MapSource {
 
     TileServer(String url){
         this.rootURL = url;
-        testTileDist();
     }
 
     public void clear(){

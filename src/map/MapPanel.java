@@ -173,7 +173,6 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
             return;
         int oldZoom = this.zoom;
         this.zoom = zoom;
-        System.out.println("Zoom set to "+zoom);
         //this.zoom = Math.min(getTileServer().getMaxZoom(), zoom);
         firePropertyChange("zoom", oldZoom, zoom);
     }
