@@ -34,21 +34,22 @@ class TileServer implements MapSource {
     //Ratio of lateral to vertical tile priority
     private static final int Z_PRIORITY = 6;
     //rings of offscreen tiles around the margins to try and load
-    private static final int CUR_ZOOM_MARGIN  = 2;
+    private static final int CUR_ZOOM_MARGIN  = 2;//2
     //rings of offscreen tiles on the next zoom to try and load
-    private static final int NEXT_ZOOM_MARGIN =-1;
+    private static final int NEXT_ZOOM_MARGIN = -1;
     //maximum percentage to zoom a tile before shrinking the layer below instead
     private static final float ZOOM_CROSSOVER = 1.30f;
     //Dummy image to render when a tile that has not loaded is requested
     private static final Image dummyTile = new BufferedImage(TILE_SIZE,TILE_SIZE,
                                                      BufferedImage.TYPE_INT_ARGB);
     private java.util.List<Component> repaintListeners = new LinkedList<Component>();
-    private Map<TileTag, Image> cache = new HashMap<TileTag, Image>(CACHE_SIZE+1, 1.0f);
+    private Map<TileTag, Image> cache = new ConcurrentHashMap<TileTag, Image>(CACHE_SIZE+1, 1.0f);
     private final String rootURL;
     private TileTag centerTag;
 
     TileServer(String url){
         this.rootURL = url;
+        testTileDist();
     }
 
     public void clear(){
@@ -105,18 +106,25 @@ class TileServer implements MapSource {
 
         for(int row = 0; row < wit; row++){
             for(int col = 0; col < hit; col++){
-                Image img = pollImage(new TileTag(row+rowB, col+colB, zoom));
-                g2d.drawImage(img, xalign+row*TILE_SIZE, yalign + col*TILE_SIZE,null);
+                /*Image img = pollImage(new TileTag(row+rowB, col+colB, zoom));
+                g2d.drawImage(img, xalign+row*TILE_SIZE, yalign+col*TILE_SIZE,null);*/
+
+                int x = xalign + row*TILE_SIZE;
+                int y = yalign + col*TILE_SIZE;
+                TileTag tile = new TileTag(row+rowB, col+colB, zoom);
+                Image img = pollImage(tile);
+                g2d.drawImage(img, xalign+row*TILE_SIZE, yalign+col*TILE_SIZE,null);
+                g2d.setColor(Color.YELLOW);
+                g2d.drawString(tile.toString(), x, y);
             }
         }
         g2d.dispose();
 
-        System.out.println(zoom);
         TileTag newCenterTag = new TileTag(rowB + wit/2, colB + hit/2, zoom);
         if(!newCenterTag.equals(centerTag)){
-            System.out.println("New center tag");
             centerTag = newCenterTag;
-            launchTileLoader(centerTag, wit, hit);
+            //System.out.println("New center tag at "+centerTag);
+            launchTileLoader(centerTag, (width/TILE_SIZE)+1, (height/TILE_SIZE)+1);
         }
     }
 
@@ -131,7 +139,6 @@ class TileServer implements MapSource {
     private void launchTileLoader(TileTag center, int width, int height){
         if(tileLoader != null) {
             tileLoader.interrupt();
-            //tileLoader.join();
         }
         tileLoader = new TileLoader(centerTag, width, height);
         tileLoader.start();
@@ -195,6 +202,7 @@ class TileServer implements MapSource {
             this.ref = ref;
             this.width = width;
             this.height = height;
+            System.out.println("Loading "+width+"x"+height+" tiles around "+ref);
         }
         public void run(){
             try{
@@ -202,8 +210,8 @@ class TileServer implements MapSource {
                 //enqueue all the tiles on this zoom level by view+margin
                 int hw = ((width +1)/2) + CUR_ZOOM_MARGIN;
                 int hh = ((height+1)/2) + CUR_ZOOM_MARGIN;
-                for(int row=-hw; row<hw; row++){
-                    for(int col=-hh; col<hh; col++){
+                for(int row=-hw; row<=hw; row++){
+                    for(int col=-hh; col<=hh; col++){
                         enqueue(new TileTag(ref.x+row, ref.y+col, ref.z));
                     }
                 }
@@ -211,8 +219,8 @@ class TileServer implements MapSource {
                 //enqueue all the tiles on the next zoom level by view+margin
                 hw = ((width +1)/2) + NEXT_ZOOM_MARGIN;
                 hh = ((height+1)/2) + NEXT_ZOOM_MARGIN;
-                for(int row=-hw; row<hw; row++){
-                    for(int col=-hh; col<hh; col++){
+                for(int row=-hw; row<=hw; row++){
+                    for(int col=-hh; col<=hh; col++){
                         enqueueBeneath(new TileTag(ref.x+row, ref.y+col, ref.z));
                     }
                 }
@@ -246,7 +254,9 @@ class TileServer implements MapSource {
             enqueue(new TileTag(tag.x*2+1, tag.y*2+1, tag.z+1));
         }
         void enqueue(TileTag tag){
-            if(tag.valid() && !cache.containsKey(tag)) toLoad.add(tag);
+            if(tag.valid() && !cache.containsKey(tag)) {
+                toLoad.add(tag);
+            }
         }
         private class Helper extends Thread {
             @Override
@@ -272,6 +282,7 @@ class TileServer implements MapSource {
             addTile(target, img);
         } catch (Exception e) {
             System.err.println("failed to load "+target);
+            e.printStackTrace();
         } finally {
             //don't repaint for prefetched tiles
             if(target.z == centerTag.z)
@@ -287,42 +298,29 @@ class TileServer implements MapSource {
     static class TileDistCmp implements Comparator<TileTag>{
         static final int FURTHEST = -1;
         static final int CLOSEST  =  1;
-        final TileTag ref;
+        //final TileTag ref;
+        final double refx;
+        final double refy;
+        final int refz;
         final int dir;
         TileDistCmp(TileTag reference, int direction){
-            ref = reference;
-            dir = direction;
-        }
-        TileTag onRefZoom(TileTag n){
-            int zdiff = ref.z - n.z;
-            if (zdiff == 0) {
-                return n;
-            } else if (zdiff > 0) {
-                //n is more zoomed out than ref
-                int fact = (1 << zdiff);
-                int newX = n.x * fact;
-                int newY = n.y * fact;
-                return new TileTag(newX, newY, ref.z);
-            } else { //zdiff < 0
-                //n is more zoomed in than ref
-                int fact = (1 << -zdiff);
-                int newX = n.x / fact;
-                int newY = n.x / fact;
-                return new TileTag(newX, newY, ref.z);
-            }
-        }
-        int xyDiff(TileTag a, TileTag b){
-            TileTag newA = onRefZoom(a);
-            TileTag newB = onRefZoom(b);
-            int adiff = Math.abs(ref.x - newA.x) + Math.abs(ref.y - newA.y);
-            int bdiff = Math.abs(ref.x - newB.x) + Math.abs(ref.y - newB.y);
-            return adiff - bdiff;
+            dir  = direction;
+            refz = reference.z;
+            refx = reference.x / (double)(1<<reference.z);
+            refy = reference.y / (double)(1<<reference.z);
         }
         public int compare(TileTag a, TileTag b){
-            int xydiff = xyDiff(a, b);
-            int azdiff = Math.abs(ref.z - a.z);
-            int bzdiff = Math.abs(ref.z - b.z);
-            return dir * (xydiff + Z_PRIORITY * (azdiff - bzdiff));
+            double ax = a.x / (double)(1<<a.z);
+            double ay = a.y / (double)(1<<a.z);
+            double bx = b.x / (double)(1<<b.z);
+            double by = b.y / (double)(1<<b.z);
+
+            double ardist = Math.abs(refx-ax) + Math.abs(refy-ay);
+            double brdist = Math.abs(refx-bx) + Math.abs(refy-by);
+
+            double xydiff = (ardist - brdist) * (double)(1<<refz);
+            double  zdiff = (double) (Math.abs(refz-a.z) - Math.abs(refz-b.z));
+            return dir * (int) Math.signum(xydiff + Z_PRIORITY * zdiff);
         }
     }
     /**
@@ -394,29 +392,32 @@ class TileServer implements MapSource {
      * small set of tests for TileDistCmp and TileTag
      */
     private void testTileDist(){
-        TileTag ref = new TileTag(4, 4, 3);
-        Comparator<TileTag> cmp = new TileDistCmp(ref, TileDistCmp.CLOSEST);
+        java.util.List<TileTag> test = new ArrayList<TileTag>();
 
-        System.out.println("Hello from test Tile Dist Test");
-        System.out.println(cmp.compare(new TileTag(4,4,3), ref)); // 0
-        System.out.println(cmp.compare(new TileTag(0,4,3), ref)); // 4
-        System.out.println(cmp.compare(new TileTag(4,0,3), ref)); // 4
-        System.out.println(cmp.compare(new TileTag(2,2,2), ref)); // 4
-        System.out.println(cmp.compare(new TileTag(8,8,4), ref)); // 4
+        TileDistCmp cmp = new TileDistCmp(new TileTag(2,2,5), TileDistCmp.FURTHEST);
 
-        TileTag[] test = new TileTag[]{
-            new TileTag(5,4,3),
-            new TileTag(4,3,3),
-            new TileTag(5,8,7),
-            new TileTag(4,5,3),
-            new TileTag(3,4,3),
-            new TileTag(5,8,2),
-            new TileTag(4,4,3),
-            new TileTag(5,5,3),
-            new TileTag(5,8,3)
-        };
+        for(int z=0; z<12; z++){
+            System.out.println(z+" dist: "+cmp.compare(
+                new TileTag((1<<6),(1<<6),6),
+                new TileTag((1<<z)+2,(1<<z)+2,z)));
+        }
 
-        Arrays.sort(test, cmp);
+
+        test.add(new TileTag(0,0,1));
+        test.add(new TileTag(0,1,1));
+        test.add(new TileTag(1,0,1));
+        test.add(new TileTag(1,1,1));
+        for(int i=0; i<4; i++){
+            for(int j=0; j<4; j++){
+                test.add(new TileTag(i, j, 2));
+                test.add(new TileTag(2*i+0, 2*j+0, 3));
+                test.add(new TileTag(2*i+0, 2*j+1, 3));
+                test.add(new TileTag(2*i+1, 2*j+0, 3));
+                test.add(new TileTag(2*i+1, 2*j+1, 3));
+            }
+        }
+
+        Collections.sort(test, new TileDistCmp(new TileTag(1,1,2), TileDistCmp.FURTHEST));
 
         for(TileTag t : test) System.out.println(t);
     }
