@@ -63,7 +63,7 @@ class TileServer implements MapSource {
 
         int recs = scale/TILE_SIZE;
         int zoom = 31 - Integer.numberOfLeadingZeros(recs);
-        int effs = (1 << zoom);
+        int effs = (1 << zoom); //scale of tile image layer
         float zfix = 1.0f + ((recs-effs)/(float)effs);
 
         if(zfix >= ZOOM_CROSSOVER){
@@ -72,6 +72,7 @@ class TileServer implements MapSource {
             zfix /= 2.0f;
         }
 
+        //effective width/height after zoom correction
         float ewidth  = (width /zfix);
         float eheight = (height/zfix);
 
@@ -122,7 +123,6 @@ class TileServer implements MapSource {
         TileTag newCenterTag = new TileTag(rowB + wit/2, colB + hit/2, zoom);
         if(!newCenterTag.equals(centerTag)){
             centerTag = newCenterTag;
-            //System.out.println("New center tag at "+centerTag);
             launchTileLoader(centerTag, (width/TILE_SIZE)+1, (height/TILE_SIZE)+1);
         }
     }

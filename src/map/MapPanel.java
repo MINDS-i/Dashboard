@@ -124,11 +124,11 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
      * Transforms absolute (lon,lat) to the pixel position in the current screen
      */
     public Point2D screenPosition(Point2D p){
-        Point2D pPix = toPixels(p);
-        Point2D cPix = toPixels(mapPosition);
         Point2D f = (Point2D) p.clone();
-        f.setLocation(pPix.getX() - cPix.getX() +  getWidth()/2,
-                      pPix.getY() - cPix.getY() + getHeight()/2 );
+        Point2D click  = toPixels(p);
+        Point2D center = toPixels(mapPosition);
+        f.setLocation( click.getX() - center.getX() +  getWidth()/2,
+                      -click.getY() + center.getY() + getHeight()/2 );
         return f;
     }
     /**
@@ -139,6 +139,23 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         //f.setLocation(p.getX() + mapPosition.x, p.getY() + mapPosition.y);
         return toCoordinates(f);
     }
+
+    /*
+    public Point2D screenPosition(Point2D p){
+        Point2D absPix = toPixels(p);
+        Point2D f = (Point2D) p.clone();
+        f.setLocation(absPix.getX() - mapPosition.x, absPix.getY() - mapPosition.y);
+        return f;
+    }
+    public Point2D mapPosition(Point2D p){
+        Point2D f = (Point2D) p.clone();
+        f.setLocation(p.getX() + mapPosition.x, p.getY() + mapPosition.y);
+        return toCoordinates(f);
+    }
+    */
+
+
+
     //End Code for CoordinateTransform interface
 
     //Code for ContextViewer interface
