@@ -96,7 +96,6 @@ public class Dashboard implements Runnable {
                               serialPanel,
                               makeDashPanel(),
                               context.alert);
-    mapPanel.setVgap(-45);
 
     f.add(mapPanel);
     f.pack();
