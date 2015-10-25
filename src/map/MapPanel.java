@@ -79,6 +79,23 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         addMouseWheelListener(mouseListener);
         addMouseListener(mll);
         addMouseMotionListener(mll);
+
+        pixCoordEQTest();
+    }
+
+    void pixCoordEQTest(){
+        System.out.println("Running test");
+        for(int i=-179; i<180; i++){
+            for(int j=-90; j<90; j++){
+                Point2D c = new Point2D.Double((double)i, (double)j);
+                Point2D p = toCoordinates(c);
+                double dx = c.getX() - toPixels(p).getX();
+                double dy = c.getY() - toPixels(p).getY();
+                if(Math.sqrt(dx*dx + dy*dy) > 0.000000001d) {
+                    System.out.println("Inaccuracy at "+c+"of "+Math.sqrt(dx*dx + dy*dy));
+                }
+            }
+        }
     }
 
     //Code for CoordinateTransform interface
@@ -97,7 +114,7 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
                            Math.tan(lat) + 1 / Math.cos(lat)
                        ) / Math.PI
                    ) * scale;
-        //double y = (Math.log(Math.tan(Math.PI/4+lat/2)) / 180.0)*scale;
+        //double y = Math.log(Math.tan(Math.PI/4+lat/2)) * scale;
         f.setLocation(x,y);
         return f;
     }
@@ -118,7 +135,7 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
                                )
                            )
                        );
-        //double lat = Math.toDegrees(2* Math.atan(Math.exp(y)) - Math.PI/2);
+        //double lat = Math.toDegrees(2*Math.atan(Math.exp(y) - Math.PI/2));
         f.setLocation(lon,lat);
         return f;
     }
@@ -129,8 +146,8 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         Point2D f = (Point2D) p.clone();
         Point2D click  = toPixels(p);
         Point2D center = getMapPosPixels();
-        f.setLocation( click.getX() - center.getX() +  getWidth()/2,
-                      -click.getY() + center.getY() + getHeight()/2 );
+        f.setLocation(click.getX() - center.getX() +  getWidth()/2,
+                      click.getY() - center.getY() + getHeight()/2 );
         return f;
     }
     /**
@@ -138,7 +155,9 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
      */
     public Point2D mapPosition(Point2D p){
         Point2D f = (Point2D) p.clone();
-        //f.setLocation(p.getX() + mapPosition.x, p.getY() + mapPosition.y);
+        Point2D center = getMapPosPixels();
+        f.setLocation(p.getX() + center.getX() -  getWidth()/2,
+                      p.getY() + center.getY() - getHeight()/2);
         return toCoordinates(f);
     }
 
@@ -155,8 +174,6 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         return toCoordinates(f);
     }
     */
-
-
 
     //End Code for CoordinateTransform interface
 
@@ -176,6 +193,22 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
     public void setMapPosCoords(Point2D pos) {
         this.mapPosition = (Point2D) pos.clone();
     }
+
+/*    public Point2D getMapPosPixels() {
+        return (Point2D) mapPosition.clone();
+    }
+
+    public Point2D getMapPosCoords() {
+        return toCoordinates(mapPosition);
+    }
+
+    public void setMapPosPixels(Point2D pos) {
+        this.mapPosition = (Point2D) pos.clone();
+    }
+
+    public void setMapPosCoords(Point2D pos) {
+        this.mapPosition = toPixels(pos);
+    }*/
 
     public int getZoom() {
         return zoom;
@@ -227,7 +260,7 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         Graphics2D g = (Graphics2D) gOrig.create();
         try {
             mapSource.paint(g,
-                            getMapPosCoords(),
+                            getMapPosPixels(),
                             zoom,
                             getWidth(),
                             getHeight() );
@@ -240,10 +273,6 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
     private class DragListener implements Layer, MouseWheelListener {
         private Point downCoords = null;
         private Point2D downPosition = null;
-
-        DragListener(){
-
-        }
 
         public int getZ(){
             return -1;
@@ -268,7 +297,7 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
                 int    dx = downCoords.x - e.getX();
                 int    dy = downCoords.y - e.getY();
                 double nx = downPosition.getX() + dx;
-                double ny = downPosition.getY() - dy;
+                double ny = downPosition.getY() + dy;
                 setMapPosPixels(new Point2D.Double(nx, ny));
                 repaint();
             }

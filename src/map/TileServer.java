@@ -61,59 +61,50 @@ class TileServer implements MapSource {
     public void paint(Graphics2D gd, Point2D center, int scale, int width, int height){
         Graphics2D g2d = (Graphics2D) gd.create();
 
-        int recs = scale/TILE_SIZE;
-        int zoom = 31 - Integer.numberOfLeadingZeros(recs);
-        int effs = (1 << zoom); //scale of tile image layer
-        float zfix = 1.0f + ((recs-effs)/(float)effs);
+        int zoom = 31 - Integer.numberOfLeadingZeros(scale/TILE_SIZE);
+        int effs = (1 << zoom) * TILE_SIZE; //scale of tile image layer that will be drawn
+        double zfix = (double) scale / (double) effs;
 
         if(zfix >= ZOOM_CROSSOVER){
             zoom += 1;
             effs *= 2;
-            zfix /= 2.0f;
+            zfix /= 2.0;
         }
 
         //effective width/height after zoom correction
-        float ewidth  = (width /zfix);
-        float eheight = (height/zfix);
+        double ewidth  = (width /zfix);
+        double eheight = (height/zfix);
 
-        g2d.translate((width / 2.0f), (height/ 2.0f));
         g2d.scale(zfix, zfix);
-        g2d.translate(-(ewidth / 2.0f), -(eheight/ 2.0f));
         g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-                    RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                             RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
         /**
          * From here on, the graphics object is mapped so that if we draw
-         * around the center of an ewidth by eheight screen normally, it will
-         * fit in the orginal screen size zoomed correctly
+         * around the center of an ewidth by eheight screen at effs (effective scale),
+         * it will fit in the orginal screen size zoomed correctly
          */
 
-        //normalized coordinates of the central lat/son
-        float nlon = ((float)(center.getX()+90.0f)/180.0f);
-        float nlat = ((float)(center.getY()+90.0f)/180.0f);
-        //pixel positions of top left point from lat/lon
-        float sLon = (effs * TILE_SIZE * nlon) - (ewidth /2.0f);
-        float sLat = (effs * TILE_SIZE * nlat) - (eheight/2.0f);
+        //pixel positions of top left point
+        double sLon = (center.getX()/zfix) - (ewidth /2.0);
+        double sLat = (center.getY()/zfix) - (eheight/2.0);
         //row/col Base index in the top left corner
-        int rowB   = (int)(sLon/TILE_SIZE);
-        int colB   = (int)(sLat/TILE_SIZE);
+        int rowB   = (int)(sLon/(double)TILE_SIZE);
+        int colB   = (int)(sLat/(double)TILE_SIZE);
         //X,Y shifts to keep the view in alignment
-        int xalign = (int) -(sLon - rowB*TILE_SIZE);
-        int yalign = (int) -(sLat - colB*TILE_SIZE);
+        int xalign = (int)-(sLon%TILE_SIZE);
+        int yalign = (int)-(sLat%TILE_SIZE);
         //width/height in tiles
         int wit    = (((int)ewidth -xalign)/TILE_SIZE)+1;
         int hit    = (((int)eheight-yalign)/TILE_SIZE)+1;
 
         for(int row = 0; row < wit; row++){
             for(int col = 0; col < hit; col++){
-                /*Image img = pollImage(new TileTag(row+rowB, col+colB, zoom));
-                g2d.drawImage(img, xalign+row*TILE_SIZE, yalign+col*TILE_SIZE,null);*/
-
                 int x = xalign + row*TILE_SIZE;
                 int y = yalign + col*TILE_SIZE;
                 TileTag tile = new TileTag(row+rowB, col+colB, zoom);
                 Image img = pollImage(tile);
-                g2d.drawImage(img, xalign+row*TILE_SIZE, yalign+col*TILE_SIZE,null);
+                g2d.drawImage(img, x, y,null);
                 g2d.setColor(Color.YELLOW);
                 g2d.drawString(tile.toString(), x, y);
             }
