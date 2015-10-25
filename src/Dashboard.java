@@ -91,7 +91,7 @@ public class Dashboard implements Runnable {
     JPanel serialPanel = new SerialConnectPanel(connectActions);
 
     MapPanel mapPanel = new MapPanel(  context,
-                              new Point(475,1100),
+                              new Point(0,0),
                               4,
                               serialPanel,
                               makeDashPanel(),

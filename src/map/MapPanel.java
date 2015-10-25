@@ -46,7 +46,7 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
     private WaypointPanel waypointPanel;
 
     public MapPanel(Context cxt) {
-        this(cxt, new Point(8282, 5179), 6, null, null, null);
+        this(cxt, new Point(0, 0), 6, null, null, null);
     }
 
     public MapPanel(Context cxt, Point mapPosition, int zoom){
@@ -78,7 +78,7 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         south.add(north, BorderLayout.CENTER);
 
         setZoom(TILE_SIZE * (1 << zoom));
-        //setMapPosition(mapPosition);
+        setMapPosCoords(mapPosition);
 
         mll.add(new RoverPath(context, this, waypointPanel));
         mll.add(mouseListener);
@@ -94,11 +94,11 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         for(int i=-179; i<180; i++){
             for(int j=-90; j<90; j++){
                 Point2D c = new Point2D.Double((double)i, (double)j);
-                Point2D p = toCoordinates(c);
-                double dx = c.getX() - toPixels(p).getX();
-                double dy = c.getY() - toPixels(p).getY();
+                Point2D p = toPixels(c);
+                double dx = c.getX() - toCoordinates(p).getX();
+                double dy = c.getY() - toCoordinates(p).getY();
                 if(Math.sqrt(dx*dx + dy*dy) > 0.000000001d) {
-                    System.out.println("Inaccuracy at "+c+"of "+Math.sqrt(dx*dx + dy*dy));
+                    System.out.println("Inaccuracy at "+c+"of "+toCoordinates(p));
                 }
             }
         }
@@ -114,12 +114,12 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         double scale = zoom;
         double lon   = Math.toRadians(p.getX());
         double lat   = Math.toRadians(p.getY());
-        double x = ((lon + Math.PI) / Math.PI) * scale;
-        double y = (1 -
+        double x = (p.getX()+180.0)/360.0 * scale;
+        double y = ((1 -
                        Math.log(
                            Math.tan(lat) + 1 / Math.cos(lat)
                        ) / Math.PI
-                   ) * scale;
+                   )/2) * scale;
         f.setLocation(x,y);
         return f;
     }
@@ -131,8 +131,8 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         Point2D f = (Point2D) p.clone();
         double scale = zoom;
         double x     = p.getX() / scale;
-        double y     = p.getY() / scale;
-        double lon   = x * 180 - 180;
+        double y     = ((p.getY()/scale)*2);
+        double lon   = x * 360 - 180;
         double lat   = Math.toDegrees(
                            Math.atan(
                                Math.sinh(
@@ -166,22 +166,6 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
     }
     //End Code for CoordinateTransform interface
 
-/*    public Point2D getMapPosPixels() {
-        return (Point2D) toPixels(mapPosition);
-    }
-
-    public Point2D getMapPosCoords() {
-        return (Point2D) mapPosition.clone();
-    }
-
-    public void setMapPosPixels(Point2D pos) {
-        this.mapPosition = toCoordinates(pos);
-    }
-
-    public void setMapPosCoords(Point2D pos) {
-        this.mapPosition = (Point2D) pos.clone();
-    }*/
-
     public Point2D getMapPosPixels() {
         return (Point2D) mapPosition.clone();
     }
@@ -209,7 +193,6 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
     public void zoomIn(Point pivot) {
         /*if (getZoom() >= getTileServer().getMaxZoom())
             return;*/
-
         Point2D startLoc = getMapPosPixels();
         setZoom((int)(getZoom()*ZOOM_FACTOR));
         double dx = (pivot.x- getWidth()/2);
