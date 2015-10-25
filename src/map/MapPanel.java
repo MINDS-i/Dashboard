@@ -29,7 +29,12 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
     private static final int TILE_SIZE = 256;
     private static final float ZOOM_FACTOR = 1.1f;
 
-    private MapSource mapSource = new TileServer("http://otile1.mqcdn.com/tiles/1.0.0/sat");
+    private MapSource[] mapSources = new MapSource[]{
+        new TileServer("http://otile1.mqcdn.com/tiles/1.0.0/sat"),
+        new TileServer("http://otile1.mqcdn.com/tiles/1.0.0/map"),
+    };
+    private int mapSourceIndex = 0;
+    private MapSource mapSource = mapSources[0];
 
     private int zoom;
     private Point2D mapPosition = new Point2D.Double(0, 0);
@@ -54,7 +59,7 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         context = cxt;
         context.registerViewer(this);
 
-        mapSource.addRepaintListener(this);
+        for(MapSource ms : mapSources) ms.addRepaintListener(this);
 
         border.setVgap(-20);
         setOpaque(true);
@@ -237,6 +242,11 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
     //End code for ContextViewep interface
 
     public void nextTileServer() {
+        mapSource.clear();
+        mapSourceIndex++;
+        if(mapSourceIndex >= mapSources.length) mapSourceIndex = 0;
+        mapSource = mapSources[mapSourceIndex];
+        repaint();
     }
 
     @Override
