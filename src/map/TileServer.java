@@ -10,6 +10,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.imageio.*;
 
 class TileServer implements MapSource {
+    //label tiles on screen for debugging
+    private static final boolean TILE_LABEL = false;
     //Number of pixels a tile takes up
     private static final int TILE_SIZE = 256;
     //Minimum index any tile can have on Z
@@ -99,8 +101,10 @@ class TileServer implements MapSource {
                 TileTag tile = new TileTag(row+rowB, col+colB, zoom);
                 Image img = pollImage(tile);
                 g2d.drawImage(img, x, y,null);
-                g2d.setColor(Color.YELLOW);
-                g2d.drawString(tile.toString(), x, y);
+                if(TILE_LABEL){
+                    g2d.setColor(Color.YELLOW);
+                    g2d.drawString(tile.toString(), x, y);
+                }
             }
         }
         g2d.dispose();
@@ -186,7 +190,6 @@ class TileServer implements MapSource {
             this.ref = ref;
             this.width = width;
             this.height = height;
-            System.out.println("Loading "+width+"x"+height+" tiles around "+ref);
         }
         public void run(){
             try{
