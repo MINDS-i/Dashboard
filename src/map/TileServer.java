@@ -1,18 +1,13 @@
 package com.map;
 
 import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.*;
-import java.awt.Graphics2D;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.imageio.*;
-import javax.swing.*;
 
 class TileServer implements MapSource {
     //Number of pixels a tile takes up
@@ -34,7 +29,7 @@ class TileServer implements MapSource {
     //Ratio of lateral to vertical tile priority
     private static final int Z_PRIORITY = 6;
     //rings of offscreen tiles around the margins to try and load
-    private static final int CUR_ZOOM_MARGIN  = 2;//2
+    private static final int CUR_ZOOM_MARGIN  = 2;
     //rings of offscreen tiles on the next zoom to try and load
     private static final int NEXT_ZOOM_MARGIN = -1;
     //maximum percentage to zoom a tile before shrinking the layer below instead
@@ -61,13 +56,12 @@ class TileServer implements MapSource {
     public void paint(Graphics2D gd, Point2D center, int scale, int width, int height){
         Graphics2D g2d = (Graphics2D) gd.create();
 
-        int zoom = 31 - Integer.numberOfLeadingZeros(scale/TILE_SIZE);
-        int effs = (1 << zoom) * TILE_SIZE; //scale of tile image layer that will be drawn
-        double zfix = (double) scale / (double) effs;
+        //ratio between zoom and the tile layer above it
+        double zfix = (double) scale / (double) Integer.highestOneBit(scale);
+        int    zoom = 31 - Integer.numberOfLeadingZeros(scale/TILE_SIZE);
 
         if(zfix >= ZOOM_CROSSOVER){
             zoom += 1;
-            effs *= 2;
             zfix /= 2.0;
         }
 
@@ -196,7 +190,6 @@ class TileServer implements MapSource {
         }
         public void run(){
             try{
-    long st = System.nanoTime();
                 //enqueue all the tiles on this zoom level by view+margin
                 int hw = ((width +1)/2) + CUR_ZOOM_MARGIN;
                 int hh = ((height+1)/2) + CUR_ZOOM_MARGIN;
@@ -227,13 +220,8 @@ class TileServer implements MapSource {
                     try{ Thread.sleep(50); }
                     catch(Exception e){ stop = true; }
                 }
-
-    long et = System.nanoTime();
-    double ns = et-st;
-    double mspt = (ns/numToLoad)/1000000.0d;
-    if(!stop) System.out.println(numToLoad+" Tiles at "+mspt+" mspt");
             } catch (Exception e) {
-
+                e.printStackTrace();
             }
         }
         //enqueue the 4 tiles on the next zoom level, beneath the argument
@@ -391,7 +379,6 @@ class TileServer implements MapSource {
                 new TileTag((1<<6),(1<<6),6),
                 new TileTag((1<<z)+2,(1<<z)+2,z)));
         }
-
 
         test.add(new TileTag(0,0,1));
         test.add(new TileTag(0,1,1));
