@@ -16,7 +16,7 @@ import javax.imageio.*;
 
 class TileServer implements MapSource {
     //label tiles on screen for debugging
-    private static final boolean TILE_LABEL = true;
+    private static final boolean TILE_LABEL = false;
     //Number of pixels a tile takes up
     private static final int TILE_SIZE = 256;
     //Minimum index any tile can have on Z
