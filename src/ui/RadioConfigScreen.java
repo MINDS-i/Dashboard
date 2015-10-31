@@ -30,8 +30,8 @@ public class RadioConfigScreen extends JPanel{
             String id    = idSplit[0];
             String name  = idSplit[1];
             String value = idSplit[2];
-            this.id    = Integer.valueOf(id);
-            this.value = Integer.valueOf(value);
+            this.id    = Integer.parseInt(id);
+            this.value = Integer.parseInt(value);
             this.name  = name;
         }
         @Override

@@ -68,7 +68,7 @@ public class SettingList{
                 switch(event){
                     case XMLStreamConstants.START_ELEMENT:
                         if(!reader.getLocalName().equals("setting")) continue;
-                        int index = Integer.valueOf(reader.getAttributeValue(null,"index"));
+                        int index = Integer.parseInt(reader.getAttributeValue(null,"index"));
                         if(index >= settingData.size()){
                             System.err.println("Setting doc has index outside of bounds");
                             continue;
