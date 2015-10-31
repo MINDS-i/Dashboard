@@ -26,6 +26,7 @@ public class TelemetryManager{
         }
         @Override
         public boolean equals(Object tl){
+            if(tl == null) return false;
             if(tl.getClass() != this.getClass()) return false;
             return tl.equals(listener);
         }
