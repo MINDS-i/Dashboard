@@ -11,16 +11,13 @@ public class LayerManager extends MouseAdapter{
 
     public void add(Layer l){
         layers.add(l);
+        //sort collection by z index
         Collections.sort(layers, new Comparator<Layer>(){
             @Override
             public int compare(Layer a, Layer b){
                 return a.getZ() - b.getZ();
             }
         });
-        //sort collection by z index
-        for(Layer ml : layers){
-            System.out.println(ml.getZ());
-        }
     }
 
     public void draw(Graphics g){

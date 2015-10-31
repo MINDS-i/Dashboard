@@ -85,25 +85,7 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         addMouseWheelListener(mouseListener);
         addMouseListener(mll);
         addMouseMotionListener(mll);
-
-        pixCoordEQTest();
     }
-
-    void pixCoordEQTest(){
-        System.out.println("Running test");
-        for(int i=-179; i<180; i++){
-            for(int j=-90; j<90; j++){
-                Point2D c = new Point2D.Double((double)i, (double)j);
-                Point2D p = toPixels(c);
-                double dx = c.getX() - toCoordinates(p).getX();
-                double dy = c.getY() - toCoordinates(p).getY();
-                if(Math.sqrt(dx*dx + dy*dy) > 0.000000001d) {
-                    System.out.println("Inaccuracy at "+c+"of "+toCoordinates(p));
-                }
-            }
-        }
-    }
-
     //Code for CoordinateTransform interface
     /**
      * Transforms a (lonitude,latitude) point to absolute (x,y) pixels
