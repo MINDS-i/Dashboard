@@ -77,7 +77,7 @@ public class Theme{
 		return bt;
 	}
 	public JButton makeButton(Action a){
-		NinePatchButton bt = (NinePatchButton) makeButton();
+		JButton bt = makeButton();
 		bt.setAction(a);
 		return bt;
 	}
