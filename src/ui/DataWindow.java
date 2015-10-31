@@ -112,16 +112,12 @@ public class DataWindow implements ActionListener{
 					settingList.pushSetting(row,(Float)val);
 					System.out.println("Setting New Value "+(Float)val);
 				} else if(val.getClass()==String.class){
-					try{
-						Float newVal = Float.valueOf((String)val);
-						if(settingList.get(row).outsideOfBounds(newVal)){
-            				JFrame mf = new JFrame("Warning");
-							JOptionPane.showMessageDialog(mf, "Caution: new value is outside of logical bounds");
-						}
-						settingList.pushSetting(row,newVal);
-					} catch(Exception e) {
-						System.out.println("Bad new value");
+					Float newVal = Float.valueOf((String)val);
+					if(settingList.get(row).outsideOfBounds(newVal)){
+        				JFrame mf = new JFrame("Warning");
+						JOptionPane.showMessageDialog(mf, "Caution: new value is outside of logical bounds");
 					}
+					settingList.pushSetting(row,newVal);
 				}
 			}
 		});
