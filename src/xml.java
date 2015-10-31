@@ -74,6 +74,7 @@ public class xml{
 		writer.writeEndElement();// /gpx
 		writer.flush();
 		try{
+			writer.close();
 			outputStream.close();
 		} catch (IOException ex){
 			System.err.println(ex.getMessage());
@@ -183,5 +184,7 @@ public class xml{
 		//set mapPanel points to new points
 		context.waypoint.swap(routes.get(selection));
 		context.sender.sendWaypointList();
+
+		reader.close();
 	}
 }

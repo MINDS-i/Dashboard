@@ -94,6 +94,8 @@ public class SettingList{
                     default: break;
                 }
             }
+
+            reader.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
