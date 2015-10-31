@@ -22,8 +22,6 @@ import javax.swing.event.*;
 import javax.swing.table.*;
 import javax.swing.text.*;
 
-//import settings labels from properties
-
 public class DataWindow implements ActionListener{
 	public static final long PERIOD = 200; //update period in MS
 
@@ -197,7 +195,7 @@ public class DataWindow implements ActionListener{
 		logPanel.setLayout(new FlowLayout());
 		JLabel label = new JLabel("Set logging period (ms)");
 
-		JTextField logInput = new JTextField();
+		logInput = new JTextField();
 		logInput.addActionListener(this);
 		logInput.setText(Integer.toString(context.telemetry.getLogPeriod()));
 		logInput.setColumns(8);
