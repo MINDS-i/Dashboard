@@ -61,11 +61,11 @@ public class Graph extends JPanel{
         this.setLayout(new FlowLayout(FlowLayout.LEADING));
         this.add(new JButton(configPopupAction));
 
-        //call back when the window is clased
+        //call back when the window is closed
         this.addHierarchyListener(new HierarchyListener(){
             public void hierarchyChanged(HierarchyEvent e){
                 boolean showing_changed = (e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0;
-                if(showing_changed & !isShowing()){
+                if(showing_changed && !isShowing()){
                     onClose();
                 }
             }
@@ -83,7 +83,6 @@ public class Graph extends JPanel{
     }
 
     private void onClose(){
-        System.out.println("Closing graph");
         if(config != null) config.close();
         if(refreshTimer != null) refreshTimer.cancel();
     }
