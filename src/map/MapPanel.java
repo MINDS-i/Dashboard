@@ -94,9 +94,9 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
     public Point2D toPixels(Point2D p){
         Point2D f = (Point2D) p.clone();
         double scale = zoom;
-        double lon   = Math.toRadians(p.getX());
+        double lon   = p.getX();
         double lat   = Math.toRadians(p.getY());
-        double x = (p.getX()+180.0)/360.0 * scale;
+        double x = (lon+180.0)/360.0 * scale;
         double y = ((1 -
                        Math.log(
                            Math.tan(lat) + 1 / Math.cos(lat)
