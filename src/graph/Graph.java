@@ -113,8 +113,8 @@ public class Graph extends JPanel{
 
         //find data->pixel conversion constants
         final Graphics2D g2d = (Graphics2D) g;
-        final double   scale =-getHeight()/yScale;
-        final double  center = getHeight()/2+scale*-yCenter;
+        final double   scale =- getHeight()/yScale;
+        final double  center = (getHeight()/2.0)+scale*-yCenter;
 
         //Draw background
         g2d.setPaint(Color.BLACK);

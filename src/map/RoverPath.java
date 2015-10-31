@@ -195,8 +195,8 @@ class RoverPath implements Layer, ContextViewer {
         for(int i=0; i<context.waypoint.size(); i++){
             Dot d = context.waypoint.get(i);
             Point2D loc = mapTransform.screenPosition(d.getLocation());
-            if(Math.abs(click.getX()-loc.getX()-1) > image.getWidth() /2) continue;
-            if(Math.abs(click.getY()-loc.getY()-1) > image.getHeight()/2) continue;
+            if(Math.abs(click.getX()-loc.getX()-1) > image.getWidth() /2.0) continue;
+            if(Math.abs(click.getY()-loc.getY()-1) > image.getHeight()/2.0) continue;
             return i;
         }
         return -1;

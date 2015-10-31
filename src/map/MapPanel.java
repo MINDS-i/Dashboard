@@ -132,8 +132,8 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         Point2D f = (Point2D) p.clone();
         Point2D click  = toPixels(p);
         Point2D center = getMapPosPixels();
-        f.setLocation(click.getX() - center.getX() +  getWidth()/2,
-                      click.getY() - center.getY() + getHeight()/2 );
+        f.setLocation(click.getX() - center.getX() +  getWidth()/2.0,
+                      click.getY() - center.getY() + getHeight()/2.0 );
         return f;
     }
     /**
@@ -142,8 +142,8 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
     public Point2D mapPosition(Point2D p){
         Point2D f = (Point2D) p.clone();
         Point2D center = getMapPosPixels();
-        f.setLocation(p.getX() + center.getX() -  getWidth()/2,
-                      p.getY() + center.getY() - getHeight()/2);
+        f.setLocation(p.getX() + center.getX() -  getWidth()/2.0,
+                      p.getY() + center.getY() - getHeight()/2.0);
         return toCoordinates(f);
     }
     //End Code for CoordinateTransform interface
