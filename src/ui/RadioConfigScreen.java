@@ -14,7 +14,7 @@ import com.table.ColumnTableModel;
 
 public class RadioConfigScreen extends JPanel{
 
-    class Setting{
+    static class Setting{
         public int id;
         public String name;
         public int value;

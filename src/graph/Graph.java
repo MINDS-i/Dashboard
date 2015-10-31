@@ -237,7 +237,7 @@ public class Graph extends JPanel{
         g2d.dispose();
     }
 
-    class DataConfig{
+    static class DataConfig{
         DataSource  source;
         Paint       paint;
         boolean     drawn;

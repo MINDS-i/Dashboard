@@ -11,7 +11,7 @@ import java.text.DecimalFormat;
 public class TelemetryManager{
     private final static int DEFAULT_LOG_PERIOD = 250;
 
-    private class Observer{
+    private static class Observer{
         private final int watched;
         private final TelemetryListener listener;
         Observer(int id, TelemetryListener tl){
