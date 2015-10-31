@@ -15,7 +15,6 @@ interface MapSource {
      *     may draw outside the minumum height and width
      *     Will draw with the gps coordinate defined by "center" at 0,0
      *     "scale" defines the number of pixels wide/tall the earth is
-     *     will try to approximate scale as best as possible
      */
     void paint(Graphics2D g, Point2D center, int scale, int width, int height);
     /**
@@ -28,4 +27,9 @@ interface MapSource {
      * when this mapSource changes its content
      */
     void removeRepaintListener(Component c);
+    /**
+     * Returns if a given zoom level (expressed in pixels/earth radius)
+     *  can be displayed by this MapSource
+     */
+    boolean isValidZoom(int zoomLevel);
 }

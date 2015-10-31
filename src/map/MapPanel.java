@@ -167,16 +167,19 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
     public int getZoom() {
         return zoom;
     }
-
-    public void setZoom(int zoom) {
-        this.zoom = zoom;
+    /**
+     * Returns true if the new zoom is valid and the view has been changed
+     */
+    public boolean setZoom(int zoom) {
+        boolean valid = mapSource.isValidZoom(zoom);
+        if(valid) this.zoom = zoom;
+        return valid;
     }
 
     public void zoomIn(Point pivot) {
-        /*if (getZoom() >= getTileServer().getMaxZoom())
-            return;*/
         Point2D startLoc = getMapPosPixels();
-        setZoom((int)(getZoom()*ZOOM_FACTOR));
+        boolean success = setZoom((int)(getZoom()*ZOOM_FACTOR));
+        if(!success) return;
         double dx = (pivot.x- getWidth()/2);
         double dy = (pivot.y-getHeight()/2);
         Point2D endLoc = new Point2D.Double(
@@ -187,10 +190,9 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
     }
 
     public void zoomOut(Point pivot) {
-        /*if (getZoom() <= getWidth())//screen width
-            return;*/
         Point2D startLoc = getMapPosPixels();
-        setZoom((int)(getZoom()/ZOOM_FACTOR));
+        boolean success = setZoom((int)(getZoom()/ZOOM_FACTOR));
+        if(!success) return;
         double dx = (pivot.x- getWidth()/2);
         double dy = (pivot.y-getHeight()/2);
         Point2D endLoc = new Point2D.Double(
