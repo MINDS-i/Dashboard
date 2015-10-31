@@ -154,7 +154,6 @@ class GraphConfigWindow{
         };
 
         strokeModel = new SpinnerNumberModel(1, 1, 100, 1);
-        JSpinner lineStroke = new JSpinner(strokeModel);
 
         //construct color picker
         colorPicker = new JColorChooser(Color.BLACK);
