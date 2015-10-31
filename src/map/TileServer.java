@@ -47,7 +47,7 @@ class TileServer implements MapSource {
     private java.util.List<Component> repaintListeners = new LinkedList<Component>();
     private Map<TileTag, Image> cache = new ConcurrentHashMap<TileTag, Image>(CACHE_SIZE+1, 1.0f);
     private final String rootURL;
-    private TileTag centerTag;
+    private TileTag centerTag = new TileTag(0,0,0);
 
     TileServer(String url){
         this.rootURL = url;
