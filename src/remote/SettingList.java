@@ -42,7 +42,7 @@ public class SettingList{
         String raw = reader.getAttributeValue(null,label);
         if(raw == null) return 0.0f;
         //strip whitespace
-        raw.replaceAll("\\s","");
+        raw = raw.replaceAll("\\s","");
         //parse
         if(raw.equals("+inf"))       return Float.POSITIVE_INFINITY;
         else if (raw.equals("-inf")) return Float.NEGATIVE_INFINITY;
