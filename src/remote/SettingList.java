@@ -56,7 +56,6 @@ public class SettingList{
 
         try{
             File xmlFile = context.getSettingsDescriptionFile().toFile();
-            System.out.println(xmlFile);
             FileReader input = new FileReader(xmlFile);
             XMLInputFactory factory = XMLInputFactory.newInstance();
             XMLStreamReader reader  = factory.createXMLStreamReader(input);

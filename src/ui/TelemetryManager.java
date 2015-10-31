@@ -69,7 +69,6 @@ public class TelemetryManager{
             if(labels.containsKey("t"+next)) lastNamedIndex = next;
             else break;
         }
-        System.out.println(lastNamedIndex);
         updateTelemetry(lastNamedIndex, 0.0d);
     }
     public String getTelemetryName(int index){
