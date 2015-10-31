@@ -18,11 +18,9 @@ public class SerialSender{
 	private static final Object lock = new Object();
 	private LinkedList<Message> pendingConfirm;
 	private Timer timer;
-	private SerialPort port;
 	private boolean sendingWaypointList;
 	private int waypointListPosition;
 	private int waypointListWaitingCode;
-	private MapPanel mapPanel;
 	private Context context;
 
 	public SerialSender(Context cxt){

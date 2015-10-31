@@ -42,7 +42,6 @@ public class TelemetryManager{
     private List<Double>         telemetry;
     private Collection<Observer> observers;
     private List<DataSource>     streams;
-    private Context              context;
     private ResourceBundle       labels;
     public TelemetryManager(Context context){
         telemetry = new ArrayList<Double>();

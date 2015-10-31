@@ -19,8 +19,6 @@ import java.nio.charset.StandardCharsets;
 
 public class SerialParser implements SerialPortEventListener{
 	Context context;
-	Dashboard parent;
-	SerialSender sender;
 	byte[] buffer;
 	int bufPos = 0;
 	static final int BUFLEN = 256;

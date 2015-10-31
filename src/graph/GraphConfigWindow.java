@@ -14,7 +14,6 @@ class GraphConfigWindow{
     private static final Dimension SPINNER_SIZE = new Dimension(80,20);
     private Graph  subject; //the graph to configure
     private JFrame frame;
-    private int closeupIndex;
     private JSpinner xScaleSpinner;
     private JSpinner yScaleSpinner;
     private JSpinner yCenterSpinner;
