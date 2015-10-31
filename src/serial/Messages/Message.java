@@ -21,11 +21,11 @@ public class Message{
 	public Message(byte[] data){
 		failCount	= 0;
 		checkPair   = new byte[2];
-		content     = data;
+		content     = data.clone();
 		buildChecksum();
 	}
 	public void sendTime(Date date){
-		sent = date;
+		sent = (Date)date.clone();
 	}
 	public boolean isConfirmedBy(int confirmation){
 		return ((confirmation&0xFFFF) == (confirmSum&0xFFFF));
