@@ -41,16 +41,10 @@ public class Context{
 		toUpdate  = new Vector<ContextViewer>();
 
 		props = new Properties();
-		FileInputStream file = null;
-		try{
-			file = new FileInputStream(propertiesFile);
+		try(FileInputStream file = new FileInputStream(propertiesFile)){
 			props.load(file);
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			try {
-				if(file != null) file.close();
-			} catch (Exception e) {}
 		}
 		loadLocale();
 
