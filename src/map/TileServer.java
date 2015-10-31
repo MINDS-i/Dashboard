@@ -9,6 +9,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.imageio.*;
 
+/**
+ * MapSource implementation for web-mecator maps loaded from external
+ *  tile servers
+ */
+
 class TileServer implements MapSource {
     //label tiles on screen for debugging
     private static final boolean TILE_LABEL = false;
@@ -114,6 +119,11 @@ class TileServer implements MapSource {
             centerTag = newCenterTag;
             launchTileLoader(centerTag, (width/TILE_SIZE)+1, (height/TILE_SIZE)+1);
         }
+    }
+
+    public boolean isValidZoom(int zoomLevel){
+        int    zoom = 31 - Integer.numberOfLeadingZeros(zoomLevel/TILE_SIZE);
+        return (zoom >= MIN_Z && zoom < MAX_Z);
     }
 
     Image pollImage(TileTag target){
