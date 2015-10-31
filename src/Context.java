@@ -61,6 +61,7 @@ public class Context{
         	log = new PrintStream("log/"+time+".log");
         } catch (Exception e){
         	System.err.println("Cannot save log file");
+        	e.printStackTrace();
         }
 	}
 	public void toggleLocale(){
@@ -73,16 +74,10 @@ public class Context{
 		saveProps();
 	}
 	private void saveProps(){
-		FileOutputStream file = null;
-		try{
-			file = new FileOutputStream(propertiesFile);
-			props.store(file, " no comment ");
+		try(FileOutputStream file = new FileOutputStream(propertiesFile)){
+			props.store(file, "no comment");
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			try {
-				if(file != null) file.close();
-			} catch (Exception e) {}
 		}
 	}
 	private void loadLocale(){
