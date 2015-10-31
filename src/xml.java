@@ -85,7 +85,7 @@ public class xml{
 		Vector<Dot>     	 list = new Vector<Dot>();
 		Vector<Vector>       routes = new Vector<Vector>();
 		XMLInputFactory 	 factory = XMLInputFactory.newInstance();
-		String 				 data = new String();
+		String 				 data = "";
 		XMLStreamReader 	 reader;
 		FileReader 			 inputStream;
 		try{

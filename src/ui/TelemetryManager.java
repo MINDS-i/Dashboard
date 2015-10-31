@@ -78,7 +78,7 @@ public class TelemetryManager{
         try{
             name = labels.getString("t"+index);
         } catch(Exception e) {
-            name = new String("# "+index);
+            name = "# "+index;
         }
         return name;
     }
