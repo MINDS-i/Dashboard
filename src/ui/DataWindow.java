@@ -113,7 +113,7 @@ public class DataWindow implements ActionListener{
 					System.out.println("Setting New Value "+(Float)val);
 				} else if(val.getClass()==String.class){
 					try{
-						Float newVal = new Float((String)val);
+						Float newVal = Float.valueOf((String)val);
 						if(settingList.get(row).outsideOfBounds(newVal)){
             				JFrame mf = new JFrame("Warning");
 							JOptionPane.showMessageDialog(mf, "Caution: new value is outside of logical bounds");
