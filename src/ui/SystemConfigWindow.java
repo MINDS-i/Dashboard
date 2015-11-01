@@ -25,6 +25,8 @@ public class SystemConfigWindow{
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(new JButton(toggleLocale));
+        if(isWindows())
+            buttonPanel.add(new JButton(driverExec));
         container.add(buttonPanel);
 
         JPanel lpanel = new JPanel();
@@ -51,6 +53,10 @@ public class SystemConfigWindow{
         frame.pack();
         frame.setVisible(true);
     }
+    private boolean isWindows(){
+        String OS = System.getProperty("os.name");
+        return OS.startsWith("Windows");
+    }
     private Action toggleLocale = new AbstractAction(){
         {
             String text = "Toggle ground/air mode";
@@ -60,6 +66,20 @@ public class SystemConfigWindow{
             context.toggleLocale();
             JFrame mf = new JFrame("message");
             JOptionPane.showMessageDialog(mf, "Changes will take effect next launch");
+        }
+    };
+    private Action driverExec = new AbstractAction(){
+        {
+            String text = "Launch driver installer";
+            putValue(Action.NAME, text);
+        }
+        public void actionPerformed(ActionEvent e){
+            String[] cmd = { "RadioDiversv2.12.06WHQL_Centified.exe" };
+            try{
+                Process p = Runtime.getRuntime().exec(cmd);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
     };
 }
