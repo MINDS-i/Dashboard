@@ -18,8 +18,12 @@
         <ivy:cleancache />
     </target>
 
-    <target name="compile" depends="init">
+    <target name="retrieve" depends="init">
+        <ivy:retrieve conf="testing" pattern="${testLibDir}/[artifact].[ext]"/>
         <ivy:retrieve conf="application" pattern="${libDir}/[artifact].[ext]"/>
+    </target>
+
+    <target name="compile" depends="init">
         <javac srcdir="${sourceDir}" destdir="${outputDir}" extdirs="${libDir}"
                 includeantruntime="false" >
             <classpath path="${classpath}"/>
@@ -47,7 +51,6 @@
     </target>
 
     <target name="test" depends="compile">
-        <ivy:retrieve conf="testing" pattern="${testLibDir}/[artifact].[ext]"/>
         <javac srcdir="${testDir}" destdir="${outputDir}" extdirs="${libDir}:${outputDir}"
                 includeantruntime="false" >
             <classpath path="${classpath}">
