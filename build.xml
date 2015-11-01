@@ -7,7 +7,6 @@
         <mkdir dir="${libDir}"/>
     </target>
 
-
     <target name="clean" depends="init">
         <delete dir="${outputDir}"/>
     </target>
@@ -72,20 +71,28 @@
 
         <javac srcdir="${testDir}" destdir="${outputDir}" extdirs="${libDir}:${outputDir}"
                 includeantruntime="false" >
-            <classpath path="${classpath}:${junit}:${hamcrest}"/>
+            <classpath path="${classpath}">
+                <fileset dir="${testLibs}">
+                    <include name="**/*.jar"/>
+                </fileset>
+            </classpath>
             <compilerarg value="-XDignore.symbol.file"/>
         </javac>
 
-        <junit printsummary="yes" haltonfailure="yes">
-          <classpath path="${classpath}:${junit}:${hamcrest}"/>
-          <formatter type="plain"/>
+        <junit printsummary="yes" haltonfailure="yes" showoutput="yes">
+            <classpath>
+                <pathelement path="${classpath}"/>
+                <fileset dir="${testLibs}">
+                    <include name="**/*.jar"/>
+                </fileset>
+            </classpath>
+            <formatter type="plain"/>
 
-          <batchtest fork="yes" todir="${reportsDir}">
-            <fileset dir="${testDir}">
-              <include name="**/*_test.java"/>
-            </fileset>
-          </batchtest>
-
+            <batchtest fork="yes" todir="${reportsDir}">
+                <fileset dir="${testDir}">
+                    <include name="**/*_test.java"/>
+                </fileset>
+            </batchtest>
         </junit>
     </target>
 </project>

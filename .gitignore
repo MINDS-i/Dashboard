@@ -2,6 +2,8 @@ log/*
 *.log
 *.telem
 *.class
+*.jar
+!lib/*
 log.txt
 DashBoard.jar
 reports/*
