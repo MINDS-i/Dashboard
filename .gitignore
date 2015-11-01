@@ -1,12 +1,13 @@
 log/*
+lib/*
+test/lib/*
+reports/*
+bir/*
 *.log
 *.telem
 *.class
-*.jar
-!lib/*
+data/persist.properties
 log.txt
 DashBoard.jar
-reports/*
 graph.jar
 Dashboard.zip
-data/persist.properties
