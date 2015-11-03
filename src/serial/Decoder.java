@@ -93,17 +93,14 @@ public class Decoder{
         for(int i=0; i < foundHeaders.size(); i++){
             Packet p = foundHeaders.get(i);
             int packLen = checksumPos-p.startPos;
-
-            if(packLen > p.maxLength+1) {
-                System.err.println("Packet too long; was " + packLen + " should be " + p.maxLength);
-                continue;
-            }
+            if(packLen < 0) continue; //packet doesn't have both type byte and checksum
+            if(packLen > p.maxLength) continue; //packet exceeds max length specified
 
             byte[] data = new byte[packLen];
             for(int b=0; b<packLen; b++) data[b] = buffer.get(p.startPos+b);
             //calculate and match checksum
             byte[] checksum = sum.calc(data);
-            if(match(checksum, checksumPos)){
+            if(match(checksum, footerPos)){
                 //remove older headers and call handler
                 foundHeaders.subList(0, i+1).clear();
                 p.claimee.handle(data);
