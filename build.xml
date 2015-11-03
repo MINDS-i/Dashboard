@@ -61,14 +61,15 @@
             <compilerarg value="-XDignore.symbol.file"/>
         </javac>
 
-        <junit printsummary="yes" haltonfailure="yes" showoutput="yes">
+        <junit>
             <classpath>
                 <pathelement path="${classpath}"/>
                 <fileset dir="${testLibDir}">
                     <include name="**/*.jar"/>
                 </fileset>
             </classpath>
-            <formatter type="plain"/>
+            <!-- <formatter type="plain"/> -->
+            <formatter type="plain" usefile="false" />
 
             <batchtest fork="yes" todir="${reportsDir}">
                 <fileset dir="${testDir}">
