@@ -67,6 +67,9 @@
                 <fileset dir="${testLibDir}">
                     <include name="**/*.jar"/>
                 </fileset>
+                <fileset dir="${libDir}">
+                    <include name="**/*.jar"/>
+                </fileset>
             </classpath>
             <!-- <formatter type="plain"/> -->
             <formatter type="plain" usefile="false" />
