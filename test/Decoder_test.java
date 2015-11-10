@@ -8,54 +8,53 @@ import static org.mockito.Mockito.*;
 
 public class Decoder_test {
     private Random rand = new Random();
-    private String testHeader   = "H";
-    private String testFooter   = "F";
-    private String testChecksum = "CC";
+    private byte[] testHeader   = "H".getBytes();
+    private byte[] testFooter   = "F".getBytes();
+    private byte[] testChecksum = "CC".getBytes();
     private Checksum mockChecksum = mock(Checksum.class);
 
-    public Decoder_test(){
-        when(mockChecksum.length()).thenReturn(testChecksum.getBytes().length);
-        when(mockChecksum.calc(any(byte[].class))).thenReturn(testChecksum.getBytes());
+    public Decoder_test() throws IOException {
+        when(mockChecksum.length()).thenReturn(testChecksum.length);
+        when(mockChecksum.calc(any(byte[].class))).thenReturn(testChecksum);
     }
 
-    private InputStream input(String header, String data, String checksum, String footer){
-        String message = header+data+checksum+footer;
-        return new ByteArrayInputStream(message.getBytes());
+    private InputStream input(byte[] header, byte[] data, byte[] checksum, byte[] footer) throws IOException {
+        ByteArrayOutputStream concat = new ByteArrayOutputStream();
+        concat.write(header);
+        concat.write(data);
+        concat.write(checksum);
+        concat.write(footer);
+        return new ByteArrayInputStream(concat.toByteArray());
     }
 
-    private InputStream input(String data){
+    private InputStream input(byte[] data) throws IOException {
         return input(testHeader, data, testChecksum, testFooter);
     }
 
-    private Decoder testDecoder(InputStream is, PacketReader pr){
-        Decoder decoder = new Decoder(is, testHeader.getBytes(),
-                                          testFooter.getBytes(),
-                                          mockChecksum);
+    private Decoder testDecoder(InputStream is, PacketReader pr) throws IOException {
+        Decoder decoder = new Decoder(is, testHeader, testFooter, mockChecksum);
         decoder.addPacketReader(pr);
         return decoder;
     }
 
-    private Decoder testDecoder(String is, PacketReader pr){
+    private Decoder testDecoder(byte[] is, PacketReader pr) throws IOException {
         return testDecoder(input(is), pr);
     }
 
-    private String randomString(int length){
-        StringBuilder builder = new StringBuilder();
-        for(int i=0; i<length; i++){
-            builder.append((char)(rand.nextInt(255)+1));
-        }
-        return builder.toString();
+    private byte[] randomData(int length) throws IOException {
+        byte[] bytes = new byte[length];
+        rand.nextBytes(bytes);
+        return bytes;
     }
 
     @Test
-    public void matchRandomData() {
+    public void matchRandomData() throws IOException {
         for(int i=1; i<64; i++){
-            String dataString = randomString(i);
-            byte[] data = dataString.getBytes();
-
+            byte[] data        = randomData(i);
             PacketReader mRead = mock(PacketReader.class);
+            Decoder decoder    = testDecoder(data, mRead);
+
             when(mRead.claim(data[0])).thenReturn(data.length);
-            Decoder decoder = testDecoder(dataString, mRead);
             decoder.update();
 
             verify(mRead).handle(data);
@@ -63,14 +62,13 @@ public class Decoder_test {
     }
 
     @Test
-    public void longHeader(){
-        String dataString = "longHeader";
-        String longHeader = "abcdefghijklmnop";
-        byte[] data = dataString.getBytes();
-        InputStream stream = input(longHeader, dataString, testChecksum, testFooter);
-
+    public void longHeader() throws IOException {
+        byte[] data        = "longHeader".getBytes();
+        byte[] longHeader  = "abcdefghijklmnop".getBytes();
+        InputStream stream = input(longHeader, data, testChecksum, testFooter);
         PacketReader mRead = mock(PacketReader.class);
-        Decoder decoder = new Decoder(stream, longHeader.getBytes(), testFooter.getBytes(), mockChecksum);
+        Decoder decoder    = new Decoder(stream, longHeader, testFooter, mockChecksum);
+
         decoder.addPacketReader(mRead);
         when(mRead.claim(data[0])).thenReturn(data.length);
         decoder.update();
@@ -79,14 +77,13 @@ public class Decoder_test {
     }
 
     @Test
-    public void longFooter(){
-        String dataString = "longFooter";
-        String longFooter = "abcdefghijklmnop";
-        byte[] data = dataString.getBytes();
-        InputStream stream = input(testHeader, dataString, testChecksum, longFooter);
-
+    public void longFooter() throws IOException {
+        byte[] data        = "longFooter".getBytes();
+        byte[] longFooter  = "abcdefghijklmnop".getBytes();
+        InputStream stream = input(testHeader, data, testChecksum, longFooter);
         PacketReader mRead = mock(PacketReader.class);
-        Decoder decoder = new Decoder(stream, testHeader.getBytes(), longFooter.getBytes(), mockChecksum);
+        Decoder decoder    = new Decoder(stream, testHeader, longFooter, mockChecksum);
+
         decoder.addPacketReader(mRead);
         when(mRead.claim(data[0])).thenReturn(data.length);
         decoder.update();
@@ -95,17 +92,16 @@ public class Decoder_test {
     }
 
     @Test
-    public void longChecksum(){
-        String dataString = "longSum";
-        String longSum = "abcdefghijklmnop";
-        byte[] data = dataString.getBytes();
-        InputStream stream = input(testHeader, dataString, longSum, testFooter);
-
+    public void longChecksum() throws IOException {
+        byte[] longSum     = "abcdefghijklmnop".getBytes();
+        byte[] data        = "longSum".getBytes();
+        InputStream stream = input(testHeader, data, longSum, testFooter);
         PacketReader mRead = mock(PacketReader.class);
-        Checksum checker = mock(Checksum.class);
-        when(checker.length()).thenReturn(longSum.getBytes().length);
-        when(checker.calc(any(byte[].class))).thenReturn(longSum.getBytes());
-        Decoder decoder = new Decoder(stream, testHeader.getBytes(), testFooter.getBytes(), checker);
+        Checksum checker   = mock(Checksum.class);
+        Decoder decoder    = new Decoder(stream, testHeader, testFooter, checker);
+
+        when(checker.length()).thenReturn(longSum.length);
+        when(checker.calc(any(byte[].class))).thenReturn(longSum);
         decoder.addPacketReader(mRead);
         when(mRead.claim(data[0])).thenReturn(data.length);
         decoder.update();
@@ -115,17 +111,23 @@ public class Decoder_test {
 
 
     @Test
-    public void badPacketBefore(){
-        String dataString = "I'mTheGoodData";
-        byte[] data = dataString.getBytes();
-        InputStream stream = input("", testHeader+"I'mBadData"+testHeader+dataString+testChecksum+testFooter, "", "");
+    public void badPacketBefore() throws IOException {
+        byte[] data = "I'mTheGoodData".getBytes();
+        ByteArrayOutputStream concat = new ByteArrayOutputStream();
+        concat.write(testHeader);
+        concat.write("badData".getBytes());
+        concat.write(testHeader);
+        concat.write(data);
+        concat.write(testChecksum);
+        concat.write(testFooter);
+        InputStream stream = new ByteArrayInputStream(concat.toByteArray());
 
         PacketReader mRead = mock(PacketReader.class);
-        Checksum checker = mock(Checksum.class);
-        when(checker.length()).thenReturn(testChecksum.getBytes().length);
-        when(checker.calc(data)).thenReturn(testChecksum.getBytes());
-        Decoder decoder = new Decoder(stream, testHeader.getBytes(), testFooter.getBytes(), checker);
-        decoder.addPacketReader(mRead);
+        Checksum checker   = mock(Checksum.class);
+        Decoder decoder    = testDecoder(stream, mRead);
+
+        when(checker.length()).thenReturn(testChecksum.length);
+        when(checker.calc(data)).thenReturn(testChecksum);
         when(mRead.claim(data[0])).thenReturn(data.length);
         decoder.update();
 
@@ -133,13 +135,19 @@ public class Decoder_test {
     }
 
     @Test
-    public void multipleMatch(){
-        String dataString = "I'mTheGoodData";
-        byte[] data = dataString.getBytes();
-        String packetString = testHeader+dataString+testChecksum+testFooter;
+    public void multipleMatch() throws IOException {
+        byte[] data         = "I'mTheGoodData".getBytes();
+        ByteArrayOutputStream concat = new ByteArrayOutputStream();
+        for(int i=0; i<3; i++){
+            concat.write(testHeader);
+            concat.write(data);
+            concat.write(testChecksum);
+            concat.write(testFooter);
+        }
+        InputStream stream = new ByteArrayInputStream(concat.toByteArray());
+        PacketReader mRead  = mock(PacketReader.class);
+        Decoder decoder     = testDecoder(stream, mRead);
 
-        PacketReader mRead = mock(PacketReader.class);
-        Decoder decoder = testDecoder(packetString+packetString+packetString, mRead);
         when(mRead.claim(data[0])).thenReturn(data.length);
         decoder.update();
 
@@ -147,34 +155,40 @@ public class Decoder_test {
     }
 
     @Test
-    public void multiplePacketTypes(){
-        String firstString  = "FirstPacket";
-        String secondString = "SecondPacket";
-        String packetString = testHeader+firstString+testChecksum+testFooter+
-                              testHeader+secondString+testChecksum+testFooter;
-        InputStream stream = input("",packetString,"","");
+    public void multiplePacketTypes() throws IOException {
+        byte[][] data = {
+            "firstPacket".getBytes(),
+            "secondPacket".getBytes()
+        };
+        ByteArrayOutputStream concat = new ByteArrayOutputStream();
+        for(int i=0; i<2; i++){
+            concat.write(testHeader);
+            concat.write(data[i]);
+            concat.write(testChecksum);
+            concat.write(testFooter);
+        }
+        InputStream stream = new ByteArrayInputStream(concat.toByteArray());
+        PacketReader aRead  = mock(PacketReader.class);
+        PacketReader bRead  = mock(PacketReader.class);
+        Decoder decoder     = testDecoder(stream, aRead);
 
-        PacketReader aRead = mock(PacketReader.class);
-        PacketReader bRead = mock(PacketReader.class);
-        Decoder decoder = testDecoder(stream, aRead);
         decoder.addPacketReader(bRead);
         when(aRead.claim(any(byte.class))).thenReturn(-1);
         when(bRead.claim(any(byte.class))).thenReturn(-1);
-        when(aRead.claim((byte)'F')).thenReturn(firstString.getBytes().length);
-        when(bRead.claim((byte)'S')).thenReturn(secondString.getBytes().length);
+        when(aRead.claim(data[0][0])).thenReturn(data[0].length);
+        when(bRead.claim(data[1][0])).thenReturn(data[1].length);
         decoder.update();
 
-        verify(bRead).handle(secondString.getBytes());
-        verify(aRead).handle(firstString.getBytes());
+        verify(bRead).handle(data[1]);
+        verify(aRead).handle(data[0]);
     }
 
     @Test
-    public void decoyHeaderInData(){
-        String dataString = testHeader+testHeader+testHeader;
-        byte[] data = dataString.getBytes();
-
+    public void decoyHeaderInData() throws IOException {
+        byte[] data        = "HHH".getBytes();
         PacketReader mRead = mock(PacketReader.class);
-        Decoder decoder = testDecoder(dataString, mRead);
+        Decoder decoder    = testDecoder(data, mRead);
+
         when(mRead.claim(data[0])).thenReturn(data.length);
         decoder.update();
 
@@ -182,12 +196,11 @@ public class Decoder_test {
     }
 
     @Test
-    public void decoyFooterInData(){
-        String dataString = testFooter+testFooter+testFooter;
-        byte[] data = dataString.getBytes();
-
+    public void decoyFooterInData() throws IOException {
+        byte[] data        = "FFF".getBytes();
         PacketReader mRead = mock(PacketReader.class);
-        Decoder decoder = testDecoder(dataString, mRead);
+        Decoder decoder    = testDecoder(data, mRead);
+
         when(mRead.claim(data[0])).thenReturn(data.length);
         decoder.update();
 
@@ -195,27 +208,24 @@ public class Decoder_test {
     }
 
     @Test
-    public void dontClaimMessage(){
-        String dataString = "NotClaimed";
-        byte[] data = dataString.getBytes();
-        InputStream stream = input(testHeader, dataString, "", testFooter);
-
+    public void dontClaimMessage() throws IOException {
+        byte[] data        = "Not Claimed".getBytes();
+        InputStream stream = input(testHeader, data, new byte[0], testFooter);
         PacketReader mRead = mock(PacketReader.class);
-        Decoder decoder = testDecoder(stream, mRead);
+        Decoder decoder    = testDecoder(stream, mRead);
+
         when(mRead.claim(any(byte.class))).thenReturn(-1);
         decoder.update();
 
         verify(mRead, never()).handle(any(byte[].class));
     }
-
     @Test
-    public void badChecksum(){
-        String dataString = "NoChecksum";
-        byte[] data = dataString.getBytes();
-        InputStream stream = input(testHeader, dataString, "", testFooter);
-
+    public void badChecksum() throws IOException {
+        byte[] data        = "noChecksum".getBytes();
+        InputStream stream = input(testHeader, data, new byte[0], testFooter);
         PacketReader mRead = mock(PacketReader.class);
-        Decoder decoder = testDecoder(stream, mRead);
+        Decoder decoder    = testDecoder(stream, mRead);
+
         when(mRead.claim(data[0])).thenReturn(data.length);
         decoder.update();
 
@@ -223,12 +233,11 @@ public class Decoder_test {
     }
 
     @Test
-    public void packetTooLong(){
-        String dataString = "I'mTooLong";
-        byte[] data = dataString.getBytes();
-
+    public void packetTooLong() throws IOException {
+        byte[] data        = "I'mTooLong".getBytes();
         PacketReader mRead = mock(PacketReader.class);
-        Decoder decoder = testDecoder(dataString, mRead);
+        Decoder decoder    = testDecoder(data, mRead);
+
         when(mRead.claim(data[0])).thenReturn(data.length-1);
         decoder.update();
 
@@ -236,12 +245,11 @@ public class Decoder_test {
     }
 
     @Test
-    public void removedPacketReader(){
-        String dataString = "NobodyReadsMe";
-        byte[] data = dataString.getBytes();
-
+    public void removedPacketReader() throws IOException {
+        byte[] data        = "NobodyReadsMe".getBytes();
         PacketReader mRead = mock(PacketReader.class);
-        Decoder decoder = testDecoder(dataString, mRead);
+        Decoder decoder    = testDecoder(data, mRead);
+
         when(mRead.claim(data[0])).thenReturn(data.length);
         decoder.removePacketReader(mRead);
         decoder.update();
