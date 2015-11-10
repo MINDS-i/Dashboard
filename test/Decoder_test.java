@@ -185,7 +185,7 @@ public class Decoder_test {
 
     @Test
     public void decoyHeaderInData() throws IOException {
-        byte[] data        = "HHH".getBytes();
+        byte[] data        = testHeader;
         PacketReader mRead = mock(PacketReader.class);
         Decoder decoder    = testDecoder(data, mRead);
 
@@ -197,7 +197,7 @@ public class Decoder_test {
 
     @Test
     public void decoyFooterInData() throws IOException {
-        byte[] data        = "FFF".getBytes();
+        byte[] data        = testFooter;
         PacketReader mRead = mock(PacketReader.class);
         Decoder decoder    = testDecoder(data, mRead);
 
