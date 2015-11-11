@@ -68,6 +68,25 @@ public class Serial{
 		return (int) ( ((bSum)<<8)|(aSum) );
 	}
 
+	public static byte[] fletcher16bytes(byte[] message){
+		int iterator = 0;
+		int aSum=0xff, bSum=0xff;
+		short tmp;
+		int length = message.length;
+		while(length > 0){
+			int tlen = length > 359 ? 359 : length;
+			length -= tlen;
+			do{
+				bSum += aSum += (message[iterator++]&0xff);
+			} while (--tlen >0);
+			aSum = (aSum & 0xff) + (aSum >> 8);
+			bSum = (bSum & 0xff) + (bSum >> 8);
+		}
+		aSum = (aSum & 0xff) + (aSum >> 8);
+		bSum = (bSum & 0xff) + (bSum >> 8);
+		return new byte[]{ (byte)(bSum), (byte)(aSum)};
+	}
+
 	public static int fletcher16( byte[] message ){
 		return fletcher16(message, message.length);
 	}
