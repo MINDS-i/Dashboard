@@ -62,6 +62,22 @@ public class Decoder_test {
     }
 
     @Test
+    public void checksumOverCorrectRange() throws IOException {
+        byte[] data        = "checksum me!".getBytes();
+        PacketReader mRead = mock(PacketReader.class);
+        Checksum check     = mock(Checksum.class);
+        Decoder decoder    = new Decoder(input(data), testHeader, testFooter, check);
+
+        when(mRead.claim(data[0])).thenReturn(data.length);
+        when(check.length()).thenReturn(testChecksum.length);
+        when(check.calc(any(byte[].class))).thenReturn(testChecksum);
+        decoder.addPacketReader(mRead);
+        decoder.update();
+
+        verify(check).calc(data);
+    }
+
+    @Test
     public void longHeader() throws IOException {
         byte[] data        = "longHeader".getBytes();
         byte[] longHeader  = "abcdefghijklmnop".getBytes();
@@ -168,9 +184,9 @@ public class Decoder_test {
             concat.write(testFooter);
         }
         InputStream stream = new ByteArrayInputStream(concat.toByteArray());
-        PacketReader aRead  = mock(PacketReader.class);
-        PacketReader bRead  = mock(PacketReader.class);
-        Decoder decoder     = testDecoder(stream, aRead);
+        PacketReader aRead = mock(PacketReader.class);
+        PacketReader bRead = mock(PacketReader.class);
+        Decoder decoder    = testDecoder(stream, aRead);
 
         decoder.addPacketReader(bRead);
         when(aRead.claim(any(byte.class))).thenReturn(-1);
