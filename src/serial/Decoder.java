@@ -56,6 +56,7 @@ public class Decoder{
         //because the header includes one byte beyond the "header" buffer,
         //it isn't matched until the header was matched one byte ago
         for(int i=oldPos+1; i<buffer.size(); i++){
+System.err.println((byte)buffer.get(i));
             if (match(header, i-1)) foundHeader(i);
             if (match(footer, i  )) foundFooter(i);
         }
@@ -99,7 +100,13 @@ public class Decoder{
             byte[] data = new byte[packLen];
             for(int b=0; b<packLen; b++) data[b] = buffer.get(p.startPos+b);
             //calculate and match checksum
+System.err.print("[");
+for(int j=0; j<packLen; j++){
+    System.err.print(data[j]+",");
+}
+System.err.println("]");
             byte[] checksum = sum.calc(data);
+
             if(match(checksum, footerPos)){
                 //remove older headers and call handler
                 foundHeaders.subList(0, i+1).clear();
@@ -110,11 +117,19 @@ public class Decoder{
     }
 
     private void cleanBuffers(){
-        int retained = Math.max(buffer.size() - header.length, 0);
-        for(Packet p : foundHeaders){
-            retained = Math.min(retained, p.startPos);
+        int removed = Math.max(buffer.size() - header.length, 0);
+        for(Iterator<Packet> iter = foundHeaders.listIterator(); iter.hasNext();) {
+            Packet p = iter.next();
+            if(buffer.size() - p.startPos > p.maxLength){
+                iter.remove(); //remove packets past their max length
+            } else {
+                removed = Math.min(removed, p.startPos);
+            }
         }
-        buffer.subList(0, retained).clear();
+        buffer.subList(0, removed).clear();
+        for(Packet p : foundHeaders){
+            p.startPos -= removed;
+        }
     }
 
     public void close(){
