@@ -50,29 +50,10 @@ public class Serial{
 	public static final byte[] HEADER = {0x13, 0x37};
 	public static final byte[] FOOTER = {(byte)0x9A};
 
-	public static int fletcher16( byte[] message, int length){
+	public static byte[] fletcher16bytes(byte[] message, int length){
 		int iterator = 0;
 		int aSum=0xff, bSum=0xff;
 		short tmp;
-		while(length > 0){
-			int tlen = length > 359 ? 359 : length;
-			length -= tlen;
-			do{
-				bSum += aSum += (message[iterator++]&0xff);
-			} while (--tlen >0);
-			aSum = (aSum & 0xff) + (aSum >> 8);
-			bSum = (bSum & 0xff) + (bSum >> 8);
-		}
-		aSum = (aSum & 0xff) + (aSum >> 8);
-		bSum = (bSum & 0xff) + (bSum >> 8);
-		return (int) ( ((bSum)<<8)|(aSum) );
-	}
-
-	public static byte[] fletcher16bytes(byte[] message){
-		int iterator = 0;
-		int aSum=0xff, bSum=0xff;
-		short tmp;
-		int length = message.length;
 		while(length > 0){
 			int tlen = length > 359 ? 359 : length;
 			length -= tlen;
@@ -86,18 +67,13 @@ public class Serial{
 		bSum = (bSum & 0xff) + (bSum >> 8);
 		return new byte[]{ (byte)(bSum), (byte)(aSum)};
 	}
-
-	public static int fletcher16( byte[] message ){
-		return fletcher16(message, message.length);
+	public static byte[] fletcher16bytes(byte[] message){
+		return fletcher16bytes(message, message.length);
 	}
-
-	public static boolean fletcher(byte[] message, int length){
-		if(length <= 2) return false;
-		int foundSum = ( ( (message[length-2]&0xff) <<8) | (message[length-1]&0xff) );
-		int generatedSum = fletcher16(message, length-2);
-		return generatedSum == foundSum;
+	public static int fletcher16(byte[] message){
+		byte[] sum = fletcher16bytes(message);
+		return ((sum[0]&0xff) << 8) | (sum[1]&0xff);
 	}
-
 	public static int getMsgType(byte input){
 		return (input&0x0F);
 	}

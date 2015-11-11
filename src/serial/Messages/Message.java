@@ -16,11 +16,9 @@ public class Message{
 	protected Date   sent;
 	protected Message(){ //subclasses must call buildChecksums after making content
 		failCount = 0;
-		checkPair = new byte[2];
 	}
 	public Message(byte[] data){
 		failCount	= 0;
-		checkPair   = new byte[2];
 		content     = data.clone();
 		buildChecksum();
 	}
@@ -60,10 +58,8 @@ public class Message{
 		return c;
 	}
 	protected void buildChecksum(){
-		checkSum		= Serial.fletcher16( content );
-		checkPair[0]	= (byte)(checkSum>>8);
-		checkPair[1]	= (byte)(checkSum&0xff);
-		confirmSum  	= Serial.fletcher16( concat(content,checkPair) )&0xffff;
+		checkPair  = Serial.fletcher16bytes(content);
+		confirmSum = Serial.fletcher16( concat(content,checkPair) )&0xffff;
 	}
 	//these should be overridden
 	public boolean needsConfirm(){
