@@ -31,14 +31,14 @@ public class Context{
 	public TelemetryManager telemetry;
 
 	private SerialPort				port;
-	private Vector<ContextViewer> 	toUpdate;
+	private Vector<ContextViewer> 	waypointViewers;
 
 	private static String propertiesFile = "./data/persist.properties";
 	private Properties props;
 
 	public Context(){
 		connected = false;
-		toUpdate  = new Vector<ContextViewer>();
+		waypointViewers  = new Vector<ContextViewer>();
 
 		props = new Properties();
 		try(FileInputStream file = new FileInputStream(propertiesFile)){
@@ -123,16 +123,16 @@ public class Context{
 	}
 
 	public void waypointUpdated(){
-		Iterator it = toUpdate.iterator();
+		Iterator it = waypointViewers.iterator();
 		while(it.hasNext()) ((ContextViewer)it.next()).waypointUpdate();
 	}
 	//register viewer of waypoint list
 	public void registerViewer(ContextViewer viewer){
-		toUpdate.add(viewer);
+		waypointViewers.add(viewer);
 	}
 	//remove viewer of waypoint list
 	public void removeViewer(ContextViewer viewer){
-		toUpdate.remove(viewer);
+		waypointViewers.remove(viewer);
 	}
 
 	public void sendSetting(int index){
