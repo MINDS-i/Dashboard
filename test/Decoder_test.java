@@ -151,10 +151,28 @@ public class Decoder_test {
     }
 
     @Test
+    public void longGargbageStringBefore() throws IOException {
+        byte[] data = "Packet".getBytes();
+        ByteArrayOutputStream concat = new ByteArrayOutputStream();
+        concat.write(randomData(256));
+        concat.write(testHeader);
+        concat.write(data);
+        concat.write(testChecksum);
+        concat.write(testFooter);
+        PacketReader mRead = mock(PacketReader.class);
+        Decoder decoder    = testDecoder(new ByteArrayInputStream(concat.toByteArray()), mRead);
+
+        when(mRead.claim(anyByte())).thenReturn(data.length);
+        decoder.update();
+
+        verify(mRead).handle(data);
+    }
+
+    @Test
     public void multipleMatch() throws IOException {
         byte[] data         = "I'mTheGoodData".getBytes();
         ByteArrayOutputStream concat = new ByteArrayOutputStream();
-        for(int i=0; i<3; i++){
+        for(int i=0; i<30; i++){
             concat.write(testHeader);
             concat.write(data);
             concat.write(testChecksum);
@@ -167,7 +185,7 @@ public class Decoder_test {
         when(mRead.claim(data[0])).thenReturn(data.length);
         decoder.update();
 
-        verify(mRead, times(3)).handle(data);
+        verify(mRead, times(30)).handle(data);
     }
 
     @Test
