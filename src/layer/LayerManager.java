@@ -6,6 +6,15 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.*;
 
+/**
+ * LayerManager distributes mouse events and chances to draw on a set
+ * of Layer objects sorted with largest "getZ" an "top"
+ *
+ * Mouse clicks and presses are passed down the layers until a layer claims the
+ * event by return true in its handler. Subsequent events associated with a
+ * claimed event are passed directly to the claimant.
+ */
+
 public class LayerManager extends MouseAdapter{
     private List<Layer> layers = new ArrayList<Layer>();
 
