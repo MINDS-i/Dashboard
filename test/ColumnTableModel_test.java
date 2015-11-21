@@ -9,17 +9,6 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import org.mockito.InOrder;
 
-/**
- * public ColumnTableModel(List<TableColumn> cList){
- * public int getColumnCount() {
- * public int getRowCount() {
- * public String getColumnName(int col) {
- * public Object getValueAt(int row, int col) {
- * public Class getColumnClass(int col) {
- * public boolean isCellEditable(int row, int col) {
- * public void setValueAt(Object value, int row, int col) {
- */
-
 public class ColumnTableModel_test {
     List<TableColumn> mockTable(int cols) {
         List list = new ArrayList();
