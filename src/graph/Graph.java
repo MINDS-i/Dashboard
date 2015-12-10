@@ -118,69 +118,90 @@ public class Graph extends JPanel{
         final int width     = getWidth();
         final double scale  = -height/yScale;
         final double center = (height/2.0)+scale*-yCenter;
+        //viewSpec.at(getHeight(), getWidth());
+        final View view = new View( getHeight(), getWidth(),
+            (float)scale, (float)center,
+            (float)getWidth() , 0.00f
+            );
+
 
         //Draw background
         g2d.setPaint(Color.BLACK);
-        drawGrid(g2d, scale, center, height, width);
+        drawGrid(g2d, view);
 
         //Draw graph elements
         for(DataConfig data : sources){
             if(data.getDrawn())
-                drawData(g2d, data, (float) scale, (float) center, (float) xScale, (float) width);
+                drawData(g2d, data, view);
         }
-        drawLabels(g2d, sources, height);
+        drawLabels(g2d, sources, view);
 
         //Foreground draw by swing calling PaintComponents
     }
 
-    private double pow2(int exp){
-        int abs = Math.abs(exp);
-        double output = (double)(1 << abs);
-        if(exp < 0) return 1.0 / output;
-        return output;
+    static class ViewSpec{
+/*        View at(int height, int width){
+
+        }*/
     }
 
-    private void drawGrid(Graphics2D g2d, double scale, double center,
-                int height, int width){
+    static class View{
+        private int h,w;
+        private float yScale, yCenter;
+        private float xScale, xCenter;
+        View(int h, int w, float yScale, float yCenter, float xScale, float xCenter){
+            this.h = h;
+            this.w = w;
+            this.yScale  = yScale;
+            this.yCenter = yCenter;
+            this.xScale  = xScale;
+            this.xCenter = xCenter;
+        }
+        int height() { return h; }
+        int width()  { return w; }
+        float yRange() { return (float)h / yScale; }
+        float xRange() { return (float)w / xScale; }
+        float yPixToData(int y) { return ((float)y-yCenter) / yScale; }
+        float xPixToData(int x) { return ((float)x-xCenter) / xScale; }
+        int yDataToPix(float y) { return (int)(y*yScale + yCenter);   }
+        int xDataToPix(float x) { return (int)(x*xScale + xCenter);   }
+    }
+
+    private void drawGrid(Graphics2D g2d, View v){
         Graphics2D g = (Graphics2D) g2d.create();
-        /**
-         * data*scale + center = pixel
-         * (pixel - center) / scale = data
-         * 0 is the top of the screen, height is the bottom
-         */
-        final double maxDataVal = (0.0-center)/scale;
-        final double minDataVal = (height-center)/scale;
-        final int    horzRuleScale = Math.getExponent(maxDataVal-minDataVal) - NUM_HORZ_RULES;
-        final double horzRuleDelta = pow2(horzRuleScale);
-        final double minRule = minDataVal - (minDataVal%horzRuleDelta);
+
+        final int   horzRuleScale = Math.getExponent(v.yRange()) - NUM_HORZ_RULES;
+        final float horzRuleDelta = pow2(horzRuleScale);
+        final float maxDataVal = v.yPixToData(0);
+        final float minDataVal = v.yPixToData(v.height());
+        final float minRule    = minDataVal - (minDataVal%horzRuleDelta);
 
         //horizontal rules
         g.setStroke(new BasicStroke(1));
         g.setColor(Color.LIGHT_GRAY);
-        for(double r = minRule; r<maxDataVal; r+=horzRuleDelta){
-            final int pY = (int)(r * scale + center);
-            g.drawLine(0,pY,width,pY);
+        for(float r = minRule; r<maxDataVal; r+=horzRuleDelta){
+            final int pY = v.yDataToPix(r);
+            g.drawLine(0, pY, v.width(), pY);
             g.drawString(""+r, RULER_XOFF, pY-RULER_YOFF);
         }
 
         //vertical rules
         g.setStroke(new BasicStroke(1));
         g.setColor(Color.LIGHT_GRAY);
-        final int dx = width/NUM_VERT_RULES;
-        for(int x=0; x<width; x+=dx){
-            g.drawLine(x,0,x,height);
+        final int dx = v.width()/NUM_VERT_RULES;
+        for(int x=0; x<v.width(); x+=dx){
+            g.drawLine(x,0,x,v.height());
         }
 
         //bold 0 line
         g.setStroke(new BasicStroke(3));
         g.setColor(Color.BLACK);
-        g.drawLine(0, (int)center, width, (int)center); //bold 0 line
+        g.drawLine(0, v.yDataToPix(0), v.width(), v.yDataToPix(0)); //bold 0 line
 
         g.dispose();
     }
 
-    private void drawData(Graphics2D g2d, DataConfig data,
-                          float scale, float center, float xWidth, float width){
+    private void drawData(Graphics2D g2d, DataConfig data, View v){
         Graphics2D g = (Graphics2D) g2d.create();
         if(AA_ON){
             RenderingHints rh = new RenderingHints(
@@ -190,14 +211,13 @@ public class Graph extends JPanel{
         }
         g.setPaint(data.getPaint());
 
-
         final DataSource source = data.getSource();
         GeneralPath dataShape  = new GeneralPath();
         dataShape.moveTo(0,0);
 
-        for(int x=0; x<width; x++){
-            final float xPos = (1.0f-xWidth) + xWidth * (((float)x) / width);
-            final float y = (float) (source.get(xPos)*scale + center);
+        for(int x=0; x<v.width(); x++){
+            final float xData = v.xPixToData(x);
+            final float y     = v.yDataToPix((float)source.get((double)xData));
             dataShape.lineTo(x, y);
         }
 
@@ -206,7 +226,7 @@ public class Graph extends JPanel{
         g.dispose();
     }
 
-    private void drawLabels(Graphics2D g2d, List<DataConfig> dcs, int height){
+    private void drawLabels(Graphics2D g2d, List<DataConfig> dcs, View v){
         g2d = (Graphics2D) g2d.create();
         FontMetrics metrics = g2d.getFontMetrics();
         final int dropPoint = metrics.getDescent();
@@ -217,7 +237,7 @@ public class Graph extends JPanel{
         final int TEXT_RISE = RECT_BUFF + 3;
 
         final int startX = WALL_BUFF;
-        final int startY = height - WALL_BUFF;
+        final int startY = v.height() - WALL_BUFF;
 
         int dCount = 0;
         for(int i = 0; i < dcs.size(); i++) {
@@ -237,6 +257,13 @@ public class Graph extends JPanel{
                             left+rowHeight, bot-dropPoint-TEXT_RISE);
         }
         g2d.dispose();
+    }
+
+    private float pow2(int exp){
+        int abs = Math.abs(exp);
+        float output = (float)(1 << abs);
+        if(exp < 0) return 1.0f / output;
+        return output;
     }
 
     static class DataConfig{
