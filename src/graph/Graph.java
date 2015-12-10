@@ -113,20 +113,22 @@ public class Graph extends JPanel{
 
         //find data->pixel conversion constants
         final Graphics2D g2d = (Graphics2D) g;
-        final double   scale =- getHeight()/yScale;
-        final double  center = (getHeight()/2.0)+scale*-yCenter;
+
+        final int height    = getHeight();
+        final int width     = getWidth();
+        final double scale  = -height/yScale;
+        final double center = (height/2.0)+scale*-yCenter;
 
         //Draw background
         g2d.setPaint(Color.BLACK);
-        drawGrid(g2d, scale, center);
+        drawGrid(g2d, scale, center, height, width);
 
         //Draw graph elements
         for(DataConfig data : sources){
             if(data.getDrawn())
-                drawData(g2d, data, (float) scale, (float) center, (float) xScale);
-                //drawData(g2d, data, scale, center, xScale);
+                drawData(g2d, data, (float) scale, (float) center, (float) xScale, (float) width);
         }
-        drawLabels(g2d, sources);
+        drawLabels(g2d, sources, height);
 
         //Foreground draw by swing calling PaintComponents
     }
@@ -138,7 +140,8 @@ public class Graph extends JPanel{
         return output;
     }
 
-    private void drawGrid(Graphics2D g2d, double scale, double center){
+    private void drawGrid(Graphics2D g2d, double scale, double center,
+                int height, int width){
         Graphics2D g = (Graphics2D) g2d.create();
         /**
          * data*scale + center = pixel
@@ -146,7 +149,7 @@ public class Graph extends JPanel{
          * 0 is the top of the screen, height is the bottom
          */
         final double maxDataVal = (0.0-center)/scale;
-        final double minDataVal = (getHeight()-center)/scale;
+        final double minDataVal = (height-center)/scale;
         final int    horzRuleScale = Math.getExponent(maxDataVal-minDataVal) - NUM_HORZ_RULES;
         final double horzRuleDelta = pow2(horzRuleScale);
         final double minRule = minDataVal - (minDataVal%horzRuleDelta);
@@ -156,28 +159,28 @@ public class Graph extends JPanel{
         g.setColor(Color.LIGHT_GRAY);
         for(double r = minRule; r<maxDataVal; r+=horzRuleDelta){
             final int pY = (int)(r * scale + center);
-            g.drawLine(0,pY,getWidth(),pY);
+            g.drawLine(0,pY,width,pY);
             g.drawString(""+r, RULER_XOFF, pY-RULER_YOFF);
         }
 
         //vertical rules
         g.setStroke(new BasicStroke(1));
         g.setColor(Color.LIGHT_GRAY);
-        final int dx = getWidth()/NUM_VERT_RULES;
-        for(int x=0; x<getWidth(); x+=dx){
-            g.drawLine(x,0,x,getHeight());
+        final int dx = width/NUM_VERT_RULES;
+        for(int x=0; x<width; x+=dx){
+            g.drawLine(x,0,x,height);
         }
 
         //bold 0 line
         g.setStroke(new BasicStroke(3));
         g.setColor(Color.BLACK);
-        g.drawLine(0, (int)center, getWidth(), (int)center); //bold 0 line
+        g.drawLine(0, (int)center, width, (int)center); //bold 0 line
 
         g.dispose();
     }
 
     private void drawData(Graphics2D g2d, DataConfig data,
-                          float scale, float center, float xWidth){
+                          float scale, float center, float xWidth, float width){
         Graphics2D g = (Graphics2D) g2d.create();
         if(AA_ON){
             RenderingHints rh = new RenderingHints(
@@ -189,7 +192,6 @@ public class Graph extends JPanel{
 
 
         final DataSource source = data.getSource();
-        final float width       = (float) this.getWidth();
         GeneralPath dataShape  = new GeneralPath();
         dataShape.moveTo(0,0);
 
@@ -204,7 +206,7 @@ public class Graph extends JPanel{
         g.dispose();
     }
 
-    private void drawLabels(Graphics2D g2d, List<DataConfig> dcs){
+    private void drawLabels(Graphics2D g2d, List<DataConfig> dcs, int height){
         g2d = (Graphics2D) g2d.create();
         FontMetrics metrics = g2d.getFontMetrics();
         final int dropPoint = metrics.getDescent();
@@ -215,7 +217,7 @@ public class Graph extends JPanel{
         final int TEXT_RISE = RECT_BUFF + 3;
 
         final int startX = WALL_BUFF;
-        final int startY = getHeight() - WALL_BUFF;
+        final int startY = height - WALL_BUFF;
 
         int dCount = 0;
         for(int i = 0; i < dcs.size(); i++) {
