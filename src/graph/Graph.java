@@ -13,48 +13,36 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.List;
 
+//for testing purposes
+import java.io.File;
+
 public class Graph extends JPanel{
     private final static int RULER_XOFF = 10;
     private final static int RULER_YOFF =  2;
     private final static int REPAINT_INTERVAL = 50; //milliseconds
     private final static int NUM_HORZ_RULES = 4; //creates 2^NUM_VERT_RULES horizontal rulers
     private final static int NUM_VERT_RULES = 16; //creates x evenly spaces vertical rulers
-    private final static boolean AA_ON = false; //anti-aliasing render hint
-    private final static double XSCALE_MAX = 1.00;
-    private final static double XSCALE_MIN = 0.05;
+    private final static Paint[] DEFAULT_PAINTS =
+        { Color.BLACK,   Color.BLUE,   Color.RED,  Color.GREEN,
+          Color.MAGENTA, Color.ORANGE, Color.CYAN, Color.GRAY,
+          Color.PINK,    Color.YELLOW };
 
     private List<DataConfig> sources;
     private Timer refreshTimer;
     private GraphConfigWindow config;
-    private double xScale  = XSCALE_MAX; //how much of the data's x range to display
-    private double yScale  = 40.0; //scale of data per half graph height
-    private double yCenter =  0.0; //pixel offset for where 0 line should be
+    private boolean antiAlias = true; //anti-aliasing render hint
 
+    public void setAntiAliasing(boolean on){ antiAlias = on; }
+    public boolean getAntiAliasing() { return antiAlias; }
     List<DataConfig> getSources(){ return sources; }
-    void setXScale(double s) {
-        xScale = s;
-        if(config != null) config.graphConfigsUpdated();
-    }
-    void setYScale(double s) {
-        yScale = s;
-        if(config != null) config.graphConfigsUpdated();
-    }
-    void setYCenter(double s){
-        yCenter= s;
-        if(config != null) config.graphConfigsUpdated();
-    }
-    double getXScale() { return xScale;  }
-    double getYScale() { return yScale;  }
-    double getYCenter(){ return yCenter; }
 
-    /*
-    clean up graph logic
-    add data/pixel units to parameters
-    */
     public Graph(List<DataSource> inputSources, boolean defaultState){
         sources = new ArrayList<DataConfig>();
+        int paintCount = 0;
         for(DataSource source : inputSources){
-            sources.add(new DataConfig(source, defaultState));
+            DataConfig dc = new DataConfig(source, defaultState);
+            dc.setPaint(DEFAULT_PAINTS[(paintCount++) % DEFAULT_PAINTS.length]);
+            sources.add(dc);
         }
 
         //place configuration button
@@ -64,16 +52,12 @@ public class Graph extends JPanel{
         //call back when the window is closed
         this.addHierarchyListener(new HierarchyListener(){
             public void hierarchyChanged(HierarchyEvent e){
-                boolean showing_changed = (e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0;
-                if(showing_changed && !isShowing()){
-                    onClose();
-                }
+                boolean showingChanged = (e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0;
+                if(!showingChanged) return;
+                if(isShowing()) onShow();
+                else onClose();
             }
         });
-
-        //repaint at regular interval
-        refreshTimer = new Timer();
-        refreshTimer.scheduleAtFixedRate(new RefreshTimerTask(), 0, REPAINT_INTERVAL);
 
         //turn on graph mouse listener
         MouseAdapter mouseAdapter = new GraphMouseHandler();
@@ -82,12 +66,20 @@ public class Graph extends JPanel{
         this.addMouseWheelListener(mouseAdapter);
     }
 
+    private void onShow(){
+        System.out.println("On Show");
+
+        refreshTimer = new Timer();
+        refreshTimer.scheduleAtFixedRate(new RepaintTask(), 0, REPAINT_INTERVAL);
+    }
+
     private void onClose(){
+        System.out.println("On Close");
         if(config != null) config.close();
         if(refreshTimer != null) refreshTimer.cancel();
     }
 
-    private class RefreshTimerTask extends TimerTask{
+    private class RepaintTask extends TimerTask{
         public void run(){
             repaint();
         }
@@ -110,20 +102,26 @@ public class Graph extends JPanel{
     @Override
     public void paintComponent(Graphics g){
         super.paintComponent(g);
+        render((Graphics2D)g, getHeight(), getWidth());
+        //Foreground draw by swing calling PaintComponents
+    }
 
-        //find data->pixel conversion constants
-        final Graphics2D g2d = (Graphics2D) g;
+    public BufferedImage render(int height, int width){
+        BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2d = img.createGraphics();
+        {
+            Graphics g = g2d.create();
+            g.setColor(Color.WHITE);
+            g.fillRect(0,0,width,height);
+            g.dispose();
+        }
+        render(g2d, height, width);
+        g2d.dispose();
+        return img;
+    }
 
-        final int height    = getHeight();
-        final int width     = getWidth();
-        final double scale  = -height/yScale;
-        final double center = (height/2.0)+scale*-yCenter;
-        //viewSpec.at(getHeight(), getWidth());
-        final View view = new View( getHeight(), getWidth(),
-            (float)scale, (float)center,
-            (float)getWidth() , 0.00f
-            );
-
+    private void render(Graphics2D g2d, int height, int width){
+        final View view = at(height, width);
 
         //Draw background
         g2d.setPaint(Color.BLACK);
@@ -135,15 +133,46 @@ public class Graph extends JPanel{
                 drawData(g2d, data, view);
         }
         drawLabels(g2d, sources, view);
-
-        //Foreground draw by swing calling PaintComponents
     }
 
-    static class ViewSpec{
-/*        View at(int height, int width){
+    //////////////////////////
 
-        }*/
+/*    static class ViewSpec{
     }
+*/
+    private final static double XSCALE_MIN = 0.05;
+    private final static double XSCALE_MAX = 1.00;
+    private double xScale  = XSCALE_MAX; //how much of the data's x range to display
+    private double yScale  = 40.0; //scale of data per half graph height
+    private double yCenter =  0.0; //pixel offset for where 0 line should be
+    void setXScale(double s) {
+        xScale = s;
+        if(config != null) config.graphConfigsUpdated();
+    }
+    void setYScale(double s) {
+        yScale = s;
+        if(config != null) config.graphConfigsUpdated();
+    }
+    void setYCenter(double s){
+        yCenter= s;
+        if(config != null) config.graphConfigsUpdated();
+    }
+    double getXScale() { return xScale;  }
+    double getYScale() { return yScale;  }
+    double getYCenter(){ return yCenter; }
+
+    View at(int height, int width){
+        double scale  = -height/yScale;
+        double center = (height/2.0)+scale*-yCenter;
+        View view = new View( height, width,
+            (float)scale, (float)center,
+            (float)width , 0.00f
+            );
+
+        return view;
+    }
+
+    //////////////////////
 
     static class View{
         private int h,w;
@@ -203,7 +232,7 @@ public class Graph extends JPanel{
 
     private void drawData(Graphics2D g2d, DataConfig data, View v){
         Graphics2D g = (Graphics2D) g2d.create();
-        if(AA_ON){
+        if(antiAlias){
             RenderingHints rh = new RenderingHints(
                  RenderingHints.KEY_ANTIALIASING,
                  RenderingHints.VALUE_ANTIALIAS_ON);
@@ -368,11 +397,19 @@ public class Graph extends JPanel{
         trialSources.add(cos);
 
         Graph g = new Graph(trialSources, true);
+
+        try {
+            BufferedImage img = g.render(400,800);
+            File out = new File("test.png");
+            ImageIO.write(img, "png", out);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         JFrame f = new JFrame("graphTest");
         f.add(g);
         f.pack();
         f.setVisible(true);
-
         while(f.isShowing()){
             try {
                 Thread.sleep(1000);
@@ -380,5 +417,6 @@ public class Graph extends JPanel{
                 e.printStackTrace();
             }
         }
+
     }
 }
