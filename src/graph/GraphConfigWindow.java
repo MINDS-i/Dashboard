@@ -64,11 +64,17 @@ class GraphConfigWindow{
                 ));
         };
 
+        JCheckBox aa = new JCheckBox("AntiAlias", subject.getAntiAliasing());
+        aa.addChangeListener( (ChangeEvent e) ->
+            subject.setAntiAliasing( aa.getModel().isSelected() )
+        );
+
+        spinnerPanel.add(aa);
         spinnerPanel.add(new JLabel(" Y Scale:"));
         spinnerPanel.add(numberSpinner(yscale, cl));
         spinnerPanel.add(new JLabel(" Y Center:"));
         spinnerPanel.add(numberSpinner(ycenter, cl));
-        spinnerPanel.add(new JLabel("X Scale:"));
+        spinnerPanel.add(new JLabel(" X Scale:"));
         spinnerPanel.add(numberSpinner(xscale, cl));
 
         return spinnerPanel;
