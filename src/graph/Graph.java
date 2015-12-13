@@ -17,7 +17,7 @@ import java.util.List;
 import java.io.File;
 
 public class Graph extends JPanel{
-    private final static float ZOOM_FACTOR = 0.025f;
+    private final static float ZOOM_FACTOR = 0.05f;
     private final static int RULER_XOFF = 10;
     private final static int RULER_YOFF =  2;
     private final static int REPAINT_INTERVAL = 50; //milliseconds
@@ -304,7 +304,7 @@ public class Graph extends JPanel{
         @Override
         public void mouseWheelMoved(MouseWheelEvent e){
             float d = (float) e.getPreciseWheelRotation();
-            viewSpec.zoom(d*ZOOM_FACTOR);
+            viewSpec.zoom(1.0f + d*ZOOM_FACTOR);
         }
     }
 
