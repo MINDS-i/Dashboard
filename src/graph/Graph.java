@@ -17,6 +17,7 @@ import java.util.List;
 import java.io.File;
 
 public class Graph extends JPanel{
+    private final static float ZOOM_FACTOR = 0.025f;
     private final static int RULER_XOFF = 10;
     private final static int RULER_YOFF =  2;
     private final static int REPAINT_INTERVAL = 50; //milliseconds
@@ -27,14 +28,19 @@ public class Graph extends JPanel{
           Color.MAGENTA, Color.ORANGE, Color.CYAN, Color.GRAY,
           Color.PINK,    Color.YELLOW };
 
-    private List<DataConfig> sources;
     private Timer refreshTimer;
     private GraphConfigWindow config;
-    private boolean antiAlias = true; //anti-aliasing render hint
 
+    private List<DataConfig> sources;
+    List<DataConfig> getSources(){ return sources; }
+
+    private ViewSpec viewSpec = new RTViewSpec();
+    public ViewSpec getViewSpec() { return viewSpec; }
+    public void setViewSpec(ViewSpec vs) { viewSpec = vs; }
+
+    private boolean antiAlias = true; //anti-aliasing render hint
     public void setAntiAliasing(boolean on){ antiAlias = on; }
     public boolean getAntiAliasing() { return antiAlias; }
-    List<DataConfig> getSources(){ return sources; }
 
     public Graph(List<DataSource> inputSources, boolean defaultState){
         sources = new ArrayList<DataConfig>();
@@ -67,14 +73,11 @@ public class Graph extends JPanel{
     }
 
     private void onShow(){
-        System.out.println("On Show");
-
         refreshTimer = new Timer();
         refreshTimer.scheduleAtFixedRate(new RepaintTask(), 0, REPAINT_INTERVAL);
     }
 
     private void onClose(){
-        System.out.println("On Close");
         if(config != null) config.close();
         if(refreshTimer != null) refreshTimer.cancel();
     }
@@ -121,7 +124,8 @@ public class Graph extends JPanel{
     }
 
     private void render(Graphics2D g2d, int height, int width){
-        final View view = at(height, width);
+
+        final View view = viewSpec.at(height, width);
 
         //Draw background
         g2d.setPaint(Color.BLACK);
@@ -133,67 +137,6 @@ public class Graph extends JPanel{
                 drawData(g2d, data, view);
         }
         drawLabels(g2d, sources, view);
-    }
-
-    //////////////////////////
-
-/*    static class ViewSpec{
-    }
-*/
-    private final static double XSCALE_MIN = 0.05;
-    private final static double XSCALE_MAX = 1.00;
-    private double xScale  = XSCALE_MAX; //how much of the data's x range to display
-    private double yScale  = 40.0; //scale of data per half graph height
-    private double yCenter =  0.0; //pixel offset for where 0 line should be
-    void setXScale(double s) {
-        xScale = s;
-        if(config != null) config.graphConfigsUpdated();
-    }
-    void setYScale(double s) {
-        yScale = s;
-        if(config != null) config.graphConfigsUpdated();
-    }
-    void setYCenter(double s){
-        yCenter= s;
-        if(config != null) config.graphConfigsUpdated();
-    }
-    double getXScale() { return xScale;  }
-    double getYScale() { return yScale;  }
-    double getYCenter(){ return yCenter; }
-
-    View at(int height, int width){
-        double scale  = -height/yScale;
-        double center = (height/2.0)+scale*-yCenter;
-        View view = new View( height, width,
-            (float)scale, (float)center,
-            (float)width , 0.00f
-            );
-
-        return view;
-    }
-
-    //////////////////////
-
-    static class View{
-        private int h,w;
-        private float yScale, yCenter;
-        private float xScale, xCenter;
-        View(int h, int w, float yScale, float yCenter, float xScale, float xCenter){
-            this.h = h;
-            this.w = w;
-            this.yScale  = yScale;
-            this.yCenter = yCenter;
-            this.xScale  = xScale;
-            this.xCenter = xCenter;
-        }
-        int height() { return h; }
-        int width()  { return w; }
-        float yRange() { return (float)h / yScale; }
-        float xRange() { return (float)w / xScale; }
-        float yPixToData(int y) { return ((float)y-yCenter) / yScale; }
-        float xPixToData(int x) { return ((float)x-xCenter) / xScale; }
-        int yDataToPix(float y) { return (int)(y*yScale + yCenter);   }
-        int xDataToPix(float x) { return (int)(x*xScale + xCenter);   }
     }
 
     private void drawGrid(Graphics2D g2d, View v){
@@ -346,17 +289,10 @@ public class Graph extends JPanel{
         @Override
         public void mouseDragged(MouseEvent e){
             if(dragPoint != null){
-                final Graph   g = Graph.this;
                 final double dx = e.getPoint().x - dragPoint.x;
                 final double dy = e.getPoint().y - dragPoint.y;
-                //scale x drag motion by width, use it to alter the graph x scale
-                double xs = dx/((double)Graph.this.getWidth());
-                xs += g.getXScale();
-                xs = Math.max( Math.min(xs, XSCALE_MAX), XSCALE_MIN);
-                g.setXScale( xs );
-                //pan the y axis by delta y
-                final double dyunit = (dy/g.getHeight()) * g.getYScale();
-                g.setYCenter( g.getYCenter() + dyunit );
+                viewSpec.panY((int)-dy);
+                viewSpec.panX((int) dx);
                 //save current point for delta calculations
                 dragPoint = e.getPoint();
             }
@@ -367,10 +303,8 @@ public class Graph extends JPanel{
         }
         @Override
         public void mouseWheelMoved(MouseWheelEvent e){
-            final double ZOOM_FACTOR = 0.025;
-            double d = e.getPreciseWheelRotation();
-            Graph g = Graph.this;
-            g.setYScale( d*ZOOM_FACTOR*g.getYScale() + g.getYScale() );
+            float d = (float) e.getPreciseWheelRotation();
+            viewSpec.zoom(d*ZOOM_FACTOR);
         }
     }
 
@@ -397,6 +331,7 @@ public class Graph extends JPanel{
         trialSources.add(cos);
 
         Graph g = new Graph(trialSources, true);
+        g.setViewSpec(new RTViewSpec(50.0f, 10.0f));
 
         try {
             BufferedImage img = g.render(400,800);

@@ -12,11 +12,8 @@ import javax.swing.colorchooser.AbstractColorChooserPanel;
 
 class GraphConfigWindow{
     private static final Dimension SPINNER_SIZE = new Dimension(80,20);
-    private Graph  subject; //the graph to configure
-    private JFrame frame;
-    private JSpinner xScaleSpinner;
-    private JSpinner yScaleSpinner;
-    private JSpinner yCenterSpinner;
+    private Graph    subject;
+    private JFrame   frame;
 
     public GraphConfigWindow(Graph subject){
         this.subject = subject;
@@ -40,58 +37,39 @@ class GraphConfigWindow{
         frame.dispose();
     }
 
-    public void graphConfigsUpdated(){
-        xScaleSpinner.setValue( subject.getXScale() );
-        yScaleSpinner.setValue( subject.getYScale() );
-        yCenterSpinner.setValue( subject.getYCenter() );
+    JSpinner numberSpinner(SpinnerNumberModel model, ChangeListener cl){
+        JSpinner js = new JSpinner(model);
+        js.setPreferredSize(SPINNER_SIZE);
+        js.addChangeListener(cl);
+        return js;
     }
 
     private JPanel buildSpinners(){
         JPanel spinnerPanel = new JPanel();
 
-        //X scale spinner
-        SpinnerNumberModel xScaleM = new SpinnerNumberModel(subject.getXScale(),
-                                                           0.01, 1.0, 0.1);
-        xScaleSpinner = new JSpinner(xScaleM);
-        xScaleSpinner.setPreferredSize(SPINNER_SIZE);
-        xScaleSpinner.addChangeListener(new ChangeListener(){
-            public void stateChanged(ChangeEvent e){
-                subject.setXScale(xScaleM.getNumber().doubleValue());
-            }
-        });
+        ViewSpec vs = subject.getViewSpec();
+        double curYscale  =  vs.maxY() - vs.minY();
+        double curYcenter = (vs.maxY() + vs.minY()) / 2.0;
+        SpinnerNumberModel yscale  =
+            new SpinnerNumberModel(curYscale, Double.MIN_NORMAL, Double.MAX_VALUE, 1.0);
+        SpinnerNumberModel ycenter =
+            new SpinnerNumberModel(curYcenter, -Double.MAX_VALUE, Double.MAX_VALUE, 2.0);
+        SpinnerNumberModel xscale  = new SpinnerNumberModel(1.0, 0.0, 1.0, 0.05);
 
-        //Y scale spinner
-        SpinnerNumberModel yScaleM = new SpinnerNumberModel(subject.getYScale(),
-                                                           0.0,
-                                                           Double.MAX_VALUE,
-                                                           0.25);
-        yScaleSpinner = new JSpinner(yScaleM);
-        yScaleSpinner.setPreferredSize(SPINNER_SIZE);
-        yScaleSpinner.addChangeListener(new ChangeListener(){
-            public void stateChanged(ChangeEvent e){
-                subject.setYScale(yScaleM.getNumber().doubleValue());
-            }
-        });
+        ChangeListener cl = (ChangeEvent e) -> {
+            subject.setViewSpec(new RTViewSpec(
+                yscale.getNumber().floatValue(),
+                ycenter.getNumber().floatValue(),
+                xscale.getNumber().floatValue()
+                ));
+        };
 
-        //Y center spinner
-        SpinnerNumberModel yCenterM = new SpinnerNumberModel(subject.getYCenter(),
-                                                            -Double.MAX_VALUE,
-                                                            Double.MAX_VALUE,
-                                                            0.5);
-        yCenterSpinner = new JSpinner(yCenterM);
-        yCenterSpinner.setPreferredSize(SPINNER_SIZE);
-        yCenterSpinner.addChangeListener(new ChangeListener(){
-            public void stateChanged(ChangeEvent e){
-                subject.setYCenter(yCenterM.getNumber().doubleValue());
-            }
-        });
-
-        spinnerPanel.add(new JLabel("X Scale:"));
-        spinnerPanel.add(xScaleSpinner);
         spinnerPanel.add(new JLabel(" Y Scale:"));
-        spinnerPanel.add(yScaleSpinner);
+        spinnerPanel.add(numberSpinner(yscale, cl));
         spinnerPanel.add(new JLabel(" Y Center:"));
-        spinnerPanel.add(yCenterSpinner);
+        spinnerPanel.add(numberSpinner(ycenter, cl));
+        spinnerPanel.add(new JLabel("X Scale:"));
+        spinnerPanel.add(numberSpinner(xscale, cl));
 
         return spinnerPanel;
     }
