@@ -331,7 +331,7 @@ public class Graph extends JPanel{
         trialSources.add(cos);
 
         Graph g = new Graph(trialSources, true);
-        g.setViewSpec(new RTViewSpec(50.0f, 10.0f));
+        //g.setViewSpec(new RTViewSpec(50.0f, 10.0f));
 
         try {
             BufferedImage img = g.render(400,800);

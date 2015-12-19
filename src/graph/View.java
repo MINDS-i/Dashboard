@@ -6,23 +6,31 @@ package com.graph;
  */
 
 class View{
-    private int h,w;
+    private int h, w;
     private float yScale, yMin;
     private float xScale, xMin;
-    View(int h, int w, float yScale, float yMin, float xScale, float xMin){
-        this.h = h;
-        this.w = w;
-        this.yScale = yScale;
-        this.yMin   = yMin;
-        this.xScale = xScale;
-        this.xMin   = xMin;
+    /**
+     * h = height of final view
+     * w = width of final view
+     * yScale  = height in y data of the view
+     * yCenter = location in data to be centered vertically in the view
+     * xScale  = width in x data of the view
+     * xCenter = location in data to be centered horizonally in the view
+     */
+    View(int h, int w, float yScale, float yCenter, float xScale, float xCenter){
+        this.h      = h;
+        this.w      = w;
+        this.yScale = - h / yScale;
+        this.yMin   = yCenter + yScale/2;
+        this.xScale =   w / xScale;
+        this.xMin   = xCenter - xScale/2;
     }
     int height() { return h; }
     int width()  { return w; }
-    float yRange() { return (float)h / yScale; }
-    float xRange() { return (float)w / xScale; }
-    float yPixToData(int y) { return ((float)y-yMin) / yScale; }
-    float xPixToData(int x) { return ((float)x-xMin) / xScale; }
-    int yDataToPix(float y) { return (int)(y*yScale + yMin);   }
-    int xDataToPix(float x) { return (int)(x*xScale + xMin);   }
+    float yRange() { return h/yScale; }
+    float xRange() { return w/xScale; }
+    float yPixToData(int y) { return (y/yScale)+yMin; }
+    float xPixToData(int x) { return (x/xScale)+xMin; }
+    int yDataToPix(float y) { return (int)((y-yMin)*yScale); }
+    int xDataToPix(float x) { return (int)((x-xMin)*xScale); }
 }
