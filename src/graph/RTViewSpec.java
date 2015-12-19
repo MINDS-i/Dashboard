@@ -18,41 +18,39 @@ public class RTViewSpec implements ViewSpec{
     private float yCenter;//pixels
 
     public RTViewSpec(){
-        this(40.0f, 0.0f, XCENTER_MIN);
+        this(40.0f, 0.0f, 1.0f);
     }
     public RTViewSpec(float yScale, float yCenter){
-        this(yScale, yCenter, XCENTER_MIN);
+        this(yScale, yCenter, 1.0f);
     }
-    public RTViewSpec(float yScale, float yCenter, float xCenter){
-        this.xCenter  = xCenter;
+    public RTViewSpec(float yScale, float yCenter, float xScale){
+        this.xCenter = Math.min(XCENTER_MAX, Math.max(XCENTER_MIN, xScale/2.0f));
         this.yScale  = yScale;
         this.yCenter = yCenter;
     }
-
     public float maxY(){
-        return yCenter/yScale + yScale/2.0f;
+        return yCenter + yScale/2.0f;
     }
     public float minY(){
-        return yCenter/yScale - yScale/2.0f;
+        return yCenter - yScale/2.0f;
     }
-
     public void zoom(float fac){
         yScale *= fac;
+        System.out.println(maxY() + " to " + minY());
     }
-    public void panY(int pix){
-        yCenter -= (float) pix;
+    public void panY(int pix, int height){
+        yCenter -= (pix/(float)height)*yScale;
+        System.out.println(maxY() + " to " + minY());
     }
-    public void panX(int pix){
-        float nScale = xCenter - (float)pix*0.005f;
+    public void panX(int pix, int width){
+        float nScale = xCenter - pix/(2.0f*(float)width);
         xCenter = Math.min(XCENTER_MAX, Math.max(XCENTER_MIN, nScale));
     }
     public View at(int height, int width){
-
-        float yDataCenter = yCenter*(yScale/(float)height);
         float xDist  = (1.0f-xCenter)*2.0f;
 
         View view = new View( height, width,
-                              yScale, yDataCenter,
+                              yScale, yCenter,
                               xDist , xCenter);
         return view;
     }

@@ -291,8 +291,8 @@ public class Graph extends JPanel{
             if(dragPoint != null){
                 final double dx = e.getPoint().x - dragPoint.x;
                 final double dy = e.getPoint().y - dragPoint.y;
-                viewSpec.panY((int)-dy);
-                viewSpec.panX((int) dx);
+                viewSpec.panY((int)-dy, getHeight());
+                viewSpec.panX((int) dx, getWidth());
                 //save current point for delta calculations
                 dragPoint = e.getPoint();
             }
