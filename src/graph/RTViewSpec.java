@@ -36,11 +36,9 @@ public class RTViewSpec implements ViewSpec{
     }
     public void zoom(float fac){
         yScale *= fac;
-        System.out.println(maxY() + " to " + minY());
     }
     public void panY(int pix, int height){
         yCenter -= (pix/(float)height)*yScale;
-        System.out.println(maxY() + " to " + minY());
     }
     public void panX(int pix, int width){
         float nScale = xCenter - pix/(2.0f*(float)width);
