@@ -27,8 +27,8 @@ class View{
     }
     int height() { return h; }
     int width()  { return w; }
-    float yRange() { return h/yScale; }
-    float xRange() { return w/xScale; }
+    float yRange() { return -h/yScale; }
+    float xRange() { return  w/xScale; }
     float yPixToData(int y) { return (y/yScale)+yMin; }
     float xPixToData(int x) { return (x/xScale)+xMin; }
     int yDataToPix(float y) { return (int)((y-yMin)*yScale); }
