@@ -124,7 +124,6 @@ public class Graph extends JPanel{
     }
 
     private void render(Graphics2D g2d, int height, int width){
-
         final View view = viewSpec.at(height, width);
 
         //Draw background
@@ -143,10 +142,12 @@ public class Graph extends JPanel{
         Graphics2D g = (Graphics2D) g2d.create();
 
         final int   horzRuleScale = Math.getExponent(v.yRange()) - NUM_HORZ_RULES;
-        final float horzRuleDelta = pow2(horzRuleScale);
+        final float horzRuleDelta = (float)Math.pow(2.0, (double)horzRuleScale);
         final float maxDataVal = v.yPixToData(0);
         final float minDataVal = v.yPixToData(v.height());
         final float minRule    = minDataVal - (minDataVal%horzRuleDelta);
+
+        if(horzRuleDelta <= 0.0f) throw new RuntimeException("Horz rule spacing must be positive");
 
         //horizontal rules
         g.setStroke(new BasicStroke(1));
@@ -229,13 +230,6 @@ public class Graph extends JPanel{
                             left+rowHeight, bot-dropPoint-TEXT_RISE);
         }
         g2d.dispose();
-    }
-
-    private float pow2(int exp){
-        int abs = Math.abs(exp);
-        float output = (float)(1 << abs);
-        if(exp < 0) return 1.0f / output;
-        return output;
     }
 
     static class DataConfig{

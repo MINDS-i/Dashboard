@@ -12,6 +12,8 @@ package com.graph;
 public class RTViewSpec implements ViewSpec{
     private final static float XCENTER_MIN = 0.50f;
     private final static float XCENTER_MAX = 0.95f;
+    private final static float ZOOM_MIN = Float.MIN_NORMAL;
+    private final static float ZOOM_MAX = Float.MAX_VALUE;
 
     private float xCenter;//data
     private float yScale; //data
@@ -35,7 +37,7 @@ public class RTViewSpec implements ViewSpec{
         return yCenter - yScale/2.0f;
     }
     public void zoom(float fac){
-        yScale *= fac;
+        yScale = Math.min(ZOOM_MAX,Math.max(ZOOM_MIN,yScale*fac));
     }
     public void panY(int pix, int height){
         yCenter -= (pix/(float)height)*yScale;
