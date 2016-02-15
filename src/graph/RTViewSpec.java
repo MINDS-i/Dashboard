@@ -3,7 +3,7 @@ package com.graph;
 /**
  * RTViewSpec implements a ViewSpec optimized for Real Time data
  *    - the data on screen is independent of height/width
- *    - The newest data (XCENTER_MAX) is always on screen
+ *    - The newest data (x = 1.0) is always on screen
  *    - Vertical panning should be a simple pixel accurate shift
  *    - Horizonal panning should shift the leftmost X value in view
  *    - Zooming effects only the Y axis
@@ -36,11 +36,9 @@ public class RTViewSpec implements ViewSpec{
     }
     public void zoom(float fac){
         yScale *= fac;
-        System.out.println(maxY() + " to " + minY());
     }
     public void panY(int pix, int height){
         yCenter -= (pix/(float)height)*yScale;
-        System.out.println(maxY() + " to " + minY());
     }
     public void panX(int pix, int width){
         float nScale = xCenter - pix/(2.0f*(float)width);
