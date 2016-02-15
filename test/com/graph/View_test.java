@@ -46,9 +46,9 @@ public class View_test {
 
     @Test
     public void yPixToData() {
-        assertEquals("minimum",yCenter-yScale/2, sub.yPixToData(0), DELTA);
+        assertEquals("minimum",yCenter-yScale/2, sub.yPixToData(height), DELTA);
         assertEquals("center" ,yCenter         , sub.yPixToData(height/2), DELTA);
-        assertEquals("maximum",yCenter+yScale/2, sub.yPixToData(height), DELTA);
+        assertEquals("maximum",yCenter+yScale/2, sub.yPixToData(0), DELTA);
     }
 
     @Test
@@ -60,9 +60,9 @@ public class View_test {
 
     @Test
     public void yDataToPix() {
-        assertEquals("pixel 0"       , 0       , sub.yDataToPix(yCenter-yScale/2));
+        assertEquals("pixel 0"       , 0       , sub.yDataToPix(yCenter+yScale/2));
         assertEquals("pixel height/2", height/2, sub.yDataToPix(yCenter));
-        assertEquals("pixel height"  , height  , sub.yDataToPix(yCenter+yScale/2));
+        assertEquals("pixel height"  , height  , sub.yDataToPix(yCenter-yScale/2));
     }
 
     @Test
