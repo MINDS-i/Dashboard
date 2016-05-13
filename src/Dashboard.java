@@ -88,7 +88,8 @@ public class Dashboard implements Runnable {
         resetData();
       }
     };
-    JPanel serialPanel = new SerialConnectPanel(connectActions);
+    SerialConnectPanel serialPanel = new SerialConnectPanel(connectActions);
+    serialPanel.showBaudSelector(true);
 
     MapPanel mapPanel = new MapPanel(  context,
                               new Point(0,0),
