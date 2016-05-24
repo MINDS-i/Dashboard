@@ -44,7 +44,6 @@
     <target name="release" depends="updateMessageDatabase,test">
         <fail message="Failing tests; build aborted" if="test.failed"/>
         <jar destfile="${outputJar}" basedir="${outputDir}">
-            <fileset dir="${resourceDir}" />
             <zipgroupfileset dir="${libDir}">
                 <include name="*.jar"/>
             </zipgroupfileset>

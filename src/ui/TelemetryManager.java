@@ -59,7 +59,8 @@ public class TelemetryManager{
           System.err.println(ex);
         }
 
-        labels = ResourceBundle.getBundle("telemetryLabels", context.locale);
+        String labelResPath = context.getResource("telemetryLabels");
+        labels = context.loadResourceBundle(labelResPath);
 
         //Update the last named telemetry to get streams built for the
         // predefined telemetry indecies

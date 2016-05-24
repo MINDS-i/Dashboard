@@ -33,16 +33,17 @@ public class Context{
 	private SerialPort				port;
 	private Vector<ContextViewer> 	waypointViewers;
 
-	private static String propertiesFile = "./data/persist.properties";
-	private Properties props;
+	private ResourceBundle resources;
+	private static String propertiesFile = "./resources/persist/persist.properties";
+	private Properties persist;
 
 	public Context(){
 		connected = false;
 		waypointViewers  = new Vector<ContextViewer>();
 
-		props = new Properties();
+		persist = new Properties();
 		try(FileInputStream file = new FileInputStream(propertiesFile)){
-			props.load(file);
+			persist.load(file);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -59,27 +60,29 @@ public class Context{
         }
 	}
 	public void toggleLocale(){
-		String current = (String) props.get("subject");
+		String current = (String) persist.get("subject");
 		if(current.equals("air")){
-			props.put("subject","ground");
+			persist.put("subject","ground");
 		} else {
-			props.put("subject","air");
+			persist.put("subject","air");
 		}
 		saveProps();
+		//loadLocale();
 	}
 	private void saveProps(){
 		try(FileOutputStream file = new FileOutputStream(propertiesFile)){
-			props.store(file, "no comment");
+			persist.store(file, "no comment");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	private void loadLocale(){
-		if (!props.containsKey("subject")) {
-			props.put("subject","air");
+		if (!persist.containsKey("subject")) {
+			persist.put("subject","air");
 		}
-		String sub = (String) props.get("subject");
+		String sub = (String) persist.get("subject");
 		locale = new Locale("en","US",sub);
+		resources = loadResourceBundle("resources");
 	}
 
 	public void give( 	Dashboard    dashboard,
@@ -94,7 +97,7 @@ public class Context{
 		parser      = serialParser;
 		waypoint    = waypointList;
 		port        = serialPort;
-		theme       = new Theme(locale);
+		theme       = new Theme(this);
 		telemetry   = new TelemetryManager(this);
 		settingList = new SettingList(this);
 		if(alertPanel != null) {
@@ -117,9 +120,19 @@ public class Context{
 	public SerialPort port(){
 		return port;
 	}
-	public Path getSettingsDescriptionFile() throws MissingResourceException {
-		ResourceBundle res = ResourceBundle.getBundle("resources", locale);
-		return Paths.get(res.getString("settings_spec"));
+
+	public ResourceBundle loadResourceBundle(String name){
+		return ResourceBundle.getBundle("resources", locale);
+	}
+
+	public String getResource(String name){
+		return resources.getString(name);
+	}
+
+	public String getResource(String name, String otherwise){
+		String rtn = getResource(name);
+		if(rtn == null) return otherwise;
+		return rtn;
 	}
 
 	public void waypointUpdated(){

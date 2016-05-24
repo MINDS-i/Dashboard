@@ -205,21 +205,21 @@ public class NinePatch{
         NinePatch testOdd = new NinePatch();
         NinePatch testButton = new NinePatch();
         try{
-            BufferedImage c1            = ImageIO.read(new File("./data/nP/c1.png"));
-            BufferedImage c2            = ImageIO.read(new File("./data/nP/c2.png"));
-            BufferedImage c3            = ImageIO.read(new File("./data/nP/c3.png"));
-            BufferedImage c4            = ImageIO.read(new File("./data/nP/c4.png"));
-            BufferedImage center        = ImageIO.read(new File("./data/nP/center.png"));
-            BufferedImage corner        = ImageIO.read(new File("./data/nP/corner.png"));
-            BufferedImage edge          = ImageIO.read(new File("./data/nP/edge.png"));
-            BufferedImage horzGreenGrad = ImageIO.read(new File("./data/nP/horzGreenGrad.png"));
-            BufferedImage spiral        = ImageIO.read(new File("./data/nP/spiral.png"));
-            BufferedImage vertGreenGrad = ImageIO.read(new File("./data/nP/vertGreenGrad.png"));
+            BufferedImage c1            = ImageIO.read(new File("./resources/images/nP/c1.png"));
+            BufferedImage c2            = ImageIO.read(new File("./resources/images/nP/c2.png"));
+            BufferedImage c3            = ImageIO.read(new File("./resources/images/nP/c3.png"));
+            BufferedImage c4            = ImageIO.read(new File("./resources/images/nP/c4.png"));
+            BufferedImage center        = ImageIO.read(new File("./resources/images/nP/center.png"));
+            BufferedImage corner        = ImageIO.read(new File("./resources/images/nP/corner.png"));
+            BufferedImage edge          = ImageIO.read(new File("./resources/images/nP/edge.png"));
+            BufferedImage horzGreenGrad = ImageIO.read(new File("./resources/images/nP/horzGreenGrad.png"));
+            BufferedImage spiral        = ImageIO.read(new File("./resources/images/nP/spiral.png"));
+            BufferedImage vertGreenGrad = ImageIO.read(new File("./resources/images/nP/vertGreenGrad.png"));
 
-            BufferedImage oddCorner = ImageIO.read(new File("./data/nP/oddSize/corner.png"));
-            BufferedImage oddHorz   = ImageIO.read(new File("./data/nP/oddSize/horzWall.png"));
-            BufferedImage oddVert   = ImageIO.read(new File("./data/nP/oddSize/vertWall.png"));
-            BufferedImage oddCenter = ImageIO.read(new File("./data/nP/oddSize/whiteCenter.png"));
+            BufferedImage oddCorner = ImageIO.read(new File("./resources/images/nP/oddSize/corner.png"));
+            BufferedImage oddHorz   = ImageIO.read(new File("./resources/images/nP/oddSize/horzWall.png"));
+            BufferedImage oddVert   = ImageIO.read(new File("./resources/images/nP/oddSize/vertWall.png"));
+            BufferedImage oddCenter = ImageIO.read(new File("./resources/images/nP/oddSize/whiteCenter.png"));
 
             BufferedImage[] walls = new BufferedImage[]{
                 vertGreenGrad, horzGreenGrad, horzGreenGrad, vertGreenGrad
@@ -232,7 +232,7 @@ public class NinePatch{
             test4 = new NinePatch(spiral, vertGreenGrad, horzGreenGrad, c1);
             test9 = new NinePatch(spiral, walls, corners);
             testOdd = new NinePatch(oddCenter, oddVert, oddHorz, oddCorner);
-            testButton = NinePatch.loadFrom(Paths.get("./data/nP/screen"));
+            testButton = NinePatch.loadFrom(Paths.get("./resources/images/nP/screen"));
         } catch (Exception e){
             e.printStackTrace();
         }

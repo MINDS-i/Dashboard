@@ -23,7 +23,6 @@ import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Calendar;
-import java.util.Locale;
 import javax.imageio.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -44,7 +43,7 @@ public class Dashboard implements Runnable {
   public void run() {
     try{
       //setup a loading frame
-      BufferedImage logo = ImageIO.read(new File("./data/startup-logo.png"));
+      BufferedImage logo = ImageIO.read(new File("./resources/images/startup-logo.png"));
       JFrame loading = new JFrame("MINDS-i Loading Box");
       loading.setUndecorated(true);
       loading.setBackground(new Color(0,0,0,0));

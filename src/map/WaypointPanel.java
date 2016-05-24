@@ -17,8 +17,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.awt.geom.RoundRectangle2D;
-import java.util.PropertyResourceBundle;
-import java.util.ResourceBundle;
 import javax.imageio.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -139,13 +137,12 @@ class WaypointPanel extends NinePatchPanel implements ContextViewer{
 			}
 		}
 		ArrayList<EditBoxSpec> editorBoxes = new ArrayList<EditBoxSpec>();
-		ResourceBundle res = ResourceBundle.getBundle("resources", context.locale);
 		latitude  = new JTextField();
 		longitude = new JTextField();
 		altitude  = new JTextField();
 		editorBoxes.add(new EditBoxSpec(latitude , "Lat: "));
 		editorBoxes.add(new EditBoxSpec(longitude, "Lng: "));
-		editorBoxes.add(new EditBoxSpec(altitude , res.getString("waypointExtra")+" "));
+		editorBoxes.add(new EditBoxSpec(altitude , context.getResource("waypointExtra")+" "));
 		ArrayList<JPanel> editorPanels = new ArrayList<JPanel>();
 		for(EditBoxSpec box : editorBoxes){
 			//construct panel
