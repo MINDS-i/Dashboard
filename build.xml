@@ -82,13 +82,11 @@
         </junit>
     </target>
 
-    <target name="graph" depends="compile">
-        <java classname="com.graph.Graph">
-            <classpath>
-                <pathelement location="${outputDir}"/>
-                <pathelement location="/usr/lib/jvm/java-8-jdk/lib/visualvm/profiler/lib/jfluid-server.jar"/>
-            </classpath>
-        </java>
+    <target name="updateMessageDatabase">
+        <exec executable="${msgDbTool}">
+          <arg value="${DroneLibsDir}"/>
+          <arg value="${MessageDbFile}"/>
+        </exec>
     </target>
 
     <target name="export_graph" depends="compile">
@@ -96,6 +94,15 @@
             <fileset dir="${outputDir}" includes="com/graph/*" />
             <fileset dir="${outputDir}" includes="com/table/*" />
         </jar>
+    </target>
+
+    <target name="graph" depends="compile">
+        <java classname="com.graph.Graph">
+            <classpath>
+                <pathelement location="${outputDir}"/>
+                <pathelement location="/usr/lib/jvm/java-8-jdk/lib/visualvm/profiler/lib/jfluid-server.jar"/>
+            </classpath>
+        </java>
     </target>
 
     <target name="radio" depends="compile">

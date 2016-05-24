@@ -12,3 +12,5 @@ DashBoard.jar
 graph.jar
 Dashboard.zip
 test.png
+resources/stateMessageDb.xml
+stateMessageParser/test/
