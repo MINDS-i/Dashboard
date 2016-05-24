@@ -9,6 +9,10 @@ import com.serial.Messages.*;
 import com.ui.*;
 import com.xml;
 import java.io.*;
+import java.lang.ClassLoader;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.*;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -36,6 +40,22 @@ public class Context{
 	private ResourceBundle resources;
 	private static String propertiesFile = "./resources/persist/persist.properties";
 	private Properties persist;
+
+	// this classloader will be setup to load .properties files from the
+	// resources directory
+	private static final ClassLoader resourceLoader; static {
+		ClassLoader rL = null;
+		try{
+			File loc = new File("./resources/");
+			URL[] urls = {loc.toURI().toURL()};
+			rL = new URLClassLoader(urls);
+		} catch (Exception e) {
+			Exception error = new Exception("Can't reference resource directory", e);
+			error.printStackTrace();
+			Dashboard.displayErrorPopup(error);
+		}
+		resourceLoader = rL;
+	}
 
 	public Context(){
 		connected = false;
@@ -122,7 +142,7 @@ public class Context{
 	}
 
 	public ResourceBundle loadResourceBundle(String name){
-		return ResourceBundle.getBundle("resources", locale);
+		return ResourceBundle.getBundle("resources", locale, resourceLoader);
 	}
 
 	public String getResource(String name){
