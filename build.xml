@@ -31,7 +31,18 @@
         </javac>
     </target>
 
-    <target name="jar" depends="compile">
+    <target name="run" depends="compile">
+        <java classname="com.Dashboard" fork="true">
+            <classpath path="${classpath}">
+                <fileset dir="${libDir}">
+                    <include name="**/*.jar"/>
+                </fileset>
+            </classpath>
+        </java>
+    </target>
+
+    <target name="release" depends="updateMessageDatabase,test">
+        <fail message="Failing tests; build aborted" if="test.failed"/>
         <jar destfile="${outputJar}" basedir="${outputDir}">
             <fileset dir="${resourceDir}" />
             <zipgroupfileset dir="${libDir}">
@@ -41,13 +52,8 @@
                 <attribute name="Main-Class" value="com.Dashboard"/>
             </manifest>
         </jar>
+        <!--Create Dashboard.zip archive containing data,resources,jar,drivers,dashboard.exe-->
         <delete dir="${outputDir}" />
-    </target>
-
-    <target name="build" depends="jar">
-        <java jar="${outputJar}" fork="true">
-            <classpath path="${classpath}"/>
-        </java>
     </target>
 
     <target name="test" depends="compile">
@@ -61,7 +67,7 @@
             <compilerarg value="-XDignore.symbol.file"/>
         </javac>
 
-        <junit>
+        <junit failureproperty="test.failed">
             <classpath>
                 <pathelement path="${classpath}"/>
                 <fileset dir="${testLibDir}">
