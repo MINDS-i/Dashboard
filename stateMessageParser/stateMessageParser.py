@@ -13,7 +13,7 @@ state name string.
 
 The script requires two arguments;
 the folder path to search within,
-followed by the destination directory for XML message database"""
+followed by the destination filename for XML message database"""
 
 import sys, os, re
 import xml.etree.ElementTree as ET
