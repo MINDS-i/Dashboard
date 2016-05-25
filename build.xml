@@ -3,6 +3,7 @@
 
     <path id="class.path">
         <pathelement location="${outputDir}"/>
+        <pathelement location="${packDir}"/>
         <fileset dir="${libDir}">
             <include name="**/*.jar"/>
         </fileset>
@@ -14,6 +15,13 @@
             <include name="**/*.jar"/>
         </fileset>
     </path>
+
+    <manifestclasspath property="jar.classpath"
+                       jarfile="${outputJar}">
+        <classpath>
+            <pathelement location="${packDir}"/>
+        </classpath>
+    </manifestclasspath>
 
     <target name="init">
         <mkdir dir="${resourceDir}"/>
@@ -62,6 +70,7 @@
             </zipgroupfileset>
             <manifest>
                 <attribute name="Main-Class" value="${mainclass}"/>
+                <attribute name="Class-Path" value="${jar.classpath}" />
             </manifest>
         </jar>
         <zip destfile="${outputZip}">
@@ -79,7 +88,6 @@
             <compilerarg value="-XDignore.symbol.file"/>
         </javac>
     </target>
-
 
     <target name="test" depends="compileTests">
         <!-- use "ant -Dtest.match=* run" to run a subset of all tests -->
