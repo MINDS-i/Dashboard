@@ -51,7 +51,11 @@
                 <attribute name="Main-Class" value="com.Dashboard"/>
             </manifest>
         </jar>
-        <!--Create Dashboard.zip archive containing data,resources,jar,drivers,dashboard.exe-->
+        <zip destfile="${outputZip}">
+            <zipfileset dir="${packDir}" prefix="${packDir}"/>
+            <zipfileset src="${packZip}"/>
+            <zipfileset dir="./" includes="${outputJar}"/>
+        </zip>
         <delete dir="${outputDir}" />
     </target>
 
