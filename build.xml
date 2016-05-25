@@ -34,7 +34,8 @@
     </target>
 
     <target name="run" depends="compile">
-        <java classname="com.Dashboard" fork="true">
+        <!-- use "ant -Dmainclass=* run" to run a different class than main-->
+        <java classname="${mainclass}" fork="true">
             <classpath path="${classpath}">
                 <fileset dir="${libDir}">
                     <include name="**/*.jar"/>
@@ -50,7 +51,7 @@
                 <include name="*.jar"/>
             </zipgroupfileset>
             <manifest>
-                <attribute name="Main-Class" value="com.Dashboard"/>
+                <attribute name="Main-Class" value="${mainclass}"/>
             </manifest>
         </jar>
         <zip destfile="${outputZip}">
@@ -106,29 +107,4 @@
             <fileset dir="${outputDir}" includes="com/table/*" />
         </jar>
     </target>
-
-    <target name="graph" depends="compile">
-        <java classname="com.graph.Graph">
-            <classpath>
-                <pathelement location="${outputDir}"/>
-                <pathelement location="/usr/lib/jvm/java-8-jdk/lib/visualvm/profiler/lib/jfluid-server.jar"/>
-            </classpath>
-        </java>
-    </target>
-
-    <target name="radio" depends="compile">
-        <java classname="com.ui.RadioConfigScreen">
-            <classpath>
-                <pathelement location="${outputDir}"/>
-                <pathelement location="lib/jssc.jar"/>
-            </classpath>
-        </java>
-    </target>
-
-    <target name="nine" depends="compile">
-        <java classname="com.ui.ninePatch.NinePatch">
-            <classpath path="${outputDir}"/>
-        </java>
-    </target>
-
 </project>
