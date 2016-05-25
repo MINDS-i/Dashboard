@@ -15,6 +15,8 @@
         <delete dir="${outputDir}"/>
         <delete dir="${libDir}"/>
         <delete dir="${reportsDir}"/>
+        <delete file="${outputZip}"/>
+        <delete file="${outputJar}"/>
         <ivy:cleancache />
     </target>
 
