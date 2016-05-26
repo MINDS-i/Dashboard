@@ -86,7 +86,7 @@ public class Dashboard implements Runnable {
     try{
       Handler file = new FileHandler("log/"+context.getInstanceLogName()+".log");
       file.setFormatter(new SimpleFormatter());
-      String fileLevel = context.getResource("console_log_level", "OFF");
+      String fileLevel = context.getResource("file_log_level", "OFF");
       file.setLevel(Level.parse(fileLevel));
       root.addHandler(file);
     } catch (Exception e){

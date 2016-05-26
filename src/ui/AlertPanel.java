@@ -9,7 +9,8 @@ import javax.imageio.*;
 import javax.swing.*;
 import java.awt.FontMetrics;
 import java.awt.font.*;
-import java.util.*;
+//import java.util.*;
+import java.util.logging.*;
 import java.io.*;
 
 public class AlertPanel extends JPanel {
@@ -28,10 +29,27 @@ public class AlertPanel extends JPanel {
 		for(int i=0; i<NUM_LINES; i++) messages[i]="";
 		displayMessage("Welcome!");
 		updateDim();
+
+		Logger root = Logger.getLogger("d");
+		root.addHandler(new PanelHandler());
 	}
 	public AlertPanel(Theme theme){
 		this();
 		this.theme = theme;
+	}
+
+	private class PanelHandler extends Handler {
+		public void close() {}
+		public void flush() {}
+		public void publish(LogRecord record) {
+			Filter filter = getFilter();
+			if(filter != null && !filter.isLoggable(record)) return;
+
+			Formatter format = getFormatter();
+			String msg = (format==null)? record.getMessage()
+									   : format.format(record);
+			displayMessage(msg);
+		}
 	}
 
 	public void setTheme(Theme theme){
@@ -107,7 +125,7 @@ public class AlertPanel extends JPanel {
 
 	//private void paintString(Graphics g, String msg, int x, int y){}
 
-	public void displayMessage(String msg){
+	private void displayMessage(String msg){
 		for(int i=NUM_LINES-1; i>0; i--){
 			messages[i] = messages[i-1];
 		}
