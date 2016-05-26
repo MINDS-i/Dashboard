@@ -6,8 +6,8 @@ import com.map.Dot;
 import com.map.MapPanel;
 import com.serial.Messages.*;
 import com.serial.*;
-import com.ui.AlertPanel;
 import java.util.Arrays;
+import java.util.logging.Logger;
 import jssc.SerialPort;
 import jssc.SerialPortException;
 
@@ -22,6 +22,8 @@ public class SerialSender{
 	private int waypointListPosition;
 	private int waypointListWaitingCode;
 	private Context context;
+
+	private final Logger seriallog = Logger.getLogger("d.serial");
 
 	public SerialSender(Context cxt){
 		context = cxt;
@@ -40,8 +42,7 @@ public class SerialSender{
 						if(msg.isPastExpiration(now)){
 							if(msg.numberOfFailures() >= Serial.MAX_FAILURES){
 								i.remove();
-								System.err.println("Message Failed to send repeatedly; connection bad");
-								context.alert.displayMessage("Connection failed; Rover unware of "+msg.toString()+"!");
+								seriallog.severe("Connection failed; Rover unware of "+msg.toString()+"!");
 							} else {
 								resendMessage(msg);
 							}
@@ -81,14 +82,11 @@ public class SerialSender{
 				if(msg.needsConfirm())
 					synchronized(lock){ pendingConfirm.add(msg); }
 
-				System.err.print("" + Integer.toHexString(msg.getConfirmSum())
-									+ " Sent "
-									+ msg.toString()
-									+ "\n" );
-				context.alert.displayMessage(msg.toString()+" Sent");
+				seriallog.finer(Integer.toHexString(msg.getConfirmSum()) +
+									" Sent " +
+									msg.toString());
 			} catch (SerialPortException ex){
-				System.err.println(ex.getMessage());
-				context.alert.displayMessage(ex.getMessage());
+				seriallog.severe(ex.getMessage());
 			}
 		}
 	}
@@ -98,23 +96,19 @@ public class SerialSender{
 			try{
 				msg.addFailure();
 				msg.send(context.port());
-				System.out.print(Integer.toHexString(msg.getConfirmSum()));
-				System.out.print(" resend of " + msg.toString());
-				System.out.println("");
-				context.alert.displayMessage(
-										"No response to "+msg.toString()
-									   +" resend #"+msg.numberOfFailures());
+				seriallog.warning(Integer.toHexString(msg.getConfirmSum())+" "+
+									  "No response to "+msg.toString()+
+									  " resend #"+msg.numberOfFailures());
 			} catch (SerialPortException ex){
-				System.err.println(ex.getMessage());
-				context.alert.displayMessage(ex.getMessage());
+				seriallog.severe(ex.getMessage());
 			}
 		}
 	}
 
 	public void notifyOfConfirm(int confirm){
 		if(sendingWaypointList) advanceWaypointList(confirm);
-		System.out.print("Incomming Confirmation Message ");
-		System.out.println(Integer.toHexString(confirm));
+		seriallog.finer("Incomming Confirmation Message to "+
+							 Integer.toHexString(confirm));
 		synchronized(lock){
 			for(Iterator<Message> i = pendingConfirm.iterator(); i.hasNext();){
 				Message msg = i.next();
@@ -127,7 +121,7 @@ public class SerialSender{
 	}
 
 	public void sendWaypointList(){
-		context.alert.displayMessage("Sending waypoint list");
+		seriallog.fine("Sending waypoint list");
 		sendingWaypointList = true;
 		waypointListPosition = 0;
 		Message msg = Message.clearWaypoints();

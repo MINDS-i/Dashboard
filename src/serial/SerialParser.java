@@ -4,7 +4,6 @@ import com.Dashboard;
 import com.map.Dot;
 import com.map.MapPanel;
 import com.serial.Serial;
-import com.ui.AlertPanel;
 import com.Context;
 import com.serial.*;
 import com.serial.Messages.*;
@@ -13,6 +12,7 @@ import jssc.SerialPortException;
 import jssc.SerialPortEventListener;
 import jssc.SerialPortEvent;
 import java.util.Arrays;
+import java.util.logging.Logger;
 import java.io.InputStream;
 import java.awt.*;
 import java.nio.charset.StandardCharsets;
@@ -20,6 +20,9 @@ import java.nio.charset.StandardCharsets;
 public class SerialParser implements SerialPortEventListener{
 	private Context context;
 	private Decoder decoder;
+
+	private final Logger seriallog = Logger.getLogger("d.serial");
+	private final Logger robotlog = Logger.getLogger("d.robot");
 
 	public SerialParser(Context cxt){
 		context = cxt;
@@ -48,8 +51,7 @@ public class SerialParser implements SerialPortEventListener{
 		try{
 			context.port().addEventListener(this);
 		} catch(SerialPortException ex) {
-			System.err.println(ex.getMessage());
-	  		context.alert.displayMessage(ex.getMessage());
+			seriallog.severe(ex.getMessage());
 		}
 	}
 
@@ -150,7 +152,7 @@ public class SerialParser implements SerialPortEventListener{
 				buff[i-1] = msg[i];
 			}
 			String data = new String(buff, StandardCharsets.US_ASCII);
-			context.alert.displayMessage("Rover: "+data);
+			robotlog.fine(data);
 		}
 	}
 }

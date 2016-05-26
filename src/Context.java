@@ -17,7 +17,6 @@ import jssc.SerialPort;
 import jssc.SerialPortException;
 
 public class Context{
-	public AlertPanel	alert;
 	public boolean		connected;
 	public Dashboard	dash;
 	public Locale		locale;
@@ -25,21 +24,24 @@ public class Context{
 	public SerialSender	sender;
 	public Theme		theme;
 	public WaypointList	waypoint;
-	public PrintStream  log;
 	public SettingList  settingList;
-
 	public TelemetryManager telemetry;
 
 	private SerialPort				port;
 	private Vector<ContextViewer> 	waypointViewers;
-
 	private ResourceBundle resources;
 	private static String propertiesFile = "./resources/persist/persist.properties";
 	private Properties persist;
 
+	private final String instanceLogName;
+
 	public Context(){
 		connected = false;
 		waypointViewers  = new Vector<ContextViewer>();
+
+	    Calendar cal = Calendar.getInstance();
+	    SimpleDateFormat sdf = new SimpleDateFormat("HH-mm_MM-dd_yyyyGG");
+	    instanceLogName = sdf.format(cal.getTime());
 
 		persist = new Properties();
 		try(FileInputStream file = new FileInputStream(propertiesFile)){
@@ -48,16 +50,6 @@ public class Context{
 			e.printStackTrace();
 		}
 		loadLocale();
-
-        Calendar cal = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("HH-mm_MM-dd_yyyyGG");
-        String time = sdf.format(cal.getTime());
-        try {
-        	log = new PrintStream("log/"+time+".log");
-        } catch (Exception e){
-        	System.err.println("Cannot save log file");
-        	e.printStackTrace();
-        }
 	}
 	public void toggleLocale(){
 		String current = (String) persist.get("subject");
@@ -86,13 +78,11 @@ public class Context{
 	}
 
 	public void give( 	Dashboard    dashboard,
-						AlertPanel   alertPanel,
 						SerialSender serialSender,
 						SerialParser serialParser,
 						WaypointList waypointList,
 						SerialPort   serialPort){
 		dash        = dashboard;
-		alert       = alertPanel;
 		sender      = serialSender;
 		parser      = serialParser;
 		waypoint    = waypointList;
@@ -100,10 +90,6 @@ public class Context{
 		theme       = new Theme(this);
 		telemetry   = new TelemetryManager(this);
 		settingList = new SettingList(this);
-		if(alertPanel != null) {
-			alertPanel.setTheme(theme);
-			alertPanel.logTo(log);
-		}
 	}
 	public void updatePort(SerialPort newPort){
 		closePort();
@@ -119,6 +105,10 @@ public class Context{
 	}
 	public SerialPort port(){
 		return port;
+	}
+
+	public String getInstanceLogName(){
+		return instanceLogName;
 	}
 
 	public ResourceBundle loadResourceBundle(String name){

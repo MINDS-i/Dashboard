@@ -23,6 +23,7 @@ import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Calendar;
+import java.util.logging.*;
 import javax.imageio.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -39,6 +40,8 @@ public class Dashboard implements Runnable {
   private Collection<DataLabel> displays = new ArrayList<DataLabel>(dataLabels.length);
   private Context context = new Context();
 
+  private final Logger seriallog = Logger.getLogger("d.serial");
+
   @Override
   public void run() {
     try{
@@ -52,23 +55,47 @@ public class Dashboard implements Runnable {
       loading.setVisible(true);
       //initialize the major classes into the context
       context.give(this,
-                   new AlertPanel(),
                    new SerialSender(context),
                    new SerialParser(context),
                    new WaypointList(context),
                    null //serialPort
                    );
-      //build the UI - set alert font
-      InitUI();
-      context.alert.setFont(context.theme.text);
-      //remove loading window
+      initLogging();
+      initUI();
       loading.dispose();
     } catch (IOException e) {
       displayErrorPopup((Exception)e);
     }
   }
 
-  private void InitUI(){
+  private void initLogging(){
+    Logger root = Logger.getLogger("d");
+    root.setLevel(Level.ALL);
+
+    java.util.logging.Formatter simpleForm = new java.util.logging.Formatter(){
+      public String format(LogRecord rec){
+        return String.format("%s: %s%n", rec.getLevel(), rec.getMessage());
+      }
+    };
+    Handler console = new ConsoleHandler();
+    console.setFormatter(simpleForm);
+    String consoleLevel = context.getResource("console_log_level", "OFF");
+    console.setLevel(Level.parse(consoleLevel));
+    root.addHandler(console);
+
+    try{
+      Handler file = new FileHandler("log/"+context.getInstanceLogName()+".log");
+      file.setFormatter(new SimpleFormatter());
+      String fileLevel = context.getResource("console_log_level", "OFF");
+      file.setLevel(Level.parse(fileLevel));
+      root.addHandler(file);
+    } catch (Exception e){
+      System.err.println("Log File Write Failed");
+      e.printStackTrace();
+    }
+  }
+
+  private void initUI(){
     JFrame f = new JFrame("MINDS-i Dashboard");
     f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     f.setVisible(false);
@@ -78,23 +105,25 @@ public class Dashboard implements Runnable {
     SerialEventListener connectActions = new SerialEventListener(){
       public void connectionEstablished(SerialPort port){
         context.updatePort(port);
-        context.alert.displayMessage("Port opened");
+        seriallog.fine("Port opened");
         context.sender.sendSync();
       }
       public void disconnectRequest(){
         context.closePort();
-        context.alert.displayMessage("Serial Port Closed");
+        seriallog.fine("Serial Port Closed");
         resetData();
       }
     };
     SerialConnectPanel serialPanel = new SerialConnectPanel(connectActions);
+
+    AlertPanel messageBox = new AlertPanel(context.theme);
 
     MapPanel mapPanel = new MapPanel(  context,
                               new Point(0,0),
                               4,
                               serialPanel,
                               makeDashPanel(),
-                              context.alert);
+                              messageBox);
 
     f.add(mapPanel);
     f.pack();
