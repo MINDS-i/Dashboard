@@ -88,7 +88,6 @@ public class Dashboard implements Runnable {
       }
     };
     SerialConnectPanel serialPanel = new SerialConnectPanel(connectActions);
-    serialPanel.showBaudSelector(true);
 
     MapPanel mapPanel = new MapPanel(  context,
                               new Point(0,0),
