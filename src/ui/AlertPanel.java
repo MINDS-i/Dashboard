@@ -10,7 +10,8 @@ import javax.imageio.*;
 import javax.swing.*;
 import java.awt.FontMetrics;
 import java.awt.font.*;
-//import java.util.*;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.logging.*;
 import java.io.*;
 
@@ -20,13 +21,13 @@ public class AlertPanel extends JPanel {
 	private Theme theme;
 	private int lineHeight;
 	private FontMetrics metrics;
-	private String[] messages = new String[NUM_LINES];
+	private List<String> messages = new ArrayList<String>(NUM_LINES);
 	private boolean fontUpdated = true;
 
 	public AlertPanel(){
 		//this.setPreferredSize(new Dimension(4000000,200)); //cheap fix for autoscaling
 		setOpaque(false);
-		for(int i=0; i<NUM_LINES; i++) messages[i]="";
+		for(int i=0; i<NUM_LINES; i++) addMessage("");
 		addMessage("Welcome!");
 		updateDim();
 
@@ -47,10 +48,9 @@ public class AlertPanel extends JPanel {
 	}
 
 	private void addMessage(String msg){
-		for(int i=NUM_LINES-1; i>0; i--){
-			messages[i] = messages[i-1];
-		}
-		messages[0] = msg;
+		while(messages.size() >= NUM_LINES)
+			messages.remove(0);
+		messages.add(msg);
 		repaint();
 	}
 
@@ -90,11 +90,12 @@ public class AlertPanel extends JPanel {
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
     		                 RenderingHints.VALUE_ANTIALIAS_ON);
 		FontRenderContext frc = g2d.getFontRenderContext();
+
 		for(int i=0; i<NUM_LINES; i++){
 			//Draw string centered on the line
 			Graphics2D g2 = (Graphics2D) g2d.create();
 
-			String message = messages[i];
+			String message = messages.get(NUM_LINES-1-i);
 			GlyphVector gv = g2.getFont().createGlyphVector(frc, message);
     		Shape shape = gv.getOutline();
 
