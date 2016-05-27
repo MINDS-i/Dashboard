@@ -63,9 +63,9 @@ public class Context{
 	}
 	private void saveProps(){
 		try(FileOutputStream file = new FileOutputStream(propertiesFile)){
-			persist.store(file, "no comment");
+			persist.store(file, "");
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getLogger("d.io").severe("Can't save persist props "+e);
 		}
 	}
 	private void loadLocale(){

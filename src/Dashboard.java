@@ -42,6 +42,7 @@ public class Dashboard implements Runnable {
   private Context context = new Context();
 
   private final Logger seriallog = Logger.getLogger("d.serial");
+  private final Logger iolog = Logger.getLogger("d.io");
   private final Logger rootlog = Logger.getLogger("d");
 
   @Override
@@ -66,6 +67,7 @@ public class Dashboard implements Runnable {
       initUI();
       loading.dispose();
     } catch (IOException e) {
+      rootlog.severe("Dashboard startup failure: "+e.toString());
       displayErrorPopup((Exception)e);
     }
   }
@@ -92,7 +94,7 @@ public class Dashboard implements Runnable {
       file.setLevel(Level.parse(fileLevel));
       root.addHandler(file);
     } catch (Exception e){
-      System.err.println("Log File Write Failed");
+      iolog.severe("Log File Write Failed "+e.toString());
       e.printStackTrace();
     }
   }

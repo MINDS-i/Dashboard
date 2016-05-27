@@ -9,6 +9,7 @@ import java.awt.*;
 import java.awt.image.*;
 import java.io.*;
 import java.nio.file.*;
+import java.util.logging.Logger;
 import javax.imageio.*;
 import javax.swing.*;
 
@@ -66,6 +67,7 @@ public class Theme{
             textColor        = new Color(255,155,30);
             alertFont        = new Font(Font.MONOSPACED,Font.BOLD,16);
         } catch(IOException|FontFormatException e){
+            Logger.getLogger("d.io").severe(e.toString());
             Dashboard.displayErrorPopup(e);
         }
 	}
