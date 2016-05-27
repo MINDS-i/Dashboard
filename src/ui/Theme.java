@@ -64,7 +64,7 @@ public class Theme{
             text             = text.deriveFont(13f);
             number           = number.deriveFont(36f);
             textColor        = new Color(255,155,30);
-            alertFont        = null;
+            alertFont        = new Font(Font.MONOSPACED,Font.BOLD,16);
         } catch(IOException|FontFormatException e){
             Dashboard.displayErrorPopup(e);
         }

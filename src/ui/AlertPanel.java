@@ -12,55 +12,36 @@ import java.util.logging.*;
 import java.io.*;
 
 public class AlertPanel extends JPanel {
-	private final static int REC_LINE_LEN = 80;
-	private final static int NUM_LINES = 8;
-	private Font messageFont = new Font(Font.MONOSPACED,Font.BOLD,16);
+	private List<String> messages = new ArrayList<String>();
 	private Color messageColor = Color.WHITE;
-	private List<String> messages = new ArrayList<String>(NUM_LINES);
-	private List<Object> gcHold = new ArrayList<Object>();
-	private boolean fontUpdated = true;
-	private int lineHeight;
-	private FontMetrics metrics;
+	private int lineLength;
+	private int lineCount;
+	private Font messageFont;
 
-	public static AlertPanel createLogDisplay(String logNS, Level level){
-		AlertPanel ap = new AlertPanel();
-		Logger log = Logger.getLogger(logNS);
-		// if `log` gets garbage collected ap will stop getting updates
-		ap.addGcHold(log);
-		Handler handler = new SimpleHandler((String s) -> ap.addMessage(s));
-		handler.setFormatter(new EllipsisFormatter(REC_LINE_LEN));
-		log.addHandler(handler);
-		return ap;
-	}
+	public AlertPanel(Font messageFont, int lineCount, int lineLength){
+		this.messageFont = messageFont;
+		this.lineCount = lineCount;
+		this.lineLength = lineLength;
 
-	public AlertPanel(){
+		// Set preferred size for the container assuming W is the widest char
+		FontMetrics metrics = this.getFontMetrics(messageFont);
+		setPreferredSize(new Dimension(lineLength*metrics.charWidth('W'),
+							   			lineCount*metrics.getHeight()));
+
 		setOpaque(false);
-		for(int i=0; i<NUM_LINES; i++) addMessage("");
+		for(int i=0; i<lineCount; i++) addMessage("");
 		addMessage("Welcome!");
-		updateDim();
 	}
 
 	public void addMessage(String msg){
-		while(messages.size() >= NUM_LINES)
+		while(messages.size() >= lineCount)
 			messages.remove(0);
-		messages.add(msg);
+		messages.add( EllipsisFormatter.ellipsize(msg,lineLength) );
 		repaint();
-	}
-
-	public void setFont(Font f){
-		messageFont = f;
 	}
 
 	public void setColor(Color c){
 		messageColor = c;
-	}
-
-	private void addGcHold(Object o){
-		gcHold.add(o);
-	}
-
-	private void updateDim(){
-		fontUpdated = true;
 	}
 
 	@Override
@@ -68,26 +49,19 @@ public class AlertPanel extends JPanel {
 		super.paintComponent(g);
 		g.setFont(messageFont);
 
-		metrics = g.getFontMetrics();
+		FontMetrics metrics = this.getFontMetrics(messageFont);
 		final int rowHeight = metrics.getHeight();
-
-		//use number of lines and 80 char length to calculate preferred size
-		if(fontUpdated){
-			setPreferredSize(new Dimension(REC_LINE_LEN*metrics.charWidth('W'),
-										   NUM_LINES*metrics.getHeight()));
-			fontUpdated = false;
-		}
 
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
     		                 RenderingHints.VALUE_ANTIALIAS_ON);
 		FontRenderContext frc = g2d.getFontRenderContext();
 
-		for(int i=0; i<NUM_LINES; i++){
+		for(int i=0; i<lineCount; i++){
 			//Draw string centered on the line
 			Graphics2D g2 = (Graphics2D) g2d.create();
 
-			String message = messages.get(NUM_LINES-1-i);
+			String message = messages.get(lineCount-1-i);
 			GlyphVector gv = g2.getFont().createGlyphVector(frc, message);
     		Shape shape = gv.getOutline();
 

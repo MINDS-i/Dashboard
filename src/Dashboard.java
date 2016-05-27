@@ -1,12 +1,13 @@
 package com;
 
+import com.logging.*;
 import com.map.MapPanel;
 import com.map.WaypointList;
 import com.serial.Serial;
-import com.serial.SerialParser;
-import com.serial.SerialSender;
 import com.serial.SerialConnectPanel;
 import com.serial.SerialEventListener;
+import com.serial.SerialParser;
+import com.serial.SerialSender;
 import com.ui.*;
 import com.ui.ninePatch.*;
 import java.awt.*;
@@ -41,6 +42,7 @@ public class Dashboard implements Runnable {
   private Context context = new Context();
 
   private final Logger seriallog = Logger.getLogger("d.serial");
+  private final Logger rootlog = Logger.getLogger("d");
 
   @Override
   public void run() {
@@ -69,7 +71,7 @@ public class Dashboard implements Runnable {
   }
 
   private void initLogging(){
-    Logger root = Logger.getLogger("d");
+    Logger root = rootlog;
     root.setLevel(Level.ALL);
 
     java.util.logging.Formatter simpleForm = new java.util.logging.Formatter(){
@@ -105,20 +107,18 @@ public class Dashboard implements Runnable {
     SerialEventListener connectActions = new SerialEventListener(){
       public void connectionEstablished(SerialPort port){
         context.updatePort(port);
-        seriallog.fine("Port opened");
+        seriallog.info("Port opened");
         context.sender.sendSync();
       }
       public void disconnectRequest(){
         context.closePort();
-        seriallog.fine("Serial Port Closed");
+        seriallog.info("Serial Port Closed");
         resetData();
       }
     };
     SerialConnectPanel serialPanel = new SerialConnectPanel(connectActions);
 
-    AlertPanel messageBox = AlertPanel.createLogDisplay("d", Level.FINE);
-    //messageBox.setFont(context.theme);
-    messageBox.setColor(context.theme.textColor);
+    JPanel messageBox = createAlertBox();
 
     MapPanel mapPanel = new MapPanel(  context,
                               new Point(0,0),
@@ -131,6 +131,16 @@ public class Dashboard implements Runnable {
     f.pack();
     f.setSize(START_WIDTH, START_HEIGHT);
     f.setVisible(true);
+  }
+
+  private JPanel createAlertBox(){
+    AlertPanel ap = new AlertPanel(context.theme.alertFont, 8, 80);
+    ap.setColor(context.theme.textColor);
+
+    Handler handler = new SimpleHandler((String s) -> ap.addMessage(s));
+    handler.setLevel(Level.INFO);
+    rootlog.addHandler(handler);
+    return ap;
   }
 
   private JPanel makeDashPanel(){

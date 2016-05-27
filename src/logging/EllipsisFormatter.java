@@ -23,12 +23,12 @@ public class EllipsisFormatter extends Formatter{
     }
     /** Fromat the given log record and return the formatted string */
     public String format(LogRecord lr){
-        return ellipsize(content.get(lr));
+        return ellipsize(content.get(lr), maxLineLength);
     }
-    /** Make a string one line of at most maxLineLength chars */
-    private String ellipsize(String s){
-        String line = (s.length() <= maxLineLength)? s
-                        : s.substring(0,maxLineLength-3) + "...";
+    /** Make a string one line of at most length chars */
+    public static String ellipsize(String s, int length){
+        String line = (s.length() <= length)? s
+                        : s.substring(0,length-3) + "...";
         return line.replace("\n"," ");
     }
 }
