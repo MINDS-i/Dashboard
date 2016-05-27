@@ -41,7 +41,6 @@ public class LogViewer{
 
         frame.add(container);
         frame.pack();
-        frame.setVisible(true);
     }
     /**
      * Show or hide the log viewer window
@@ -134,6 +133,7 @@ public class LogViewer{
         log.info("Test message E");
         log.info("Test message LONG MESSAGE THAT GOES ON A REALLY LONG WAAAAAAAAAAAAAAAAAAAAAAAAAAAAAY");
         log.info("<i>Test message</i> <b>HTML</b>");
+        lv.setVisible(true);
         try{
             while(true){
                 log.info("New Message");

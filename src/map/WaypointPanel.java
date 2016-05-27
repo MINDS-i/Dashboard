@@ -1,28 +1,30 @@
 package com.map;
 
+import com.Context;
+import com.ContextViewer;
 import com.Dashboard;
+import com.graph.Graph;
 import com.map.coordinateListener;
 import com.map.Dot;
 import com.serial.*;
 import com.ui.DataWindow;
-import com.xml;
-import com.ContextViewer;
-import com.Context;
-import com.graph.Graph;
-import com.ui.Theme;
+import com.ui.LogViewer;
 import com.ui.ninePatch.NinePatchPanel;
 import com.ui.SystemConfigWindow;
+import com.ui.Theme;
+import com.xml;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.BufferedImage;
 import java.awt.geom.RoundRectangle2D;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.logging.*;
 import javax.imageio.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.xml.stream.XMLStreamException;
-import java.util.ArrayList;
 
 class WaypointPanel extends NinePatchPanel implements ContextViewer{
 	protected static final int MOVE_STEP = 32;
@@ -104,8 +106,10 @@ class WaypointPanel extends NinePatchPanel implements ContextViewer{
 		JButton reTarget 	= theme.makeButton(reTargetRover);
 		JButton looping 	= theme.makeButton(toggleLooping);
 		JButton config      = theme.makeButton(openConfigWindow);
+		JButton logPanelButton = theme.makeButton(logPanelAction);
 		JComponent[] format = new JComponent[]{
-			tileButton, dataPanel, graphButton, reTarget, looping, config
+			tileButton, dataPanel, graphButton,
+			reTarget, looping, config, logPanelButton
 		};
 		for(JComponent jc : format){
 			jc.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -181,6 +185,8 @@ class WaypointPanel extends NinePatchPanel implements ContextViewer{
 		add(Box.createRigidArea(space));
 		add(graphButton);
 		add(Box.createRigidArea(space));
+		add(logPanelButton);
+		add(Box.createRigidArea(space));
 		add(new JSeparator(SwingConstants.HORIZONTAL));
 		add(Box.createRigidArea(space));
 		add(selector);
@@ -218,7 +224,19 @@ class WaypointPanel extends NinePatchPanel implements ContextViewer{
 			}
 		} catch (NumberFormatException e) {}
 	}
-
+	private Action logPanelAction = new AbstractAction() {
+		LogViewer lv;
+		Logger log;
+		{
+			lv = new LogViewer();
+			log = Logger.getLogger("d");
+			log.addHandler(lv.getHandler());
+			putValue(Action.NAME, "View Log");
+		}
+		public void actionPerformed(ActionEvent e) {
+			lv.setVisible(true);
+		}
+	};
 	private Action zoomInAction = new AbstractAction() {
 		{
 			String text = "+";
