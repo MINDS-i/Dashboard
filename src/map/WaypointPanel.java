@@ -231,7 +231,7 @@ class WaypointPanel extends NinePatchPanel implements ContextViewer{
 			lv = new LogViewer();
 			log = Logger.getLogger("d");
 			log.addHandler(lv.getHandler());
-			putValue(Action.NAME, "View Log");
+			putValue(Action.NAME, "Event Log");
 		}
 		public void actionPerformed(ActionEvent e) {
 			lv.setVisible(true);
@@ -370,7 +370,7 @@ class WaypointPanel extends NinePatchPanel implements ContextViewer{
 	};
 	private Action openDataPanel = new AbstractAction(){
 		{
-			String text = "Data Log";
+			String text = "Telemetry";
 			putValue(Action.NAME, text);
 		}
 		public void actionPerformed(ActionEvent e){
