@@ -3,6 +3,7 @@ import com.Dashboard;
 import com.serial.SerialSender;
 import com.serial.*;
 import com.serial.Messages.*;
+import com.logging.*;
 
 import java.awt.*;
 import javax.imageio.*;
@@ -20,36 +21,24 @@ public class AlertPanel extends JPanel {
 	private int lineHeight;
 	private FontMetrics metrics;
 	private String[] messages = new String[NUM_LINES];
-	private PrintStream log;
 	private boolean fontUpdated = true;
 
 	public AlertPanel(){
 		//this.setPreferredSize(new Dimension(4000000,200)); //cheap fix for autoscaling
 		setOpaque(false);
 		for(int i=0; i<NUM_LINES; i++) messages[i]="";
-		displayMessage("Welcome!");
+		addMessage("Welcome!");
 		updateDim();
 
 		Logger root = Logger.getLogger("d");
-		root.addHandler(new PanelHandler());
+		Handler handler = new SimpleHandler((String s) ->addMessage(s));
+		handler.setFormatter(new EllipsisFormatter(REC_LINE_LEN));
+		root.addHandler(handler);
 	}
+
 	public AlertPanel(Theme theme){
 		this();
 		this.theme = theme;
-	}
-
-	private class PanelHandler extends Handler {
-		public void close() {}
-		public void flush() {}
-		public void publish(LogRecord record) {
-			Filter filter = getFilter();
-			if(filter != null && !filter.isLoggable(record)) return;
-
-			Formatter format = getFormatter();
-			String msg = (format==null)? record.getMessage()
-									   : format.format(record);
-			displayMessage(msg);
-		}
 	}
 
 	public void setTheme(Theme theme){
@@ -57,8 +46,12 @@ public class AlertPanel extends JPanel {
 		updateDim();
 	}
 
-	public void logTo(PrintStream log){
-		this.log = log;
+	private void addMessage(String msg){
+		for(int i=NUM_LINES-1; i>0; i--){
+			messages[i] = messages[i-1];
+		}
+		messages[0] = msg;
+		repaint();
 	}
 
 	private void updateDim(){
@@ -122,16 +115,4 @@ public class AlertPanel extends JPanel {
 			g2.dispose();
 		}
 	}
-
-	//private void paintString(Graphics g, String msg, int x, int y){}
-
-	private void displayMessage(String msg){
-		for(int i=NUM_LINES-1; i>0; i--){
-			messages[i] = messages[i-1];
-		}
-		messages[0] = msg;
-		if(log != null) log.println(msg);
-		repaint();
-	}
-
 }

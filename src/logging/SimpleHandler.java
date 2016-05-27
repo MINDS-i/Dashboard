@@ -13,7 +13,7 @@ public class SimpleHandler extends Handler {
         public void use(String message);
     }
     private final MessageUser messageUser;
-    SimpleHandler(MessageUser messageUser){
+    public SimpleHandler(MessageUser messageUser){
         super();
         this.messageUser = messageUser;
     }

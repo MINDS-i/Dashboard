@@ -161,10 +161,10 @@ public class SerialParser implements SerialPortEventListener{
 			Optional<Description> details = sm.getFullDescription(data);
 			if(!details.isPresent()) return data;
 			Description d = details.get();
-			return String.format("%s (%s): %s",
+			return String.format("Drone: %s %s (from %s)",
 									d.getName(),
-									d.getSourceFile(),
-									d.getDescription());
+									d.getDescription(),
+									d.getSourceFile());
 		}
     	public int claim(byte data){
     		if(Serial.getMsgType(data) == Serial.STRING_TYPE) return 255;
