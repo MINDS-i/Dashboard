@@ -3,7 +3,7 @@ package com.logging;
 import java.util.logging.*;
 
 /**
- * SimpleHandler is a minimal implementation of Handler for convenience
+ * SimpleHandler is a minimal implementation of Handler for convenience.
  * It respects its assigned level, filter, and formatter, then gives the
  * final strings to a MessageUser instance
  */
@@ -14,6 +14,7 @@ public class SimpleHandler extends Handler {
     }
     private final MessageUser messageUser;
     SimpleHandler(MessageUser messageUser){
+        super();
         this.messageUser = messageUser;
     }
     public void close() {}

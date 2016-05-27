@@ -10,6 +10,7 @@ public class EllipsisFormatter extends Formatter{
      * A formatter that ellipsizes each logRecord's raw message at maxLineLength
      */
     public EllipsisFormatter(int maxLineLength){
+        super();
         content = (LogRecord l) -> l.getMessage();
         this.maxLineLength = maxLineLength;
     }
