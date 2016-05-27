@@ -10,7 +10,7 @@ import java.util.logging.*;
 public class SimpleHandler extends Handler {
     public interface MessageUser{
         /** Consume a filtered, formatted log message */
-        public void use(String message);
+        public void use(LogRecord l, String message);
     }
     private final MessageUser messageUser;
     public SimpleHandler(MessageUser messageUser){
@@ -32,6 +32,6 @@ public class SimpleHandler extends Handler {
         Formatter format = getFormatter();
         String msg = (format==null)? record.getMessage()
                                    : format.format(record);
-        messageUser.use(msg);
+        messageUser.use(record, msg);
     }
 }

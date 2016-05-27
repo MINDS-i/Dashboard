@@ -11,6 +11,7 @@ import com.logging.SimpleHandler.MessageUser;
 
 public class SimpleHandler_test{
     Level l = Level.WARNING;
+    LogRecord r = new LogRecord(l,"hi");
     MessageUser mu;
     SimpleHandler sh;
 
@@ -22,43 +23,43 @@ public class SimpleHandler_test{
 
     @Test
     public void testDefaultString(){
-        sh.publish(new LogRecord(l,"hi"));
-        verify(mu).use("hi");
+        sh.publish(r);
+        verify(mu).use(r,"hi");
     }
     @Test
     public void testLevelPass(){
         sh.setLevel(Level.FINE);
-        sh.publish(new LogRecord(l,"hi"));
-        verify(mu).use("hi");
+        sh.publish(r);
+        verify(mu).use(r,"hi");
     }
     @Test
     public void testLevelFail(){
         sh.setLevel(Level.OFF);
-        sh.publish(new LogRecord(l,"hi"));
-        verify(mu, never()).use("hi");
+        sh.publish(r);
+        verify(mu, never()).use(r,"hi");
     }
     @Test
     public void testFilterPass(){
         Filter filter = mock(Filter.class);
         when(filter.isLoggable(anyObject())).thenReturn(true);
         sh.setFilter(filter);
-        sh.publish(new LogRecord(l,"hi"));
-        verify(mu).use("hi");
+        sh.publish(r);
+        verify(mu).use(r,"hi");
     }
     @Test
     public void testFilterFail(){
         Filter filter = mock(Filter.class);
         when(filter.isLoggable(anyObject())).thenReturn(false);
         sh.setFilter(filter);
-        sh.publish(new LogRecord(l,"hi"));
-        verify(mu, never()).use("hi");
+        sh.publish(r);
+        verify(mu, never()).use(r,"hi");
     }
     @Test
     public void testFormatterApplied(){
         Formatter fmt = mock(Formatter.class);
         when(fmt.format(anyObject())).thenReturn("bye");
         sh.setFormatter(fmt);
-        sh.publish(new LogRecord(l,"hi"));
-        verify(mu).use("bye");
+        sh.publish(r);
+        verify(mu).use(r,"bye");
     }
 }

@@ -137,7 +137,8 @@ public class Dashboard implements Runnable {
     AlertPanel ap = new AlertPanel(context.theme.alertFont, 8, 80);
     ap.setColor(context.theme.textColor);
 
-    Handler handler = new SimpleHandler((String s) -> ap.addMessage(s));
+    Handler handler = new SimpleHandler((LogRecord l, String s) ->
+                                                    ap.addMessage(s));
     handler.setLevel(Level.INFO);
     rootlog.addHandler(handler);
     return ap;
