@@ -5,35 +5,35 @@ import javax.swing.*;
 import java.awt.*;
 import javax.swing.border.EmptyBorder;
 
-public class NinePatchButton extends JButton{
+public class NinePatchButton extends JButton {
     private NinePatch normal;
     private NinePatch pressed;
     private NinePatch hover;
 
-    public NinePatchButton(NinePatch normal){
+    public NinePatchButton(NinePatch normal) {
         super();
         this.normal = normal;
         configure();
     }
-    public NinePatchButton(NinePatch normal, Action action){
+    public NinePatchButton(NinePatch normal, Action action) {
         super(action);
         this.normal = normal;
         configure();
     }
-    public NinePatchButton(NinePatch normal, String label){
+    public NinePatchButton(NinePatch normal, String label) {
         super(label);
         this.normal = normal;
         configure();
     }
-    private void configure(){
+    private void configure() {
         setOpaque(false);
         setBorderPainted(false);
         setMinimumSize(normal.minimumSize());
     }
-    public void setHoverPatch(NinePatch hover){
+    public void setHoverPatch(NinePatch hover) {
         this.hover = hover;
     }
-    public void setPressedPatch(NinePatch pressed){
+    public void setPressedPatch(NinePatch pressed) {
         this.pressed = pressed;
     }
     @Override

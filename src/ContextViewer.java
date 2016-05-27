@@ -1,5 +1,5 @@
 package com;
 
-public interface ContextViewer{
-	public void waypointUpdate();
+public interface ContextViewer {
+    public void waypointUpdate();
 }

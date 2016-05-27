@@ -9,19 +9,19 @@ import javax.swing.*;
 import java.util.*;
 
 public class SerialConnectPanel extends JPanel {
-    private static class BaudRate{
+    private static class BaudRate {
         public String name;
         public int id;
-        BaudRate(String name, int id){
+        BaudRate(String name, int id) {
             this.name = name;
             this.id = id;
         }
         @Override
-        public String toString(){
+        public String toString() {
             return name;
         }
     }
-    private static BaudRate[] rates = new BaudRate[]{
+    private static BaudRate[] rates = new BaudRate[] {
         new BaudRate("110   ",SerialPort.BAUDRATE_110    ),
         new BaudRate("300   ",SerialPort.BAUDRATE_300    ),
         new BaudRate("600   ",SerialPort.BAUDRATE_600    ),
@@ -43,7 +43,7 @@ public class SerialConnectPanel extends JPanel {
     private JComboBox dropDown;
     private JComboBox<BaudRate> baudSelect;
 
-    public SerialConnectPanel(SerialEventListener listener){
+    public SerialConnectPanel(SerialEventListener listener) {
         this.listener = listener;
         refreshButton = new JButton(refreshAction);
         connectButton = new JButton(connectAction);
@@ -51,8 +51,8 @@ public class SerialConnectPanel extends JPanel {
         addSerialList(dropDown);
         baudSelect = new JComboBox<BaudRate>(rates);
         //if the protocol spec'd baud rate is in the list, choose it
-        for(int i=0; i<rates.length; i++){
-            if(rates[i].id == Serial.BAUD){
+        for(int i=0; i<rates.length; i++) {
+            if(rates[i].id == Serial.BAUD) {
                 baudSelect.setSelectedIndex(i);
                 break;
             }
@@ -65,11 +65,11 @@ public class SerialConnectPanel extends JPanel {
         setOpaque(false);
     }
 
-    public void setBaudRate(int baudRate){
+    public void setBaudRate(int baudRate) {
         this.baudRate = baudRate;
     }
 
-    public void showBaudSelector(boolean show){
+    public void showBaudSelector(boolean show) {
         baudSelect.setVisible(show);
     }
 
@@ -83,8 +83,8 @@ public class SerialConnectPanel extends JPanel {
     private static final String BUTTON_DISCONNECTING = "Disabling ";
     private static final String BUTTON_DISCONNECTED  = " Connect  ";
     private boolean inProgress = false;
-    private void connect(){
-        if(inProgress){
+    private void connect() {
+        if(inProgress) {
             System.err.println("Connect command issued while a change was in Progress");
             return;
         }
@@ -95,15 +95,15 @@ public class SerialConnectPanel extends JPanel {
         inProgress = true;
         (new Thread(connectSerial)).start();
     }
-    private void connectDone(){
+    private void connectDone() {
         refreshButton.setEnabled(false);
         dropDown.setEnabled(false);
         connectButton.setEnabled(true);
         connectButton.setText(BUTTON_CONNECTED);
         inProgress = false;
     }
-    private void disconnect(){
-        if(inProgress){
+    private void disconnect() {
+        if(inProgress) {
             System.err.println("Connect command issued while a change was in Progress");
             return;
         }
@@ -114,7 +114,7 @@ public class SerialConnectPanel extends JPanel {
         inProgress = true;
         (new Thread(disconnectSerial)).start();
     }
-    private void disconnectDone(){
+    private void disconnectDone() {
         refreshButton.setEnabled(true);
         dropDown.setEnabled(true);
         connectButton.setEnabled(true);
@@ -122,7 +122,7 @@ public class SerialConnectPanel extends JPanel {
         inProgress = false;
     }
 
-    Action refreshAction = new AbstractAction(){
+    Action refreshAction = new AbstractAction() {
         {
             String text = "Refresh";
             putValue(Action.NAME, text);
@@ -136,35 +136,35 @@ public class SerialConnectPanel extends JPanel {
         }
     };
 
-    private void addSerialList(JComboBox box){
+    private void addSerialList(JComboBox box) {
         String[] portNames = SerialPortList.getPortNames();
-        for(int i = 0; i < portNames.length; i++){
+        for(int i = 0; i < portNames.length; i++) {
             box.addItem(portNames[i]);
         }
     }
 
-    Action connectAction = new AbstractAction(){
+    Action connectAction = new AbstractAction() {
         {
-        String text = BUTTON_DISCONNECTED;
-        putValue(Action.NAME, text);
-        putValue(Action.SHORT_DESCRIPTION, text);
+            String text = BUTTON_DISCONNECTED;
+            putValue(Action.NAME, text);
+            putValue(Action.SHORT_DESCRIPTION, text);
         }
-        public void actionPerformed(ActionEvent e){
+        public void actionPerformed(ActionEvent e) {
             if (connectedPort == null) connect();
             else disconnect();
         }
     };
 
-    private Runnable connectSerial = new Runnable(){
-        public void run(){
+    private Runnable connectSerial = new Runnable() {
+        public void run() {
             if(dropDown.getSelectedItem() == null) return;
 
             SerialPort serialPort = new SerialPort((String)dropDown.getSelectedItem());
 
-            try{
+            try {
                 serialPort.openPort();
 
-                if(baudSelect.isVisible()){
+                if(baudSelect.isVisible()) {
                     baudRate = ((BaudRate)baudSelect.getSelectedItem()).id;
                 }
 
@@ -172,7 +172,7 @@ public class SerialConnectPanel extends JPanel {
                                      SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
                 serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN |
                                               SerialPort.FLOWCONTROL_RTSCTS_OUT);
-            } catch(SerialPortException ex){
+            } catch(SerialPortException ex) {
                 System.err.println(ex.getMessage());
                 return;
             }
@@ -183,11 +183,11 @@ public class SerialConnectPanel extends JPanel {
         }
     };
 
-    private Runnable disconnectSerial = new Runnable(){
-        public void run(){
+    private Runnable disconnectSerial = new Runnable() {
+        public void run() {
             listener.disconnectRequest();
 
-            try{
+            try {
                 connectedPort.closePort();
             } catch (Exception e) {
                 e.printStackTrace();

@@ -12,7 +12,7 @@ import java.util.logging.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
-public class LogViewer{
+public class LogViewer {
     private JFrame frame;
     private JTextPane details;
     private JList<Record> logList;
@@ -22,7 +22,7 @@ public class LogViewer{
      * Attach its handler to each logger that log viewer should display
      * log messages from
      */
-    public LogViewer(){
+    public LogViewer() {
         frame = new JFrame("Event Log");
 
         logList = new JList<Record>();
@@ -38,7 +38,7 @@ public class LogViewer{
         JScrollPane detailPane = new JScrollPane(details);
 
         JSplitPane container = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-                                            listPane, detailPane);
+                                              listPane, detailPane);
 
         frame.add(container);
         frame.pack();
@@ -46,7 +46,7 @@ public class LogViewer{
     /**
      * Show or hide the log viewer window
      */
-    public void setVisible(boolean visible){
+    public void setVisible(boolean visible) {
         frame.setVisible(visible);
     }
     /**
@@ -68,11 +68,15 @@ public class LogViewer{
      * A model for a JList that lists all the LogRecords its handler
      * has received
      */
-    private class LogModel extends AbstractListModel<Record>{
+    private class LogModel extends AbstractListModel<Record> {
         List<Record> records = new Vector<Record>();
-        public Record getElementAt(int idx){ return records.get(idx); }
-        public int getSize(){ return records.size(); }
-        public Handler logHandler = new SimpleHandler((LogRecord l, String s)->{
+        public Record getElementAt(int idx) {
+            return records.get(idx);
+        }
+        public int getSize() {
+            return records.size();
+        }
+        public Handler logHandler = new SimpleHandler((LogRecord l, String s)-> {
             records.add(0, new Record(l));
             fireIntervalAdded(this, 0, 0);
         });
@@ -82,17 +86,17 @@ public class LogViewer{
      * This provides better control over formatting and better performance,
      * Because JList will call toString quite often
      */
-    private class Record{
+    private class Record {
         private LogRecord bR;
         private String asString;
         private String fullMessage;
         private DateFormat formatter = new SimpleDateFormat("HH:mm:ss");
-        Record(LogRecord backingRecord){
+        Record(LogRecord backingRecord) {
             this.bR = backingRecord;
             asString = EllipsisFormatter.ellipsize(bR.getMessage(),30);
             fullMessage = buildFullMessage();
         }
-        private String buildFullMessage(){
+        private String buildFullMessage() {
             StringBuilder b = new StringBuilder();
             Date date = new Date(getMillis());
             String dateFormatted = formatter.format(date);
@@ -109,23 +113,45 @@ public class LogViewer{
         @Override public String toString() {
             return asString;
         }
-        String getMessage(){ return fullMessage; }
-        Level getLevel(){ return bR.getLevel(); }
-        String getLoggerName(){ return bR.getLoggerName(); }
-        long getMillis(){ return bR.getMillis(); }
-        Object[] getParameters(){ return bR.getParameters(); }
-        String getResourceBundleName(){ return bR.getResourceBundleName(); }
-        long getSequenceNumber(){ return bR.getSequenceNumber(); }
-        String getSourceClassName(){ return bR.getSourceClassName(); }
-        String getSourceMethodName(){ return bR.getSourceMethodName(); }
-        int getThreadID(){ return bR.getThreadID(); }
-        Throwable getThrown(){ return bR.getThrown(); }
+        String getMessage() {
+            return fullMessage;
+        }
+        Level getLevel() {
+            return bR.getLevel();
+        }
+        String getLoggerName() {
+            return bR.getLoggerName();
+        }
+        long getMillis() {
+            return bR.getMillis();
+        }
+        Object[] getParameters() {
+            return bR.getParameters();
+        }
+        String getResourceBundleName() {
+            return bR.getResourceBundleName();
+        }
+        long getSequenceNumber() {
+            return bR.getSequenceNumber();
+        }
+        String getSourceClassName() {
+            return bR.getSourceClassName();
+        }
+        String getSourceMethodName() {
+            return bR.getSourceMethodName();
+        }
+        int getThreadID() {
+            return bR.getThreadID();
+        }
+        Throwable getThrown() {
+            return bR.getThrown();
+        }
     }
     /**
      * Returns an object that gets rendered as each element in the list
      */
-    private class Renderer extends JLabel implements ListCellRenderer<Record>{
-        Renderer(){
+    private class Renderer extends JLabel implements ListCellRenderer<Record> {
+        Renderer() {
             setOpaque(true);
             //setBorder(BorderFactory.createLineBorder(Color.black));
         }
@@ -138,10 +164,9 @@ public class LogViewer{
             Color background = Color.WHITE;
             Color foreground = Color.BLACK;
 
-            if(cellHasFocus){
+            if(cellHasFocus) {
                 background = Color.YELLOW;
-            }
-            else if ((index-model.getSize()) % 2 == 0) {
+            } else if ((index-model.getSize()) % 2 == 0) {
                 background = Color.LIGHT_GRAY;
             }
 
@@ -151,7 +176,7 @@ public class LogViewer{
             return this;
         }
         @Override
-        public void paintComponent(Graphics g){
+        public void paintComponent(Graphics g) {
             super.paintComponent(g);
             Graphics2D g2d = (Graphics2D) g.create();
             g.setColor(Color.BLACK);
@@ -160,7 +185,7 @@ public class LogViewer{
         }
     }
     // This method exists for rapid testing of the component by itself
-    public static void main(String[] strs){
+    public static void main(String[] strs) {
         LogViewer lv = new LogViewer();
         lv.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Logger log = Logger.getLogger("t");
@@ -173,8 +198,8 @@ public class LogViewer{
         log.info("Test message LONG MESSAGE THAT GOES ON A REALLY LONG WAAAAAAAAAAAAAAAAAAAAAAAAAAAAAY");
         log.info("<i>Test message</i> <b>HTML</b>");
         lv.setVisible(true);
-        try{
-            while(true){
+        try {
+            while(true) {
                 log.info("New Message");
                 Thread.sleep(1000);
             }

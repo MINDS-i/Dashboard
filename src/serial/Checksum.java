@@ -1,6 +1,6 @@
 package com.serial;
 
-public interface Checksum{
+public interface Checksum {
     /**
      * return a byte[] containing the checksum of the plaintext array
      */

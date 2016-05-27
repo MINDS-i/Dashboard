@@ -8,12 +8,12 @@ import java.util.logging.*;
  * final strings to a MessageUser instance
  */
 public class SimpleHandler extends Handler {
-    public interface MessageUser{
+    public interface MessageUser {
         /** Consume a filtered, formatted log message */
         public void use(LogRecord l, String message);
     }
     private final MessageUser messageUser;
-    public SimpleHandler(MessageUser messageUser){
+    public SimpleHandler(MessageUser messageUser) {
         super();
         this.messageUser = messageUser;
     }
@@ -31,7 +31,7 @@ public class SimpleHandler extends Handler {
         // Format and consume the message
         Formatter format = getFormatter();
         String msg = (format==null)? record.getMessage()
-                                   : format.format(record);
+                     : format.format(record);
         messageUser.use(record, msg);
     }
 }

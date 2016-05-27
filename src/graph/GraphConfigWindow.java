@@ -10,12 +10,12 @@ import java.util.List;
 import java.util.ArrayList;
 import javax.swing.colorchooser.AbstractColorChooserPanel;
 
-class GraphConfigWindow{
+class GraphConfigWindow {
     private static final Dimension SPINNER_SIZE = new Dimension(80,20);
-    private Graph    subject;
-    private JFrame   frame;
+    private Graph subject;
+    private JFrame frame;
 
-    public GraphConfigWindow(Graph subject){
+    public GraphConfigWindow(Graph subject) {
         this.subject = subject;
         frame = new JFrame("Graph Configuration");
 
@@ -29,22 +29,22 @@ class GraphConfigWindow{
         frame.pack();
     }
 
-    public void show(){
+    public void show() {
         frame.setVisible(true);
     }
 
-    public void close(){
+    public void close() {
         frame.dispose();
     }
 
-    JSpinner numberSpinner(SpinnerNumberModel model, ChangeListener cl){
+    JSpinner numberSpinner(SpinnerNumberModel model, ChangeListener cl) {
         JSpinner js = new JSpinner(model);
         js.setPreferredSize(SPINNER_SIZE);
         js.addChangeListener(cl);
         return js;
     }
 
-    private JPanel buildSpinners(){
+    private JPanel buildSpinners() {
         JPanel spinnerPanel = new JPanel();
 
         ViewSpec vs = subject.getViewSpec();
@@ -61,13 +61,13 @@ class GraphConfigWindow{
                 yscale.getNumber().floatValue(),
                 ycenter.getNumber().floatValue(),
                 xscale.getNumber().floatValue()
-                ));
+            ));
         };
 
         JCheckBox aa = new JCheckBox("AntiAlias", subject.getAntiAliasing());
         aa.addChangeListener( (ChangeEvent e) ->
-            subject.setAntiAliasing( aa.getModel().isSelected() )
-        );
+                              subject.setAntiAliasing( aa.getModel().isSelected() )
+                            );
 
         spinnerPanel.add(aa);
         spinnerPanel.add(new JLabel(" Y Scale:"));
@@ -80,26 +80,48 @@ class GraphConfigWindow{
         return spinnerPanel;
     }
 
-    private JComponent buildSourceTable(){
+    private JComponent buildSourceTable() {
         List<Graph.DataConfig> sources = subject.getSources();
 
         ArrayList<TableColumn> cols = new ArrayList<TableColumn>();
-        cols.add( new TableColumn(){
-            public String  getName(){ return "#"; }
-            public Object  getValueAt(int row){ return sources.get(row).getName(); }
-            public int     getRowCount(){ return sources.size(); }
-            public Class   getDataClass(){ return String.class; }
-            public boolean isRowEditable(int row){ return false; }
-            public void    setValueAt(Object val, int row){;}
+        cols.add( new TableColumn() {
+            public String getName() {
+                return "#";
+            }
+            public Object getValueAt(int row) {
+                return sources.get(row).getName();
+            }
+            public int getRowCount() {
+                return sources.size();
+            }
+            public Class getDataClass() {
+                return String.class;
+            }
+            public boolean isRowEditable(int row) {
+                return false;
+            }
+            public void setValueAt(Object val, int row) {
+                ;
+            }
         });
         cols.add( new TableColumn() {
-            public String   getName(){ return "Graph?"; }
-            public Object   getValueAt(int row){ return sources.get(row).getDrawn(); }
-            public int      getRowCount(){ return sources.size(); }
-            public Class    getDataClass(){ return Boolean.class; }
-            public boolean  isRowEditable(int row){ return true; }
-            public void     setValueAt(Object val, int row){
-                if(val.getClass() == Boolean.class){
+            public String getName() {
+                return "Graph?";
+            }
+            public Object getValueAt(int row) {
+                return sources.get(row).getDrawn();
+            }
+            public int getRowCount() {
+                return sources.size();
+            }
+            public Class getDataClass() {
+                return Boolean.class;
+            }
+            public boolean isRowEditable(int row) {
+                return true;
+            }
+            public void setValueAt(Object val, int row) {
+                if(val.getClass() == Boolean.class) {
                     sources.get(row).setDrawn((Boolean) val);
                 }
             }
@@ -107,8 +129,8 @@ class GraphConfigWindow{
 
         ColumnTableModel colModel = new ColumnTableModel(cols);
         JTable table = new JTable(colModel);
-        table.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
-        public void valueChanged(ListSelectionEvent event) {
+        table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent event) {
                 setCloseup(sources.get(table.getSelectedRow()));
             }
         });
@@ -117,8 +139,8 @@ class GraphConfigWindow{
         table.setFillsViewportHeight(true);
         table.setPreferredScrollableViewportSize(new Dimension(200, 120));
         pane.setBorder(BorderFactory.createCompoundBorder(
-                         BorderFactory.createEmptyBorder(5, 10, 5,10),
-                         BorderFactory.createLineBorder(Color.BLACK)  ));
+                           BorderFactory.createEmptyBorder(5, 10, 5,10),
+                           BorderFactory.createLineBorder(Color.BLACK)  ));
         return pane;
     }
 
@@ -127,11 +149,11 @@ class GraphConfigWindow{
     private JColorChooser      colorPicker;
 
     //provides a closeup view of the settings associated with a particular DataConfig
-    private JPanel buildCloseupPanel(){
+    private JPanel buildCloseupPanel() {
         JPanel panel = new JPanel();
 
-        ChangeListener updateListener = new ChangeListener(){
-            public void stateChanged(ChangeEvent e){
+        ChangeListener updateListener = new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
                 updateCloseupPaint();
             }
         };
@@ -147,12 +169,12 @@ class GraphConfigWindow{
         return panel;
     }
 
-    private void setCloseup(Graph.DataConfig dc){
+    private void setCloseup(Graph.DataConfig dc) {
         closeupData = dc;
         colorPicker.setColor((Color)closeupData.getPaint());
     }
 
-    private void updateCloseupPaint(){
+    private void updateCloseupPaint() {
         if(closeupData == null) return;
         closeupData.setPaint( (Paint) colorPicker.getColor() );
     }

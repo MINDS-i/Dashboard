@@ -10,13 +10,14 @@ import javax.swing.colorchooser.AbstractColorChooserPanel;
 import javax.swing.event.*;
 import javax.swing.text.*;
 
-public class SystemConfigWindow{
+public class SystemConfigWindow {
     private Context context;
-    protected static final String COPY_RIGHT_TEXT = "Map Tiles Courtesy of MapQuest" +
+    protected static final String COPY_RIGHT_TEXT =
+        "Map Tiles Courtesy of MapQuest" +
         "\nStreet Data from OpenStreetMap\nPortions Courtesy NASA/JPL-Caltech" +
         " and\nU.S. Depart. of Agriculture, Farm Service Agency";
 
-    public SystemConfigWindow(Context cxt){
+    public SystemConfigWindow(Context cxt) {
         this.context = cxt;
         JFrame frame = new JFrame("Configuration");
 
@@ -53,29 +54,29 @@ public class SystemConfigWindow{
         frame.pack();
         frame.setVisible(true);
     }
-    private boolean isWindows(){
+    private boolean isWindows() {
         String OS = System.getProperty("os.name");
         return OS.startsWith("Windows");
     }
-    private Action toggleLocale = new AbstractAction(){
+    private Action toggleLocale = new AbstractAction() {
         {
             String text = "Toggle ground/air mode";
             putValue(Action.NAME, text);
         }
-        public void actionPerformed(ActionEvent e){
+        public void actionPerformed(ActionEvent e) {
             context.toggleLocale();
             JFrame mf = new JFrame("message");
             JOptionPane.showMessageDialog(mf, "Changes will take effect next launch");
         }
     };
-    private Action driverExec = new AbstractAction(){
+    private Action driverExec = new AbstractAction() {
         {
             String text = "Launch driver installer";
             putValue(Action.NAME, text);
         }
-        public void actionPerformed(ActionEvent e){
+        public void actionPerformed(ActionEvent e) {
             String[] cmd = { "RadioDiversv2.12.06WHQL_Centified.exe" };
-            try{
+            try {
                 Process p = Runtime.getRuntime().exec(cmd);
             } catch (Exception ex) {
                 ex.printStackTrace();

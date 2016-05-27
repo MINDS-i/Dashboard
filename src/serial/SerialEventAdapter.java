@@ -4,8 +4,8 @@ import jssc.SerialPort;
 import com.serial.SerialEventListener;
 
 public class SerialEventAdapter implements SerialEventListener {
-    public void connectionEstablished(SerialPort newConnection){
+    public void connectionEstablished(SerialPort newConnection) {
     }
-    public void disconnectRequest(){
+    public void disconnectRequest() {
     }
 }

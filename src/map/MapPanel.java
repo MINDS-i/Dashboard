@@ -29,7 +29,7 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
     private static final int TILE_SIZE = 256;
     private static final float ZOOM_FACTOR = 1.1f;
 
-    private MapSource[] mapSources = new MapSource[]{
+    private MapSource[] mapSources = new MapSource[] {
         new TileServer("http://otile1.mqcdn.com/tiles/1.0.0/sat"),
         new TileServer("http://otile1.mqcdn.com/tiles/1.0.0/map"),
     };
@@ -49,13 +49,13 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         this(cxt, new Point(0, 0), 6, null, null, null);
     }
 
-    public MapPanel(Context cxt, Point mapPosition, int zoom){
+    public MapPanel(Context cxt, Point mapPosition, int zoom) {
         this(cxt, mapPosition, zoom, null, null, null);
     }
 
     public MapPanel(Context cxt, Point mapPosition, int zoom, JPanel north,
-                                                              JPanel east,
-                                                              JPanel south) {
+                    JPanel east,
+                    JPanel south) {
         context = cxt;
         context.registerViewer(this);
 
@@ -91,17 +91,17 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
      * Transforms a (lonitude,latitude) point to absolute (x,y) pixels
      * Will return an instance of the same class as the argument p
      */
-    public Point2D toPixels(Point2D p){
+    public Point2D toPixels(Point2D p) {
         Point2D f = (Point2D) p.clone();
         double scale = zoom;
         double lon   = p.getX();
         double lat   = Math.toRadians(p.getY());
         double x = (lon+180.0)/360.0 * scale;
         double y = ((1 -
-                       Math.log(
-                           Math.tan(lat) + 1 / Math.cos(lat)
-                       ) / Math.PI
-                   )/2) * scale;
+                     Math.log(
+                         Math.tan(lat) + 1 / Math.cos(lat)
+                     ) / Math.PI
+                    )/2) * scale;
         f.setLocation(x,y);
         return f;
     }
@@ -109,7 +109,7 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
      * Transforms absolute (x,y) pixels to (lonitude,latitude)
      * Will return an instance of the same class as the argument p
      */
-    public Point2D toCoordinates(Point2D p){
+    public Point2D toCoordinates(Point2D p) {
         Point2D f = (Point2D) p.clone();
         double scale = zoom;
         double x     = p.getX() / scale;
@@ -128,7 +128,7 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
     /**
      * Transforms absolute (lon,lat) to the pixel position in the current screen
      */
-    public Point2D screenPosition(Point2D p){
+    public Point2D screenPosition(Point2D p) {
         Point2D f = (Point2D) p.clone();
         Point2D click  = toPixels(p);
         Point2D center = getMapPosPixels();
@@ -139,7 +139,7 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
     /**
      * Transforms pixel position relative current screen to absolute (lon,lat)
      */
-    public Point2D mapPosition(Point2D p){
+    public Point2D mapPosition(Point2D p) {
         Point2D f = (Point2D) p.clone();
         Point2D center = getMapPosPixels();
         f.setLocation(p.getX() + center.getX() -  getWidth()/2.0,
@@ -203,7 +203,7 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
     }
 
     //Code for ContextViewer interface
-    public void waypointUpdate(){
+    public void waypointUpdate() {
         repaint();
     }
     //End code for ContextViewep interface
@@ -236,11 +236,11 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         private Point downCoords = null;
         private Point2D downPosition = null;
 
-        public int getZ(){
+        public int getZ() {
             return -1;
         }
 
-        public boolean onClick(MouseEvent e){
+        public boolean onClick(MouseEvent e) {
             return false;
         }
 
@@ -279,11 +279,11 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
                 zoomOut(new Point(mouseCoords.x, mouseCoords.y));
         }
 
-        public void paint(Graphics g){
+        public void paint(Graphics g) {
         }
     }
 
-    public static JPanel contain(JPanel input){
+    public static JPanel contain(JPanel input) {
         JPanel tmp = new JPanel();
         tmp.add(input);
         tmp.setOpaque(false);

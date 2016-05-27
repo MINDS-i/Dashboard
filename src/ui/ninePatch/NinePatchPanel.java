@@ -4,9 +4,9 @@ import com.ui.ninePatch.NinePatch;
 import javax.swing.*;
 import java.awt.*;
 
-public class NinePatchPanel extends JPanel{
+public class NinePatchPanel extends JPanel {
     private NinePatch np;
-    public NinePatchPanel(NinePatch np){
+    public NinePatchPanel(NinePatch np) {
         super();
         this.np = np;
         setOpaque(false);

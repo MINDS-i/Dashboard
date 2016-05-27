@@ -2,19 +2,25 @@ package com.data.stateDescription;
 
 import java.lang.StringBuilder;
 
-public class Description{
+public class Description {
     private final String name;
     private final String file;
     private final String text;
-    public Description(String stateName, String sourceFile, String description){
+    public Description(String stateName, String sourceFile, String description) {
         name = stateName;
         file = sourceFile;
         text = description;
     }
-    public String getName(){ return name; }
-    public String getSourceFile(){ return file; }
-    public String getDescription(){ return text; }
-    @Override public boolean equals(Object o){
+    public String getName() {
+        return name;
+    }
+    public String getSourceFile() {
+        return file;
+    }
+    public String getDescription() {
+        return text;
+    }
+    @Override public boolean equals(Object o) {
         if (this == o)
             return true;
         if (!(o instanceof Description))
@@ -24,7 +30,7 @@ public class Description{
                d.file.equals(file) &&
                d.text.equals(text);
     }
-    @Override public int hashCode(){
+    @Override public int hashCode() {
         // Computed as recommended by Effective Java Second Edition
         int result = 17;
         result = 31 * result + name.hashCode();
@@ -32,7 +38,7 @@ public class Description{
         result = 31 * result + text.hashCode();
         return result;
     }
-    @Override public String toString(){
+    @Override public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(name);
         sb.append(" (");

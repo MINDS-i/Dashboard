@@ -6,10 +6,10 @@ import com.serial.Messages.*;
 
 import java.nio.charset.StandardCharsets;
 
-class StringMessage extends Message{
+class StringMessage extends Message {
     int msgType;
     String str;
-    public StringMessage(int type, String str){
+    public StringMessage(int type, String str) {
         super();
         msgType = type;
         this.str = str;
@@ -19,11 +19,11 @@ class StringMessage extends Message{
         buildChecksum();
     }
     @Override
-    public boolean needsConfirm(){
+    public boolean needsConfirm() {
         return false;
     }
     @Override
-    public String toString(){
+    public String toString() {
         return "Message: \""+str+"\"";
     }
 }

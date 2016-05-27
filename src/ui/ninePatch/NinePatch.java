@@ -13,7 +13,7 @@ import javax.swing.*;
 import com.ui.BackgroundPanel;
 import com.ui.ninePatch.NinePatchPanel;
 
-public class NinePatch{
+public class NinePatch {
     private final BufferedImage middle;
     private final BufferedImage topBorder;
     private final BufferedImage leftBorder;
@@ -24,7 +24,7 @@ public class NinePatch{
     private final BufferedImage bottomLeft;
     private final BufferedImage bottomRight;
 
-    static BufferedImage copyRotated(BufferedImage bi, double rotation){
+    static BufferedImage copyRotated(BufferedImage bi, double rotation) {
         //paramaterize rotation
         double rot = Math.toRadians(rotation);
         int newWidth  = (int) Math.abs(bi.getWidth()*Math.cos(rot) ) +
@@ -50,9 +50,9 @@ public class NinePatch{
     }
 
     enum Flip { IDENTITY, HORIZONTAL, VERTICAL, BOTH };
-    static BufferedImage copyFlipped(BufferedImage bi, Flip dir){
+    static BufferedImage copyFlipped(BufferedImage bi, Flip dir) {
         AffineTransform tx = new AffineTransform();
-        switch(dir){
+        switch(dir) {
             case IDENTITY:
                 tx = new AffineTransform();
                 break;
@@ -73,7 +73,7 @@ public class NinePatch{
         return op.filter(bi, null);
     }
 
-    private NinePatch(){
+    private NinePatch() {
         middle       = null;
         topBorder    = null;
         leftBorder   = null;
@@ -84,7 +84,7 @@ public class NinePatch{
         bottomLeft   = null;
         bottomRight  = null;
     }
-    public NinePatch(BufferedImage center, BufferedImage wall, BufferedImage corner){
+    public NinePatch(BufferedImage center, BufferedImage wall, BufferedImage corner) {
         middle       = center;
         topBorder    = copyFlipped(wall, Flip.IDENTITY);
         leftBorder   = copyRotated(wall, -90);
@@ -98,7 +98,7 @@ public class NinePatch{
     public NinePatch(BufferedImage center,
                      BufferedImage topWall,
                      BufferedImage sideWall,
-                     BufferedImage corner){
+                     BufferedImage corner) {
         middle       = center;
         leftBorder   = copyFlipped(sideWall, Flip.IDENTITY);
         rightBorder  = copyFlipped(sideWall, Flip.BOTH);
@@ -109,7 +109,7 @@ public class NinePatch{
         bottomLeft   = copyFlipped(corner, Flip.VERTICAL);
         bottomRight  = copyFlipped(corner, Flip.BOTH);
     }
-    public NinePatch(BufferedImage center, BufferedImage[] walls, BufferedImage[] corners){
+    public NinePatch(BufferedImage center, BufferedImage[] walls, BufferedImage[] corners) {
         middle       = center;
         topBorder    = walls[0];
         leftBorder   = walls[1];
@@ -123,20 +123,22 @@ public class NinePatch{
 
     public static NinePatch loadFrom(Path dir) throws IOException {
         BufferedImage center = ImageIO.read(dir.resolve("Middle.png").toFile());
-        BufferedImage[] walls = new BufferedImage[]{
+        BufferedImage[] walls = new BufferedImage[] {
             ImageIO.read(dir.resolve("TopBorder.png").toFile()),
             ImageIO.read(dir.resolve("LeftBorder.png").toFile()),
             ImageIO.read(dir.resolve("RightBorder.png").toFile()),
-            ImageIO.read(dir.resolve("BottomBorder.png").toFile()) };
-        BufferedImage[] joints = new BufferedImage[]{
+            ImageIO.read(dir.resolve("BottomBorder.png").toFile())
+        };
+        BufferedImage[] joints = new BufferedImage[] {
             ImageIO.read(dir.resolve("TopLeft.png").toFile()),
             ImageIO.read(dir.resolve("TopRight.png").toFile()),
             ImageIO.read(dir.resolve("BottomLeft.png").toFile()),
-            ImageIO.read(dir.resolve("BottomRight.png").toFile()) };
+            ImageIO.read(dir.resolve("BottomRight.png").toFile())
+        };
         return new NinePatch(center, walls, joints);
     }
 
-    public Dimension minimumSize(){
+    public Dimension minimumSize() {
         //widest left corner + widest right corner
         int width = Math.max(topLeft.getWidth(), bottomLeft.getWidth()) +
                     Math.max(topRight.getWidth(), bottomRight.getWidth());
@@ -146,7 +148,7 @@ public class NinePatch{
         return new Dimension(width, height);
     }
 
-    public BufferedImage getImage(int width, int height){
+    public BufferedImage getImage(int width, int height) {
         BufferedImage me = new BufferedImage(width, height, middle.getType());
         Graphics2D g2d = me.createGraphics();
         paintIn(g2d, width, height);
@@ -154,7 +156,7 @@ public class NinePatch{
         return me;
     }
 
-    public void paintIn(Graphics g, int width, int height){
+    public void paintIn(Graphics g, int width, int height) {
         Graphics2D g2d = (Graphics2D) g;
         //fill between walls
         paintTexture(g2d,middle,
@@ -186,12 +188,12 @@ public class NinePatch{
     }
 
     private void paintTexture(Graphics2D g, BufferedImage bi,
-                             int x1, int y1, int x2, int y2  ){
+                              int x1, int y1, int x2, int y2  ) {
         Graphics2D g2d = (Graphics2D) g.create();
         g2d.translate(x1, y1);
         g2d.setPaint(new TexturePaint(bi,
-                        new Rectangle2D.Float(0f, 0f,
-                            (float)bi.getWidth(), (float)bi.getHeight())));
+                                      new Rectangle2D.Float(0f, 0f,
+                                                            (float)bi.getWidth(), (float)bi.getHeight())));
         g2d.fillRect(0,0,x2-x1,y2-y1);
         g2d.dispose();
     }
@@ -204,7 +206,7 @@ public class NinePatch{
         NinePatch test9 = new NinePatch();
         NinePatch testOdd = new NinePatch();
         NinePatch testButton = new NinePatch();
-        try{
+        try {
             BufferedImage c1            = ImageIO.read(new File("./resources/images/nP/c1.png"));
             BufferedImage c2            = ImageIO.read(new File("./resources/images/nP/c2.png"));
             BufferedImage c3            = ImageIO.read(new File("./resources/images/nP/c3.png"));
@@ -221,10 +223,10 @@ public class NinePatch{
             BufferedImage oddVert   = ImageIO.read(new File("./resources/images/nP/oddSize/vertWall.png"));
             BufferedImage oddCenter = ImageIO.read(new File("./resources/images/nP/oddSize/whiteCenter.png"));
 
-            BufferedImage[] walls = new BufferedImage[]{
+            BufferedImage[] walls = new BufferedImage[] {
                 vertGreenGrad, horzGreenGrad, horzGreenGrad, vertGreenGrad
             };
-            BufferedImage[] corners = new BufferedImage[]{
+            BufferedImage[] corners = new BufferedImage[] {
                 c1, c2, c3, c4
             };
 
@@ -233,13 +235,13 @@ public class NinePatch{
             test9 = new NinePatch(spiral, walls, corners);
             testOdd = new NinePatch(oddCenter, oddVert, oddHorz, oddCorner);
             testButton = NinePatch.loadFrom(Paths.get("./resources/images/nP/screen"));
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
         JPanel layoutPanel = new JPanel();
-        JComponent[] panels = new JComponent[]{
-             new NinePatchPanel(test3)
+        JComponent[] panels = new JComponent[] {
+            new NinePatchPanel(test3)
             ,new NinePatchPanel(test4)
             ,new NinePatchPanel(test9)
             ,new BackgroundPanel(test9.getImage(200,200))
@@ -247,7 +249,7 @@ public class NinePatch{
             ,new NinePatchButton(testButton, "Hello")
         };
 
-        for(JComponent panel: panels){
+        for(JComponent panel: panels) {
             panel.setPreferredSize(new Dimension(400, 400));
             layoutPanel.add(panel);
         }
@@ -257,7 +259,7 @@ public class NinePatch{
         f.pack();
         f.setVisible(true);
 
-        while(f.isShowing()){
+        while(f.isShowing()) {
             try {
                 Thread.sleep(1000);
             } catch (Exception e) {

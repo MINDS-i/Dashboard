@@ -14,24 +14,24 @@ import javax.swing.event.*;
 import javax.swing.text.*;
 
 class coordinateListener implements DocumentListener, ActionListener {
-	JTextField field;
-	WaypointPanel parent;
+    JTextField field;
+    WaypointPanel parent;
 
-	coordinateListener(JTextField speaker, WaypointPanel father){
-		field = speaker;
-		parent = father;
-	}
+    coordinateListener(JTextField speaker, WaypointPanel father) {
+        field = speaker;
+        parent = father;
+    }
 
-	public void insertUpdate(DocumentEvent e) {
-		field.setForeground(Color.BLUE);
-	}
-	public void removeUpdate(DocumentEvent e) {
-		field.setForeground(Color.BLUE);
-	}
-	public void changedUpdate(DocumentEvent e) {
-	}
+    public void insertUpdate(DocumentEvent e) {
+        field.setForeground(Color.BLUE);
+    }
+    public void removeUpdate(DocumentEvent e) {
+        field.setForeground(Color.BLUE);
+    }
+    public void changedUpdate(DocumentEvent e) {
+    }
 
-	public void actionPerformed(ActionEvent e) {
-		parent.interpretLocationEntry();
-	}
+    public void actionPerformed(ActionEvent e) {
+        parent.interpretLocationEntry();
+    }
 }

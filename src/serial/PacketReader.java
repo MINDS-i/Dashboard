@@ -1,6 +1,6 @@
 package com.serial;
 
-public interface PacketReader{
+public interface PacketReader {
     /**
      * Give this message reader a chance to claim a particular packet
      *     data is the first byte of a packet's data section

@@ -12,19 +12,19 @@ import java.nio.charset.Charset;
 import com.table.TableColumn;
 import com.table.ColumnTableModel;
 
-public class RadioConfigScreen extends JPanel{
+public class RadioConfigScreen extends JPanel {
 
-    static class Setting{
+    static class Setting {
         public int id;
         public String name;
         public int value;
-        public Setting(){}
-        public Setting(int id, String name, int value){
+        public Setting() {}
+        public Setting(int id, String name, int value) {
             this.id = id;
             this.value = value;
             this.name = name;
         }
-        public Setting(String line){
+        public Setting(String line) {
             String set = line.substring(1);
             String[] idSplit = set.split("[:=\\n\\r]");
             String id    = idSplit[0];
@@ -35,60 +35,60 @@ public class RadioConfigScreen extends JPanel{
             this.name  = name;
         }
         @Override
-        public String toString(){
+        public String toString() {
             return "S"+id+":"+name+"="+value;
         }
-        public String getWriteCmd(){
+        public String getWriteCmd() {
             return "\r\nATS"+id+"="+value+"\r\n";
         }
     }
 
-    class TelemRadio{ //put this in its own file soon
+    class TelemRadio { //put this in its own file soon
         SerialPort port = null;
         java.util.List<Setting> settings = new ArrayList<Setting>();
-        public TelemRadio(){}
-        public TelemRadio(SerialPort port){
+        public TelemRadio() {}
+        public TelemRadio(SerialPort port) {
             this.port = port;
-            try{
+            try {
                 Thread.sleep(1100);
                 port.writeString("+++");
                 Thread.sleep(1100);
                 port.readString();
                 loadSettings();
-            } catch (Exception e){
+            } catch (Exception e) {
                 System.err.println("Failed to communicate with radio");
                 e.printStackTrace();
             }
 
-            for(Setting s : settings){
+            for(Setting s : settings) {
                 System.out.println(s.toString());
             }
         }
-        synchronized String getResponse(String call) throws SerialPortException{
+        synchronized String getResponse(String call) throws SerialPortException {
             port.writeBytes(call.getBytes(Charset.forName("US-ASCII")));
 
             StringBuffer output = new StringBuffer();
-            class Bool{
+            class Bool {
                 public boolean val = false;
-                public Bool(){}
+                public Bool() {}
             }
             final Bool stopped = new Bool();
-            SerialPortEventListener listener = new SerialPortEventListener(){
-                public void serialEvent(SerialPortEvent e){
-                    try{
+            SerialPortEventListener listener = new SerialPortEventListener() {
+                public void serialEvent(SerialPortEvent e) {
+                    try {
                         output.append(port.readString());
-                    } catch (Exception ex){
+                    } catch (Exception ex) {
                         ex.printStackTrace();
                     }
                     stopped.val = false;
                 }
             };
             port.addEventListener(listener);
-            while(!stopped.val){
+            while(!stopped.val) {
                 stopped.val = true;
-                try{
+                try {
                     Thread.sleep(150);
-                } catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -96,84 +96,77 @@ public class RadioConfigScreen extends JPanel{
 
             return output.toString();
         }
-        void loadSettings(){
+        void loadSettings() {
             String rsp = "";
-            try{
+            try {
                 rsp = getResponse("\r\nATI5\r\n");
             } catch (Exception e) {
                 e.printStackTrace();
                 return;
             }
 
-            for(String line : rsp.split("\n")){
+            for(String line : rsp.split("\n")) {
                 if(line.length() <= 1) continue;
                 if(line.charAt(0) != 'S') continue;
                 Setting found = new Setting(line);
                 settings.add(found);
             }
         }
-        int getIndexByID(int id){
-            for(int i=0; i<settings.size(); i++){
+        int getIndexByID(int id) {
+            for(int i=0; i<settings.size(); i++) {
                 Setting old = settings.get(i);
-                if(old.id == id){
+                if(old.id == id) {
                     return i;
                 }
             }
             return -1;
         }
-        void updateValue(int i, int val){
+        void updateValue(int i, int val) {
             Setting changed = settings.get(i);
             int orig = changed.value;
             changed.value = val;
             String rsp = "";
             boolean failed = false;
-            try{
+            try {
                 rsp = getResponse(changed.getWriteCmd());
             } catch (Exception e) {
                 failed = true;
                 e.printStackTrace();
             }
             if(!rsp.contains("OK")) failed = true;
-            if(failed){
+            if(failed) {
                 changed.value = orig;
                 JFrame mf = new JFrame("Error changing setting");
                 JOptionPane.showMessageDialog(mf, "Error:\n"+rsp);
             }
         }
-        void writeToEEPROM(){
-            try{
+        void writeToEEPROM() {
+            try {
                 String rsp = getResponse("\r\nAT&W\r\n");
                 System.out.println(rsp);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        void writeDefaults(){
+        void writeDefaults() {
             updateValue(getIndexByID(1), 9); //serial speed = 9600
             updateValue(getIndexByID(2), 32);//air speed = 32k
             updateValue(getIndexByID(6), 0); //mavlink mode off
         }
     }
 
-
-
-
-
-
-
-
     private JButton defsButton;
     private JButton saveButton;
     private TelemRadio radio = new TelemRadio();
     private JTable settingTable = null;
-    SerialEventListener sel = new SerialEventListener(){
-        public void connectionEstablished(SerialPort newConnection){
+    SerialEventListener sel = new SerialEventListener() {
+        public void connectionEstablished(SerialPort newConnection) {
             radio = new TelemRadio(newConnection);
             settingTable.invalidate();
             defsButton.setEnabled(true);
             saveButton.setEnabled(true);
         }
-        public void disconnectRequest(){
+        public void disconnectRequest() {
             radio = new TelemRadio();
             settingTable.invalidate();
             defsButton.setEnabled(false);
@@ -181,15 +174,15 @@ public class RadioConfigScreen extends JPanel{
         }
     };
 
-    public RadioConfigScreen(){
+    public RadioConfigScreen() {
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         SerialConnectPanel scp = new SerialConnectPanel(sel);
         scp.showBaudSelector(true);
         settingTable = makeSettingTable();
         JScrollPane sScroll = new JScrollPane(settingTable);
         sScroll.setBorder(BorderFactory.createCompoundBorder(
-                            BorderFactory.createEmptyBorder(5, 10, 5,10),
-                            BorderFactory.createLineBorder(Color.BLACK)  ));
+                              BorderFactory.createEmptyBorder(5, 10, 5,10),
+                              BorderFactory.createLineBorder(Color.BLACK)  ));
         JPanel buttonPanel = new JPanel();
         defsButton = new JButton(loadDefualtsAction);
         saveButton = new JButton(saveAction);
@@ -221,37 +214,65 @@ public class RadioConfigScreen extends JPanel{
             radio.writeDefaults();
         }
     };
-    private JTable makeSettingTable(){
+    private JTable makeSettingTable() {
         java.util.List<TableColumn> setCols = new ArrayList<TableColumn>();
-        setCols.add( new TableColumn(){
-            public String   getName(){ return "ID"; }
-            public Object   getValueAt(int row){
+        setCols.add( new TableColumn() {
+            public String getName() {
+                return "ID";
+            }
+            public Object getValueAt(int row) {
                 return radio.settings.get(row).id;
             }
-            public int      getRowCount(){ return radio.settings.size(); }
-            public Class    getDataClass(){ return Integer.class; }
-            public boolean  isRowEditable(int row){ return false; }
-            public void     setValueAt(Object val, int row){ ; }
+            public int getRowCount() {
+                return radio.settings.size();
+            }
+            public Class  getDataClass() {
+                return Integer.class;
+            }
+            public boolean isRowEditable(int row) {
+                return false;
+            }
+            public void setValueAt(Object val, int row) {
+                ;
+            }
         });
-        setCols.add( new TableColumn(){
-            public String   getName(){ return "Name"; }
-            public Object   getValueAt(int row){
+        setCols.add( new TableColumn() {
+            public String getName() {
+                return "Name";
+            }
+            public Object getValueAt(int row) {
                 return radio.settings.get(row).name;
             }
-            public int      getRowCount(){ return radio.settings.size(); }
-            public Class    getDataClass(){ return String.class; }
-            public boolean  isRowEditable(int row){ return false; }
-            public void     setValueAt(Object val, int row){ ; }
+            public int getRowCount() {
+                return radio.settings.size();
+            }
+            public Class getDataClass() {
+                return String.class;
+            }
+            public boolean isRowEditable(int row) {
+                return false;
+            }
+            public void setValueAt(Object val, int row) {
+                ;
+            }
         });
-        setCols.add( new TableColumn(){
-            public String   getName(){ return "Value"; }
-            public Object   getValueAt(int row){
+        setCols.add( new TableColumn() {
+            public String getName() {
+                return "Value";
+            }
+            public Object getValueAt(int row) {
                 return radio.settings.get(row).value;
             }
-            public int      getRowCount(){ return radio.settings.size(); }
-            public Class    getDataClass(){ return Integer.class; }
-            public boolean  isRowEditable(int row){ return true; }
-            public void     setValueAt(Object val, int row){
+            public int getRowCount() {
+                return radio.settings.size();
+            }
+            public Class getDataClass() {
+                return Integer.class;
+            }
+            public boolean isRowEditable(int row) {
+                return true;
+            }
+            public void setValueAt(Object val, int row) {
                 if(val.getClass() != Integer.class) return;
                 radio.updateValue(row, (Integer)val);
             }
@@ -272,7 +293,7 @@ public class RadioConfigScreen extends JPanel{
         f.pack();
         f.setVisible(true);
 
-        while(f.isShowing()){
+        while(f.isShowing()) {
             try {
                 Thread.sleep(500);
             } catch (Exception e) {

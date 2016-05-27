@@ -3,9 +3,9 @@ package com.serial.Messages;
 import com.serial.Serial;
 import com.serial.Messages.*;
 
-class DataMessage extends Message{
+class DataMessage extends Message {
     int msgType;
-    public DataMessage(int type, byte index, float data){
+    public DataMessage(int type, byte index, float data) {
         super();
         msgType = type;
 
@@ -22,14 +22,16 @@ class DataMessage extends Message{
         buildChecksum();
     }
     @Override
-    public boolean needsConfirm(){
+    public boolean needsConfirm() {
         return (msgType == Serial.SETTING_DATA);
     }
     @Override
-    public String toString(){
-        switch(msgType){
-            case Serial.TELEMETRY_DATA: return "Telemetry Message";
-            case Serial.SETTING_DATA: return "Settings Change";
+    public String toString() {
+        switch(msgType) {
+            case Serial.TELEMETRY_DATA:
+                return "Telemetry Message";
+            case Serial.SETTING_DATA:
+                return "Settings Change";
         }
         return "Data Message";
     }
