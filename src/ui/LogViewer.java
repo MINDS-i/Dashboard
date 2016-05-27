@@ -30,6 +30,7 @@ public class LogViewer{
         logList.addListSelectionListener(onSelect);
         logList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         logList.setLayoutOrientation(JList.VERTICAL);
+        logList.setCellRenderer(new Renderer());
         JScrollPane listPane = new JScrollPane(logList);
 
         details = new JTextPane();
@@ -67,7 +68,7 @@ public class LogViewer{
      * A model for a JList that lists all the LogRecords its handler
      * has received
      */
-    class LogModel extends AbstractListModel<Record>{
+    private class LogModel extends AbstractListModel<Record>{
         List<Record> records = new Vector<Record>();
         public Record getElementAt(int idx){ return records.get(idx); }
         public int getSize(){ return records.size(); }
@@ -119,6 +120,44 @@ public class LogViewer{
         String getSourceMethodName(){ return bR.getSourceMethodName(); }
         int getThreadID(){ return bR.getThreadID(); }
         Throwable getThrown(){ return bR.getThrown(); }
+    }
+    /**
+     * Returns an object that gets rendered as each element in the list
+     */
+    private class Renderer extends JLabel implements ListCellRenderer<Record>{
+        Renderer(){
+            setOpaque(true);
+            //setBorder(BorderFactory.createLineBorder(Color.black));
+        }
+        public Component
+        getListCellRendererComponent(JList<? extends Record> list,
+                                     Record value,
+                                     int index,
+                                     boolean isSelected,
+                                     boolean cellHasFocus) {
+            Color background = Color.WHITE;
+            Color foreground = Color.BLACK;
+
+            if(cellHasFocus){
+                background = Color.YELLOW;
+            }
+            else if ((index-model.getSize()) % 2 == 0) {
+                background = Color.LIGHT_GRAY;
+            }
+
+            setBackground(background);
+            setForeground(foreground);
+            setText(value.toString());
+            return this;
+        }
+        @Override
+        public void paintComponent(Graphics g){
+            super.paintComponent(g);
+            Graphics2D g2d = (Graphics2D) g.create();
+            g.setColor(Color.BLACK);
+            g.drawLine(0, getHeight()-1, getWidth(), getHeight()-1);
+            g2d.dispose();
+        }
     }
     // This method exists for rapid testing of the component by itself
     public static void main(String[] strs){
