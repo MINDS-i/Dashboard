@@ -1,8 +1,4 @@
 package com.ui;
-import com.Dashboard;
-import com.serial.SerialSender;
-import com.serial.*;
-import com.serial.Messages.*;
 import com.logging.*;
 
 import java.awt.*;
@@ -18,63 +14,59 @@ import java.io.*;
 public class AlertPanel extends JPanel {
 	private final static int REC_LINE_LEN = 80;
 	private final static int NUM_LINES = 8;
-	private Theme theme;
+	private Font messageFont = new Font(Font.MONOSPACED,Font.BOLD,16);
+	private Color messageColor = Color.WHITE;
+	private List<String> messages = new ArrayList<String>(NUM_LINES);
+	private List<Object> gcHold = new ArrayList<Object>();
+	private boolean fontUpdated = true;
 	private int lineHeight;
 	private FontMetrics metrics;
-	private List<String> messages = new ArrayList<String>(NUM_LINES);
-	private boolean fontUpdated = true;
+
+	public static AlertPanel createLogDisplay(String logNS, Level level){
+		AlertPanel ap = new AlertPanel();
+		Logger log = Logger.getLogger(logNS);
+		// if `log` gets garbage collected ap will stop getting updates
+		ap.addGcHold(log);
+		Handler handler = new SimpleHandler((String s) -> ap.addMessage(s));
+		handler.setFormatter(new EllipsisFormatter(REC_LINE_LEN));
+		log.addHandler(handler);
+		return ap;
+	}
 
 	public AlertPanel(){
-		//this.setPreferredSize(new Dimension(4000000,200)); //cheap fix for autoscaling
 		setOpaque(false);
 		for(int i=0; i<NUM_LINES; i++) addMessage("");
 		addMessage("Welcome!");
 		updateDim();
-
-		Logger root = Logger.getLogger("d");
-		Handler handler = new SimpleHandler((String s) ->addMessage(s));
-		handler.setFormatter(new EllipsisFormatter(REC_LINE_LEN));
-		root.addHandler(handler);
 	}
 
-	public AlertPanel(Theme theme){
-		this();
-		this.theme = theme;
-	}
-
-	public void setTheme(Theme theme){
-		this.theme = theme;
-		updateDim();
-	}
-
-	private void addMessage(String msg){
+	public void addMessage(String msg){
 		while(messages.size() >= NUM_LINES)
 			messages.remove(0);
 		messages.add(msg);
 		repaint();
 	}
 
-	private void updateDim(){
-		fontUpdated = true;
-	}
-	private Font getMessageFont(){
-		if(theme != null && theme.alertFont != null)
-			return theme.alertFont;
-		else
-			return new Font(Font.MONOSPACED,Font.BOLD,16);
+	public void setFont(Font f){
+		messageFont = f;
 	}
 
-	private Color getMessageColor(){
-		if (theme!=null)
-			return theme.textColor;
-		else
-			return Color.WHITE;
+	public void setColor(Color c){
+		messageColor = c;
+	}
+
+	private void addGcHold(Object o){
+		gcHold.add(o);
+	}
+
+	private void updateDim(){
+		fontUpdated = true;
 	}
 
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		g.setFont(getMessageFont());
+		g.setFont(messageFont);
 
 		metrics = g.getFontMetrics();
 		final int rowHeight = metrics.getHeight();
@@ -110,7 +102,7 @@ public class AlertPanel extends JPanel {
 							 BasicStroke.JOIN_ROUND,
 							 BasicStroke.CAP_ROUND));
 			g2.draw(shape);
-			g2.setColor(getMessageColor());
+			g2.setColor(messageColor);
 			g2.fill(shape);
 
 			g2.dispose();

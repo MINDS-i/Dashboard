@@ -116,7 +116,9 @@ public class Dashboard implements Runnable {
     };
     SerialConnectPanel serialPanel = new SerialConnectPanel(connectActions);
 
-    AlertPanel messageBox = new AlertPanel(context.theme);
+    AlertPanel messageBox = AlertPanel.createLogDisplay("d", Level.FINE);
+    //messageBox.setFont(context.theme);
+    messageBox.setColor(context.theme.textColor);
 
     MapPanel mapPanel = new MapPanel(  context,
                               new Point(0,0),
