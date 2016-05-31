@@ -1,0 +1,11 @@
+Logs use java.util.logging.*
+
+Log levels can be set in a "resources" properties file with the names
+    console_log_level (level output to debug console)
+    file_log_level (level output to log/*.log file)
+
+namespaces
+    d: root namespace for dashboard logs
+    d.io: Messages about dashboard-local file reading/writing
+    d.serial: Messages about dashboard<->robot communications
+    d.robot: Messages originating on the robot
