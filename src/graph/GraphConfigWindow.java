@@ -83,47 +83,45 @@ class GraphConfigWindow {
     private JComponent buildSourceTable() {
         List<Graph.DataConfig> sources = subject.getSources();
 
-        ArrayList<TableColumn> cols = new ArrayList<TableColumn>();
-        cols.add( new TableColumn() {
+        ArrayList<TableColumn<?>> cols = new ArrayList<TableColumn<?>>();
+        cols.add( new TableColumn<String>() {
             public String getName() {
                 return "#";
             }
-            public Object getValueAt(int row) {
+            public String getValueAt(int row) {
                 return sources.get(row).getName();
             }
             public int getRowCount() {
                 return sources.size();
             }
-            public Class getDataClass() {
+            public Class<String> getDataClass() {
                 return String.class;
             }
             public boolean isRowEditable(int row) {
                 return false;
             }
-            public void setValueAt(Object val, int row) {
+            public void setValueAt(String val, int row) {
                 ;
             }
         });
-        cols.add( new TableColumn() {
+        cols.add( new TableColumn<Boolean>() {
             public String getName() {
                 return "Graph?";
             }
-            public Object getValueAt(int row) {
+            public Boolean getValueAt(int row) {
                 return sources.get(row).getDrawn();
             }
             public int getRowCount() {
                 return sources.size();
             }
-            public Class getDataClass() {
+            public Class<Boolean> getDataClass() {
                 return Boolean.class;
             }
             public boolean isRowEditable(int row) {
                 return true;
             }
-            public void setValueAt(Object val, int row) {
-                if(val.getClass() == Boolean.class) {
-                    sources.get(row).setDrawn((Boolean) val);
-                }
+            public void setValueAt(Boolean val, int row) {
+                sources.get(row).setDrawn(val);
             }
         });
 

@@ -9,8 +9,8 @@ import javax.swing.event.*;
 import javax.swing.table.*;
 
 public class ColumnTableModel extends AbstractTableModel {
-    private List<TableColumn> columns;
-    public ColumnTableModel(List<TableColumn> cList) {
+    private List<TableColumn<?>> columns;
+    public ColumnTableModel(List<TableColumn<?>> cList) {
         columns = cList;
     }
     public int getColumnCount() {
@@ -38,7 +38,11 @@ public class ColumnTableModel extends AbstractTableModel {
         return columns.get(col).isRowEditable(row);
     }
     public void setValueAt(Object value, int row, int col) {
-        columns.get(col).setValueAt(value, row);
+        setValueAtHelper(columns.get(col), value, row);
         fireTableCellUpdated(row, col);
+    }
+    private <T> void setValueAtHelper(TableColumn<T> tc, Object obj, int row){
+        T val = tc.getDataClass().cast(obj);
+        tc.setValueAt(val, row);
     }
 }

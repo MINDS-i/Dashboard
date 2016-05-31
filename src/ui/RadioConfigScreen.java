@@ -215,66 +215,65 @@ public class RadioConfigScreen extends JPanel {
         }
     };
     private JTable makeSettingTable() {
-        java.util.List<TableColumn> setCols = new ArrayList<TableColumn>();
-        setCols.add( new TableColumn() {
+        java.util.List<TableColumn<?>> setCols = new ArrayList<TableColumn<?>>();
+        setCols.add( new TableColumn<Integer>() {
             public String getName() {
                 return "ID";
             }
-            public Object getValueAt(int row) {
+            public Integer getValueAt(int row) {
                 return radio.settings.get(row).id;
             }
             public int getRowCount() {
                 return radio.settings.size();
             }
-            public Class  getDataClass() {
+            public Class<Integer> getDataClass() {
                 return Integer.class;
             }
             public boolean isRowEditable(int row) {
                 return false;
             }
-            public void setValueAt(Object val, int row) {
+            public void setValueAt(Integer val, int row) {
                 ;
             }
         });
-        setCols.add( new TableColumn() {
+        setCols.add( new TableColumn<String>() {
             public String getName() {
                 return "Name";
             }
-            public Object getValueAt(int row) {
+            public String getValueAt(int row) {
                 return radio.settings.get(row).name;
             }
             public int getRowCount() {
                 return radio.settings.size();
             }
-            public Class getDataClass() {
+            public Class<String> getDataClass() {
                 return String.class;
             }
             public boolean isRowEditable(int row) {
                 return false;
             }
-            public void setValueAt(Object val, int row) {
+            public void setValueAt(String val, int row) {
                 ;
             }
         });
-        setCols.add( new TableColumn() {
+        setCols.add( new TableColumn<Integer>() {
             public String getName() {
                 return "Value";
             }
-            public Object getValueAt(int row) {
+            public Integer getValueAt(int row) {
                 return radio.settings.get(row).value;
             }
             public int getRowCount() {
                 return radio.settings.size();
             }
-            public Class getDataClass() {
+            public Class<Integer> getDataClass() {
                 return Integer.class;
             }
             public boolean isRowEditable(int row) {
                 return true;
             }
-            public void setValueAt(Object val, int row) {
-                if(val.getClass() != Integer.class) return;
-                radio.updateValue(row, (Integer)val);
+            public void setValueAt(Integer val, int row) {
+                radio.updateValue(row, val);
             }
         });
         ColumnTableModel setModel    = new ColumnTableModel(setCols);

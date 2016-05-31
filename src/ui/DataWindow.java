@@ -59,101 +59,95 @@ public class DataWindow implements ActionListener {
 
         final SettingList settingList = context.settingList;
 
-        ArrayList<TableColumn> telem = new ArrayList<TableColumn>();
-        telem.add( new TableColumn() {
-            public String	getName() {
+        ArrayList<TableColumn<?>> telem = new ArrayList<TableColumn<?>>();
+        telem.add( new TableColumn<String>() {
+            public String getName() {
                 return "name";
             }
-            public Object	getValueAt(int row) {
+            public String getValueAt(int row) {
                 return context.getTelemetryName(row);
             }
-            public int		getRowCount() {
-                return 256;
-            }
-            public Class	getDataClass() {
-                return String.class;
-            }
-            public boolean	isRowEditable(int row) {
-                return false;
-            }
-            public void		setValueAt(Object val, int row) {
-                ;
-            }
-        });
-
-        telem.add( new TableColumn() {
-            public String	getName() {
-                return "Value";
-            }
-            public Object	getValueAt(int row) {
-                return " "+context.getTelemetry(row);
-            }
-            public int		getRowCount() {
+            public int getRowCount() {
                 return context.getTelemetryCount();
             }
-            public Class	getDataClass() {
+            public Class<String> getDataClass() {
                 return String.class;
             }
-            public boolean	isRowEditable(int row) {
+            public boolean isRowEditable(int row) {
                 return false;
             }
-            public void		setValueAt(Object val, int row) {
+            public void setValueAt(String val, int row) {
+            }
+        });
+
+        telem.add( new TableColumn<String>() {
+            public String getName() {
+                return "Value";
+            }
+            public String getValueAt(int row) {
+                return " "+context.getTelemetry(row);
+            }
+            public int getRowCount() {
+                return context.getTelemetryCount();
+            }
+            public Class<String> getDataClass() {
+                return String.class;
+            }
+            public boolean isRowEditable(int row) {
+                return false;
+            }
+            public void setValueAt(String val, int row) {
                 ;
             }
         });
 
-        ArrayList<TableColumn> settings = new ArrayList<TableColumn>();
-        settings.add( new TableColumn() {
-            public String	getName() {
+        ArrayList<TableColumn<?>> settings = new ArrayList<TableColumn<?>>();
+        settings.add( new TableColumn<String>() {
+            public String getName() {
                 return "name";
             }
-            public Object	getValueAt(int row) {
+            public String getValueAt(int row) {
                 if(row < settingList.size())
                     return settingList.get(row).getName();
                 return "#"+row;
             }
-            public int		getRowCount() {
+            public int getRowCount() {
                 return settingList.size();
             }
-            public Class	getDataClass() {
+            public Class<String> getDataClass() {
                 return String.class;
             }
-            public boolean	isRowEditable(int row) {
+            public boolean isRowEditable(int row) {
                 return false;
             }
-            public void		setValueAt(Object val, int row) {
+            public void setValueAt(String val, int row) {
                 ;
             }
         });
-        settings.add( new TableColumn() {
-            public String	getName() {
+        settings.add( new TableColumn<String>() {
+            public String getName() {
                 return "Setting";
             }
-            public Object	getValueAt(int row) {
+            public String getValueAt(int row) {
                 float val = settingList.get(row).getVal();
                 return " "+val;
             }
-            public int		getRowCount() {
+            public int getRowCount() {
                 return settingList.size();
             }
-            public Class	getDataClass() {
+            public Class<String> getDataClass() {
                 return String.class;
             }
-            public boolean	isRowEditable(int row) {
+            public boolean isRowEditable(int row) {
                 return true;
             }
-            public void		setValueAt(Object val, int row) {
-                if(val.getClass()==Float.class) {
-                    settingList.pushSetting(row,(Float)val);
-                    System.out.println("Setting New Value "+(Float)val);
-                } else if(val.getClass()==String.class) {
-                    Float newVal = Float.valueOf((String)val);
-                    if(settingList.get(row).outsideOfBounds(newVal)) {
-                        JFrame mf = new JFrame("Warning");
-                        JOptionPane.showMessageDialog(mf, "Caution: new value is outside of logical bounds");
-                    }
-                    settingList.pushSetting(row,newVal);
+            public void setValueAt(String val, int row) {
+                Float newVal = Float.valueOf((String)val);
+                if(settingList.get(row).outsideOfBounds(newVal)) {
+                    JFrame mf = new JFrame("Warning");
+                    JOptionPane.showMessageDialog(mf, "Caution: new value is outside of logical bounds");
                 }
+                settingList.pushSetting(row,newVal);
             }
         });
 
