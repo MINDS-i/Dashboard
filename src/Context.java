@@ -107,25 +107,20 @@ public class Context {
     public SerialPort port() {
         return port;
     }
-
     public String getInstanceLogName() {
         return instanceLogName;
     }
-
     public ResourceBundle loadResourceBundle(String name) {
         return ResourceBundle.getBundle("resources", locale);
     }
-
     public String getResource(String name) {
         return resources.getString(name);
     }
-
     public String getResource(String name, String otherwise) {
         String rtn = getResource(name);
         if(rtn == null) return otherwise;
         return rtn;
     }
-
     public void waypointUpdated() {
         Iterator it = waypointViewers.iterator();
         while(it.hasNext()) ((ContextViewer)it.next()).waypointUpdate();
@@ -138,7 +133,6 @@ public class Context {
     public void removeViewer(ContextViewer viewer) {
         waypointViewers.remove(viewer);
     }
-
     public void sendSetting(int index) {
         settingList.pushSetting(index);
     }
@@ -148,7 +142,6 @@ public class Context {
     public void setSettingQuiet(int index, float value) {
         settingList.updateSettingVal(index, value);
     }
-
     public void setTelemetry(int id, float value) {
         telemetry.updateTelemetry(id, (double)value);
     }
