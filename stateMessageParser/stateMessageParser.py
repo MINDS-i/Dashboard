@@ -7,6 +7,12 @@ to contain /*# followed by a state name (no spaces). All text following the
 first space after the state name is considered the description.
 /*#STATE_NAME ...description...*/
 
+It also allows a multiline version which cleans off the left margin before the
+'*' so they can be embedded in the natural indentation level of the code
+/*#STATE_NAME ...description...
+ * ...more description ...
+ */
+
 The names and description will be dumped to an XML file the Dashboard can use
 to provide more detailed information about errors it receives containing the
 state name string.
@@ -19,7 +25,11 @@ import sys, os, re
 import xml.etree.ElementTree as ET
 
 FILETYPES = {'.ino', '.h', '.c', '.hpp', '.cpp'}
-MSG_REGEX = re.compile("""/\*#(\w*) (.*)\*/""")
+MSG_REGEX = re.compile("""/\*#(\w*) (.*?)\*/""", re.DOTALL)
+
+def formatMsg(msg):
+    """ Clean the raw regex match of multiline comment left margin *'s """
+    return re.sub(r'\n\s*\* ?', ' ', msg, flags=re.MULTILINE)
 
 def hasExtension(name, extList):
     """ Returns true if `name` has an extension that appears in `extList` """
@@ -42,7 +52,7 @@ class Message:
     def __init__(self, path, match):
         self.name = match[0]
         self.path = path
-        self.text = match[1]
+        self.text = formatMsg(match[1])
 
 # check args
 if len(sys.argv) != 3:
