@@ -40,7 +40,7 @@ public class Dashboard implements Runnable {
                                                 "Rol:", "MPH:", "Vcc:", "Amp:"
                                                };
     private Collection<DataLabel> displays = new ArrayList<DataLabel>(dataLabels.length);
-    private Context context = new Context();
+    private Context context;
 
     private final Logger seriallog = Logger.getLogger("d.serial");
     private final Logger iolog = Logger.getLogger("d.io");
@@ -58,6 +58,7 @@ public class Dashboard implements Runnable {
             loading.pack();
             loading.setVisible(true);
             //initialize the major classes into the context
+            context = new Context();
             context.give(this,
                          new SerialSender(context),
                          new SerialParser(context),
