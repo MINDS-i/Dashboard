@@ -32,9 +32,13 @@ public class Context {
     private Vector<ContextViewer> waypointViewers;
     private ResourceBundle resources;
     private Properties persist;
-    private static final String persistanceFile =
-        "./resources/persist/persist.properties";
+/*    private static final String persistanceFile =
+        "./resources/persist/persist.properties";*/
+    private static final File persistanceFile =
+        new File("./resources/persist/persist.properties");
     private final String instanceLogName;
+
+    private final Logger ioerr = Logger.getLogger("d.io");
 
     public Context() {
         connected = false;
@@ -45,12 +49,20 @@ public class Context {
         instanceLogName = sdf.format(cal.getTime());
 
         persist = new Properties();
-        try(FileInputStream file = new FileInputStream(persistanceFile)) {
-            persist.load(file);
+        try {
+            if(!persistanceFile.exists()) {
+                persistanceFile.getParentFile().mkdirs();
+                persistanceFile.createNewFile();
+            }
+            InputStream is =new FileInputStream(persistanceFile);
+            persist.load(is);
+            is.close();
         } catch (Exception e) {
+            ioerr.severe("Failed to open and read persistance file");
             e.printStackTrace();
+        } finally {
+            loadLocale(); // defaults to "air" mode
         }
-        loadLocale();
     }
     public void toggleLocale() {
         String current = (String) persist.get("subject");
@@ -60,13 +72,12 @@ public class Context {
             persist.put("subject","air");
         }
         saveProps();
-        //loadLocale();
     }
     private void saveProps() {
         try(FileOutputStream file = new FileOutputStream(persistanceFile)) {
             persist.store(file, "");
         } catch (Exception e) {
-            Logger.getLogger("d.io").severe("Can't save persist props "+e);
+            ioerr.severe("Can't save persist props "+e);
         }
     }
     private void loadLocale() {
