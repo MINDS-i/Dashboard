@@ -85,7 +85,6 @@ public class SettingList {
                     case XMLStreamConstants.END_ELEMENT:
                         if(tmp != null) {
                             tmp.description = str.toString();
-                            settingData.add(tmp);
                             str = new StringBuilder();
                         }
                         tmp = null;

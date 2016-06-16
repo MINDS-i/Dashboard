@@ -153,12 +153,12 @@ public class DataWindow implements ActionListener {
 
         //JTable telTable, setTable;
         JScrollPane telScroll, setScroll;
-        telModel	= new ColumnTableModel(telem);
-        telTable	= new JTable(telModel);
-        telScroll	= new JScrollPane(telTable);
-        setModel	= new ColumnTableModel(settings);
-        setTable	= new JTable(setModel);
-        setScroll	= new JScrollPane(setTable);
+        telModel  = new ColumnTableModel(telem);
+        telTable  = new JTable(telModel);
+        telScroll = new JScrollPane(telTable);
+        setModel  = new ColumnTableModel(settings);
+        setTable  = new JTable(setModel);
+        setScroll = new JScrollPane(setTable);
 
         telTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         telTable.setFillsViewportHeight(true);
@@ -175,7 +175,7 @@ public class DataWindow implements ActionListener {
 
         Border tableBorders = BorderFactory.createCompoundBorder(
                                   BorderFactory.createEmptyBorder(5, 5, 5, 5),
-                                  BorderFactory.createLineBorder(Color.BLACK)  );
+                                  BorderFactory.createLineBorder(Color.BLACK) );
         setScroll.setBorder(tableBorders);
         telScroll.setBorder(tableBorders);
 
