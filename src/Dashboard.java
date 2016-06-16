@@ -76,6 +76,7 @@ public class Dashboard implements Runnable {
 
     private void initLogging() {
         Logger root = rootlog;
+        root.setUseParentHandlers(false);
         root.setLevel(Level.ALL);
 
         java.util.logging.Formatter simpleForm = new java.util.logging.Formatter() {
