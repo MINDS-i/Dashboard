@@ -47,6 +47,7 @@ class TileServer implements MapSource {
     private java.util.List<Component> repaintListeners = new LinkedList<Component>();
     private Map<TileTag, Image> cache = new ConcurrentHashMap<TileTag, Image>(CACHE_SIZE+1, 1.0f);
     private final String rootURL;
+    // Keep track of the map position on the last draw to trigger new tile loads
     private TileTag centerTag = new TileTag(0,0,0);
 
     TileServer(String url) {
@@ -58,6 +59,8 @@ class TileServer implements MapSource {
             tileLoader.interrupt();
         }
         cache.clear();
+        // reset the center tag to trigger tile loads immediatly on next draw
+        centerTag = new TileTag(0,0,0);
     }
 
     public void paint(Graphics2D gd, Point2D center, int scale, int width, int height) {
@@ -114,6 +117,7 @@ class TileServer implements MapSource {
         }
         g2d.dispose();
 
+        // Start loading new tiles if the center tag has changed
         TileTag newCenterTag = new TileTag(rowB + wit/2, colB + hit/2, zoom);
         if(!newCenterTag.equals(centerTag)) {
             centerTag = newCenterTag;
