@@ -45,7 +45,7 @@ public class Context {
         waypointViewers  = new Vector<ContextViewer>();
 
         Calendar cal = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("HH-mm_MM-dd_yyyyGG");
+        SimpleDateFormat sdf = new SimpleDateFormat("MMdd_HHmm_yyyyGG");
         instanceLogName = sdf.format(cal.getTime());
 
         persist = new Properties();
