@@ -23,36 +23,15 @@ followed by the destination filename for XML message database"""
 
 import sys, os, re
 import xml.etree.ElementTree as ET
+from common import *
 
-FILETYPES = {'.ino', '.h', '.c', '.hpp', '.cpp'}
 MSG_REGEX = re.compile("""/\*#(\w*) (.*?)\*/""", re.DOTALL)
-
-def formatMsg(msg):
-    """ Clean the raw regex match of multiline comment left margin *'s """
-    return re.sub(r'\n\s*\* ?', ' ', msg, flags=re.MULTILINE)
-
-def hasExtension(name, extList):
-    """ Returns true if `name` has an extension that appears in `extList` """
-    _, foundExt = os.path.splitext(name)
-    return any(map(lambda e: foundExt == e, extList))
-
-def filesUnder(directory):
-    """ Returns a list of files found recursivly under `directory` """
-    files = list()
-    for root,_,names in os.walk(directory):
-        files += [os.path.join(root,n) for n in names]
-    return files
-
-def getMatches(file, regex):
-    """ Returns a list of all passages in `file` matching `regex` """
-    source = open(file, "r")
-    return [x for x in regex.findall(source.read())]
 
 class Message:
     def __init__(self, path, match):
         self.name = match[0]
         self.path = path
-        self.text = formatMsg(match[1])
+        self.text = removeStarGutter(match[1])
 
 # check args
 if len(sys.argv) != 3:
@@ -62,7 +41,7 @@ searchDir = sys.argv[1]
 destFile = sys.argv[2]
 
 # find messages
-filesToScan = [f for f in filesUnder(searchDir) if hasExtension(f,FILETYPES)]
+filesToScan = [f for f in filesUnder(searchDir) if hasExtension(f,ARDUINO_FILES)]
 messages = list()
 for f in filesToScan:
     path = f[len(searchDir):] # show path relative to search folder

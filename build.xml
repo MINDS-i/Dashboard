@@ -108,6 +108,10 @@
           <arg value="${DroneLibsDir}"/>
           <arg value="${MessageDbFile}"/>
         </exec>
+        <exec executable="${settingsDbTool}">
+          <arg value="${DroneLibsDir}"/>
+          <arg value="${resourceDir}"/>
+        </exec>
     </target>
 
     <target name="export_graph" depends="compile">

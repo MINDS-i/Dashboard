@@ -13,6 +13,9 @@ graph.jar
 Dashboard.zip
 test.png
 resources/stateMessageDb.xml
-stateMessageParser/test/
+resources/airSettings.xml
+resources/groundSettings.xml
+sourceExtraction/test/
+sourceExtraction/__pycache__/
 DashBoard.zip
 resources/persist/*
