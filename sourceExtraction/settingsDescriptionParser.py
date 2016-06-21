@@ -25,7 +25,7 @@ from common import *
 
 SETTING_TYPES = [("AIRSETTING","airSettings.xml"),
                  ("GROUNDSETTING","groundSettings.xml")]
-MSG_REGEX = re.compile("""/\*(\w+) ([^\n]*)(.*?)\*/""", re.DOTALL)
+MSG_REGEX = re.compile("""/\*(\w+)\s([^\n]*)(.*?)\*/""", re.DOTALL)
 
 # check args
 if len(sys.argv) != 3:

@@ -25,7 +25,7 @@ import sys, os, re
 import xml.etree.ElementTree as ET
 from common import *
 
-MSG_REGEX = re.compile("""/\*#(\w*) (.*?)\*/""", re.DOTALL)
+MSG_REGEX = re.compile("""/\*#(\w*)\s(.*?)\*/""", re.DOTALL)
 
 class Message:
     def __init__(self, path, match):
