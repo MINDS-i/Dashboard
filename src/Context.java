@@ -122,7 +122,7 @@ public class Context {
         return instanceLogName;
     }
     public ResourceBundle loadResourceBundle(String name) {
-        return ResourceBundle.getBundle("resources", locale);
+        return ResourceBundle.getBundle(name, locale);
     }
     public String getResource(String name) {
         return resources.getString(name);
