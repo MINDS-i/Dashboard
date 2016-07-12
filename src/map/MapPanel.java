@@ -30,8 +30,8 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
     private static final float ZOOM_FACTOR = 1.1f;
 
     private MapSource[] mapSources = new MapSource[] {
-        new TileServer("http://otile1.mqcdn.com/tiles/1.0.0/sat"),
-        new TileServer("http://otile1.mqcdn.com/tiles/1.0.0/map"),
+        new TileServer("http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.png"),
+        new TileServer("http://a.tile.thunderforest.com/outdoors/{z}/{x}/{y}.png"),
     };
     private int mapSourceIndex = 0;
     private MapSource mapSource = mapSources[0];

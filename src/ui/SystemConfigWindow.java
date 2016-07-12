@@ -13,9 +13,9 @@ import javax.swing.text.*;
 public class SystemConfigWindow {
     private Context context;
     protected static final String COPY_RIGHT_TEXT =
-        "Map Tiles Courtesy of MapQuest" +
-        "\nStreet Data from OpenStreetMap\nPortions Courtesy NASA/JPL-Caltech" +
-        " and\nU.S. Depart. of Agriculture, Farm Service Agency";
+        "Map data courtesy of\n" +
+        "Esri, DigitalGlobe, Earthstar Geographics, CNES/Airbus DS, GeoEye, USDA FSA, USGS, Getmapping, Aerogrid, IGN, IGP, and the GIS User Community\n"+
+        "Maps © www.thunderforest.com, Data © www.osm.org/copyright";
 
     public SystemConfigWindow(Context cxt) {
         this.context = cxt;

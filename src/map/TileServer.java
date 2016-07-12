@@ -358,17 +358,12 @@ class TileServer implements MapSource {
                    y >=     0 && y <  (1 << z)   ;
         }
         URL getURL(String rootURL) {
-            StringBuilder sb = new StringBuilder(rootURL);
-            sb.append("/");
-            sb.append(z);
-            sb.append("/");
-            sb.append(x);
-            sb.append("/");
-            sb.append(y);
-            sb.append(".png");
+            String url = rootURL.replaceAll("\\{[xX]\\}", ""+x)
+                                .replaceAll("\\{[yY]\\}", ""+y)
+                                .replaceAll("\\{[zZ]\\}", ""+z);
             URL res = null;
             try {
-                res = new URL(sb.toString());
+                res = new URL(url);
             } catch (Exception e) {
                 e.printStackTrace();
             }
