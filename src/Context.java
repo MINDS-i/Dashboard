@@ -32,8 +32,7 @@ public class Context {
     private Vector<ContextViewer> waypointViewers;
     private ResourceBundle resources;
     private Properties persist;
-/*    private static final String persistanceFile =
-        "./resources/persist/persist.properties";*/
+
     private static final File persistanceFile =
         new File("./resources/persist/persist.properties");
     private final String instanceLogName;

@@ -58,6 +58,7 @@ public class Dashboard implements Runnable {
             loading.pack();
             loading.setVisible(true);
             //initialize the major classes into the context
+            createLogDirectory();
             context = new Context();
             context.give(this,
                          new SerialSender(context),
@@ -71,6 +72,16 @@ public class Dashboard implements Runnable {
         } catch (IOException e) {
             rootlog.severe("Dashboard startup failure: "+e.toString());
             displayErrorPopup((Exception)e);
+        }
+    }
+
+    private void createLogDirectory(){
+        File logDir = new File("log");
+        try{
+            logDir.mkdir();
+        } catch (Exception e){
+            System.err.println("Cannot create log directory");
+            e.printStackTrace();
         }
     }
 
