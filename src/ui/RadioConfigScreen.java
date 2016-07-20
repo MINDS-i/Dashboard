@@ -37,7 +37,24 @@ public class RadioConfigScreen extends JPanel {
     }
 
     class TelemRadio {
-        static final long RESPONSE_READ_WAIT_TIME = 1500;
+        final long RESPONSE_READ_WAIT_TIME = 1500;
+        final int[][] RADIO_DEFAULTS = new int[][]{
+            {1, 9}, // Serial speed = 9 (9600 baud)
+            {2, 32}, // Air Speed = 32 (32K baud)
+            {3, 25}, // Net ID
+            {4, 20}, // TXPOWER
+            {5, 1}, // ECC = 1 on
+            {6, 0}, // Mavlink = 0 off
+            {7, 1}, // OPPRESEND = 0 off
+            {8, 915000}, // MIN_FREQ
+            {9, 928000}, // MAX_FREQ
+            {10, 50}, // NUM_CHANNELS
+            {11, 100}, // DUTY_CYCLE
+            {12, 0}, // LBT_RSSI off
+            {13, 0}, // Manchester off
+            {14, 0}, // RTSCTS off
+            {15, 131} // MAX_WINDOW
+        };
         SerialPort port = null;
         java.util.List<Setting> settings = new ArrayList<Setting>();
         public TelemRadio() {}
@@ -68,7 +85,8 @@ public class RadioConfigScreen extends JPanel {
                 e.printStackTrace();
             }
 
-            return port.readString();
+            String response = port.readString();
+            return (response == null)? "" : response;
         }
 
         final Pattern settingRegex = Pattern.compile("S(\\d+):(.+)=(\\d+)");
@@ -90,6 +108,16 @@ public class RadioConfigScreen extends JPanel {
                 int value = Integer.valueOf(matcher.group(3));
                 settings.add(new Setting(id,name,value));
             }
+
+            if(settings.size() == 0) {
+                JFrame mf = new JFrame("Radio did not respond");
+                JOptionPane.showMessageDialog(mf,
+                    "The radio did not respond to a request to lead setting " +
+                    "data.\n Check its connection to the computer and that the"+
+                    " correct baud rate is selected.\nNote that factory radios"+
+                    " use 57600 baud but radios configured for MINDS-i drones" +
+                    " operate at 9600 baud.");
+            }
         }
         int getIndexByID(int id) {
             for(int i=0; i<settings.size(); i++) {
@@ -101,22 +129,31 @@ public class RadioConfigScreen extends JPanel {
             return -1;
         }
         void updateValue(int i, int val) {
-            Setting changed = settings.get(i);
-            int orig = changed.value;
-            changed.value = val;
+            Setting setting = settings.get(i);
+            if(setting.value == val) return;
+
+            // Write the value so it will return the `getWriteCmd` we want
+            int original = setting.value;
+            setting.value = val;
+
             String rsp = "";
             boolean failed = false;
             try {
-                rsp = getResponse(changed.getWriteCmd());
+                rsp = getResponse(setting.getWriteCmd());
             } catch (Exception e) {
                 failed = true;
                 e.printStackTrace();
             }
+
             if(!rsp.contains("OK")) failed = true;
+
             if(failed) {
-                changed.value = orig;
+                setting.value = original;
                 JFrame mf = new JFrame("Error changing setting");
-                JOptionPane.showMessageDialog(mf, "Error:\n"+rsp);
+                JOptionPane.showMessageDialog(mf,
+                    "Setting could not be updated.\nRadio response:\n"+rsp);
+            } else {
+                enableSaveButton();
             }
         }
         void writeToEEPROM() {
@@ -129,9 +166,10 @@ public class RadioConfigScreen extends JPanel {
             }
         }
         void writeDefaults() {
-            updateValue(getIndexByID(1), 9); //serial speed = 9600
-            updateValue(getIndexByID(2), 32);//air speed = 32k
-            updateValue(getIndexByID(6), 0); //mavlink mode off
+            for(int i=0; i<RADIO_DEFAULTS.length; i++){
+                updateValue(getIndexByID(RADIO_DEFAULTS[i][0]),
+                            RADIO_DEFAULTS[i][1]);
+            }
         }
     }
 
@@ -144,15 +182,22 @@ public class RadioConfigScreen extends JPanel {
             radio = new TelemRadio(newConnection);
             settingTable.invalidate();
             defsButton.setEnabled(true);
-            saveButton.setEnabled(true);
         }
         public void disconnectRequest() {
             radio = new TelemRadio();
             settingTable.invalidate();
             defsButton.setEnabled(false);
-            saveButton.setEnabled(false);
+            disableSaveButton();
         }
     };
+
+    private void enableSaveButton(){
+        saveButton.setEnabled(true);
+    }
+
+    private void disableSaveButton(){
+        saveButton.setEnabled(false);
+    }
 
     public RadioConfigScreen() {
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
@@ -176,17 +221,18 @@ public class RadioConfigScreen extends JPanel {
     }
     private Action saveAction = new AbstractAction() {
         {
-            String text = "Save Settings";
+            String text = "Save Changes";
             putValue(Action.NAME, text);
             putValue(Action.SHORT_DESCRIPTION, text);
         }
         public void actionPerformed(ActionEvent e) {
             radio.writeToEEPROM();
+            disableSaveButton();
         }
     };
     private Action loadDefualtsAction = new AbstractAction() {
         {
-            String text = "Write Defaults";
+            String text = "Import Defaults";
             putValue(Action.NAME, text);
             putValue(Action.SHORT_DESCRIPTION, text);
         }
