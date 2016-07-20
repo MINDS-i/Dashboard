@@ -6,8 +6,11 @@ import com.serial.Serial;
 import jssc.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.*;
 import java.util.*;
+import java.util.regex.*;
 import java.nio.charset.Charset;
 import com.table.TableColumn;
 import com.table.ColumnTableModel;
@@ -24,16 +27,6 @@ public class RadioConfigScreen extends JPanel {
             this.value = value;
             this.name = name;
         }
-        public Setting(String line) {
-            String set = line.substring(1);
-            String[] idSplit = set.split("[:=\\n\\r]");
-            String id    = idSplit[0];
-            String name  = idSplit[1];
-            String value = idSplit[2];
-            this.id    = Integer.parseInt(id);
-            this.value = Integer.parseInt(value);
-            this.name  = name;
-        }
         @Override
         public String toString() {
             return "S"+id+":"+name+"="+value;
@@ -43,59 +36,43 @@ public class RadioConfigScreen extends JPanel {
         }
     }
 
-    class TelemRadio { //put this in its own file soon
+    class TelemRadio {
+        static final long RESPONSE_READ_WAIT_TIME = 1500;
         SerialPort port = null;
         java.util.List<Setting> settings = new ArrayList<Setting>();
         public TelemRadio() {}
         public TelemRadio(SerialPort port) {
             this.port = port;
             try {
-                Thread.sleep(1100);
+                Thread.sleep(RESPONSE_READ_WAIT_TIME);
                 port.writeString("+++");
-                Thread.sleep(1100);
+                Thread.sleep(RESPONSE_READ_WAIT_TIME);
                 port.readString();
                 loadSettings();
             } catch (Exception e) {
                 System.err.println("Failed to communicate with radio");
                 e.printStackTrace();
             }
-
-            for(Setting s : settings) {
-                System.out.println(s.toString());
-            }
         }
         synchronized String getResponse(String call) throws SerialPortException {
+            // Clear any buffered input
+            port.readString();
+
+            // Write the command
             port.writeBytes(call.getBytes(Charset.forName("US-ASCII")));
 
-            StringBuffer output = new StringBuffer();
-            class Bool {
-                public boolean val = false;
-                public Bool() {}
+            // Wait for data to return
+            try {
+                Thread.sleep(RESPONSE_READ_WAIT_TIME);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            final Bool stopped = new Bool();
-            SerialPortEventListener listener = new SerialPortEventListener() {
-                public void serialEvent(SerialPortEvent e) {
-                    try {
-                        output.append(port.readString());
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-                    stopped.val = false;
-                }
-            };
-            port.addEventListener(listener);
-            while(!stopped.val) {
-                stopped.val = true;
-                try {
-                    Thread.sleep(150);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            port.removeEventListener();
 
-            return output.toString();
+            return port.readString();
         }
+
+        final Pattern settingRegex = Pattern.compile("S(\\d+):(.+)=(\\d+)");
+
         void loadSettings() {
             String rsp = "";
             try {
@@ -105,11 +82,13 @@ public class RadioConfigScreen extends JPanel {
                 return;
             }
 
-            for(String line : rsp.split("\n")) {
-                if(line.length() <= 1) continue;
-                if(line.charAt(0) != 'S') continue;
-                Setting found = new Setting(line);
-                settings.add(found);
+            Matcher matcher = settingRegex.matcher(rsp);
+
+            while(matcher.find()){
+                int id = Integer.valueOf(matcher.group(1));
+                String name = matcher.group(2);
+                int value = Integer.valueOf(matcher.group(3));
+                settings.add(new Setting(id,name,value));
             }
         }
         int getIndexByID(int id) {
@@ -143,6 +122,7 @@ public class RadioConfigScreen extends JPanel {
         void writeToEEPROM() {
             try {
                 String rsp = getResponse("\r\nAT&W\r\n");
+                System.out.println("Response Read");
                 System.out.println(rsp);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -276,7 +256,7 @@ public class RadioConfigScreen extends JPanel {
                 radio.updateValue(row, val);
             }
         });
-        ColumnTableModel setModel    = new ColumnTableModel(setCols);
+        ColumnTableModel setModel = new ColumnTableModel(setCols);
         JTable table = new JTable(setModel);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         table.setFillsViewportHeight(true);
