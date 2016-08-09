@@ -115,11 +115,17 @@ public class SerialConnectPanel extends JPanel {
         (new Thread(disconnectSerial)).start();
     }
     private void disconnectDone() {
+        refreshDropDown();
         refreshButton.setEnabled(true);
         dropDown.setEnabled(true);
         connectButton.setEnabled(true);
         connectButton.setText(BUTTON_DISCONNECTED);
         inProgress = false;
+    }
+
+    private void refreshDropDown(){
+        dropDown.removeAllItems();
+        addSerialList(dropDown);
     }
 
     Action refreshAction = new AbstractAction() {
@@ -130,8 +136,7 @@ public class SerialConnectPanel extends JPanel {
         }
         public void actionPerformed(ActionEvent e) {
             if(inProgress) return;
-            dropDown.removeAllItems();
-            addSerialList(dropDown);
+            refreshDropDown();
             SerialConnectPanel.this.updateUI();
         }
     };
@@ -157,9 +162,17 @@ public class SerialConnectPanel extends JPanel {
 
     private Runnable connectSerial = new Runnable() {
         public void run() {
-            if(dropDown.getSelectedItem() == null) return;
+            String portName = (String)dropDown.getSelectedItem();
+            String[] validNames = SerialPortList.getPortNames();
+            boolean nameStillExists = false;
+            for(String s : validNames) nameStillExists |= s.equals(portName);
 
-            SerialPort serialPort = new SerialPort((String)dropDown.getSelectedItem());
+            if (!nameStillExists) {
+                disconnectDone();
+                return;
+            }
+
+            SerialPort serialPort = new SerialPort(portName);
 
             try {
                 serialPort.openPort();
