@@ -34,11 +34,15 @@ class RoverPath implements Layer, ContextViewer {
         context.telemetry.registerListener(Serial.LATITUDE, new TelemetryListener() {
             public void update(double data) {
                 rover.setLatitude( data );
+                // fire event to waypoint listeners that the rover has moved
+                context.waypointUpdated();
             }
         });
         context.telemetry.registerListener(Serial.LONGITUDE, new TelemetryListener() {
             public void update(double data) {
                 rover.setLongitude( data );
+                // fire event to waypoint listeners that the rover has moved;
+                context.waypointUpdated();
             }
         });
     }
@@ -52,7 +56,6 @@ class RoverPath implements Layer, ContextViewer {
     }
 
     public void waypointUpdate() {
-        //direct parent to repaint?
     }
 
     public boolean onClick(MouseEvent e) {
