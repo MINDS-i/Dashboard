@@ -37,6 +37,8 @@ public class Dashboard implements Runnable {
     private static final int START_HEIGHT = 820; //default window height
     private Context context;
 
+    private TelemetryWidget dataWidget;
+
     private final Logger seriallog = Logger.getLogger("d.serial");
     private final Logger iolog = Logger.getLogger("d.io");
     private final Logger rootlog = Logger.getLogger("d");
@@ -160,73 +162,27 @@ public class Dashboard implements Runnable {
         JPanel topGauge   = AngleWidget.createDial(context, Serial.PITCH, context.theme.roverTop);
         JPanel frontGauge = AngleWidget.createDial(context, Serial.ROLL, context.theme.roverFront);
 
-        /*Collection<TelemetryWidget.LineItem> items = new ArrayList<TelemetryWidget.LineItem>();
-        items.add(new TelemetryWidget.LineItem("Lat:",0));
-        items.add(new TelemetryWidget.LineItem("Lon:",1));
-        items.add(new TelemetryWidget.LineItem("Dir:",2));
-        JPanel dataPanel = TelemetryWidget.create(context, 13, items);*/
-        JPanel dataPanel = null;
         try {
-            dataPanel = TelemetryWidget.fromXML(context, "telemetryWidetSpec");
+            dataWidget = TelemetryWidget.fromXML(context, "telemetryWidetSpec");
         } catch(Exception e) {
             iolog.severe("Failed to load telemetry widget line spec "+e);
             e.printStackTrace();
         }
 
-
-        /*final int[] dataBorderSize = {15,18,46,18};//top,left,bottom,right
-        final String dataLabels[] = {
-        "Lat:",
-        "Lng:",
-        "Dir:",
-        "Ptc:",
-        "Rol:",
-        "MPH:",
-        "Vcc:",
-        "Amp:" };
-        Collection<DataLabel> displays = new ArrayList<DataLabel>(dataLabels.length);
-
-        NinePatchPanel dataPanel = new NinePatchPanel(context.theme.screenPatch);
-        dataPanel.setBorder(new EmptyBorder(dataBorderSize[0],
-                                            dataBorderSize[1],
-                                            dataBorderSize[2],
-                                            dataBorderSize[3]) );
-        dataPanel.setLayout(new BoxLayout(dataPanel, BoxLayout.PAGE_AXIS));
-        dataPanel.setOpaque(false);
-        for(int i=0; i<dataLabels.length; i++) {
-            DataLabel label = new DataLabel(dataLabels[i]);
-            label.setMaxLength(13);
-            context.telemetry.registerListener(i, label);
-            label.setForeground(context.theme.textColor);
-            label.setFont(context.theme.text);
-            dataPanel.add(label);
-        }*/
-
-
-
-
-
         JPanel dashPanel = new JPanel();
-        dashPanel.setLayout(new GridBagLayout());
         dashPanel.setOpaque(false);
-        GridBagConstraints c = new GridBagConstraints();
-        c.gridy = 1;
-        dashPanel.add(dataPanel,c);
-        c.gridy = 2;
-        dashPanel.add(frontGauge,c);
-        c.gridy = 3;
-        dashPanel.add(topGauge,c);
-        c.gridy = 4;
-        dashPanel.add(sideGauge,c);
+
+        dashPanel.setLayout(new BoxLayout(dashPanel, BoxLayout.PAGE_AXIS));
+        dashPanel.add(dataWidget);
+        dashPanel.add(frontGauge);
+        dashPanel.add(topGauge);
+        dashPanel.add(sideGauge);
 
         return dashPanel;
     }
 
     private void resetData() {
-
-        /*for(DataLabel label : displays) {
-            label.update(0);
-        }*/
+        dataWidget.reset();
     }
 
     public static void displayErrorPopup(Exception e) {
