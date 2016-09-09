@@ -35,11 +35,6 @@ import jssc.SerialPortList;
 public class Dashboard implements Runnable {
     private static final int START_WIDTH  = 820; //default window width
     private static final int START_HEIGHT = 820; //default window height
-    private static final int[] dataBorderSize = {15,18,46,18};//top,left,bottom,right
-    private static final String dataLabels[] = {"Lat:", "Lng:", "Dir:", "Ptc:",
-                                                "Rol:", "MPH:", "Vcc:", "Amp:"
-                                               };
-    private Collection<DataLabel> displays = new ArrayList<DataLabel>(dataLabels.length);
     private Context context;
 
     private final Logger seriallog = Logger.getLogger("d.serial");
@@ -140,7 +135,7 @@ public class Dashboard implements Runnable {
                                          new Point(0,0),
                                          4, // default zoom level
                                          serialPanel,
-                                         makeDashPanel(),
+                                         createRightPanel(),
                                          messageBox);
 
         f.add(mapPanel);
@@ -160,19 +155,36 @@ public class Dashboard implements Runnable {
         return ap;
     }
 
-    private JPanel makeDashPanel() {
-        RotatePanel sideGauge  = new RotatePanel(context.theme.roverSide,
-                                                 context.theme.gaugeBackground,
-                                                 context.theme.gaugeGlare);
-        RotatePanel topGauge   = new RotatePanel(context.theme.roverTop,
-                                                 context.theme.gaugeBackground,
-                                                 context.theme.gaugeGlare);
-        RotatePanel frontGauge = new RotatePanel(context.theme.roverFront,
-                                                 context.theme.gaugeBackground,
-                                                 context.theme.gaugeGlare);
-        context.telemetry.registerListener(Serial.HEADING, topGauge);
-        context.telemetry.registerListener(Serial.PITCH, sideGauge);
-        context.telemetry.registerListener(Serial.ROLL, frontGauge);
+    private JPanel createRightPanel() {
+        JPanel sideGauge  = AngleWidget.createDial(context, Serial.HEADING, context.theme.roverSide);
+        JPanel topGauge   = AngleWidget.createDial(context, Serial.PITCH, context.theme.roverTop);
+        JPanel frontGauge = AngleWidget.createDial(context, Serial.ROLL, context.theme.roverFront);
+
+        /*Collection<TelemetryWidget.LineItem> items = new ArrayList<TelemetryWidget.LineItem>();
+        items.add(new TelemetryWidget.LineItem("Lat:",0));
+        items.add(new TelemetryWidget.LineItem("Lon:",1));
+        items.add(new TelemetryWidget.LineItem("Dir:",2));
+        JPanel dataPanel = TelemetryWidget.create(context, 13, items);*/
+        JPanel dataPanel = null;
+        try {
+            dataPanel = TelemetryWidget.fromXML(context, "telemetryWidetSpec");
+        } catch(Exception e) {
+            iolog.severe("Failed to load telemetry widget line spec "+e);
+            e.printStackTrace();
+        }
+
+
+        /*final int[] dataBorderSize = {15,18,46,18};//top,left,bottom,right
+        final String dataLabels[] = {
+        "Lat:",
+        "Lng:",
+        "Dir:",
+        "Ptc:",
+        "Rol:",
+        "MPH:",
+        "Vcc:",
+        "Amp:" };
+        Collection<DataLabel> displays = new ArrayList<DataLabel>(dataLabels.length);
 
         NinePatchPanel dataPanel = new NinePatchPanel(context.theme.screenPatch);
         dataPanel.setBorder(new EmptyBorder(dataBorderSize[0],
@@ -188,7 +200,11 @@ public class Dashboard implements Runnable {
             label.setForeground(context.theme.textColor);
             label.setFont(context.theme.text);
             dataPanel.add(label);
-        }
+        }*/
+
+
+
+
 
         JPanel dashPanel = new JPanel();
         dashPanel.setLayout(new GridBagLayout());
@@ -207,9 +223,10 @@ public class Dashboard implements Runnable {
     }
 
     private void resetData() {
-        for(DataLabel label : displays) {
+
+        /*for(DataLabel label : displays) {
             label.update(0);
-        }
+        }*/
     }
 
     public static void displayErrorPopup(Exception e) {

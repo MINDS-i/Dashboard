@@ -10,6 +10,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.xml.stream.*;
 import java.text.ParseException;
 
+/**
+ * Read and contain a map of short state description Strings to full length
+ * descriptions that have been taken from the drone source code comments
+ * and put into an xml database
+ */
 public class StateMap {
     private Map<String,Description> map;
     /** Create a StateMap using the data in `xmlDatabase` */

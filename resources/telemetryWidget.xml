@@ -1,0 +1,10 @@
+<telemetryWidget width="13">
+    <line label="Lat:" index="0"/>
+    <line label="Lng:" index="1"/>
+    <line label="Dir:" index="2"/>
+    <line label="Ptc:" index="3"/>
+    <line label="Rol:" index="4"/>
+    <line label="MPH:" index="5"/>
+    <line label="Vcc:" index="6"/>
+    <line label="Amp:" index="7"/>
+</telemetryWidget>

@@ -7,16 +7,37 @@ import javax.swing.*;
 import java.awt.FontMetrics;
 import java.awt.image.BufferedImage;
 
-public class RotatePanel extends JPanel implements TelemetryListener {
+import com.Context;
+
+public class AngleWidget extends JPanel implements TelemetryListener {
+    /**
+     * Create a new AngleWidget instance that displays the values in a given
+     * telemetry index interpreted as angles by applying them to an image in
+     * a dial
+     * @param ctx         Dashboard context instance
+     * @param telemetryID Telemetry index with angles in degrees
+     * @param indicator   The image to rotate according to the telemetry data
+     */
+    public static AngleWidget createDial(
+      Context ctx,
+      int telemetryID,
+      BufferedImage indicator){
+        AngleWidget aw = new AngleWidget( indicator,
+                            ctx.theme.gaugeBackground,
+                            ctx.theme.gaugeGlare);
+        ctx.telemetry.registerListener(telemetryID, aw);
+        return aw;
+    }
+
     private double theta;
     private BufferedImage image;
     private BufferedImage background;
     private BufferedImage overlay;
 
-    public RotatePanel(
-        BufferedImage tiltImage,
-        BufferedImage backgroundImage,
-        BufferedImage foregroundImage) {
+    private AngleWidget(
+      BufferedImage tiltImage,
+      BufferedImage backgroundImage,
+      BufferedImage foregroundImage) {
         image = tiltImage;
         background = backgroundImage;
         overlay = foregroundImage;
