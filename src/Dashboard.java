@@ -158,10 +158,6 @@ public class Dashboard implements Runnable {
     }
 
     private JPanel createRightPanel() {
-        JPanel sideGauge  = AngleWidget.createDial(context, Serial.HEADING, context.theme.roverSide);
-        JPanel topGauge   = AngleWidget.createDial(context, Serial.PITCH, context.theme.roverTop);
-        JPanel frontGauge = AngleWidget.createDial(context, Serial.ROLL, context.theme.roverFront);
-
         try {
             dataWidget = TelemetryWidget.fromXML(context, "telemetryWidetSpec");
         } catch(Exception e) {
@@ -169,14 +165,20 @@ public class Dashboard implements Runnable {
             e.printStackTrace();
         }
 
+        JPanel[] widgets = {
+            dataWidget,
+            AngleWidget.createDial(context, Serial.HEADING, context.theme.roverTop),
+            AngleWidget.createDial(context, Serial.PITCH, context.theme.roverSide),
+            AngleWidget.createDial(context, Serial.ROLL, context.theme.roverFront),
+        };
+
         JPanel dashPanel = new JPanel();
         dashPanel.setOpaque(false);
-
         dashPanel.setLayout(new BoxLayout(dashPanel, BoxLayout.PAGE_AXIS));
-        dashPanel.add(dataWidget);
-        dashPanel.add(frontGauge);
-        dashPanel.add(topGauge);
-        dashPanel.add(sideGauge);
+
+        for(JPanel p : widgets){
+            dashPanel.add(p);
+        }
 
         return dashPanel;
     }
