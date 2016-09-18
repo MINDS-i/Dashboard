@@ -122,20 +122,42 @@ public class NinePatch {
     }
 
     public static NinePatch loadFrom(Path dir) throws IOException {
-        BufferedImage center = ImageIO.read(dir.resolve("Middle.png").toFile());
-        BufferedImage[] walls = new BufferedImage[] {
+        // Only Full 9-image patches define a right border
+        boolean fullPatch = dir.resolve("RightBorder.png").toFile().exists();
+        if(fullPatch){
+            BufferedImage center = ImageIO.read(dir.resolve("Middle.png").toFile());
+            BufferedImage[] walls = new BufferedImage[] {
+                ImageIO.read(dir.resolve("TopBorder.png").toFile()),
+                ImageIO.read(dir.resolve("LeftBorder.png").toFile()),
+                ImageIO.read(dir.resolve("RightBorder.png").toFile()),
+                ImageIO.read(dir.resolve("BottomBorder.png").toFile())
+            };
+            BufferedImage[] joints = new BufferedImage[] {
+                ImageIO.read(dir.resolve("TopLeft.png").toFile()),
+                ImageIO.read(dir.resolve("TopRight.png").toFile()),
+                ImageIO.read(dir.resolve("BottomLeft.png").toFile()),
+                ImageIO.read(dir.resolve("BottomRight.png").toFile())
+            };
+            return new NinePatch(center, walls, joints);
+        }
+
+        // If not a full patch, then only 4-image patches have TopBorder
+        boolean fourPatch = dir.resolve("LeftBorder.png").toFile().exists();
+        if(fourPatch){
+            return new NinePatch(
+                ImageIO.read(dir.resolve("Middle.png").toFile()),
+                ImageIO.read(dir.resolve("TopBorder.png").toFile()),
+                ImageIO.read(dir.resolve("LeftBorder.png").toFile()),
+                ImageIO.read(dir.resolve("TopLeft.png").toFile())
+            );
+        }
+
+        // Must be a three image patch
+        return new NinePatch(
+            ImageIO.read(dir.resolve("Middle.png").toFile()),
             ImageIO.read(dir.resolve("TopBorder.png").toFile()),
-            ImageIO.read(dir.resolve("LeftBorder.png").toFile()),
-            ImageIO.read(dir.resolve("RightBorder.png").toFile()),
-            ImageIO.read(dir.resolve("BottomBorder.png").toFile())
-        };
-        BufferedImage[] joints = new BufferedImage[] {
-            ImageIO.read(dir.resolve("TopLeft.png").toFile()),
-            ImageIO.read(dir.resolve("TopRight.png").toFile()),
-            ImageIO.read(dir.resolve("BottomLeft.png").toFile()),
-            ImageIO.read(dir.resolve("BottomRight.png").toFile())
-        };
-        return new NinePatch(center, walls, joints);
+            ImageIO.read(dir.resolve("TopLeft.png").toFile())
+        );
     }
 
     public Dimension minimumSize() {
