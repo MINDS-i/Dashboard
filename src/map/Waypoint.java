@@ -1,76 +1,83 @@
 package com.map;
 
-public class Waypoint{
-    // Earth's radius in miles
-    private static final double EARTH_RAD = 3958.761;
-    // Earth's circumference in miles
-    private static final double EARTH_CIRC = EARTH_RAD*Math.PI*2.0;
+import static java.lang.Math.*;
 
+public class Waypoint{
+    /** Earth's radius in miles */
+    private static final double EARTH_RAD = 3958.761;
+    /** Earth's circumference in miles */
+    private static final double EARTH_CIRC = EARTH_RAD*Math.PI*2.0;
+    /** Convert degrees to radians */
     private static double toRad(double degrees){
         return degrees*Math.PI/180.0;
     }
-
+    /** Convert radians to degrees */
     private static double toDeg(double radians){
         return radians*180.0/Math.PI;
     }
-
-    double latitude, longitude; // stored in decimal degrees
+    /**
+     * The waypoint's latitude and longitude in decimal degrees
+     * northern and eastern hemisphere are positive lat, long respectively
+     */
+    private final double latitude, longitude;
     /**
      * Construct a new waypoint; arguments are in decimal degrees
      */
-    Waypoint(double latitude, double longitude){
+    public Waypoint(double latitude, double longitude){
         this.latitude = latitude;
         this.longitude = longitude;
     }
     /** Return this Waypoint's latitude in decimal degrees */
-    double getLatitude(){
+    public double getLatitude(){
         return latitude;
     }
     /** Return this Waypoint's longitude in decimal degrees */
-    double getLongitude(){
+    public double getLongitude(){
         return longitude;
     }
     /**
      * Return the heading in degrees, north = 0, CW positive around UP from
      * this waypoint to target
      */
-    double headingTo(Waypoint target){
+    public double headingTo(Waypoint target){
         double aRlat = toRad(getLatitude());
         double aRlng = toRad(getLongitude());
         double bRlat = toRad(target.getLatitude());
         double bRlng = toRad(target.getLongitude());
-        double y = Math.sin(bRlng - aRlng) * Math.cos(bRlat);
-        double x = Math.cos(aRlat)*Math.sin(bRlat)
-                    - Math.sin(aRlat)*Math.cos(bRlat)*Math.cos(bRlng - aRlng);
-        return toDeg( Math.atan2(y,x) );
+        double y = sin(bRlng - aRlng) * cos(bRlat);
+        double x = cos(aRlat)*sin(bRlat)
+                   - sin(aRlat)*cos(bRlat)*cos(bRlng - aRlng);
+        return toDeg( atan2(y,x) );
     }
     /**
      * Return the distance in miles between this waypoint and the target
      */
-    double distanceTo(Waypoint target){
+    public double distanceTo(Waypoint target){
         double aRlat  = toRad(getLatitude());
         double aRlng  = toRad(getLongitude());
         double bRlat  = toRad(target.getLatitude());
         double bRlng  = toRad(target.getLongitude());
-        double sinlat = Math.sin((aRlat - bRlat)/2.);
-        double sinlng = Math.sin((aRlng - bRlng)/2.);
-        double chord  = sinlat*sinlat + sinlng*sinlng*Math.cos(aRlat)*Math.cos(bRlat);
-        return 2.0 * EARTH_RAD * Math.atan2( Math.sqrt(chord), Math.sqrt(1.-chord) );
+        double sinlat = sin((aRlat - bRlat)/2.);
+        double sinlng = sin((aRlng - bRlng)/2.);
+        double chord  = sinlat*sinlat + sinlng*sinlng*cos(aRlat)*cos(bRlat);
+        return 2.0 * EARTH_RAD * atan2( sqrt(chord), sqrt(1.-chord) );
     }
     /**
      * Return a waypoint that is `distance` miles away in the `heading`
      * direction from this waypoint's location.
      * heading is in degrees, north = 0, CW positive around UP
      */
-    Waypoint extrapolate(double heading, double distance){
+    public Waypoint extrapolate(double heading, double distance){
         double rlat, rlng;
         double pRlat = toRad(getLatitude());
         double pRlng = toRad(getLongitude());
-        rlat = Math.asin(Math.sin(pRlat)*Math.cos(distance/EARTH_RAD) +
-                 Math.cos(pRlat)*Math.sin(distance/EARTH_RAD) * Math.cos(toRad(heading)));
-        rlng = pRlng+Math.atan2(
-                  (Math.sin(toRad(heading))*Math.sin(distance/EARTH_RAD)*Math.cos(pRlat)),
-                  (Math.cos(distance/EARTH_RAD)-Math.sin(pRlat)*Math.sin(rlat))
+        rlat = asin(
+                   sin(pRlat)*cos(distance/EARTH_RAD) +
+                   cos(pRlat)*sin(distance/EARTH_RAD) * cos(toRad(heading))
+               );
+        rlng = pRlng+atan2(
+                   (sin(toRad(heading))*sin(distance/EARTH_RAD)*cos(pRlat)),
+                   (cos(distance/EARTH_RAD)-sin(pRlat)*sin(rlat))
                );
         return new Waypoint(toDeg(rlat), toDeg(rlng));
     }
