@@ -27,13 +27,13 @@ public class TelemetryWidget extends JPanel{
     private final Collection<Line> lines = new ArrayList<Line>();
 
     public static class LineItem {
-        private String label;
+        private String fmt;
         private int telemetryID;
-        public LineItem(String label, int telemetryID){
-            this.label = label;
+        public LineItem(String fmt, int telemetryID){
+            this.fmt = fmt;
             this.telemetryID = telemetryID;
         }
-        public String getLabel(){ return label; }
+        public String getFmt(){ return fmt; }
         public int getTelemetryId(){ return telemetryID; }
     }
 
@@ -46,13 +46,16 @@ public class TelemetryWidget extends JPanel{
     public static TelemetryWidget create(
       Context ctx,
       int lineWidth,
+      float fontSize,
       Collection<LineItem> items){
-        return new TelemetryWidget(ctx, lineWidth, items);
+        return new TelemetryWidget(ctx, lineWidth, fontSize, items);
     }
 
     public static TelemetryWidget fromXML(Context ctx, String resourceKey)
       throws ParseException {
         int width = 0;
+        float fontSize = 0f;
+        String defaultFormat = "% f";
         Collection<LineItem> items = new LinkedList<LineItem>();
         try (Reader source = new FileReader(ctx.getResource(resourceKey))){
             XMLStreamReader r = XMLInputFactory.newInstance().
@@ -62,10 +65,16 @@ public class TelemetryWidget extends JPanel{
                     case XMLStreamConstants.START_ELEMENT:
                         if(r.getLocalName().equals("telemetryWidget")) {
                             width = Integer.valueOf(r.getAttributeValue(null, "width"));
+                            fontSize = Float.valueOf(r.getAttributeValue(null, "fontsize"));
+                            defaultFormat = String.format(" %% %df", width-1);
                         } else if(r.getLocalName().equals("line")) {
-                            String label = r.getAttributeValue(null,"label");
-                            int index = Integer.valueOf(r.getAttributeValue(null,"index"));
-                            items.add(new LineItem(label,index));
+                            String fmt = r.getAttributeValue(null,"fmt");
+                            String idx = r.getAttributeValue(null,"telem");
+
+                            String format = (fmt == null)? defaultFormat : fmt;
+                            int index = (idx == null)? -1 : Integer.valueOf(idx);
+
+                            items.add(new LineItem(format,index));
                         }
                         break;
                     default:
@@ -76,7 +85,7 @@ public class TelemetryWidget extends JPanel{
             throw new ParseException("Failed to parse XML from the stream"+e,0);
         }
 
-        return new TelemetryWidget(ctx, width, items);
+        return new TelemetryWidget(ctx, width, fontSize, items);
     }
 
     /**
@@ -91,6 +100,7 @@ public class TelemetryWidget extends JPanel{
     private TelemetryWidget(
       Context ctx,
       int lineWidth,
+      float fontSize,
       Collection<LineItem> items){
         this.lineWidth = lineWidth;
 
@@ -99,9 +109,16 @@ public class TelemetryWidget extends JPanel{
         dataPanel.setLayout(new BoxLayout(dataPanel, BoxLayout.PAGE_AXIS));
         dataPanel.setOpaque(false);
 
+        Font font = ctx.theme.text.deriveFont(fontSize);
+
         for(LineItem i : items){
-            Line l = new Line(ctx, i.getLabel());
-            ctx.telemetry.registerListener(i.getTelemetryId(), l);
+            Line l = new Line(ctx, i.getFmt());
+            l.setFont(font);
+            l.setForeground(ctx.theme.textColor);
+            if(i.getTelemetryId() != -1){
+                ctx.telemetry.registerListener(i.getTelemetryId(), l);
+            }
+
             lines.add(l);
             dataPanel.add(l);
         }
@@ -111,16 +128,13 @@ public class TelemetryWidget extends JPanel{
     }
 
     private class Line extends JLabel implements TelemetryListener {
-        private String label;
-        public Line(Context ctx, String prefix) {
-            setForeground(ctx.theme.textColor);
-            setFont(ctx.theme.text);
-            label = prefix;
+        private String fmtStr;
+        public Line(Context ctx, String fmtStr) {
+            this.fmtStr = fmtStr;
             update(0.0);
         }
         public void update(double data) {
-            String fmt = String.format("%s%c%f",
-                            label, (data >= 0)? ' ' : '-', Math.abs(data));
+            String fmt = String.format(fmtStr, data);
             int finalWidth = Math.min(fmt.length(), lineWidth);
             setText(fmt.substring(0,finalWidth));
         }
