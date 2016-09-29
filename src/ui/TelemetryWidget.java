@@ -54,7 +54,7 @@ public class TelemetryWidget extends JPanel{
     public static TelemetryWidget fromXML(Context ctx, String resourceKey)
       throws ParseException {
         int width = 0;
-        float fontSize = 0f;
+        String fontSize = null;
         String defaultFormat = "% f";
         Collection<LineItem> items = new LinkedList<LineItem>();
         try (Reader source = new FileReader(ctx.getResource(resourceKey))){
@@ -65,7 +65,7 @@ public class TelemetryWidget extends JPanel{
                     case XMLStreamConstants.START_ELEMENT:
                         if(r.getLocalName().equals("telemetryWidget")) {
                             width = Integer.valueOf(r.getAttributeValue(null, "width"));
-                            fontSize = Float.valueOf(r.getAttributeValue(null, "fontsize"));
+                            fontSize = r.getAttributeValue(null, "fontsize");
                             defaultFormat = String.format(" %% %df", width-1);
                         } else if(r.getLocalName().equals("line")) {
                             String fmt = r.getAttributeValue(null,"fmt");
@@ -85,7 +85,12 @@ public class TelemetryWidget extends JPanel{
             throw new ParseException("Failed to parse XML from the stream"+e,0);
         }
 
-        return new TelemetryWidget(ctx, width, fontSize, items);
+        return new TelemetryWidget(
+                ctx,
+                width,
+                (fontSize==null)? 0f : Float.valueOf(fontSize),
+                items
+            );
     }
 
     /**
@@ -109,7 +114,10 @@ public class TelemetryWidget extends JPanel{
         dataPanel.setLayout(new BoxLayout(dataPanel, BoxLayout.PAGE_AXIS));
         dataPanel.setOpaque(false);
 
-        Font font = ctx.theme.text.deriveFont(fontSize);
+        Font font = ctx.theme.text;
+        if(fontSize != 0){
+            font = font.deriveFont(fontSize);
+        }
 
         for(LineItem i : items){
             Line l = new Line(ctx, i.getFmt());
