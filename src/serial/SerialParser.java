@@ -3,6 +3,7 @@ package com.serial;
 import com.Dashboard;
 import com.map.Dot;
 import com.map.MapPanel;
+import com.map.WaypointList;
 import com.serial.Serial;
 import com.Context;
 import com.data.stateDescription.*;
@@ -25,12 +26,14 @@ public class SerialParser implements SerialPortEventListener {
     private Context context;
     private Decoder decoder;
     private StateMap descriptionMap;
+    private WaypointList waypoints;
 
     private final Logger seriallog = Logger.getLogger("d.serial");
     private final Logger robotlog = Logger.getLogger("d.robot");
 
-    public SerialParser(Context cxt) {
+    public SerialParser(Context cxt, WaypointList waypoints) {
         context = cxt;
+        this.waypoints = waypoints;
     }
 
     public void serialEvent(SerialPortEvent event) {
@@ -48,7 +51,6 @@ public class SerialParser implements SerialPortEventListener {
             }
         };
         decoder = new Decoder(serial, Serial.HEADER, Serial.FOOTER, check);
-        decoder.addPacketReader(new WaypointReader());
         decoder.addPacketReader(new DataReader());
         decoder.addPacketReader(new WordReader());
         decoder.addPacketReader(new StringReader());
@@ -60,7 +62,7 @@ public class SerialParser implements SerialPortEventListener {
         }
     }
 
-    private class WaypointReader implements PacketReader {
+/*    private class WaypointReader implements PacketReader {
         public int claim(byte data) {
             if(Serial.getMsgType(data) == Serial.WAYPOINT_TYPE) return 255;
             else return -1;
@@ -81,15 +83,17 @@ public class SerialParser implements SerialPortEventListener {
             float longitude	= Float.intBitsToFloat(tmpLon);
             switch(subtype) {
                 case Serial.ADD_WAYPOINT:
-                    context.waypoint.add(longitude, latitude, index);
+                    waypoints.add(new Dot(longitude, latitude, 0), index);
                     break;
                 case Serial.ALTER_WAYPOINT:
-                    context.waypoint.get(index).setLocation(
+                    waypoints.set(index, new Dot(longitude, latitude, ));
+                    get(index).setLocation(
                         new Point.Double(longitude, latitude));
                     break;
             }
         }
-    }
+    }*/
+
     private class DataReader implements PacketReader {
         public int claim(byte data) {
             if(Serial.getMsgType(data) == Serial.DATA_TYPE) return 255;
@@ -139,7 +143,7 @@ public class SerialParser implements SerialPortEventListener {
                     break;
                 case Serial.COMMAND_WORD:
                     if(a == Serial.TARGET_CMD) {
-                        context.waypoint.updateTarget(b);
+                        waypoints.setTarget(b);
                     }
                     break;
             }

@@ -136,13 +136,13 @@ public class SerialSender {
 
     private void advanceWaypointList(int confirm) {
         if(confirm == waypointListWaitingCode) {
-            if(waypointListPosition >= context.waypoint.size()) {
+            if(waypointListPosition >= context.getWaypointList().size()) {
                 sendingWaypointList = false;
-                context.waypoint.sendLoopingStatus();
+                context.getWaypointList().getLooped();
                 return;
             }
             Message msg = Message.addWaypoint( (byte) waypointListPosition,
-                                               context.waypoint.get(waypointListPosition));
+                                               context.getWaypointList().get(waypointListPosition));
             sendMessage(msg);
             waypointListWaitingCode = msg.getConfirmSum();
             waypointListPosition++;

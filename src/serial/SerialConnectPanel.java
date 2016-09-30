@@ -40,14 +40,14 @@ public class SerialConnectPanel extends JPanel {
     private SerialPort connectedPort = null;
     private JButton refreshButton;
     private JButton connectButton;
-    private JComboBox dropDown;
+    private JComboBox<String> dropDown;
     private JComboBox<BaudRate> baudSelect;
 
     public SerialConnectPanel(SerialEventListener listener) {
         this.listener = listener;
         refreshButton = new JButton(refreshAction);
         connectButton = new JButton(connectAction);
-        dropDown = new JComboBox();
+        dropDown = new JComboBox<String>();
         addSerialList(dropDown);
         baudSelect = new JComboBox<BaudRate>(rates);
         //if the protocol spec'd baud rate is in the list, choose it
@@ -141,7 +141,7 @@ public class SerialConnectPanel extends JPanel {
         }
     };
 
-    private void addSerialList(JComboBox box) {
+    private void addSerialList(JComboBox<String> box) {
         String[] portNames = SerialPortList.getPortNames();
         for(int i = 0; i < portNames.length; i++) {
             box.addItem(portNames[i]);

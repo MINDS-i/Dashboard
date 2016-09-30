@@ -55,7 +55,7 @@ public class xml {
         writer.writeStartElement(URI, "rte");
         writer.writeCharacters("\n");
 
-        WaypointList p = context.waypoint;
+        WaypointList p = context.getWaypointList();
         for(int i=0; i<p.size(); i++) {
             writer.writeStartElement(URI, "rtept");
             writer.writeAttribute("lat", Double.toString(p.get(i).getLatitude ()));
@@ -84,7 +84,7 @@ public class xml {
     public static void readXML(Context context) throws XMLStreamException {
         Dot pnt = new Dot();
         Vector<Dot> list = new Vector<Dot>();
-        Vector<Vector> routes = new Vector<Vector>();
+        Vector<Vector<Dot>> routes = new Vector<Vector<Dot>>();
         XMLInputFactory factory = XMLInputFactory.newInstance();
         String data = "";
         XMLStreamReader reader;
@@ -181,9 +181,13 @@ public class xml {
                             options[0]);
         }
 
-        //set mapPanel points to new points
-        context.waypoint.swap(routes.get(selection));
-        context.sender.sendWaypointList();
+        WaypointList p = context.getWaypointList();
+        // delete old waypoints
+        while(p.size() != 0) p.remove(0);
+        // enter in new ones
+        for(int i=0; i<routes.get(selection).size(); i++){
+            p.add(routes.get(selection).get(i), i);
+        }
 
         reader.close();
     }

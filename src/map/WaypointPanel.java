@@ -1,5 +1,6 @@
 package com.map;
 
+import static com.map.WaypointList.*;
 import com.Context;
 import com.ContextViewer;
 import com.Dashboard;
@@ -26,13 +27,14 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.xml.stream.XMLStreamException;
 
-class WaypointPanel extends NinePatchPanel implements ContextViewer {
+class WaypointPanel extends NinePatchPanel {
     protected static final int MOVE_STEP = 32;
     protected static final int BDR_SIZE = 25;
     protected static final String NO_WAYPOINT_MSG = "N / A";
     private int selectedWaypoint = 0;
     private Context context;
     private MapPanel map;
+    private WaypointList waypoints;
     JTextField latitude;
     JTextField longitude;
     JTextField altitude;
@@ -42,7 +44,7 @@ class WaypointPanel extends NinePatchPanel implements ContextViewer {
         super(cxt.theme.panelPatch);
         map = mapPanel;
         context = cxt;
-        context.registerViewer(this);
+        waypoints = context.getWaypointList();
         setOpaque(false);
         LayoutManager layout = new BoxLayout(this, BoxLayout.PAGE_AXIS);
         setLayout(layout);
@@ -54,10 +56,14 @@ class WaypointPanel extends NinePatchPanel implements ContextViewer {
                 //to the map panel in the background
             }
         });
-    }
 
-    public void waypointUpdate() {
-        updateDisplay();
+        waypoints.addListener(new WaypointListener(){
+            @Override public void unusedEvent() { updateDisplay(); }
+            @Override public void selectionChanged(int selection) {
+                setSelectedWaypoint(selection);
+            }
+
+        });
     }
 
     public int getSelectedWaypoint() {
@@ -70,12 +76,12 @@ class WaypointPanel extends NinePatchPanel implements ContextViewer {
     }
 
     public void updateDisplay() {
-        if (selectedWaypoint > context.waypoint.size()-1)
-        	selectedWaypoint = context.waypoint.size()-1;
+        if (selectedWaypoint > waypoints.size()-1)
+        	selectedWaypoint = waypoints.size()-1;
         else if(selectedWaypoint < 0)
         	selectedWaypoint = 0;
 
-        if(context.waypoint.size() == 0) {
+        if(waypoints.size() == 0) {
             waypointIndexDisplay.setText(NO_WAYPOINT_MSG);
             latitude .setText("");
             longitude.setText("");
@@ -83,10 +89,10 @@ class WaypointPanel extends NinePatchPanel implements ContextViewer {
             return;
         }
 
-        String indexField = (selectedWaypoint+1) + " / " + context.waypoint.size();
+        String indexField = (selectedWaypoint+1) + " / " + waypoints.size();
         waypointIndexDisplay.setText(indexField);
-        if(selectedWaypoint >= 0 && selectedWaypoint < context.waypoint.size()) {
-            Dot dot = context.waypoint.get(selectedWaypoint);
+        if(selectedWaypoint >= 0 && selectedWaypoint < waypoints.size()) {
+            Dot dot = waypoints.get(selectedWaypoint);
             latitude .setText(((float)dot.getLatitude())+"");
             latitude .setForeground(Color.BLACK);
             longitude.setText(((float)dot.getLongitude())+"");
@@ -220,11 +226,13 @@ class WaypointPanel extends NinePatchPanel implements ContextViewer {
             int newAltitude = doubleToFixed(tmpAltitude);
             Point.Double newPosition = new Point.Double(newLongitude, newLatitude);
             if((newAltitude&0xffff) == newAltitude) {
-                context.waypoint.set(selectedWaypoint, newPosition, (short)newAltitude);
+                waypoints.set(new Dot(newPosition, (short)newAltitude), selectedWaypoint);
                 //set to display reconverted value
                 altitude.setText(fixedToDouble(newAltitude)+"");
             } else {
-                context.waypoint.set(selectedWaypoint, newPosition);
+                Dot newloc = waypoints.get(selectedWaypoint);
+                newloc.setLocation(newPosition);
+                waypoints.set(newloc, selectedWaypoint);
             }
         } catch (NumberFormatException e) {}
     }
@@ -286,9 +294,9 @@ class WaypointPanel extends NinePatchPanel implements ContextViewer {
         }
 
         public void actionPerformed(ActionEvent e) {
-            context.waypoint.setLooped(!context.waypoint.isLooped());
+            waypoints.setLooped(!waypoints.getLooped());
             putValue(Action.NAME,
-                     (context.waypoint.isLooped())? "Looping Off" : "Looping On");
+                     (waypoints.getLooped())? "Looping Off" : "Looping On");
         }
     };
     private Action previousWaypoint = new AbstractAction() {
@@ -298,7 +306,7 @@ class WaypointPanel extends NinePatchPanel implements ContextViewer {
             putValue(Action.SHORT_DESCRIPTION, text);
         }
         public void actionPerformed(ActionEvent e) {
-            setSelectedWaypoint(selectedWaypoint-1);
+            waypoints.setSelected(selectedWaypoint-1);
             updateDisplay();
             map.repaint();
         }
@@ -310,7 +318,7 @@ class WaypointPanel extends NinePatchPanel implements ContextViewer {
             putValue(Action.SHORT_DESCRIPTION, text);
         }
         public void actionPerformed(ActionEvent e) {
-            setSelectedWaypoint(selectedWaypoint+1);
+            waypoints.setSelected(selectedWaypoint+1);
             updateDisplay();
             map.repaint();
         }
@@ -342,7 +350,6 @@ class WaypointPanel extends NinePatchPanel implements ContextViewer {
             } catch (XMLStreamException ex) {
                 System.err.println(ex.getMessage());
             }
-            context.waypointUpdated();
         }
     };
     private Action interpretLocationAction = new AbstractAction() {
@@ -360,7 +367,7 @@ class WaypointPanel extends NinePatchPanel implements ContextViewer {
             putValue(Action.NAME, text);
         }
         public void actionPerformed(ActionEvent e) {
-            context.waypoint.setTarget(selectedWaypoint);
+            waypoints.setTarget(selectedWaypoint);
         }
     };
     private Action newWaypoint = new AbstractAction() {
@@ -369,8 +376,8 @@ class WaypointPanel extends NinePatchPanel implements ContextViewer {
             putValue(Action.NAME, text);
         }
         public void actionPerformed(ActionEvent e) {
-            context.waypoint.add(
-            	new Dot(context.waypoint.get(selectedWaypoint)), selectedWaypoint);
+            waypoints.add(
+            	new Dot(waypoints.get(selectedWaypoint)), selectedWaypoint);
         }
     };
     private Action openDataPanel = new AbstractAction() {

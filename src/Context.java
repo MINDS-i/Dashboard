@@ -1,8 +1,8 @@
 package com;
 
-import com.ContextViewer;
 import com.Dashboard;
 import com.map.*;
+import static com.map.WaypointList.*;
 import com.remote.SettingList;
 import com.serial.*;
 import com.serial.Messages.*;
@@ -24,12 +24,11 @@ public class Context {
     public SerialParser parser;
     public SerialSender sender;
     public Theme theme;
-    public WaypointList waypoint;
     public SettingList settingList;
     public TelemetryManager telemetry;
 
+    private WaypointList waypoint;
     private SerialPort port;
-    private Vector<ContextViewer> waypointViewers;
     private ResourceBundle resources;
     private Properties persist;
 
@@ -39,9 +38,10 @@ public class Context {
 
     private final Logger ioerr = Logger.getLogger("d.io");
 
-    public Context() {
-        connected = false;
-        waypointViewers  = new Vector<ContextViewer>();
+    public Context(Dashboard dashboard) {
+        dash        = dashboard;
+        port        = null;
+        connected   = false;
 
         Calendar cal = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("MMdd_HHmm_yyyyGG");
@@ -62,6 +62,59 @@ public class Context {
         } finally {
             loadLocale(); // defaults to "air" mode
         }
+
+        // Instance these classes after the resources have been loaded
+        theme       = new Theme(this);
+        sender      = new SerialSender(this);
+        parser      = new SerialParser(this, waypoint);
+        settingList = new SettingList(this);
+        telemetry   = new TelemetryManager(this);
+        waypoint    = new WaypointList();
+
+        // Patch the waypoint list into the serial sender
+        waypoint.addListener(new WaypointListener(){
+            @Override
+            public void changed(Dot point, int index, Action action) {
+                Message tosend;
+                switch(action){
+                    case ADD:
+                        tosend = Message.addWaypoint((byte)(index&0xff), point);
+                        break;
+                    case SET:
+                        tosend = Message.setWaypoint((byte)(index&0xff), point);
+                        break;
+                    case DELETE:
+                        tosend = Message.deleteWaypoint((byte)(index&0xff));
+                        break;
+                    default:
+                        return;
+                }
+                sender.sendMessage(tosend);
+            }
+            @Override
+            public void targetChanged(int targetIndex) {
+                sender.sendMessage(Message.setTarget((byte) targetIndex));
+            }
+            @Override
+            public void loopModeSet(boolean isLooped) {
+                sender.sendMessage(Message.setLooping((byte) ((isLooped)?1:0) ));
+            }
+        });
+
+        final double lastLatitude[] = new double[1];
+        telemetry.registerListener(Serial.LATITUDE, new TelemetryListener() {
+            public void update(double data) {
+                lastLatitude[0] = data;
+            }
+        });
+        telemetry.registerListener(Serial.LONGITUDE, new TelemetryListener() {
+            public void update(double data) {
+                Dot location = waypoint.getRover();
+                location.setLatitude(lastLatitude[0]);
+                location.setLongitude(data);
+                waypoint.setRover(location);
+            }
+        });
     }
     public void toggleLocale() {
         String current = (String) persist.get("subject");
@@ -88,20 +141,6 @@ public class Context {
         resources = loadResourceBundle("resources");
     }
 
-    public void give( 	Dashboard    dashboard,
-                        SerialSender serialSender,
-                        SerialParser serialParser,
-                        WaypointList waypointList,
-                        SerialPort   serialPort) {
-        dash        = dashboard;
-        sender      = serialSender;
-        parser      = serialParser;
-        waypoint    = waypointList;
-        port        = serialPort;
-        theme       = new Theme(this);
-        telemetry   = new TelemetryManager(this);
-        settingList = new SettingList(this);
-    }
     public void updatePort(SerialPort newPort) {
         closePort();
         port = newPort;
@@ -131,17 +170,16 @@ public class Context {
         if(rtn == null) return otherwise;
         return rtn;
     }
-    public void waypointUpdated() {
-        Iterator it = waypointViewers.iterator();
-        while(it.hasNext()) ((ContextViewer)it.next()).waypointUpdate();
-    }
     //register viewer of waypoint list
-    public void registerViewer(ContextViewer viewer) {
-        waypointViewers.add(viewer);
+    public void addWaypointListener(WaypointListener l) {
+        waypoint.addListener(l);
     }
     //remove viewer of waypoint list
-    public void removeViewer(ContextViewer viewer) {
-        waypointViewers.remove(viewer);
+    public void removeWaypointListener(WaypointListener l) {
+        waypoint.removeListener(l);
+    }
+    public WaypointList getWaypointList(){
+        return waypoint;
     }
     public void sendSetting(int index) {
         settingList.pushSetting(index);

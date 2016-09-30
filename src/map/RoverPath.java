@@ -1,5 +1,6 @@
 package com.map;
 
+import static com.map.WaypointList.*;
 import com.Context;
 import com.ContextViewer;
 import com.serial.Serial;
@@ -13,38 +14,24 @@ import java.awt.image.*;
 import java.util.*;
 import javax.swing.*;
 
-class RoverPath implements Layer, ContextViewer {
+
+class RoverPath implements Layer {
     private static final Color ACTIVE_LINE_FILL = new Color(1.f,1.f,0.f,1f);
     private static final Color PATH_LINE_FILL   = new Color(0f,0f,0f, 1f);
     private static final Color LINE_BORDER      = new Color(.5f,.5f,.5f,0f);
     private static final int   LINE_WIDTH       = 10;
 
-    private int downDot = -1;
     private Context context;
     private CoordinateTransform mapTransform;
-    private WaypointPanel waypointPanel;
+    private WaypointList waypoints;
     private Dot rover = new Dot();
+    private Component painter;
 
-    RoverPath(Context c, CoordinateTransform cT, WaypointPanel wP) {
+    RoverPath(Context c, CoordinateTransform cT, WaypointList waypoints, Component painter) {
         context = c;
         mapTransform = cT;
-        waypointPanel = wP;
-
-        context.registerViewer(this);
-        context.telemetry.registerListener(Serial.LATITUDE, new TelemetryListener() {
-            public void update(double data) {
-                rover.setLatitude( data );
-                // fire event to waypoint listeners that the rover has moved
-                context.waypointUpdated();
-            }
-        });
-        context.telemetry.registerListener(Serial.LONGITUDE, new TelemetryListener() {
-            public void update(double data) {
-                rover.setLongitude( data );
-                // fire event to waypoint listeners that the rover has moved;
-                context.waypointUpdated();
-            }
-        });
+        this.waypoints = waypoints;
+        this.painter = painter;
     }
 
     public int getZ() {
@@ -53,9 +40,6 @@ class RoverPath implements Layer, ContextViewer {
 
     public void paint(Graphics g) {
         paintDots(g);
-    }
-
-    public void waypointUpdate() {
     }
 
     public boolean onClick(MouseEvent e) {
@@ -69,28 +53,32 @@ class RoverPath implements Layer, ContextViewer {
             int line = isOverLine(e.getPoint());
             if (line==-1) {
                 //click is not over an existing line
-                context.waypoint.add(new Dot(point));
-                waypointPanel.setSelectedWaypoint(context.waypoint.size()-1);
+                waypoints.add(new Dot(point), waypoints.size());
+                waypoints.setSelected(waypoints.size() - 1);
             } else {
                 //click is over an existing line
-                context.waypoint.add(new Dot(point), line);
-                waypointPanel.setSelectedWaypoint(line);
+                waypoints.add(new Dot(point), line);
+                waypoints.setSelected(line);
             }
             return true;
         } else if ((e.getButton() == MouseEvent.BUTTON3) && (underneith != -1)) {
             //right click on top of a point
-            context.waypoint.remove(underneith);
+            waypoints.remove(underneith);
             return true;
         }
         return false;
     }
 
+    private Dot draggedDot = null;
+    private int draggedDotIdx = -1;
+    private int downDot = -1;
+
     public boolean onPress(MouseEvent e) {
         Point pixel = e.getPoint();
         downDot = isOverDot(pixel, context.theme.waypointImage);
         if(downDot != -1) {
-            waypointPanel.setSelectedWaypoint(downDot);
-            context.waypointUpdated();
+            draggedDot = waypoints.get(downDot);
+            waypoints.setSelected(downDot);
             return true;
         }
         return false;
@@ -100,15 +88,17 @@ class RoverPath implements Layer, ContextViewer {
         Point2D pixel = toP2D(e.getPoint());
         if (downDot != -1) {
             Point2D finalLoc = mapTransform.mapPosition(pixel);
-            context.waypoint.get(downDot).setLocation(finalLoc);
-            context.waypointUpdated();
+            draggedDotIdx = downDot;
+            draggedDot.setLocation(finalLoc);
+            painter.repaint();
         }
     }
 
     public void onRelease(MouseEvent e) {
         Point pixel = e.getPoint();
-        if(downDot != -1) {
-            context.waypoint.sendUpdatedPosition(downDot);
+        if(draggedDotIdx != -1) {
+            waypoints.set(draggedDot, draggedDotIdx);
+            draggedDotIdx = -1;
         }
     }
 
@@ -136,7 +126,7 @@ class RoverPath implements Layer, ContextViewer {
     }
 
     private void paintDots(Graphics g) {
-        if(context.waypoint.size()!=0) {
+        if(waypoints.size()!=0) {
             drawLines(g);
             drowRoverLine(g);
             drawPoints(g);
@@ -144,48 +134,59 @@ class RoverPath implements Layer, ContextViewer {
         drawRover(g);
     }
 
+    private Point2D drawnLocation(int index){
+        Dot d = null;
+        if(index == draggedDotIdx){
+            d = draggedDot;
+        } else {
+            d = waypoints.get(index);
+        }
+        return mapTransform.screenPosition(d.getLocation());
+    }
+
+    private Point2D roverLocation(){
+        return mapTransform.screenPosition(waypoints.getRover().getLocation());
+    }
+
     private void drawLines(Graphics g) {
         Point n = null;
         Point l = null;
-        Iterator itr = context.waypoint.iterator();
-        while(itr.hasNext()) {
-            n = toPoint(mapTransform.screenPosition( ((Dot)itr.next()).getLocation()));
+        for(int i=0; i<waypoints.size(); i++){
+            n = toPoint(drawnLocation(i));
             if(l!=null) paintLine(g, n, l, PATH_LINE_FILL);
             l = n;
         }
-        if(context.waypoint.isLooped()) {
-            n = toPoint(mapTransform.screenPosition( context.waypoint.get(0).getLocation()));
+
+        if(waypoints.getLooped()) {
+            n = toPoint(drawnLocation(0));
             paintLine(g, n, l, PATH_LINE_FILL);
         }
     }
 
     private void drawPoints(Graphics g) {
-        Point2D tmp;
-        Iterator itr = context.waypoint.iterator();
-        int i=0;
-        while(itr.hasNext()) {
-            tmp = mapTransform.screenPosition( ((Dot)itr.next()).getLocation() );
-            if(i==waypointPanel.getSelectedWaypoint())
-                drawImg(g, context.theme.waypointSelected, tmp);
+        Point tmp;
+
+        for(int i=0; i<waypoints.size(); i++){
+            tmp = toPoint(drawnLocation(i));
+            if(i==waypoints.getSelected())
+               drawImg(g, context.theme.waypointSelected, tmp);
             else
                 drawImg(g, context.theme.waypointImage, tmp);
-            i++;
         }
     }
 
     private void drawRover(Graphics g) {
-        Point2D roverPoint = mapTransform.screenPosition(rover.getLocation());
+        Point2D roverPoint = roverLocation();
         drawImg(g, context.theme.roverImage, roverPoint);
     }
 
     private void drowRoverLine(Graphics g) {
-        if(context.waypoint.getTarget() >= context.waypoint.size()) {
+        if(waypoints.getTarget() >= waypoints.size()) {
             System.err.println("roverTarget out of Bounds");
             return;
         }
-        Point n = toPoint(mapTransform.screenPosition( rover.getLocation() ));
-        Point l = toPoint(mapTransform.screenPosition(
-                              context.waypoint.getTargetWaypoint().getLocation() ));
+        Point n = toPoint(roverLocation());
+        Point l = toPoint(drawnLocation(waypoints.getTarget()));
         paintLine(g, n, l, ACTIVE_LINE_FILL);
     }
 
@@ -196,8 +197,8 @@ class RoverPath implements Layer, ContextViewer {
     }
 
     public int isOverDot(Point2D click, BufferedImage image) {
-        for(int i=0; i<context.waypoint.size(); i++) {
-            Dot d = context.waypoint.get(i);
+        for(int i=0; i<waypoints.size(); i++) {
+            Dot d = waypoints.get(i);
             Point2D loc = mapTransform.screenPosition(d.getLocation());
             if(Math.abs(click.getX()-loc.getX()-1) > image.getWidth() /2.0) continue;
             if(Math.abs(click.getY()-loc.getY()-1) > image.getHeight()/2.0) continue;
@@ -207,11 +208,10 @@ class RoverPath implements Layer, ContextViewer {
     }
 
     public int isOverLine(Point p) {
-        if(context.waypoint.size()<2) return -1;
-        Point prevPoint = toPoint(mapTransform.screenPosition(rover.getLocation()));
-        for(int i=0; i<context.waypoint.size(); i++) {
-            Point thisPoint = toPoint(mapTransform.screenPosition(
-                                          context.waypoint.get(i).getLocation()));
+        if(waypoints.size()<2) return -1;
+        Point prevPoint = toPoint(roverLocation());
+        for(int i=0; i<waypoints.size(); i++) {
+            Point thisPoint = toPoint(drawnLocation(i));
             if( distFromLine(prevPoint, thisPoint, p) < (LINE_WIDTH/2) ) {
                 return i;
             }

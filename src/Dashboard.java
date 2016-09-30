@@ -56,13 +56,7 @@ public class Dashboard implements Runnable {
             loading.setVisible(true);
             //initialize the major classes into the context
             createLogDirectory();
-            context = new Context();
-            context.give(this,
-                         new SerialSender(context),
-                         new SerialParser(context),
-                         new WaypointList(context),
-                         null //serialPort
-                        );
+            context = new Context(this);
             initLogging();
             initUI();
             loading.dispose();
