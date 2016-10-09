@@ -99,7 +99,9 @@ public class WaypointList {
      * Set the target index and inform listeners if the target changed
      */
     public void setTarget(int index){
-        if(targetIndex == index) return;
+        if(index == targetIndex || // only fire events when actually changed
+           index <  0 ||
+           index >= waypoints.size()) return;
         targetIndex = index;
         listeners.stream().forEach(l -> l.targetChanged(index));
     }
@@ -113,7 +115,9 @@ public class WaypointList {
      * Set the Selected Waypoint index and inform listeners if the target changed
      */
     public void setSelected(int index){
-        if(selectedIndex == index) return;
+        if(index == selectedIndex || // only fire events when actually changed
+           index <  0 ||
+           index >= waypoints.size()) return;
         selectedIndex = index;
         listeners.stream().forEach(l -> l.selectionChanged(index));
     }
