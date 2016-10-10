@@ -59,6 +59,15 @@ class RoverPath implements Layer {
                 //click is over an existing line
                 waypoints.add(new Dot(point), line);
                 waypoints.setSelected(line);
+                if(line == 0){
+                    // When the rover is targeting point 0, an additional line=0
+                    // can occur representing the line from the rover to the
+                    // first waypoint. If a new dot is added in this location,
+                    // the new dot should make itself the new target of the
+                    // rover so the user can quickly add a new waypoint to
+                    // the front of the line.
+                    waypoints.setTarget(line);
+                }
             }
             return true;
         } else if ((e.getButton() == MouseEvent.BUTTON3) && (underneith != Integer.MAX_VALUE)) {
@@ -146,6 +155,8 @@ class RoverPath implements Layer {
     }
 
     private void drawLines(Graphics g) {
+        if(waypoints.size() < 2) return;
+
         Point n = null;
         Point l = null;
         for(int i=0; i<waypoints.size(); i++){
@@ -202,15 +213,27 @@ class RoverPath implements Layer {
     }
 
     public int isOverLine(Point p) {
-        if(waypoints.size()<2) return Integer.MAX_VALUE;
-        Point prevPoint = toPoint(roverLocation());
-        for(int i=0; i<waypoints.size(); i++) {
-            Point thisPoint = toPoint(drawnLocation(i));
+        if(waypoints.size() <= 0) return Integer.MAX_VALUE;
+
+        int index;
+        Point prevPoint;
+
+        if(waypoints.getTarget() == 0){
+            index = 0;
+            prevPoint = toPoint(roverLocation());
+        } else {
+            index = 1;
+            prevPoint = toPoint(drawnLocation(0));
+        }
+
+        for(; index<waypoints.size(); index++) {
+            Point thisPoint = toPoint(drawnLocation(index));
             if( distFromLine(prevPoint, thisPoint, p) < (LINE_WIDTH/2) ) {
-                return i;
+                return index;
             }
             prevPoint = thisPoint;
         }
+
         return Integer.MAX_VALUE;
     }
 

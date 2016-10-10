@@ -81,13 +81,13 @@ class WaypointPanel extends NinePatchPanel {
         longitude.setForeground(Color.BLACK);
         altitude.setForeground(Color.BLACK);
         if(selectedWaypoint < 0){
-            latitude.setEnabled(false);
-            longitude.setEnabled(false);
-            altitude.setEnabled(false);
+            latitude.setEditable(false);
+            longitude.setEditable(false);
+            altitude.setEditable(false);
         } else {
-            latitude.setEnabled(true);
-            longitude.setEnabled(true);
-            altitude.setEnabled(true);
+            latitude.setEditable(true);
+            longitude.setEditable(true);
+            altitude.setEditable(true);
         }
 
     }
@@ -209,14 +209,17 @@ class WaypointPanel extends NinePatchPanel {
 
     public void interpretLocationEntry() {
         try {
+            int selectedWaypoint = waypoints.getSelected();
+
+            if(selectedWaypoint < 0) // rover or home location selected
+                return;
+
             Double newLatitude  = Double.parseDouble(latitude.getText());
             Double newLongitude = Double.parseDouble(longitude.getText());
             Double tmpAltitude  = Double.parseDouble(altitude.getText());
 
             int newAltitude = doubleToFixed(tmpAltitude);
             Point.Double newPosition = new Point.Double(newLongitude, newLatitude);
-
-            int selectedWaypoint = waypoints.getSelected();
 
             if((newAltitude&0xffff) == newAltitude) {
                 waypoints.set(new Dot(newPosition, (short)newAltitude), selectedWaypoint);
