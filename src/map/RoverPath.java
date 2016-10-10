@@ -86,8 +86,13 @@ class RoverPath implements Layer {
         Point pixel = e.getPoint();
         downDot = isOverDot(pixel, context.theme.waypointImage);
         if(downDot != Integer.MAX_VALUE) {
-            draggedDot = waypoints.get(downDot).dot();
             waypoints.setSelected(downDot);
+            if(downDot < 0) {
+                // Disable dragging for non-waypoint line dots
+                downDot = Integer.MAX_VALUE;
+            } else {
+                draggedDot = waypoints.get(downDot).dot();
+            }
             return true;
         }
         return false;
