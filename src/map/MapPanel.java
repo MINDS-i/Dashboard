@@ -44,6 +44,7 @@ public class MapPanel extends JPanel implements CoordinateTransform {
     private DragListener  mouseListener = new DragListener();
     private LayerManager  mll = new LayerManager();
     private WaypointPanel waypointPanel;
+    private RoverPath     roverPath;
 
     public MapPanel(Context cxt) {
         this(cxt, new Point(0, 0), 6, null, null, null);
@@ -82,11 +83,20 @@ public class MapPanel extends JPanel implements CoordinateTransform {
         setZoom(TILE_SIZE * (1 << zoom));
         setMapPosCoords(mapPosition);
 
-        mll.add(new RoverPath(context, this, context.getWaypointList(), this));
+        roverPath = new RoverPath(context, this, context.getWaypointList(), this);
+        mll.add(roverPath);
         mll.add(mouseListener);
         addMouseWheelListener(mouseListener);
         addMouseListener(mll);
         addMouseMotionListener(mll);
+    }
+
+    /**
+     * enable/disable the user's ability to change or add waypoints using
+     * the map's RoverPath
+     */
+    public void enablePathModifications(boolean value){
+        roverPath.setWaypointsEnabled(value);
     }
     //Code for CoordinateTransform interface
     /**

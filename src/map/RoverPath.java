@@ -26,16 +26,28 @@ class RoverPath implements Layer {
     private WaypointList waypoints;
     private Dot rover = new Dot();
     private Component painter;
+    private boolean waypointsDisabled = false;
 
     RoverPath(Context c, CoordinateTransform cT, WaypointList waypoints, Component painter) {
         context = c;
         mapTransform = cT;
         this.waypoints = waypoints;
         this.painter = painter;
+
+        waypointsDisabled = !Boolean.valueOf(
+            context.getResource("waypoints_enabled", "true")
+        );
     }
 
     public int getZ() {
         return 1;
+    }
+
+    /**
+     * Enable creating and modifying the waypoint list. Defaults to true.
+     */
+    public void setWaypointsEnabled(boolean value){
+        waypointsDisabled = !value;
     }
 
     public void paint(Graphics g) {
@@ -43,6 +55,8 @@ class RoverPath implements Layer {
     }
 
     public boolean onClick(MouseEvent e) {
+        if(waypointsDisabled) return false;
+
         Point2D pixel = toP2D(e.getPoint());
         int underneith = isOverDot(pixel, context.theme.waypointImage);
 
@@ -87,7 +101,7 @@ class RoverPath implements Layer {
         downDot = isOverDot(pixel, context.theme.waypointImage);
         if(downDot != Integer.MAX_VALUE) {
             waypoints.setSelected(downDot);
-            if(downDot < 0) {
+            if(downDot < 0 || waypointsDisabled) {
                 // Disable dragging for non-waypoint line dots
                 downDot = Integer.MAX_VALUE;
             } else {
