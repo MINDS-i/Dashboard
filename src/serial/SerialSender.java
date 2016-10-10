@@ -141,8 +141,9 @@ public class SerialSender {
                 context.getWaypointList().getLooped();
                 return;
             }
-            Message msg = Message.addWaypoint( (byte) waypointListPosition,
-                                               context.getWaypointList().get(waypointListPosition));
+            Message msg = Message.addWaypoint(
+                (byte) waypointListPosition,
+                context.getWaypointList().get(waypointListPosition).dot());
             sendMessage(msg);
             waypointListWaitingCode = msg.getConfirmSum();
             waypointListPosition++;

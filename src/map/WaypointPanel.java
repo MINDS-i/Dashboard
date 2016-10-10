@@ -31,7 +31,6 @@ class WaypointPanel extends NinePatchPanel {
     protected static final int MOVE_STEP = 32;
     protected static final int BDR_SIZE = 25;
     protected static final String NO_WAYPOINT_MSG = "N / A";
-    private int selectedWaypoint = 0;
     private Context context;
     private MapPanel map;
     private WaypointList waypoints;
@@ -59,47 +58,38 @@ class WaypointPanel extends NinePatchPanel {
 
         waypoints.addListener(new WaypointListener(){
             @Override public void unusedEvent() { updateDisplay(); }
-            @Override public void selectionChanged(int selection) {
-                setSelectedWaypoint(selection);
-            }
-
         });
-    }
-
-    public int getSelectedWaypoint() {
-        return selectedWaypoint;
-    }
-
-    public void setSelectedWaypoint(int selected) {
-        selectedWaypoint = selected;
         updateDisplay();
     }
 
     public void updateDisplay() {
-        if (selectedWaypoint > waypoints.size()-1)
-        	selectedWaypoint = waypoints.size()-1;
-        else if(selectedWaypoint < 0)
-        	selectedWaypoint = 0;
-
-        if(waypoints.size() == 0) {
-            waypointIndexDisplay.setText(NO_WAYPOINT_MSG);
-            latitude .setText("");
-            longitude.setText("");
-            altitude .setText("");
-            return;
-        }
+        int selectedWaypoint = waypoints.getSelected();
+        ExtendedWaypoint w = waypoints.get(selectedWaypoint);
+        Dot dot = w.dot();
 
         String indexField = (selectedWaypoint+1) + " / " + waypoints.size();
-        waypointIndexDisplay.setText(indexField);
-        if(selectedWaypoint >= 0 && selectedWaypoint < waypoints.size()) {
-            Dot dot = waypoints.get(selectedWaypoint);
-            latitude .setText(((float)dot.getLatitude())+"");
-            latitude .setForeground(Color.BLACK);
-            longitude.setText(((float)dot.getLongitude())+"");
-            longitude.setForeground(Color.BLACK);
-            altitude .setText(fixedToDouble(dot.getAltitude())+"");
-            altitude .setForeground(Color.BLACK);
+        switch(w.type()){
+            case ROVER: indexField = "ROVER"; break;
+            case HOME: indexField = "HOME"; break;
         }
+        waypointIndexDisplay.setText(indexField);
+
+        latitude .setText(((float)dot.getLatitude())+"");
+        longitude.setText(((float)dot.getLongitude())+"");
+        altitude .setText(fixedToDouble(dot.getAltitude())+"");
+        latitude.setForeground(Color.BLACK);
+        longitude.setForeground(Color.BLACK);
+        altitude.setForeground(Color.BLACK);
+        if(selectedWaypoint < 0){
+            latitude.setEnabled(false);
+            longitude.setEnabled(false);
+            altitude.setEnabled(false);
+        } else {
+            latitude.setEnabled(true);
+            longitude.setEnabled(true);
+            altitude.setEnabled(true);
+        }
+
     }
 
     private void buildPanel() {
@@ -225,12 +215,15 @@ class WaypointPanel extends NinePatchPanel {
 
             int newAltitude = doubleToFixed(tmpAltitude);
             Point.Double newPosition = new Point.Double(newLongitude, newLatitude);
+
+            int selectedWaypoint = waypoints.getSelected();
+
             if((newAltitude&0xffff) == newAltitude) {
                 waypoints.set(new Dot(newPosition, (short)newAltitude), selectedWaypoint);
                 //set to display reconverted value
                 altitude.setText(fixedToDouble(newAltitude)+"");
             } else {
-                Dot newloc = waypoints.get(selectedWaypoint);
+                Dot newloc = waypoints.get(selectedWaypoint).dot();
                 newloc.setLocation(newPosition);
                 waypoints.set(newloc, selectedWaypoint);
             }
@@ -306,7 +299,7 @@ class WaypointPanel extends NinePatchPanel {
             putValue(Action.SHORT_DESCRIPTION, text);
         }
         public void actionPerformed(ActionEvent e) {
-            waypoints.setSelected(selectedWaypoint-1);
+            waypoints.setSelected(waypoints.getSelected()-1);
             updateDisplay();
             map.repaint();
         }
@@ -318,7 +311,7 @@ class WaypointPanel extends NinePatchPanel {
             putValue(Action.SHORT_DESCRIPTION, text);
         }
         public void actionPerformed(ActionEvent e) {
-            waypoints.setSelected(selectedWaypoint+1);
+            waypoints.setSelected(waypoints.getSelected()+1);
             updateDisplay();
             map.repaint();
         }
@@ -367,7 +360,7 @@ class WaypointPanel extends NinePatchPanel {
             putValue(Action.NAME, text);
         }
         public void actionPerformed(ActionEvent e) {
-            waypoints.setTarget(selectedWaypoint);
+            waypoints.setTarget(waypoints.getSelected());
         }
     };
     private Action newWaypoint = new AbstractAction() {
@@ -376,8 +369,9 @@ class WaypointPanel extends NinePatchPanel {
             putValue(Action.NAME, text);
         }
         public void actionPerformed(ActionEvent e) {
+            int selectedWaypoint = waypoints.getSelected();
             waypoints.add(
-            	new Dot(waypoints.get(selectedWaypoint)), selectedWaypoint);
+            	new Dot(waypoints.get(selectedWaypoint).dot()), selectedWaypoint);
         }
     };
     private Action openDataPanel = new AbstractAction() {

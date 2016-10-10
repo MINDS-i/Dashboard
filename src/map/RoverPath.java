@@ -46,12 +46,12 @@ class RoverPath implements Layer {
         Point2D pixel = toP2D(e.getPoint());
         int underneith = isOverDot(pixel, context.theme.waypointImage);
 
-        if((e.getButton() == MouseEvent.BUTTON1) && (underneith == -1)) {
+        if((e.getButton() == MouseEvent.BUTTON1) && (underneith == Integer.MAX_VALUE)) {
             //left click thats not over a dot
             Point2D point = mapTransform.mapPosition(pixel);
 
             int line = isOverLine(e.getPoint());
-            if (line==-1) {
+            if (line==Integer.MAX_VALUE) {
                 //click is not over an existing line
                 waypoints.add(new Dot(point), waypoints.size());
                 waypoints.setSelected(waypoints.size() - 1);
@@ -61,7 +61,7 @@ class RoverPath implements Layer {
                 waypoints.setSelected(line);
             }
             return true;
-        } else if ((e.getButton() == MouseEvent.BUTTON3) && (underneith != -1)) {
+        } else if ((e.getButton() == MouseEvent.BUTTON3) && (underneith != Integer.MAX_VALUE)) {
             //right click on top of a point
             waypoints.remove(underneith);
             return true;
@@ -70,14 +70,14 @@ class RoverPath implements Layer {
     }
 
     private Dot draggedDot = null;
-    private int draggedDotIdx = -1;
-    private int downDot = -1;
+    private int draggedDotIdx = Integer.MAX_VALUE;
+    private int downDot = Integer.MAX_VALUE;
 
     public boolean onPress(MouseEvent e) {
         Point pixel = e.getPoint();
         downDot = isOverDot(pixel, context.theme.waypointImage);
-        if(downDot != -1) {
-            draggedDot = waypoints.get(downDot);
+        if(downDot != Integer.MAX_VALUE) {
+            draggedDot = waypoints.get(downDot).dot();
             waypoints.setSelected(downDot);
             return true;
         }
@@ -86,7 +86,7 @@ class RoverPath implements Layer {
 
     public void onDrag(MouseEvent e) {
         Point2D pixel = toP2D(e.getPoint());
-        if (downDot != -1) {
+        if (downDot != Integer.MAX_VALUE) {
             Point2D finalLoc = mapTransform.mapPosition(pixel);
             draggedDotIdx = downDot;
             draggedDot.setLocation(finalLoc);
@@ -96,9 +96,9 @@ class RoverPath implements Layer {
 
     public void onRelease(MouseEvent e) {
         Point pixel = e.getPoint();
-        if(draggedDotIdx != -1) {
+        if(draggedDotIdx != Integer.MAX_VALUE) {
             waypoints.set(draggedDot, draggedDotIdx);
-            draggedDotIdx = -1;
+            draggedDotIdx = Integer.MAX_VALUE;
         }
     }
 
@@ -126,12 +126,9 @@ class RoverPath implements Layer {
     }
 
     private void paintDots(Graphics g) {
-        if(waypoints.size()!=0) {
-            drawLines(g);
-            drowRoverLine(g);
-            drawPoints(g);
-        }
-        drawRover(g);
+        drawLines(g);
+        drowRoverLine(g);
+        drawPoints(g);
     }
 
     private Point2D drawnLocation(int index){
@@ -139,7 +136,7 @@ class RoverPath implements Layer {
         if(index == draggedDotIdx){
             d = draggedDot;
         } else {
-            d = waypoints.get(index);
+            d = waypoints.get(index).dot();
         }
         return mapTransform.screenPosition(d.getLocation());
     }
@@ -166,23 +163,20 @@ class RoverPath implements Layer {
     private void drawPoints(Graphics g) {
         Point tmp;
 
-        for(int i=0; i<waypoints.size(); i++){
+        for(int i=waypoints.extendedIndexStart(); i<waypoints.size(); i++){
             tmp = toPoint(drawnLocation(i));
-            if(i==waypoints.getSelected())
-               drawImg(g, context.theme.waypointSelected, tmp);
-            else
-                drawImg(g, context.theme.waypointImage, tmp);
+            ExtendedWaypoint w = waypoints.get(i);
+            BufferedImage img = context.theme.waypointImage;
+            switch(w.type()){
+                case ROVER: img = context.theme.roverImage; break;
+                case SELECTED: img = context.theme.waypointSelected; break;
+            }
+            drawImg(g, img, tmp);
         }
-    }
-
-    private void drawRover(Graphics g) {
-        Point2D roverPoint = roverLocation();
-        drawImg(g, context.theme.roverImage, roverPoint);
     }
 
     private void drowRoverLine(Graphics g) {
         if(waypoints.getTarget() >= waypoints.size()) {
-            System.err.println("roverTarget out of Bounds");
             return;
         }
         Point n = toPoint(roverLocation());
@@ -197,18 +191,18 @@ class RoverPath implements Layer {
     }
 
     public int isOverDot(Point2D click, BufferedImage image) {
-        for(int i=0; i<waypoints.size(); i++) {
-            Dot d = waypoints.get(i);
+        for(int i=waypoints.extendedIndexStart(); i<waypoints.size(); i++) {
+            Dot d = waypoints.get(i).dot();
             Point2D loc = mapTransform.screenPosition(d.getLocation());
             if(Math.abs(click.getX()-loc.getX()-1) > image.getWidth() /2.0) continue;
             if(Math.abs(click.getY()-loc.getY()-1) > image.getHeight()/2.0) continue;
             return i;
         }
-        return -1;
+        return Integer.MAX_VALUE;
     }
 
     public int isOverLine(Point p) {
-        if(waypoints.size()<2) return -1;
+        if(waypoints.size()<2) return Integer.MAX_VALUE;
         Point prevPoint = toPoint(roverLocation());
         for(int i=0; i<waypoints.size(); i++) {
             Point thisPoint = toPoint(drawnLocation(i));
@@ -217,7 +211,7 @@ class RoverPath implements Layer {
             }
             prevPoint = thisPoint;
         }
-        return -1;
+        return Integer.MAX_VALUE;
     }
 
     public int distFromLine(Point a, Point b, Point idp) {

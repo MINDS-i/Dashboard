@@ -58,11 +58,11 @@ public class xml {
         WaypointList p = context.getWaypointList();
         for(int i=0; i<p.size(); i++) {
             writer.writeStartElement(URI, "rtept");
-            writer.writeAttribute("lat", Double.toString(p.get(i).getLatitude ()));
-            writer.writeAttribute("lng", Double.toString(p.get(i).getLongitude()));
+            writer.writeAttribute("lat", Double.toString(p.get(i).dot().getLatitude ()));
+            writer.writeAttribute("lng", Double.toString(p.get(i).dot().getLongitude()));
             writer.writeCharacters("\n");
             writer.writeStartElement(URI, "ele");
-            writer.writeCharacters(Double.toString(p.get(i).getAltitude()/3.28084));//feet to meters
+            writer.writeCharacters(Double.toString(p.get(i).dot().getAltitude()/3.28084));//feet to meters
             writer.writeEndElement();// /ele
             writer.writeCharacters("\n");
             writer.writeEndElement();// /rtept

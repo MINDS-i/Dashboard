@@ -25,26 +25,50 @@ public class WaypointList {
     private Dot roverLocation = new Dot();
     private boolean isLooped = false;
     private int targetIndex = 0;
-    private int selectedIndex = 0;
+    private int selectedIndex = -1;
 
     public WaypointList() {}
 
-    /**
-     * Add a waypoint so it occures at position `index` in the Waypoint List
-     * if index is greater than the current length of the list, an
-     * IndexOutOfBoundsException is thrown.
-     */
-    public void add(Dot p, int index){
-        waypoints.add(index, p);
-        listeners.stream().forEach(l -> l.changed(p, index, WaypointListener.Action.ADD));
+    public enum Type{
+        ROVER, HOME, WAYPOINT, SELECTED
     }
+    public interface ExtendedWaypoint{
+        Dot dot();
+        Type type();
+    }
+
     /**
-     *
+     * The index location to start calling index at so that extended waypoints
+     * like the rover's location and home position get added to the list
+     */
+    public int extendedIndexStart() { return -1; }
+    /**
+     * Return the waypoint at location `index`
      * Throws IndexOutOfBoundsException if there is no waypoint at that index
      */
-    public void set(Dot p, int index){
-        waypoints.set(index, p);
-        listeners.stream().forEach(l -> l.changed(p, index, WaypointListener.Action.SET));
+    public ExtendedWaypoint get(int index) {
+        switch(index){
+            case -1: //home
+                return new ExtendedWaypoint(){
+                    public Dot dot(){ return new Dot(roverLocation); }
+                    public Type type(){ return Type.ROVER; }
+                };
+            default:
+                return new ExtendedWaypoint(){
+                    public Dot dot(){ return new Dot(waypoints.get(index)); }
+                    public Type type(){
+                        return (index == selectedIndex)
+                                    ? Type.SELECTED
+                                    : Type.WAYPOINT;
+                    }
+                };
+        }
+    }
+    /**
+     * Return the current number of waypoints
+     */
+    public int size() {
+        return waypoints.size();
     }
     /**
      * Set the rover's location
@@ -60,26 +84,34 @@ public class WaypointList {
         return new Dot(roverLocation);
     }
     /**
+     * Add a waypoint so it occures at position `index` in the Waypoint List
+     * if index is greater than the current length of the list, an
+     * IndexOutOfBoundsException is thrown.
+     */
+    public void add(Dot p, int index){
+        waypoints.add(index, p);
+        if(index <= selectedIndex) setSelected(selectedIndex + 1);
+        if(index <= targetIndex) setTarget(targetIndex + 1);
+        listeners.stream().forEach(l -> l.changed(p, index, WaypointListener.Action.ADD));
+    }
+    /**
+     *
+     * Throws IndexOutOfBoundsException if there is no waypoint at that index
+     */
+    public void set(Dot p, int index){
+        waypoints.set(index, p);
+        listeners.stream().forEach(l -> l.changed(p, index, WaypointListener.Action.SET));
+    }
+    /**
      * Return the waypoint at location `index`
      * Throws IndexOutOfBoundsException if there is no waypoint at that index
      */
     public void remove(int index){
         Dot p = waypoints.get(index);
         waypoints.remove(index);
+        if(index <= selectedIndex) setSelected(selectedIndex - 1);
+        if(index <= targetIndex) setTarget(targetIndex - 1);
         listeners.stream().forEach(l -> l.changed(p, index, WaypointListener.Action.DELETE));
-    }
-    /**
-     * Return the waypoint at location `index`
-     * Throws IndexOutOfBoundsException if there is no waypoint at that index
-     */
-    public Dot get(int index) {
-        return new Dot(waypoints.get(index));
-    }
-    /**
-     * Return the current number of waypoints
-     */
-    public int size() {
-        return waypoints.size();
     }
     /**
      * Set the waypoint looped status and inform listeners if it changed
@@ -116,7 +148,7 @@ public class WaypointList {
      */
     public void setSelected(int index){
         if(index == selectedIndex || // only fire events when actually changed
-           index <  0 ||
+           index <  extendedIndexStart() ||
            index >= waypoints.size()) return;
         selectedIndex = index;
         listeners.stream().forEach(l -> l.selectionChanged(index));
