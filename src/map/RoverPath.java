@@ -198,6 +198,7 @@ class RoverPath implements Layer {
             ExtendedWaypoint w = waypoints.get(i);
             BufferedImage img = context.theme.waypointImage;
             switch(w.type()){
+                case HOME: img = context.theme.homeIcon; break;
                 case ROVER: img = context.theme.roverImage; break;
                 case SELECTED: img = context.theme.waypointSelected; break;
             }

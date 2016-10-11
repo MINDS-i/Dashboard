@@ -69,8 +69,8 @@ class WaypointPanel extends NinePatchPanel {
 
         String indexField = (selectedWaypoint+1) + " / " + waypoints.size();
         switch(w.type()){
-            case ROVER: indexField = "ROVER"; break;
-            case HOME: indexField = "HOME"; break;
+            case ROVER: indexField = "Robot"; break;
+            case HOME: indexField = "Home "; break;
         }
         waypointIndexDisplay.setText(indexField);
 

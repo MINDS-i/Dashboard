@@ -101,7 +101,7 @@ public class Context {
             }
         });
 
-        final double lastLatitude[] = new double[1];
+        final double lastLatitude[] = new double[2];
         telemetry.registerListener(Serial.LATITUDE, new TelemetryListener() {
             public void update(double data) {
                 lastLatitude[0] = data;
@@ -113,6 +113,19 @@ public class Context {
                 location.setLatitude(lastLatitude[0]);
                 location.setLongitude(data);
                 waypoint.setRover(location);
+            }
+        });
+        telemetry.registerListener(Serial.HOMELATITUDE, new TelemetryListener() {
+            public void update(double data) {
+                lastLatitude[1] = data;
+            }
+        });
+        telemetry.registerListener(Serial.HOMELONGITUDE, new TelemetryListener() {
+            public void update(double data) {
+                Dot location = waypoint.getHome();
+                location.setLatitude(lastLatitude[1]);
+                location.setLongitude(data);
+                waypoint.setHome(location);
             }
         });
     }

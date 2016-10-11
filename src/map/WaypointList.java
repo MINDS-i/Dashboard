@@ -14,6 +14,7 @@ public class WaypointList {
          */
         public void unusedEvent() {}
         public void roverMoved(Dot p) { unusedEvent(); }
+        public void homeMoved(Dot p) { unusedEvent(); }
         public void changed(Dot p, int index, Action a) { unusedEvent(); }
         public void targetChanged(int target) { unusedEvent(); }
         public void selectionChanged(int selection) { unusedEvent(); }
@@ -23,6 +24,7 @@ public class WaypointList {
     private final List<Dot> waypoints = new LinkedList<Dot>();
     private final List<WaypointListener> listeners = new LinkedList<WaypointListener>();
     private Dot roverLocation = new Dot();
+    private Dot homeLocation = new Dot();
     private boolean isLooped = false;
     private int targetIndex = 0;
     private int selectedIndex = -1;
@@ -41,14 +43,19 @@ public class WaypointList {
      * The index location to start calling index at so that extended waypoints
      * like the rover's location and home position get added to the list
      */
-    public int extendedIndexStart() { return -1; }
+    public int extendedIndexStart() { return -2; }
     /**
      * Return the waypoint at location `index`
      * Throws IndexOutOfBoundsException if there is no waypoint at that index
      */
     public ExtendedWaypoint get(int index) {
         switch(index){
-            case -1: //home
+            case -2: //home
+                return new ExtendedWaypoint(){
+                    public Dot dot(){ return new Dot(homeLocation); }
+                    public Type type(){ return Type.HOME; }
+                };
+            case -1: //rover
                 return new ExtendedWaypoint(){
                     public Dot dot(){ return new Dot(roverLocation); }
                     public Type type(){ return Type.ROVER; }
@@ -82,6 +89,19 @@ public class WaypointList {
      */
     public Dot getRover(){
         return new Dot(roverLocation);
+    }
+    /**
+     * Set the home's location
+     */
+    public void setHome(Dot p){
+        homeLocation = p;
+        listeners.stream().forEach(l -> l.homeMoved(p));
+    }
+    /**
+     * Get the home's location
+     */
+    public Dot getHome(){
+        return new Dot(homeLocation);
     }
     /**
      * Add a waypoint so it occures at position `index` in the Waypoint List

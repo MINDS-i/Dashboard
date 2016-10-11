@@ -30,13 +30,17 @@ public class Serial {
     public static final byte SYNC_REQUEST = 0x00;
     public static final byte SYNC_RESPOND = 0x01;
     //telemetry IDs
-    public static final int LATITUDE	= 0;
-    public static final int LONGITUDE	= 1;
-    public static final int HEADING		= 2;
-    public static final int PITCH		= 3;
-    public static final int ROLL		= 4;
-    public static final int SPEED		= 5;
-    public static final int VOLTAGE		= 6;
+    public static final int LATITUDE      = 0;
+    public static final int LONGITUDE     = 1;
+    public static final int HEADING       = 2;
+    public static final int PITCH         = 3;
+    public static final int ROLL          = 4;
+    public static final int SPEED         = 5;
+    public static final int VOLTAGE       = 6;
+    public static final int AMPERAGE      = 7;
+    public static final int ALTITUDE      = 8;
+    public static final int HOMELATITUDE  = 9;
+    public static final int HOMELONGITUDE = 10;
 
     public static final int	MAX_WAYPOINTS		= 64;
     public static final int	MAX_SETTINGS		= 64;
