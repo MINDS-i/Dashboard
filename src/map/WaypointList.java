@@ -7,19 +7,21 @@ import java.util.*;
 
 public class WaypointList {
     public static class WaypointListener{
+        public enum Source { LOCAL, REMOTE }
         public enum Action { ADD, SET, DELETE }
         /**
          * Override unusedEvent to have a method called from all ather handlers
          * that were not overriden
          */
         public void unusedEvent() {}
-        public void roverMoved(Dot p) { unusedEvent(); }
-        public void homeMoved(Dot p) { unusedEvent(); }
-        public void changed(Dot p, int index, Action a) { unusedEvent(); }
-        public void targetChanged(int target) { unusedEvent(); }
         public void selectionChanged(int selection) { unusedEvent(); }
-        public void loopModeSet(boolean isLooped) { unusedEvent(); }
+        public void roverMoved(WaypointListener.Source s, Dot p) { unusedEvent(); }
+        public void homeMoved(WaypointListener.Source s, Dot p) { unusedEvent(); }
+        public void changed(WaypointListener.Source s, Dot p, int index, Action a) { unusedEvent(); }
+        public void targetChanged(WaypointListener.Source s, int target) { unusedEvent(); }
+        public void loopModeSet(WaypointListener.Source s, boolean isLooped) { unusedEvent(); }
     }
+
 
     private final List<Dot> waypoints = new LinkedList<Dot>();
     private final List<WaypointListener> listeners = new LinkedList<WaypointListener>();
@@ -81,8 +83,11 @@ public class WaypointList {
      * Set the rover's location
      */
     public void setRover(Dot p){
+        setRover(p, WaypointListener.Source.LOCAL);
+    }
+    public void setRover(Dot p, WaypointListener.Source s){
         roverLocation = p;
-        listeners.stream().forEach(l -> l.roverMoved(p));
+        listeners.stream().forEach(l -> l.roverMoved(s, p));
     }
     /**
      * Get the rover's location
@@ -94,8 +99,11 @@ public class WaypointList {
      * Set the home's location
      */
     public void setHome(Dot p){
+        setHome(p, WaypointListener.Source.LOCAL);
+    }
+    public void setHome(Dot p, WaypointListener.Source s){
         homeLocation = p;
-        listeners.stream().forEach(l -> l.homeMoved(p));
+        listeners.stream().forEach(l -> l.homeMoved(s, p));
     }
     /**
      * Get the home's location
@@ -109,37 +117,49 @@ public class WaypointList {
      * IndexOutOfBoundsException is thrown.
      */
     public void add(Dot p, int index){
+        add(p, index, WaypointListener.Source.LOCAL);
+    }
+    public void add(Dot p, int index, WaypointListener.Source s){
         waypoints.add(index, p);
         if(index <= selectedIndex) setSelected(selectedIndex + 1);
         if(index <= targetIndex) setTarget(targetIndex + 1);
-        listeners.stream().forEach(l -> l.changed(p, index, WaypointListener.Action.ADD));
+        listeners.stream().forEach(l -> l.changed(s, p, index, WaypointListener.Action.ADD));
     }
     /**
      *
      * Throws IndexOutOfBoundsException if there is no waypoint at that index
      */
     public void set(Dot p, int index){
+        set(p, index, WaypointListener.Source.LOCAL);
+    }
+    public void set(Dot p, int index, WaypointListener.Source s){
         waypoints.set(index, p);
-        listeners.stream().forEach(l -> l.changed(p, index, WaypointListener.Action.SET));
+        listeners.stream().forEach(l -> l.changed(s, p, index, WaypointListener.Action.SET));
     }
     /**
      * Return the waypoint at location `index`
      * Throws IndexOutOfBoundsException if there is no waypoint at that index
      */
     public void remove(int index){
+        remove(index, WaypointListener.Source.LOCAL);
+    }
+    public void remove(int index, WaypointListener.Source s){
         Dot p = waypoints.get(index);
         waypoints.remove(index);
         if(index <= selectedIndex) setSelected(selectedIndex - 1);
         if(index <= targetIndex) setTarget(targetIndex - 1);
-        listeners.stream().forEach(l -> l.changed(p, index, WaypointListener.Action.DELETE));
+        listeners.stream().forEach(l -> l.changed(s, p, index, WaypointListener.Action.DELETE));
     }
     /**
      * Set the waypoint looped status and inform listeners if it changed
      */
     public void setLooped(boolean state){
+        setLooped(state, WaypointListener.Source.LOCAL);
+    }
+    public void setLooped(boolean state, WaypointListener.Source s){
         if(isLooped == state) return;
         isLooped = state;
-        listeners.stream().forEach(l -> l.loopModeSet(state));
+        listeners.stream().forEach(l -> l.loopModeSet(s, state));
     }
     /**
      * Return if waypoints are currently looped
@@ -151,11 +171,14 @@ public class WaypointList {
      * Set the target index and inform listeners if the target changed
      */
     public void setTarget(int index){
+        setTarget(index, WaypointListener.Source.LOCAL);
+    }
+    public void setTarget(int index, WaypointListener.Source s){
         if(index == targetIndex || // only fire events when actually changed
            index <  0 ||
            index >= waypoints.size()) return;
         targetIndex = index;
-        listeners.stream().forEach(l -> l.targetChanged(index));
+        listeners.stream().forEach(l -> l.targetChanged(s, index));
     }
     /**
      * Return the current target index

@@ -1,14 +1,15 @@
 package com.serial;
 
+import com.Context;
 import com.Dashboard;
+import com.data.stateDescription.*;
 import com.map.Dot;
 import com.map.MapPanel;
 import com.map.WaypointList;
-import com.serial.Serial;
-import com.Context;
-import com.data.stateDescription.*;
 import com.serial.*;
 import com.serial.Messages.*;
+import com.serial.Serial;
+import static com.map.WaypointList.*;
 import jssc.SerialPort;
 import jssc.SerialPortException;
 import jssc.SerialPortEventListener;
@@ -143,7 +144,7 @@ public class SerialParser implements SerialPortEventListener {
                     break;
                 case Serial.COMMAND_WORD:
                     if(a == Serial.TARGET_CMD) {
-                        waypoints.setTarget(b);
+                        waypoints.setTarget(b, WaypointListener.Source.REMOTE);
                     }
                     break;
             }

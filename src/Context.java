@@ -64,17 +64,18 @@ public class Context {
         }
 
         // Instance these classes after the resources have been loaded
+        waypoint    = new WaypointList();
         theme       = new Theme(this);
         sender      = new SerialSender(this);
         parser      = new SerialParser(this, waypoint);
         settingList = new SettingList(this);
         telemetry   = new TelemetryManager(this);
-        waypoint    = new WaypointList();
 
         // Patch the waypoint list into the serial sender
         waypoint.addListener(new WaypointListener(){
             @Override
-            public void changed(Dot point, int index, Action action) {
+            public void changed(Source s, Dot point, int index, Action action) {
+                if(s == Source.REMOTE) return;
                 Message tosend;
                 switch(action){
                     case ADD:
@@ -92,11 +93,13 @@ public class Context {
                 sender.sendMessage(tosend);
             }
             @Override
-            public void targetChanged(int targetIndex) {
+            public void targetChanged(Source s, int targetIndex) {
+                if(s == Source.REMOTE) return;
                 sender.sendMessage(Message.setTarget((byte) targetIndex));
             }
             @Override
-            public void loopModeSet(boolean isLooped) {
+            public void loopModeSet(Source s, boolean isLooped) {
+                if(s == Source.REMOTE) return;
                 sender.sendMessage(Message.setLooping((byte) ((isLooped)?1:0) ));
             }
         });
