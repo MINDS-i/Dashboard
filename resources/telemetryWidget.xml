@@ -9,7 +9,7 @@
     <line fmt="Vcc:% 9f" telem="6"/>
     <line fmt="Amp:% 9f" telem="7"/>
 -->
-    <line fmt="Alt:%5.0f" telem="8"/>
-    <line fmt="Mph:%5.1f" telem="5"/>
-    <line fmt="Vcc:%5.1f" telem="6"/>
+    <line bg="0xEEEEEE" fmt="Alt:%5.0f" telem="8"/>
+    <line bg="0xDFDFDF" fmt="Mph:%5.1f" telem="5"/>
+    <line bg="0xEEEEEE" fmt="Vcc:%5.1f" telem="6"/>
 </telemetryWidget>

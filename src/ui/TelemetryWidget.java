@@ -20,21 +20,26 @@ import java.text.ParseException;
 public class TelemetryWidget extends JPanel{
     // The top,left,bottom,right border widths of the nine patch image rendered
     // around the internal text
-    private final static Border insets = new EmptyBorder(15,18,46,18);
+    private final static Border insets = new EmptyBorder(9,10,40,10);
     // Maximum number of chars wide to make the lines
     private final int lineWidth;
     // Collection of line instances being rendered in the telemetry widget
     private final Collection<Line> lines = new ArrayList<Line>();
 
+    private final NinePatch np;
+
     public static class LineItem {
         private String fmt;
         private int telemetryID;
-        public LineItem(String fmt, int telemetryID){
+        private Color bgcolor;
+        public LineItem(String fmt, int telemetryID, Color bgcolor){
             this.fmt = fmt;
             this.telemetryID = telemetryID;
+            this.bgcolor = bgcolor;
         }
         public String getFmt(){ return fmt; }
         public int getTelemetryId(){ return telemetryID; }
+        public Color getBgColor(){ return bgcolor; }
     }
 
     /**
@@ -71,10 +76,15 @@ public class TelemetryWidget extends JPanel{
                             String fmt = r.getAttributeValue(null,"fmt");
                             String idx = r.getAttributeValue(null,"telem");
 
+                            String bgString = r.getAttributeValue(null,"bg");
+                            Color bg = (bgString != null)
+                                        ? Color.decode(bgString)
+                                        : Color.WHITE;
+
                             String format = (fmt == null)? defaultFormat : fmt;
                             int index = (idx == null)? -1 : Integer.valueOf(idx);
 
-                            items.add(new LineItem(format,index));
+                            items.add(new LineItem(format,index, bg));
                         }
                         break;
                     default:
@@ -104,7 +114,8 @@ public class TelemetryWidget extends JPanel{
       Collection<LineItem> items){
         this.lineWidth = lineWidth;
 
-        NinePatchPanel dataPanel = new NinePatchPanel(ctx.theme.screenPatch);
+        np = ctx.theme.screenPatch;
+        JPanel dataPanel = new JPanel();
         dataPanel.setBorder(insets);
         dataPanel.setLayout(new BoxLayout(dataPanel, BoxLayout.PAGE_AXIS));
         dataPanel.setOpaque(false);
@@ -115,6 +126,8 @@ public class TelemetryWidget extends JPanel{
             Line l = new Line(ctx, i.getFmt());
             l.setFont(font);
             l.setForeground(ctx.theme.textColor);
+            l.setBackground(i.getBgColor());
+            l.setOpaque(true);
             if(i.getTelemetryId() != -1){
                 ctx.telemetry.registerListener(i.getTelemetryId(), l);
             }
@@ -125,6 +138,12 @@ public class TelemetryWidget extends JPanel{
 
         this.setOpaque(false);
         this.add(dataPanel);
+    }
+
+    @Override
+    public void paint(Graphics g) {
+        super.paint(g);
+        np.paintIn(g, getWidth(), getHeight());
     }
 
     private class Line extends JLabel implements TelemetryListener {
