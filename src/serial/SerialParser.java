@@ -144,7 +144,12 @@ public class SerialParser implements SerialPortEventListener {
                     break;
                 case Serial.COMMAND_WORD:
                     if(a == Serial.TARGET_CMD) {
-                        waypoints.setTarget(b, WaypointListener.Source.REMOTE);
+                        if(b < 0 || b >= waypoints.size()){
+                            seriallog.severe("Rover transmitted inconsistent target; resyncing");
+                            context.sender.sendWaypointList();
+                        } else {
+                            waypoints.setTarget(b, WaypointListener.Source.REMOTE);
+                        }
                     }
                     break;
             }
