@@ -2,7 +2,6 @@ package com.map;
 
 import static com.map.WaypointList.*;
 import com.Context;
-import com.ContextViewer;
 import com.serial.Serial;
 import com.ui.TelemetryListener;
 import com.layer.Layer;

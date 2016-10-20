@@ -2,7 +2,6 @@ package com.map;
 
 import static com.map.WaypointList.*;
 import com.Context;
-import com.ContextViewer;
 import com.Dashboard;
 import com.graph.Graph;
 import com.map.coordinateListener;
