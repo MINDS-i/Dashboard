@@ -1,5 +1,5 @@
 <telemetryWidget width="8" fontsize="22" color="0xEA8300">
-    <line bg="0xDFDFDF" fmt="Alt:%4.0f" telem="8"/>
+    <line bg="0xDFDFDF" fmt="Alt:%4.0f" telem="12"/>
     <line bg="0xEEEEEE" fmt="Sea:%4.0f" telem="8"/>
     <line bg="0xDFDFDF" fmt="Mph:%4.1f" telem="5"/>
     <line bg="0xEEEEEE" fmt="Vcc:%4.1f" telem="6"/>

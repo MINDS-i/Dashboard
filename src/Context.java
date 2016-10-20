@@ -131,6 +131,13 @@ public class Context {
                 waypoint.setHome(location);
             }
         });
+        telemetry.registerListener(Serial.ALTITUDE, new TelemetryListener() {
+            public void update(double altitude) {
+                telemetry.updateTelemetry(Serial.DELTAALTITUDE,
+                    altitude - telemetry.getTelemetry(Serial.HOMEALTITUDE)
+                    );
+            }
+        });
     }
     public void toggleLocale() {
         String current = (String) persist.get("subject");

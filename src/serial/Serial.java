@@ -41,6 +41,8 @@ public class Serial {
     public static final int ALTITUDE      = 8;
     public static final int HOMELATITUDE  = 9;
     public static final int HOMELONGITUDE = 10;
+    public static final int HOMEALTITUDE  = 11;
+    public static final int DELTAALTITUDE = 12;
 
     public static final int	MAX_WAYPOINTS		= 64;
     public static final int	MAX_SETTINGS		= 64;
