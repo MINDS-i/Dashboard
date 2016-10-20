@@ -1,15 +1,6 @@
-<telemetryWidget width="10" fontsize="28">
-<!--
-    <line fmt="Lat:% 9f" telem="0"/>
-    <line fmt="Lng:% 9f" telem="1"/>
-    <line fmt="Dir:% 9f" telem="2"/>
-    <line fmt="Ptc:% 9f" telem="3"/>
-    <line fmt="Rol:% 9f" telem="4"/>
-    <line fmt="MPH:% 9f" telem="5"/>
-    <line fmt="Vcc:% 9f" telem="6"/>
-    <line fmt="Amp:% 9f" telem="7"/>
--->
-    <line bg="0xEEEEEE" fmt="Alt:%5.0f" telem="8"/>
-    <line bg="0xDFDFDF" fmt="Mph:%5.1f" telem="5"/>
-    <line bg="0xEEEEEE" fmt="Vcc:%5.1f" telem="6"/>
+<telemetryWidget width="8" fontsize="22" color="0xEA8300">
+    <line bg="0xDFDFDF" fmt="Alt:%4.0f" telem="8"/>
+    <line bg="0xEEEEEE" fmt="Sea:%4.0f" telem="8"/>
+    <line bg="0xDFDFDF" fmt="Mph:%4.1f" telem="5"/>
+    <line bg="0xEEEEEE" fmt="Vcc:%4.1f" telem="6"/>
 </telemetryWidget>

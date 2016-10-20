@@ -21,6 +21,7 @@ public class TelemetryWidget extends JPanel{
     // The top,left,bottom,right border widths of the nine patch image rendered
     // around the internal text
     private final static Border insets = new EmptyBorder(9,10,40,10);
+    private final static Border padding = new EmptyBorder(0,4,0,4);
     // Maximum number of chars wide to make the lines
     private final int lineWidth;
     // Collection of line instances being rendered in the telemetry widget
@@ -53,7 +54,7 @@ public class TelemetryWidget extends JPanel{
       int lineWidth,
       float fontSize,
       Collection<LineItem> items){
-        return new TelemetryWidget(ctx, lineWidth, fontSize, items);
+        return new TelemetryWidget(ctx, lineWidth, fontSize, ctx.theme.textColor, items);
     }
 
     public static TelemetryWidget fromXML(Context ctx, String resourceKey)
@@ -61,6 +62,7 @@ public class TelemetryWidget extends JPanel{
         int width = 0;
         float fontSize = 0f;
         String defaultFormat = "% f";
+        Color textColor = ctx.theme.textColor;
         Collection<LineItem> items = new LinkedList<LineItem>();
         try (Reader source = new FileReader(ctx.getResource(resourceKey))){
             XMLStreamReader r = XMLInputFactory.newInstance().
@@ -72,6 +74,11 @@ public class TelemetryWidget extends JPanel{
                             width = Integer.valueOf(r.getAttributeValue(null, "width"));
                             fontSize = Float.valueOf(r.getAttributeValue(null, "fontsize"));
                             defaultFormat = String.format(" %% %df", width-1);
+
+                            String color = r.getAttributeValue(null,"color");
+                            if(color != null){
+                                textColor = Color.decode(color);
+                            }
                         } else if(r.getLocalName().equals("line")) {
                             String fmt = r.getAttributeValue(null,"fmt");
                             String idx = r.getAttributeValue(null,"telem");
@@ -95,7 +102,7 @@ public class TelemetryWidget extends JPanel{
             throw new ParseException("Failed to parse XML from the stream"+e,0);
         }
 
-        return new TelemetryWidget(ctx, width, fontSize, items);
+        return new TelemetryWidget(ctx, width, fontSize, textColor, items);
     }
 
     /**
@@ -111,6 +118,7 @@ public class TelemetryWidget extends JPanel{
       Context ctx,
       int lineWidth,
       float fontSize,
+      Color textColor,
       Collection<LineItem> items){
         this.lineWidth = lineWidth;
 
@@ -125,9 +133,10 @@ public class TelemetryWidget extends JPanel{
         for(LineItem i : items){
             Line l = new Line(ctx, i.getFmt());
             l.setFont(font);
-            l.setForeground(ctx.theme.textColor);
+            l.setForeground(textColor);
             l.setBackground(i.getBgColor());
             l.setOpaque(true);
+            l.setBorder(padding);
             if(i.getTelemetryId() != -1){
                 ctx.telemetry.registerListener(i.getTelemetryId(), l);
             }
