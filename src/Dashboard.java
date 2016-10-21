@@ -164,6 +164,7 @@ public class Dashboard implements Runnable {
             AngleWidget.createDial(context, Serial.HEADING, context.theme.roverTop),
             AngleWidget.createDial(context, Serial.PITCH, context.theme.roverSide),
             AngleWidget.createDial(context, Serial.ROLL, context.theme.roverFront),
+            HorizonWidgets.makeHorizonWidget(context),
         };
 
         JPanel dashPanel = new JPanel();

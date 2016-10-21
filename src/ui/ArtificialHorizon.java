@@ -18,27 +18,21 @@ import java.util.List;
 import java.io.File;
 
 public class ArtificialHorizon extends JPanel {
-
     private double pitch, roll;
     private Color groundColor = new Color(0x7D5233);
     private Color airColor = new Color(0x5B93C5);
     private Color wingColor = new Color(0xEA8300);
-    private Color barColor = Color.WHITE;
+    private Color barColor = new Color(0xBBBBBB);
 
     public ArtificialHorizon(){
-        ScheduledExecutorService ex =
-            Executors.newSingleThreadScheduledExecutor();
-        ex.scheduleAtFixedRate(
-            ()->{ this.repaint(); Toolkit.getDefaultToolkit().sync(); },
-            0,
-            20,
-            TimeUnit.MILLISECONDS);
     }
 
     public void set(double pitch, double roll){
         synchronized(this){
             this.pitch = pitch;
             this.roll = roll;
+            this.repaint();
+            Toolkit.getDefaultToolkit().sync();
         }
     }
 
@@ -73,7 +67,7 @@ public class ArtificialHorizon extends JPanel {
     }
 
     private void paintPlaneIndicator(Graphics2D g, int size){
-        int height = size/40;
+        int height = Math.max(size/40,1);
         int width = size*6/40;
         int seperation = width;
 
@@ -107,19 +101,30 @@ public class ArtificialHorizon extends JPanel {
             g.setColor(Color.BLACK);
             g.fillRect(0, horizonPosition-1, size, 2);
 
-            g.setColor(barColor);
-            int lineHeight = Math.max(size/200, 1);
-            int lineWidth = size*30/200;
-            for(int i=-60; i<=60; i+=10){
-                if(i == 0) continue;
-                int position = angleOffset(((double)i)*Math.PI/180.0+pitch, size);
-                g.fillRoundRect(
-                    size/2-lineWidth/2, position-lineHeight/2,
-                    lineWidth, lineHeight,
-                    lineHeight, lineHeight);
-            }
+            renderAngleMarkings(g, size);
         }
+    }
 
+    private void renderAngleMarkings(Graphics2D g, int size){
+        g.setColor(barColor);
+        int lineHeight = Math.max(size/200, 1);
+        int shortWidth = size/15;
+
+        for(int i=-60; i<=60; i+=5){
+            if(i == 0) continue;
+
+            int effWidth = shortWidth;
+            int position = angleOffset(((double)i)*Math.PI/180.0+pitch, size);
+
+            if(Math.abs(i) % 10 == 0){
+                effWidth = shortWidth*Math.min(Math.abs(i)/10 + 1, 3);
+            }
+
+            g.fillRoundRect(
+                size/2-effWidth/2, position-lineHeight/2,
+                effWidth, lineHeight,
+                lineHeight, lineHeight);
+        }
     }
 
     //main method for quicker manual testing
