@@ -195,6 +195,20 @@ public class Dashboard implements Runnable {
     }
 
     public static void main(String[] args) {
+        String openglProperty = "false";
+
+        try (Reader optFile = new FileReader("./resources/system.properties")) {
+            Properties launchOptions = new Properties();
+            launchOptions.load(optFile);
+            openglProperty =
+                launchOptions.getProperty("opengl", openglProperty);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        System.setProperty("sun.java2d.opengl", openglProperty);
+        System.out.println("Launching with opengl="+openglProperty);
+
         Dashboard se = new Dashboard();
         SwingUtilities.invokeLater(se);
     }
