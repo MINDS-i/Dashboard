@@ -13,36 +13,103 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.List;
+import java.util.Map;
+import java.util.EnumMap;
 
 //for testing purposes
 import java.io.File;
 
 public class ArtificialHorizon extends JPanel {
-    private double pitch, roll, altitude;
-    private Color groundColor = new Color(0x7D5233);
-    private Color airColor = new Color(0x5B93C5);
-    private Color wingColor = new Color(0xEA8300);
-    private Color barColor = new Color(0xBBBBBB);
-
+    /**
+     * Ratio of display size to the distance between the inner bar of an
+     *   axis indicator and the edge of the display
+     */
+    private static final float WDIST  = 3.0f/20.0f;
+    /**
+     * Ratio of display size to the length of a full tick mark on an axis
+     *   indicator
+     */
+    private static final float TICKH  = 1.0f/20.0f;
+    /**
+     * Ratio of display size to the width of the indicator axis lines
+     */
+    private static final float STROKE = 1.0f/300.0f;
+    /**
+     * Magnitude in abstract units between marks on the indicator axis
+     */
+    private static final float TICK_SCALE = 10f;
+    /**
+     * Number of ticks to display on each indicator axis
+     */
+    private static final int TICK_COUNT = 20;
+    /**
+     * Ratio of normal small indicator ticks to large labeled ticks
+     */
+    private static final int MAJOR_TICK_RATE = 4;
+    private static final Color groundColor = new Color(0x7D5233);
+    private static final Color airColor = new Color(0x5B93C5);
+    private static final Color wingColor = new Color(0xEA8300);
+    private static final Color barColor = new Color(0xBBBBBB);
+    enum DataAxis {
+        TOP(new IndicatorBarSpecs(
+            WDIST, WDIST, STROKE, 1f-2f*WDIST, Axis.X_AXIS, -TICKH,
+            DrawPoint.BottomCenter
+        )),
+        LEFT(new IndicatorBarSpecs(
+            WDIST, WDIST, STROKE, 1f-2f*WDIST, Axis.Y_AXIS, -TICKH,
+            DrawPoint.RightCenter
+        )),
+        RIGHT(new IndicatorBarSpecs(
+            WDIST, 1f-WDIST, STROKE, 1f-2f*WDIST, Axis.Y_AXIS, TICKH,
+            DrawPoint.LeftCenter
+        )),
+        BOTTOM(new IndicatorBarSpecs(
+            1f-WDIST, WDIST, STROKE, 1f-2f*WDIST, Axis.X_AXIS, TICKH,
+            DrawPoint.TopCenter
+        ));
+        final IndicatorBarSpecs ibs;
+        DataAxis(IndicatorBarSpecs ibs){ this.ibs = ibs; }
+    }
+    private Map<DataAxis, Float> values = new EnumMap<DataAxis, Float>(DataAxis.class);
+    private Map<DataAxis, Boolean> enabled = new EnumMap<DataAxis, Boolean>(DataAxis.class);
+    {
+        for(DataAxis a : DataAxis.values()){
+            enabled.put(a, false);
+            values.put(a, 0.0f);
+        }
+    }
+    private float pitch, roll;
+    /**
+     * Construct an artificial Horizon instance
+     */
     public ArtificialHorizon(){
     }
-
-    public void set(double pitch, double roll, double altitude){
+    /**
+     * Set the main display angles for the artificial horizon and redraw
+     */
+    public void setAngles(float pitch, float roll){
         synchronized(this){
             this.pitch = pitch;
             this.roll = roll;
-            this.altitude = altitude;
             this.repaint();
             Toolkit.getDefaultToolkit().sync();
         }
     }
-
     /**
-     * The artificial horizon is rendered in an artificial 512,512 square
-     *   which is scaled to fit the current actual window size
+     * Set the value centered on a particular data indicator axis
      */
-
-    @Override
+    public void set(DataAxis dv, float value){
+        values.put(dv, value);
+    }
+    /**
+     * Enable the drawing of a particular data indicator axis
+     */
+    public void setEnabled(DataAxis dv, boolean value){
+        enabled.put(dv, value);
+    }
+    /**
+     * Paint this Artificial Horizon in a Graphics context
+     */
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
@@ -53,11 +120,12 @@ public class ArtificialHorizon extends JPanel {
                 RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setRenderingHints(rh);
 
-        /*int artificialSize = 2048;
+        /*
+        int artificialSize = 2048;
         double scale = (double)actualSize / (double)artificialSize;
         g2d.scale(scale,scale);
         render(g2d, artificialSize);
-*/
+        */
         render(g2d, actualSize);
         g2d.dispose();
 
@@ -68,7 +136,6 @@ public class ArtificialHorizon extends JPanel {
     }
 
     private void render(Graphics2D g, int size){
-
         g.setFont( setFontHeight(g.getFont(), size/26) );
 
         Graphics2D background = (Graphics2D)g.create();
@@ -81,16 +148,6 @@ public class ArtificialHorizon extends JPanel {
         paintPlaneIndicator(g, size);
         paintIndicators(g, size);
     }
-
-
-
-
-
-
-
-
-
-
 
     private interface Marker{
         void mark(float percent, float width, String label);
@@ -147,30 +204,10 @@ public class ArtificialHorizon extends JPanel {
     }
 
     private void paintIndicators(Graphics2D g, int size){
-        final float wDist   = 3.0f/20.0f;
-        final float mHeight = 1.0f/20.0f;
-        final float stroke  = 1.0f/300.0f;
-        IndicatorBarSpecs top = new IndicatorBarSpecs(
-            wDist, wDist, stroke, 1f-2f*wDist, Axis.X_AXIS, -mHeight,
-            DrawPoint.BottomCenter
-        );
-        IndicatorBarSpecs right = new IndicatorBarSpecs(
-            wDist, 1f-wDist, stroke, 1f-2f*wDist, Axis.Y_AXIS, mHeight,
-            DrawPoint.LeftCenter
-        );
-        IndicatorBarSpecs bottom = new IndicatorBarSpecs(
-            1f-wDist, wDist, stroke, 1f-2f*wDist, Axis.X_AXIS, mHeight,
-            DrawPoint.TopCenter
-        );
-        IndicatorBarSpecs left = new IndicatorBarSpecs(
-            wDist, wDist, stroke, 1f-2f*wDist, Axis.Y_AXIS, -mHeight,
-            DrawPoint.RightCenter
-        );
-        g.setColor(Color.GREEN);
-        paintIndicator(top, g, size);
-        paintIndicator(right, g, size);
-        paintIndicator(bottom, g, size);
-        paintIndicator(left, g, size);
+        for(DataAxis a : DataAxis.values()){
+            if(enabled.get(a) == true)
+                paintIndicator(a.ibs, values.get(a), g, size);
+        }
     }
 
     private int scaleTo(float scale, int size){
@@ -183,18 +220,23 @@ public class ArtificialHorizon extends JPanel {
         g.fillRect(x, y, Math.abs(width), Math.abs(height));
     }
 
-    private void paintIndicator(IndicatorBarSpecs ibs, Graphics2D g, int size){
+    private void paintIndicator(IndicatorBarSpecs ibs, float value, Graphics2D g, int size){
         float widthScalar = (ibs.markAxis == Axis.X_AXIS)?
-            ibs.length + ibs.stroke : ibs.stroke;
+            ibs.length : 0f;
         float heightScalar = (ibs.markAxis == Axis.Y_AXIS)?
-            ibs.length + ibs.stroke : ibs.stroke;
+            ibs.length : 0f;
+
+        // Draw the straight bar
+        g.setColor(Color.GREEN);
         g.fillRect(
             scaleTo(ibs.left, size),
             scaleTo(ibs.upper, size),
-            scaleTo(widthScalar, size),
-            scaleTo(heightScalar, size)
+            scaleTo(widthScalar+ibs.stroke, size),
+            scaleTo(heightScalar+ibs.stroke, size)
             );
-        markAxis((float)altitude, 10.0f, 20, 4,
+
+        // Draw the axis tick marks
+        markAxis(value, TICK_SCALE, TICK_COUNT, MAJOR_TICK_RATE,
           (float percent, float magn, String label) -> {
             float displacement = percent*ibs.length;
             float x = ibs.left + ((ibs.markAxis == Axis.X_AXIS)? displacement : 0.0f);
@@ -212,10 +254,29 @@ public class ArtificialHorizon extends JPanel {
             float textY = (ibs.markAxis == Axis.Y_AXIS)? y : y + ibs.markHeight;
             drawString(ibs.textPos, g, label, scaleTo(textX, size), scaleTo(textY, size));
         });
+
+        // Make the Center Indicator triangle
+        float centerX = ibs.left+widthScalar/2.0f;
+        float centerY = ibs.upper+heightScalar/2.0f;
+        float magnitude = ibs.markHeight/4.0f;
+        float flip = (ibs.markAxis == Axis.X_AXIS)? 1.0f : -1.0f;
+        g.setColor(Color.YELLOW);
+        g.fillPolygon(
+            new int[]{
+                scaleTo(centerX, size),
+                scaleTo(centerX - magnitude, size),
+                scaleTo(centerX + flip*magnitude, size),
+                },
+            new int[]{
+                scaleTo(centerY, size),
+                scaleTo(centerY - magnitude, size),
+                scaleTo(centerY - flip*magnitude, size),
+                },
+            3);
     }
 
-    enum DrawPoint{ LeftCenter, RightCenter, TopCenter, BottomCenter }
-    void drawString(DrawPoint dp, Graphics2D g, String s, int x, int y){
+    private enum DrawPoint{ LeftCenter, RightCenter, TopCenter, BottomCenter }
+    private void drawString(DrawPoint dp, Graphics2D g, String s, int x, int y){
         Rectangle2D r = g.getFontMetrics().getStringBounds(s, g);
         switch(dp){
             case BottomCenter:
@@ -233,28 +294,13 @@ public class ArtificialHorizon extends JPanel {
         }
     }
 
-    Font setFontHeight(Font f, int newHeight){
+    private Font setFontHeight(Font f, int newHeight){
         FontMetrics m = this.getFontMetrics(f);
         double scale = (double)newHeight / (double)m.getHeight();
         AffineTransform transform = new AffineTransform();
         transform.setToScale(scale, scale);
         return f.deriveFont(transform);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     private void paintPlaneIndicator(Graphics2D g, int size){
         int height = Math.max(size/40,1);
@@ -273,7 +319,7 @@ public class ArtificialHorizon extends JPanel {
                         height, height);
     }
 
-    int angleOffset(double theta, int size){
+    private int angleOffset(double theta, int size){
         return (int)((theta/2.0)*(double)size)+size/2;
     }
 
@@ -324,14 +370,19 @@ public class ArtificialHorizon extends JPanel {
         f.pack();
         f.setVisible(true);
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        double wave = 0.0;
+        ah.setEnabled(DataAxis.TOP, true);
+        ah.setEnabled(DataAxis.RIGHT, true);
+        ah.setEnabled(DataAxis.BOTTOM, true);
+        ah.setEnabled(DataAxis.LEFT, true);
+        float wave = 0.0f;
         while(f.isShowing()) {
             try {
-                wave += 0.005;
-                ah.set(
-                    0,//Math.cos(wave)/3.0,
-                    0,//Math.sin(wave*(3.0/5.0))/10,
-                    wave*15.0);
+                wave += 0.005f;
+                ah.set(DataAxis.TOP, wave*20f);
+                ah.set(DataAxis.RIGHT, wave*5f+7.378f);
+                ah.setAngles(
+                    (float)Math.cos(wave)/3.0f,
+                    (float)Math.sin(wave*(3.0f/5.0f))/10f);
                 Thread.sleep(16);
             } catch (Exception e) {
                 e.printStackTrace();
