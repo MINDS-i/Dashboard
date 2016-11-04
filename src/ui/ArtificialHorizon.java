@@ -50,6 +50,8 @@ public class ArtificialHorizon extends JPanel {
     private static final Color airColor = new Color(0x5B93C5);
     private static final Color wingColor = new Color(0xEA8300);
     private static final Color barColor = new Color(0xBBBBBB);
+    private static final Color INDICATOR_COLOR = Color.GREEN;
+    private static final Color CENTER_MARKER_COLOR = Color.YELLOW;
     enum DataAxis {
         TOP(new IndicatorBarSpecs(
             WDIST, WDIST, STROKE, 1f-2f*WDIST, Axis.X_AXIS, -TICKH,
@@ -222,17 +224,17 @@ public class ArtificialHorizon extends JPanel {
 
     private void paintIndicator(IndicatorBarSpecs ibs, float value, Graphics2D g, int size){
         float widthScalar = (ibs.markAxis == Axis.X_AXIS)?
-            ibs.length : 0f;
+            ibs.length+ibs.stroke : ibs.stroke;
         float heightScalar = (ibs.markAxis == Axis.Y_AXIS)?
-            ibs.length : 0f;
+            ibs.length+ibs.stroke : ibs.stroke;
 
         // Draw the straight bar
-        g.setColor(Color.GREEN);
+        g.setColor(INDICATOR_COLOR);
         g.fillRect(
             scaleTo(ibs.left, size),
             scaleTo(ibs.upper, size),
-            scaleTo(widthScalar+ibs.stroke, size),
-            scaleTo(heightScalar+ibs.stroke, size)
+            scaleTo(widthScalar, size),
+            scaleTo(heightScalar, size)
             );
 
         // Draw the axis tick marks
@@ -260,7 +262,7 @@ public class ArtificialHorizon extends JPanel {
         float centerY = ibs.upper+heightScalar/2.0f;
         float magnitude = ibs.markHeight/4.0f;
         float flip = (ibs.markAxis == Axis.X_AXIS)? 1.0f : -1.0f;
-        g.setColor(Color.YELLOW);
+        g.setColor(CENTER_MARKER_COLOR);
         g.fillPolygon(
             new int[]{
                 scaleTo(centerX, size),
@@ -372,8 +374,8 @@ public class ArtificialHorizon extends JPanel {
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         ah.setEnabled(DataAxis.TOP, true);
         ah.setEnabled(DataAxis.RIGHT, true);
-        ah.setEnabled(DataAxis.BOTTOM, true);
-        ah.setEnabled(DataAxis.LEFT, true);
+        ah.setEnabled(DataAxis.BOTTOM, false);
+        ah.setEnabled(DataAxis.LEFT, false);
         float wave = 0.0f;
         while(f.isShowing()) {
             try {
