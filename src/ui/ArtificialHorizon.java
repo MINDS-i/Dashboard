@@ -79,7 +79,7 @@ public class ArtificialHorizon extends JPanel {
         background.dispose();
 
         paintPlaneIndicator(g, size);
-        paintNumberIndicator(g, size);
+        paintIndicators(g, size);
     }
 
 
@@ -93,7 +93,7 @@ public class ArtificialHorizon extends JPanel {
 
 
     private interface Marker{
-        void mark(double percent, double width, String label);
+        void mark(float percent, float width, String label);
     }
 
     /**
@@ -105,66 +105,132 @@ public class ArtificialHorizon extends JPanel {
      *   `output`        - the marker object responsible for output
      */
     private void markAxis(
-      double center,
-      double scale,
+      float center,
+      float scale,
       int tickCount,
       int majorRate,
       Marker output){
-        double firstLowerMarker = Math.floor(center/scale)*scale;
-        double normalizedOffset = (center - firstLowerMarker)/(scale*(double)tickCount);
-        double tickHeight = 1.0/(double)tickCount;
+        float firstLowerMarker = ((float)Math.floor(center/scale))*scale;
+        float normalizedOffset = (center - firstLowerMarker)/(scale*(float)tickCount);
+        float tickHeight = 1.0f/(float)tickCount;
 
         for(int i=1; i<tickCount+1; i++){
-            double pos = tickHeight*i - normalizedOffset;
-            double value = (i - tickCount/2)*scale + firstLowerMarker;
+            float pos = tickHeight*i - normalizedOffset;
+            float value = (i - tickCount/2)*scale + firstLowerMarker;
 
             if( (int)(value / scale) % majorRate == 0 )
-                output.mark(pos, 0.9, ""+value);
+                output.mark(pos, 0.9f, ""+value);
             else
-                output.mark(pos, 0.5, "");
+                output.mark(pos, 0.5f, "");
         }
     }
 
+    private enum Axis{ X_AXIS, Y_AXIS };
+    private static class IndicatorBarSpecs{
+        float upper;
+        float left;
+        float stroke;
+        float length;
+        Axis markAxis;
+        float markHeight;
+        DrawPoint textPos;
+        IndicatorBarSpecs(float upper, float left, float stroke, float length,
+                          Axis markAxis, float markHeight, DrawPoint textPos){
+            this.upper = upper;
+            this.left = left;
+            this.stroke = stroke;
+            this.length = length;
+            this.markAxis = markAxis;
+            this.markHeight = markHeight;
+            this.textPos = textPos;
+        }
+    }
 
-    private void paintNumberIndicator(Graphics2D g, int size){
-        final int STROKE = 3;
-        final double indicatorHeight = (14.0*(double)size)/20.0;
-        final double indicatorWidth  = ( 1.0*(double)size)/20.0;
-        final int indicatorBottom = (17*size)/20;
-        final int indicatorLeft   = (17*size)/20;
-        final int indicatorTop    = ( 3*size)/20;
-
+    private void paintIndicators(Graphics2D g, int size){
+        final float wDist   = 3.0f/20.0f;
+        final float mHeight = 1.0f/20.0f;
+        final float stroke  = 1.0f/300.0f;
+        IndicatorBarSpecs top = new IndicatorBarSpecs(
+            wDist, wDist, stroke, 1f-2f*wDist, Axis.X_AXIS, -mHeight,
+            DrawPoint.BottomCenter
+        );
+        IndicatorBarSpecs right = new IndicatorBarSpecs(
+            wDist, 1f-wDist, stroke, 1f-2f*wDist, Axis.Y_AXIS, mHeight,
+            DrawPoint.LeftCenter
+        );
+        IndicatorBarSpecs bottom = new IndicatorBarSpecs(
+            1f-wDist, wDist, stroke, 1f-2f*wDist, Axis.X_AXIS, mHeight,
+            DrawPoint.TopCenter
+        );
+        IndicatorBarSpecs left = new IndicatorBarSpecs(
+            wDist, wDist, stroke, 1f-2f*wDist, Axis.Y_AXIS, -mHeight,
+            DrawPoint.RightCenter
+        );
         g.setColor(Color.GREEN);
-        g.fillRect(indicatorLeft, indicatorTop, STROKE, (int)indicatorHeight);
+        paintIndicator(top, g, size);
+        paintIndicator(right, g, size);
+        paintIndicator(bottom, g, size);
+        paintIndicator(left, g, size);
+    }
 
-        markAxis(altitude, 10.0, 20, 4,
-          (double percent, double width, String label) -> {
-            int height =
-                indicatorBottom - (int)Math.round(
-                    percent*indicatorHeight
-                );
-            int markWidth =
-                (int) Math.round(
-                    width*indicatorWidth
-                );
-            g.fillRect(
-                indicatorLeft,
-                height,
-                markWidth,
-                STROKE
-                );
-            drawCenteredString(
-                g,
-                label,
-                indicatorLeft+(int)indicatorWidth,
-                height
+    private int scaleTo(float scale, int size){
+        return (int) Math.round(scale*(float)size);
+    }
+
+    private void fillRect(Graphics2D g, int x, int y, int width, int height){
+        if(width  < 0) x += width;
+        if(height < 0) y += height;
+        g.fillRect(x, y, Math.abs(width), Math.abs(height));
+    }
+
+    private void paintIndicator(IndicatorBarSpecs ibs, Graphics2D g, int size){
+        float widthScalar = (ibs.markAxis == Axis.X_AXIS)?
+            ibs.length + ibs.stroke : ibs.stroke;
+        float heightScalar = (ibs.markAxis == Axis.Y_AXIS)?
+            ibs.length + ibs.stroke : ibs.stroke;
+        g.fillRect(
+            scaleTo(ibs.left, size),
+            scaleTo(ibs.upper, size),
+            scaleTo(widthScalar, size),
+            scaleTo(heightScalar, size)
             );
+        markAxis((float)altitude, 10.0f, 20, 4,
+          (float percent, float magn, String label) -> {
+            float displacement = percent*ibs.length;
+            float x = ibs.left + ((ibs.markAxis == Axis.X_AXIS)? displacement : 0.0f);
+            float y = ibs.upper+ ((ibs.markAxis == Axis.Y_AXIS)? ibs.length-displacement : 0.0f);
+            float width = (ibs.markAxis == Axis.Y_AXIS)? magn*ibs.markHeight : ibs.stroke;
+            float height= (ibs.markAxis == Axis.X_AXIS)? magn*ibs.markHeight : ibs.stroke;
+            fillRect(g,
+                scaleTo(x, size),
+                scaleTo(y, size),
+                scaleTo(width, size),
+                scaleTo(height, size)
+                );
+
+            float textX = (ibs.markAxis == Axis.X_AXIS)? x : x + ibs.markHeight;
+            float textY = (ibs.markAxis == Axis.Y_AXIS)? y : y + ibs.markHeight;
+            drawString(ibs.textPos, g, label, scaleTo(textX, size), scaleTo(textY, size));
         });
     }
 
-    void drawCenteredString(Graphics2D g, String s, int x, int y){
-        FontMetrics m = g.getFontMetrics();
-        g.drawString(s, x, y + (m.getHeight()-m.getDescent())/2);
+    enum DrawPoint{ LeftCenter, RightCenter, TopCenter, BottomCenter }
+    void drawString(DrawPoint dp, Graphics2D g, String s, int x, int y){
+        Rectangle2D r = g.getFontMetrics().getStringBounds(s, g);
+        switch(dp){
+            case BottomCenter:
+                g.drawString(s, x - (int)r.getCenterX(), y);
+                break;
+            case TopCenter:
+                g.drawString(s, x - (int)r.getCenterX(), y + (int)r.getHeight());
+                break;
+            case LeftCenter:
+                g.drawString(s, x, y - (int)r.getCenterY());
+                break;
+            case RightCenter:
+                g.drawString(s, x - (int)r.getWidth(), y - (int)r.getCenterY());
+                break;
+        }
     }
 
     Font setFontHeight(Font f, int newHeight){
@@ -265,8 +331,8 @@ public class ArtificialHorizon extends JPanel {
                 ah.set(
                     0,//Math.cos(wave)/3.0,
                     0,//Math.sin(wave*(3.0/5.0))/10,
-                    wave*40.0);
-                Thread.sleep(20);
+                    wave*15.0);
+                Thread.sleep(16);
             } catch (Exception e) {
                 e.printStackTrace();
             }
