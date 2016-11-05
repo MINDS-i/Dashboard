@@ -189,9 +189,13 @@ public class Context {
         return resources.getString(name);
     }
     public String getResource(String name, String otherwise) {
-        String rtn = getResource(name);
-        if(rtn == null) return otherwise;
-        return rtn;
+        try {
+            String rtn = getResource(name);
+            if(rtn == null) return otherwise;
+            return rtn;
+        } catch (Exception e){
+            return otherwise;
+        }
     }
     //register viewer of waypoint list
     public void addWaypointListener(WaypointListener l) {

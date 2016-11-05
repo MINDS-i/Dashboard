@@ -159,20 +159,25 @@ public class Dashboard implements Runnable {
             e.printStackTrace();
         }
 
-        JPanel[] widgets = {
-            dataWidget,
-            AngleWidget.createDial(context, Serial.HEADING, context.theme.roverTop),
-            AngleWidget.createDial(context, Serial.PITCH, context.theme.roverSide),
-            AngleWidget.createDial(context, Serial.ROLL, context.theme.roverFront),
-            HorizonWidgets.makeHorizonWidget(context),
-        };
-
         JPanel dashPanel = new JPanel();
         dashPanel.setOpaque(false);
         dashPanel.setLayout(new BoxLayout(dashPanel, BoxLayout.PAGE_AXIS));
 
-        for(JPanel p : widgets){
-            dashPanel.add(p);
+        dashPanel.add(dataWidget);
+        System.out.println(context.getResource("widget_type", "Angles"));
+        dashPanel.add(
+            AngleWidget.createDial(
+                context, Serial.HEADING, context.theme.roverTop));
+        if(context.getResource("widget_type", "Angles").equals("Horizon")){
+            dashPanel.add(
+                HorizonWidgets.makeHorizonWidget(context, 140));
+        } else {
+            dashPanel.add(
+                AngleWidget.createDial(
+                    context, Serial.PITCH, context.theme.roverSide));
+            dashPanel.add(
+                AngleWidget.createDial(
+                    context, Serial.ROLL, context.theme.roverFront));
         }
 
         return dashPanel;
