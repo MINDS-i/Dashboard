@@ -18,14 +18,22 @@ import javax.xml.stream.*;
 import java.text.ParseException;
 
 public class HorizonWidgets{
-    public static JPanel makeHorizonWidget(Context ctx, int size){
+    public interface SetupCallback{
+        void setup(ArtificialHorizon ah);
+    }
+    /**
+     * Create a horizon widget jpanel in a `size` by `size` square
+     *   Calls `sc.setup` with the internal ArtificialHorizon instance
+     *   so it can be linked to the data input side/configured as needed
+     */
+    public static JPanel makeHorizonWidget(Context ctx, int size, SetupCallback sc){
+        /**
+         * The drawable margins are actually a property of the nine patch
+         *   resource's images, but the patches currently don't have a way
+         *   of storing that information so this will make it look correctly
+         *   until a more general way is implemented.
+         */
         JPanel container = new JPanel(){
-            /**
-             * The drawable margins are actually a property of the nine patch
-             *   resource's images, but the patches currently don't have a way
-             *   of storing that information so this will make it look correctly
-             *   until a more general way is implemented.
-             */
             private NinePatch np = ctx.theme.screenPatch;
             private final int LEFT_MARGIN   = 13;
             private final int RIGHT_MARGIN  = 13;
@@ -49,8 +57,11 @@ public class HorizonWidgets{
                 np.paintIn(g, getWidth(), getHeight());
             }
         };
-        //JPanel container = new JPanel();
-        JPanel horizon = new ArtificialHorizon();
+
+        ArtificialHorizon horizon = new ArtificialHorizon(
+            ()->{container.repaint();}
+        );
+        sc.setup(horizon);
         container.add(horizon);
         container.setPreferredSize(new Dimension(size,size));
         horizon.setPreferredSize(new Dimension(size,size));

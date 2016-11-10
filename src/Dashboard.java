@@ -151,6 +151,20 @@ public class Dashboard implements Runnable {
         return ap;
     }
 
+    private void registerHorizonListeners(ArtificialHorizon ah){
+        final float lastPitch[] = new float[1];
+        context.telemetry.registerListener(Serial.PITCH, new TelemetryListener() {
+            public void update(double pitch) {
+                lastPitch[0] = (float)pitch;
+            }
+        });
+        context.telemetry.registerListener(Serial.ROLL, new TelemetryListener() {
+            public void update(double roll) {
+                ah.setAngles(lastPitch[0], (float)roll);
+            }
+        });
+    }
+
     private JPanel createRightPanel() {
         try {
             dataWidget = TelemetryWidget.fromXML(context, "telemetryWidetSpec");
@@ -170,7 +184,9 @@ public class Dashboard implements Runnable {
                 context, Serial.HEADING, context.theme.roverTop));
         if(context.getResource("widget_type", "Angles").equals("Horizon")){
             dashPanel.add(
-                HorizonWidgets.makeHorizonWidget(context, 140));
+                HorizonWidgets.makeHorizonWidget(context, 140, (ArtificialHorizon ah)->{
+                    registerHorizonListeners(ah);
+                }));
         } else {
             dashPanel.add(
                 AngleWidget.createDial(

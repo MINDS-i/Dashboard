@@ -20,6 +20,7 @@ import java.util.EnumMap;
 import java.io.File;
 
 public class ArtificialHorizon extends JPanel {
+    public interface RepaintCallback { void repaint(); }
     /**
      * Ratio of display size to the distance between the inner bar of an
      *   axis indicator and the edge of the display
@@ -81,10 +82,15 @@ public class ArtificialHorizon extends JPanel {
         }
     }
     private float pitch, roll;
+    private RepaintCallback repainter;
     /**
      * Construct an artificial Horizon instance
      */
+    public ArtificialHorizon(RepaintCallback repaintParent){
+        repainter = repaintParent;
+    }
     public ArtificialHorizon(){
+        repainter = ()->{ this.repaint(); };
     }
     /**
      * Set the main display angles for the artificial horizon and redraw
@@ -93,7 +99,7 @@ public class ArtificialHorizon extends JPanel {
         synchronized(this){
             this.pitch = pitch;
             this.roll = roll;
-            this.repaint();
+            repainter.repaint();
             Toolkit.getDefaultToolkit().sync();
         }
     }
