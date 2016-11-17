@@ -9,6 +9,7 @@ import java.io.Reader;
 import java.io.FileReader;
 import java.util.*;
 import java.awt.*;
+import java.awt.event.*;
 import javax.imageio.*;
 import javax.swing.*;
 import javax.swing.border.*;
@@ -62,10 +63,30 @@ public class HorizonWidgets{
             ()->{container.repaint();}
         );
         sc.setup(horizon);
+
         container.add(horizon);
         container.setPreferredSize(new Dimension(size,size));
         horizon.setPreferredSize(new Dimension(size,size));
         container.setOpaque(false);
         return container;
+    }
+
+    /**
+     * Create a new popup window with a large artificial horizon in it.
+     *   It is set to DISPOSE_ON_CLOSE by default.
+     *   Calls `sc.setup` with the internal ArtificialHorizon instance
+     *   so it can be linked to the data input side/configured as needed
+     */
+    public static JFrame makeHorizonWindow(Context ctx, SetupCallback sc){
+        ArtificialHorizon ah = new ArtificialHorizon();
+        sc.setup(ah);
+
+        JFrame f = new JFrame("Artificial Horizon");
+        f.add(ah);
+        f.pack();
+        f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        f.setSize(800, 800);
+
+        return f;
     }
 }

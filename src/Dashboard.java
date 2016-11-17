@@ -10,6 +10,7 @@ import com.serial.SerialParser;
 import com.serial.SerialSender;
 import com.ui.*;
 import com.ui.ninePatch.*;
+import com.ui.ArtificialHorizon.DataAxis;
 import java.awt.*;
 import java.awt.Dimension;
 import java.awt.event.*;
@@ -151,7 +152,7 @@ public class Dashboard implements Runnable {
         return ap;
     }
 
-    private void registerHorizonListeners(ArtificialHorizon ah){
+    private void registerHorizonListeners(ArtificialHorizon ah, boolean sideBars){
         final float lastPitch[] = new float[1];
         context.telemetry.registerListener(Serial.PITCH, new TelemetryListener() {
             public void update(double pitch) {
@@ -163,6 +164,22 @@ public class Dashboard implements Runnable {
                 ah.setAngles(lastPitch[0], (float)roll);
             }
         });
+
+        if(sideBars){
+            ah.setEnabled(DataAxis.TOP, true);
+            context.telemetry.registerListener(Serial.HEADING, new TelemetryListener() {
+                public void update(double yaw) {
+                    ah.set(DataAxis.TOP, (float)yaw);
+                }
+            });
+
+            ah.setEnabled(DataAxis.RIGHT, true);
+            context.telemetry.registerListener(Serial.DELTAALTITUDE, new TelemetryListener() {
+                public void update(double alt) {
+                    ah.set(DataAxis.RIGHT, (float)alt);
+                }
+            });
+        }
     }
 
     private JPanel createRightPanel() {
@@ -183,10 +200,22 @@ public class Dashboard implements Runnable {
             AngleWidget.createDial(
                 context, Serial.HEADING, context.theme.roverTop));
         if(context.getResource("widget_type", "Angles").equals("Horizon")){
-            dashPanel.add(
+            // Initialize the horizon widget
+            JPanel horizon =
                 HorizonWidgets.makeHorizonWidget(context, 140, (ArtificialHorizon ah)->{
-                    registerHorizonListeners(ah);
-                }));
+                    registerHorizonListeners(ah, false);
+                });
+            // Add call back to pop out a new horizon window when clicked
+            horizon.addMouseListener(new MouseAdapter(){
+                @Override
+                public void mouseClicked(MouseEvent e){
+                    HorizonWidgets.makeHorizonWindow(context, (ArtificialHorizon ah)->{
+                        registerHorizonListeners(ah, true);
+                    }).setVisible(true);
+                }
+            });
+            // Add to the panel
+            dashPanel.add(horizon);
         } else {
             dashPanel.add(
                 AngleWidget.createDial(

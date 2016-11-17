@@ -53,7 +53,7 @@ public class ArtificialHorizon extends JPanel {
     private static final Color barColor = new Color(0xBBBBBB);
     private static final Color INDICATOR_COLOR = Color.GREEN;
     private static final Color CENTER_MARKER_COLOR = Color.YELLOW;
-    enum DataAxis {
+    public enum DataAxis {
         TOP(new IndicatorBarSpecs(
             WDIST, WDIST, STROKE, 1f-2f*WDIST, Axis.X_AXIS, -TICKH,
             DrawPoint.BottomCenter
