@@ -156,12 +156,12 @@ public class Dashboard implements Runnable {
         final float lastPitch[] = new float[1];
         context.telemetry.registerListener(Serial.PITCH, new TelemetryListener() {
             public void update(double pitch) {
-                lastPitch[0] = (float)pitch;
+                lastPitch[0] = (float)Math.toRadians(pitch);
             }
         });
         context.telemetry.registerListener(Serial.ROLL, new TelemetryListener() {
             public void update(double roll) {
-                ah.setAngles(lastPitch[0], (float)roll);
+                ah.setAngles(lastPitch[0], (float)Math.toRadians(-roll));
             }
         });
 
