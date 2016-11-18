@@ -166,6 +166,15 @@ public class TelemetryWidget extends JPanel{
             int finalWidth = Math.min(fmt.length(), lineWidth);
             setText(fmt.substring(0,finalWidth));
         }
+        @Override public void repaint(){
+            super.repaint();
+            // Since the parent component (lower in the component tree) could
+            //   render a transparent border on top of it's Lines
+            //   (higher in the view window), it must be repainted after
+            //   this component or the layers will change order depending on
+            //   who gets repainted
+            TelemetryWidget.this.repaint(getX(), getY(), getWidth(), getHeight());
+        }
     }
 
 }
