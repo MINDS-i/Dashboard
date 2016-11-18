@@ -222,7 +222,7 @@ public class DataWindow implements ActionListener {
 
         logInput = new JTextField();
         logInput.addActionListener(this);
-        logInput.setText(Integer.toString(context.telemetry.getLogPeriod()));
+        logInput.setText(Integer.toString(context.telemLog.getPeriod()));
         logInput.setColumns(8);
 
         logPanel.add(label);
@@ -266,9 +266,9 @@ public class DataWindow implements ActionListener {
         try {
             input = Integer.parseInt(inputText);
             logInput.setText(Integer.toString(input));
-            context.telemetry.setLogPeriod(input);
+            context.telemLog.setPeriod(input);
         } catch (NumberFormatException e) {
-            logInput.setText(Integer.toString(context.telemetry.getLogPeriod()));
+            logInput.setText(Integer.toString(context.telemLog.getPeriod()));
         }
     }
 }

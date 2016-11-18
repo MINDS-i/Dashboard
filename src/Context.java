@@ -7,6 +7,7 @@ import com.remote.SettingList;
 import com.serial.*;
 import com.serial.Messages.*;
 import com.ui.*;
+import com.telemetry.*;
 import com.xml;
 import java.io.*;
 import java.nio.file.*;
@@ -26,6 +27,7 @@ public class Context {
     public Theme theme;
     public SettingList settingList;
     public TelemetryManager telemetry;
+    public TelemetryLogger telemLog;
 
     private WaypointList waypoint;
     private SerialPort port;
@@ -70,6 +72,7 @@ public class Context {
         parser      = new SerialParser(this, waypoint);
         settingList = new SettingList(this);
         telemetry   = new TelemetryManager(this);
+        telemLog    = new TelemetryLogger(this, telemetry);
 
         // Patch the waypoint list into the serial sender
         waypoint.addListener(new WaypointListener(){
@@ -230,7 +233,7 @@ public class Context {
         return telemetry.getTelemetryName(id);
     }
     public int getTelemetryCount() {
-        return telemetry.telemetryCount();
+        return telemetry.maxIndex();
     }
     public void onConnection() {
         sender.sendWaypointList();

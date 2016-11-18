@@ -3,7 +3,7 @@ package com.map;
 import static com.map.WaypointList.*;
 import com.Context;
 import com.serial.Serial;
-import com.ui.TelemetryListener;
+import com.telemetry.TelemetryListener;
 import com.layer.Layer;
 
 import java.awt.*;

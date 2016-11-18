@@ -1,6 +1,6 @@
 package com.ui;
 
-import com.ui.TelemetryListener;
+import com.telemetry.TelemetryListener;
 import com.ui.ninePatch.*;
 import com.ui.ArtificialHorizon;
 import com.Context;
