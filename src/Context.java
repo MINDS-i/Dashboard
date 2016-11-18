@@ -133,9 +133,12 @@ public class Context {
         });
         telemetry.registerListener(Serial.ALTITUDE, new TelemetryListener() {
             public void update(double altitude) {
-                telemetry.updateTelemetry(Serial.DELTAALTITUDE,
-                    altitude - telemetry.getTelemetry(Serial.HOMEALTITUDE)
-                    );
+                double homeAlt = telemetry.getTelemetry(Serial.HOMEALTITUDE);
+                if(homeAlt != 0.0d){
+                    telemetry.updateTelemetry(Serial.DELTAALTITUDE,
+                        altitude - homeAlt
+                        );
+                }
             }
         });
     }
