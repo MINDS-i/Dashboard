@@ -400,7 +400,7 @@ class WaypointPanel extends NinePatchPanel {
             putValue(Action.NAME, text);
         }
         public void actionPerformed(ActionEvent e) {
-            Graph graph = new Graph(context.telemetry.getDataSources(), false);
+            Graph graph = new Graph(context.getTelemetryDataSources(), false);
             graph.setPreferredSize(new Dimension(500, 300));
             JFrame gFrame = new JFrame("Telemetry Graph");
             gFrame.add(graph);

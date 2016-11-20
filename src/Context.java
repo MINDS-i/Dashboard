@@ -9,6 +9,7 @@ import com.serial.Messages.*;
 import com.ui.*;
 import com.telemetry.*;
 import com.xml;
+import com.graph.DataSource;
 import java.io.*;
 import java.nio.file.*;
 import java.text.DecimalFormat;
@@ -234,6 +235,9 @@ public class Context {
     }
     public int getTelemetryCount() {
         return telemetry.maxIndex();
+    }
+    public List<DataSource> getTelemetryDataSources() {
+        return telemetry.getDataSources();
     }
     public void onConnection() {
         sender.sendWaypointList();
