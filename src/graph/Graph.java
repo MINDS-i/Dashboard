@@ -23,10 +23,18 @@ public class Graph extends JPanel {
     private final static int REPAINT_INTERVAL = 50; //milliseconds
     private final static int NUM_HORZ_RULES = 4; //creates 2^NUM_VERT_RULES horizontal rulers
     private final static int NUM_VERT_RULES = 16; //creates x evenly spaces vertical rulers
+    /**
+     * Graph lines are initial colored by their index mod the number of default
+     *   paints with these colors. Asside from the initial high contrast colors,
+     *   the rest are taken from "http://colorbrewer2.org"s "8-class Dark2"
+     *   palette (licensed under apache 2.0).
+     */
     private final static Paint[] DEFAULT_PAINTS = {
-        Color.BLACK,   Color.BLUE,   Color.RED,  Color.GREEN,
-        Color.MAGENTA, Color.ORANGE, Color.CYAN, Color.GRAY,
-        Color.PINK,    Color.YELLOW
+        Color.BLACK,   Color.BLUE,   Color.RED,
+        new Color(0x1b9e77), new Color(0xd95f02),
+        new Color(0x7570b3), new Color(0xe7298a),
+        new Color(0x66a61e), new Color(0xe6ab02),
+        new Color(0xa6761d), new Color(0x666666),
     };
 
     private Timer refreshTimer;
