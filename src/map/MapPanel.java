@@ -89,6 +89,13 @@ public class MapPanel extends JPanel implements CoordinateTransform {
         addMouseWheelListener(mouseListener);
         addMouseListener(mll);
         addMouseMotionListener(mll);
+
+        this.addComponentListener(new ComponentAdapter(){
+            @Override
+            public void componentResized(ComponentEvent e){
+                repaint();
+            }
+        });
     }
 
     /**
