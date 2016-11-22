@@ -8,7 +8,9 @@ import com.serial.SerialConnectPanel;
 import com.serial.SerialEventListener;
 import com.serial.SerialParser;
 import com.serial.SerialSender;
+import com.telemetry.*;
 import com.ui.*;
+import com.ui.ArtificialHorizon.DataAxis;
 import com.ui.ninePatch.*;
 import java.awt.*;
 import java.awt.Dimension;
@@ -56,13 +58,7 @@ public class Dashboard implements Runnable {
             loading.setVisible(true);
             //initialize the major classes into the context
             createLogDirectory();
-            context = new Context();
-            context.give(this,
-                         new SerialSender(context),
-                         new SerialParser(context),
-                         new WaypointList(context),
-                         null //serialPort
-                        );
+            context = new Context(this);
             initLogging();
             initUI();
             loading.dispose();
@@ -157,6 +153,36 @@ public class Dashboard implements Runnable {
         return ap;
     }
 
+    private void registerHorizonListeners(ArtificialHorizon ah, boolean sideBars){
+        final float lastPitch[] = new float[1];
+        context.telemetry.registerListener(Serial.PITCH, new TelemetryListener() {
+            public void update(double pitch) {
+                lastPitch[0] = (float)Math.toRadians(pitch);
+            }
+        });
+        context.telemetry.registerListener(Serial.ROLL, new TelemetryListener() {
+            public void update(double roll) {
+                ah.setAngles(lastPitch[0], (float)Math.toRadians(-roll));
+            }
+        });
+
+        if(sideBars){
+            ah.setEnabled(DataAxis.TOP, true);
+            context.telemetry.registerListener(Serial.HEADING, new TelemetryListener() {
+                public void update(double yaw) {
+                    ah.set(DataAxis.TOP, (float)yaw);
+                }
+            });
+
+            ah.setEnabled(DataAxis.RIGHT, true);
+            context.telemetry.registerListener(Serial.DELTAALTITUDE, new TelemetryListener() {
+                public void update(double alt) {
+                    ah.set(DataAxis.RIGHT, (float)alt);
+                }
+            });
+        }
+    }
+
     private JPanel createRightPanel() {
         try {
             dataWidget = TelemetryWidget.fromXML(context, "telemetryWidetSpec");
@@ -165,19 +191,39 @@ public class Dashboard implements Runnable {
             e.printStackTrace();
         }
 
-        JPanel[] widgets = {
-            dataWidget,
-            AngleWidget.createDial(context, Serial.HEADING, context.theme.roverTop),
-            AngleWidget.createDial(context, Serial.PITCH, context.theme.roverSide),
-            AngleWidget.createDial(context, Serial.ROLL, context.theme.roverFront),
-        };
-
         JPanel dashPanel = new JPanel();
         dashPanel.setOpaque(false);
         dashPanel.setLayout(new BoxLayout(dashPanel, BoxLayout.PAGE_AXIS));
 
-        for(JPanel p : widgets){
-            dashPanel.add(p);
+        dashPanel.add(dataWidget);
+        System.out.println(context.getResource("widget_type", "Angles"));
+        dashPanel.add(
+            AngleWidget.createDial(
+                context, Serial.HEADING, context.theme.roverTop));
+        if(context.getResource("widget_type", "Angles").equals("Horizon")){
+            // Initialize the horizon widget
+            JPanel horizon =
+                HorizonWidgets.makeHorizonWidget(context, 140, (ArtificialHorizon ah)->{
+                    registerHorizonListeners(ah, false);
+                });
+            // Add call back to pop out a new horizon window when clicked
+            horizon.addMouseListener(new MouseAdapter(){
+                @Override
+                public void mouseClicked(MouseEvent e){
+                    HorizonWidgets.makeHorizonWindow(context, (ArtificialHorizon ah)->{
+                        registerHorizonListeners(ah, true);
+                    }).setVisible(true);
+                }
+            });
+            // Add to the panel
+            dashPanel.add(horizon);
+        } else {
+            dashPanel.add(
+                AngleWidget.createDial(
+                    context, Serial.PITCH, context.theme.roverSide));
+            dashPanel.add(
+                AngleWidget.createDial(
+                    context, Serial.ROLL, context.theme.roverFront));
         }
 
         return dashPanel;
@@ -200,6 +246,20 @@ public class Dashboard implements Runnable {
     }
 
     public static void main(String[] args) {
+        String openglProperty = "false";
+
+        try (Reader optFile = new FileReader("./resources/system.properties")) {
+            Properties launchOptions = new Properties();
+            launchOptions.load(optFile);
+            openglProperty =
+                launchOptions.getProperty("opengl", openglProperty);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        System.setProperty("sun.java2d.opengl", openglProperty);
+        System.out.println("Launching with opengl="+openglProperty);
+
         Dashboard se = new Dashboard();
         SwingUtilities.invokeLater(se);
     }

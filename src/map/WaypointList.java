@@ -1,112 +1,217 @@
 package com.map;
 
-import com.Dashboard;
-import com.xml;
-import com.map.*;
-import com.serial.*;
-import com.Context;
-import com.serial.*;
-import com.serial.Messages.*;
+import com.map.Waypoint;
+import com.map.Dot;
 
-import java.util.Vector;
-import java.awt.Point;
-import java.util.Iterator;
+import java.util.*;
 
 public class WaypointList {
-    private Vector<Dot> waypoints = new Vector<Dot>();
-    private Context context;
-    private boolean isLooped;
-    private int targetIndex;
+    public static class WaypointListener{
+        public enum Source { LOCAL, REMOTE }
+        public enum Action { ADD, SET, DELETE }
+        /**
+         * Override unusedEvent to have a method called from all ather handlers
+         * that were not overriden
+         */
+        public void unusedEvent() {}
+        public void selectionChanged(int selection) { unusedEvent(); }
+        public void roverMoved(WaypointListener.Source s, Dot p) { unusedEvent(); }
+        public void homeMoved(WaypointListener.Source s, Dot p) { unusedEvent(); }
+        public void changed(WaypointListener.Source s, Dot p, int index, Action a) { unusedEvent(); }
+        public void targetChanged(WaypointListener.Source s, int target) { unusedEvent(); }
+        public void loopModeSet(WaypointListener.Source s, boolean isLooped) { unusedEvent(); }
+    }
 
-    public WaypointList(Context cxt) {
-        context = cxt;
+
+    private final List<Dot> waypoints = new LinkedList<Dot>();
+    private final List<WaypointListener> listeners = new LinkedList<WaypointListener>();
+    private Dot roverLocation = new Dot();
+    private Dot homeLocation = new Dot();
+    private boolean isLooped = false;
+    private int targetIndex = 0;
+    private int selectedIndex = -1;
+
+    public WaypointList() {}
+
+    public enum Type{
+        ROVER, HOME, WAYPOINT, SELECTED
     }
-    public void changeContext(Context cxt) {
-        context = cxt;
+    public interface ExtendedWaypoint{
+        Dot dot();
+        Type type();
     }
-    public void add(Dot newDot) {
-        add(newDot, waypoints.size());
-    }
-    public void add(double longitude, double latitude, int index) {
-        Dot tmp = new Dot(new Point.Double(longitude, latitude));
-        add(tmp, index);
-    }
-    public void add(double longitude, double latitude, short altitude, int index) {
-        Dot tmp = new Dot(new Point.Double(longitude, latitude), altitude);
-        add(tmp, index);
-    }
-    public void add(Dot newDot, int index) {
-        if(waypoints.size()>= Serial.MAX_WAYPOINTS) return;
-        if(newDot.getAltitude()==0 && index > 0) {
-            newDot.setAltitude(context.waypoint.get(index-1).getAltitude());
+
+    /**
+     * The index location to start calling index at so that extended waypoints
+     * like the rover's location and home position get added to the list
+     */
+    public int extendedIndexStart() { return -2; }
+    /**
+     * Return the waypoint at location `index`
+     * Throws IndexOutOfBoundsException if there is no waypoint at that index
+     */
+    public ExtendedWaypoint get(int index) {
+        switch(index){
+            case -2: //home
+                return new ExtendedWaypoint(){
+                    public Dot dot(){ return new Dot(homeLocation); }
+                    public Type type(){ return Type.HOME; }
+                };
+            case -1: //rover
+                return new ExtendedWaypoint(){
+                    public Dot dot(){ return new Dot(roverLocation); }
+                    public Type type(){ return Type.ROVER; }
+                };
+            default:
+                return new ExtendedWaypoint(){
+                    public Dot dot(){ return new Dot(waypoints.get(index)); }
+                    public Type type(){
+                        return (index == selectedIndex)
+                                    ? Type.SELECTED
+                                    : Type.WAYPOINT;
+                    }
+                };
         }
-        waypoints.insertElementAt(newDot, index);
-        sendMessage(Message.addWaypoint( (byte)(index&0xff), newDot ));
-        context.waypointUpdated();
     }
-    public void sendUpdatedPosition(int index) {
-        sendMessage(Message.setWaypoint( (byte)(index&0xff), get(index) ));
-    }
-    public void set(int index, Point.Double newPosition) {
-        set(index, newPosition, waypoints.get(index).getAltitude());
-    }
-    public void set(int index, Point.Double newPosition, Short alt) {
-        if(index < 0 || index >= waypoints.size()) return;
-        waypoints.get(index).setLocation(newPosition, alt);
-        sendMessage(Message.setWaypoint( (byte)(index&0xff), waypoints.get(index) ));
-        context.waypointUpdated();
-    }
-    public void remove(int index) {
-        if(index < 0 || index >= waypoints.size()) return;
-        sendMessage(Message.deleteWaypoint( (byte)(index&0xff) ));
-        waypoints.remove(index);
-        context.waypointUpdated();
-    }
-    public Dot get(int index) {
-        return waypoints.get(index);
-    }
-    public Dot get(byte index) {
-        return waypoints.get((index&0xff));
-    }
+    /**
+     * Return the current number of waypoints
+     */
     public int size() {
         return waypoints.size();
     }
-    public Iterator iterator() {
-        return waypoints.iterator();
+    /**
+     * Set the rover's location
+     */
+    public void setRover(Dot p){
+        setRover(p, WaypointListener.Source.LOCAL);
     }
-    public boolean isLooped() {
+    public void setRover(Dot p, WaypointListener.Source s){
+        roverLocation = p;
+        listeners.stream().forEach(l -> l.roverMoved(s, p));
+    }
+    /**
+     * Get the rover's location
+     */
+    public Dot getRover(){
+        return new Dot(roverLocation);
+    }
+    /**
+     * Set the home's location
+     */
+    public void setHome(Dot p){
+        setHome(p, WaypointListener.Source.LOCAL);
+    }
+    public void setHome(Dot p, WaypointListener.Source s){
+        homeLocation = p;
+        listeners.stream().forEach(l -> l.homeMoved(s, p));
+    }
+    /**
+     * Get the home's location
+     */
+    public Dot getHome(){
+        return new Dot(homeLocation);
+    }
+    /**
+     * Add a waypoint so it occures at position `index` in the Waypoint List
+     * if index is greater than the current length of the list, an
+     * IndexOutOfBoundsException is thrown.
+     */
+    public void add(Dot p, int index){
+        add(p, index, WaypointListener.Source.LOCAL);
+    }
+    public void add(Dot p, int index, WaypointListener.Source s){
+        waypoints.add(index, p);
+        if(index <= selectedIndex) setSelected(selectedIndex + 1);
+        if(index <= targetIndex) setTarget(targetIndex + 1);
+        listeners.stream().forEach(l -> l.changed(s, p, index, WaypointListener.Action.ADD));
+    }
+    /**
+     *
+     * Throws IndexOutOfBoundsException if there is no waypoint at that index
+     */
+    public void set(Dot p, int index){
+        set(p, index, WaypointListener.Source.LOCAL);
+    }
+    public void set(Dot p, int index, WaypointListener.Source s){
+        waypoints.set(index, p);
+        listeners.stream().forEach(l -> l.changed(s, p, index, WaypointListener.Action.SET));
+    }
+    /**
+     * Return the waypoint at location `index`
+     * Throws IndexOutOfBoundsException if there is no waypoint at that index
+     */
+    public void remove(int index){
+        remove(index, WaypointListener.Source.LOCAL);
+    }
+    public void remove(int index, WaypointListener.Source s){
+        Dot p = waypoints.get(index);
+        waypoints.remove(index);
+        if(index <= selectedIndex) setSelected(selectedIndex - 1);
+        if(index <= targetIndex) setTarget(targetIndex - 1);
+        listeners.stream().forEach(l -> l.changed(s, p, index, WaypointListener.Action.DELETE));
+    }
+    /**
+     * Set the waypoint looped status and inform listeners if it changed
+     */
+    public void setLooped(boolean state){
+        setLooped(state, WaypointListener.Source.LOCAL);
+    }
+    public void setLooped(boolean state, WaypointListener.Source s){
+        if(isLooped == state) return;
+        isLooped = state;
+        listeners.stream().forEach(l -> l.loopModeSet(s, state));
+    }
+    /**
+     * Return if waypoints are currently looped
+     */
+    public boolean getLooped(){
         return isLooped;
     }
-    public void setLooped(boolean loop) {
-        isLooped = loop;
-        context.waypointUpdated();
-        sendLoopingStatus();
+    /**
+     * Set the target index and inform listeners if the target changed
+     */
+    public void setTarget(int index){
+        setTarget(index, WaypointListener.Source.LOCAL);
     }
-    public void sendLoopingStatus() {
-        Message msg = Message.setLooping((byte) ((isLooped)?1:0) );
-        context.sender.sendMessage(msg);
+    public void setTarget(int index, WaypointListener.Source s){
+        if(index == targetIndex || // only fire events when actually changed
+           index <  0 ||
+           index >= waypoints.size()) return;
+        targetIndex = index;
+        listeners.stream().forEach(l -> l.targetChanged(s, index));
     }
-    public int getTarget() {
+    /**
+     * Return the current target index
+     */
+    public int getTarget(){
         return targetIndex;
     }
-    public Dot getTargetWaypoint() {
-        return waypoints.get(getTarget());
+    /**
+     * Set the Selected Waypoint index and inform listeners if the target changed
+     */
+    public void setSelected(int index){
+        if(index == selectedIndex || // only fire events when actually changed
+           index <  extendedIndexStart() ||
+           index >= waypoints.size()) return;
+        selectedIndex = index;
+        listeners.stream().forEach(l -> l.selectionChanged(index));
     }
-    public void setTarget(int target) { //updates and transmits the target waypoint
-        updateTarget(target);
-        Message msg = Message.setTarget((byte) target);
-        sendMessage(msg);
+    /**
+     * Return the current target index
+     */
+    public int getSelected(){
+        return selectedIndex;
     }
-    public void updateTarget(int target) { //sets the target waypoint
-        targetIndex = target;
-        context.waypointUpdated();
+    /**
+     * Register a new WaypointListener
+     */
+    public void addListener(WaypointListener l){
+        listeners.add(l);
     }
-    public void swap(Vector<Dot> newList) {
-        waypoints = newList;
-    }
-    private void sendMessage(Message msg) {
-        if(context.sender != null) {
-            context.sender.sendMessage(msg);
-        }
+    /**
+     * Removes the first occurance of a listener .equals to `l`
+     */
+    public void removeListener(WaypointListener l){
+        listeners.remove(l);
     }
 }

@@ -9,10 +9,10 @@
  ******************************************************************************/
 
 package com.map;
-import com.ContextViewer;
 import com.Context;
 import com.layer.*;
 
+import static com.map.WaypointList.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
@@ -25,7 +25,7 @@ import java.util.LinkedHashMap;
 import javax.imageio.*;
 import javax.swing.*;
 
-public class MapPanel extends JPanel implements ContextViewer, CoordinateTransform {
+public class MapPanel extends JPanel implements CoordinateTransform {
     private static final int TILE_SIZE = 256;
     private static final float ZOOM_FACTOR = 1.1f;
 
@@ -44,6 +44,7 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
     private DragListener  mouseListener = new DragListener();
     private LayerManager  mll = new LayerManager();
     private WaypointPanel waypointPanel;
+    private RoverPath     roverPath;
 
     public MapPanel(Context cxt) {
         this(cxt, new Point(0, 0), 6, null, null, null);
@@ -57,7 +58,9 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
                     JPanel east,
                     JPanel south) {
         context = cxt;
-        context.registerViewer(this);
+        context.getWaypointList().addListener(new WaypointListener(){
+            @Override public void unusedEvent() { repaint(); }
+        });
 
         for(MapSource ms : mapSources) ms.addRepaintListener(this);
 
@@ -80,11 +83,27 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         setZoom(TILE_SIZE * (1 << zoom));
         setMapPosCoords(mapPosition);
 
-        mll.add(new RoverPath(context, this, waypointPanel));
+        roverPath = new RoverPath(context, this, context.getWaypointList(), this);
+        mll.add(roverPath);
         mll.add(mouseListener);
         addMouseWheelListener(mouseListener);
         addMouseListener(mll);
         addMouseMotionListener(mll);
+
+        this.addComponentListener(new ComponentAdapter(){
+            @Override
+            public void componentResized(ComponentEvent e){
+                repaint();
+            }
+        });
+    }
+
+    /**
+     * enable/disable the user's ability to change or add waypoints using
+     * the map's RoverPath
+     */
+    public void enablePathModifications(boolean value){
+        roverPath.setWaypointsEnabled(value);
     }
     //Code for CoordinateTransform interface
     /**
@@ -201,12 +220,6 @@ public class MapPanel extends JPanel implements ContextViewer, CoordinateTransfo
         setMapPosPixels(endLoc);
         repaint();
     }
-
-    //Code for ContextViewer interface
-    public void waypointUpdate() {
-        repaint();
-    }
-    //End code for ContextViewep interface
 
     public void nextTileServer() {
         mapSource.clear();

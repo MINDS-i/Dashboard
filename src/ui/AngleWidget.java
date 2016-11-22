@@ -1,6 +1,6 @@
 package com.ui;
 
-import com.ui.TelemetryListener;
+import com.telemetry.TelemetryListener;
 import java.awt.*;
 import javax.imageio.*;
 import javax.swing.*;

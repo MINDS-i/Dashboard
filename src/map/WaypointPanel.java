@@ -1,7 +1,7 @@
 package com.map;
 
+import static com.map.WaypointList.*;
 import com.Context;
-import com.ContextViewer;
 import com.Dashboard;
 import com.graph.Graph;
 import com.map.coordinateListener;
@@ -26,13 +26,13 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.xml.stream.XMLStreamException;
 
-class WaypointPanel extends NinePatchPanel implements ContextViewer {
+class WaypointPanel extends NinePatchPanel {
     protected static final int MOVE_STEP = 32;
     protected static final int BDR_SIZE = 25;
     protected static final String NO_WAYPOINT_MSG = "N / A";
-    private int selectedWaypoint = 0;
     private Context context;
     private MapPanel map;
+    private WaypointList waypoints;
     JTextField latitude;
     JTextField longitude;
     JTextField altitude;
@@ -42,7 +42,7 @@ class WaypointPanel extends NinePatchPanel implements ContextViewer {
         super(cxt.theme.panelPatch);
         map = mapPanel;
         context = cxt;
-        context.registerViewer(this);
+        waypoints = context.getWaypointList();
         setOpaque(false);
         LayoutManager layout = new BoxLayout(this, BoxLayout.PAGE_AXIS);
         setLayout(layout);
@@ -54,46 +54,41 @@ class WaypointPanel extends NinePatchPanel implements ContextViewer {
                 //to the map panel in the background
             }
         });
-    }
 
-    public void waypointUpdate() {
-        updateDisplay();
-    }
-
-    public int getSelectedWaypoint() {
-        return selectedWaypoint;
-    }
-
-    public void setSelectedWaypoint(int selected) {
-        selectedWaypoint = selected;
+        waypoints.addListener(new WaypointListener(){
+            @Override public void unusedEvent() { updateDisplay(); }
+        });
         updateDisplay();
     }
 
     public void updateDisplay() {
-        if (selectedWaypoint > context.waypoint.size()-1)
-        	selectedWaypoint = context.waypoint.size()-1;
-        else if(selectedWaypoint < 0)
-        	selectedWaypoint = 0;
+        int selectedWaypoint = waypoints.getSelected();
+        ExtendedWaypoint w = waypoints.get(selectedWaypoint);
+        Dot dot = w.dot();
 
-        if(context.waypoint.size() == 0) {
-            waypointIndexDisplay.setText(NO_WAYPOINT_MSG);
-            latitude .setText("");
-            longitude.setText("");
-            altitude .setText("");
-            return;
+        String indexField = (selectedWaypoint+1) + " / " + waypoints.size();
+        switch(w.type()){
+            case ROVER: indexField = "Robot"; break;
+            case HOME: indexField = "Home "; break;
         }
-
-        String indexField = (selectedWaypoint+1) + " / " + context.waypoint.size();
         waypointIndexDisplay.setText(indexField);
-        if(selectedWaypoint >= 0 && selectedWaypoint < context.waypoint.size()) {
-            Dot dot = context.waypoint.get(selectedWaypoint);
-            latitude .setText(((float)dot.getLatitude())+"");
-            latitude .setForeground(Color.BLACK);
-            longitude.setText(((float)dot.getLongitude())+"");
-            longitude.setForeground(Color.BLACK);
-            altitude .setText(fixedToDouble(dot.getAltitude())+"");
-            altitude .setForeground(Color.BLACK);
+
+        latitude .setText(((float)dot.getLatitude())+"");
+        longitude.setText(((float)dot.getLongitude())+"");
+        altitude .setText(fixedToDouble(dot.getAltitude())+"");
+        latitude.setForeground(Color.BLACK);
+        longitude.setForeground(Color.BLACK);
+        altitude.setForeground(Color.BLACK);
+        if(selectedWaypoint < 0){
+            latitude.setEditable(false);
+            longitude.setEditable(false);
+            altitude.setEditable(false);
+        } else {
+            latitude.setEditable(true);
+            longitude.setEditable(true);
+            altitude.setEditable(true);
         }
+
     }
 
     private void buildPanel() {
@@ -213,18 +208,26 @@ class WaypointPanel extends NinePatchPanel implements ContextViewer {
 
     public void interpretLocationEntry() {
         try {
+            int selectedWaypoint = waypoints.getSelected();
+
+            if(selectedWaypoint < 0) // rover or home location selected
+                return;
+
             Double newLatitude  = Double.parseDouble(latitude.getText());
             Double newLongitude = Double.parseDouble(longitude.getText());
             Double tmpAltitude  = Double.parseDouble(altitude.getText());
 
             int newAltitude = doubleToFixed(tmpAltitude);
             Point.Double newPosition = new Point.Double(newLongitude, newLatitude);
+
             if((newAltitude&0xffff) == newAltitude) {
-                context.waypoint.set(selectedWaypoint, newPosition, (short)newAltitude);
+                waypoints.set(new Dot(newPosition, (short)newAltitude), selectedWaypoint);
                 //set to display reconverted value
                 altitude.setText(fixedToDouble(newAltitude)+"");
             } else {
-                context.waypoint.set(selectedWaypoint, newPosition);
+                Dot newloc = waypoints.get(selectedWaypoint).dot();
+                newloc.setLocation(newPosition);
+                waypoints.set(newloc, selectedWaypoint);
             }
         } catch (NumberFormatException e) {}
     }
@@ -286,9 +289,9 @@ class WaypointPanel extends NinePatchPanel implements ContextViewer {
         }
 
         public void actionPerformed(ActionEvent e) {
-            context.waypoint.setLooped(!context.waypoint.isLooped());
+            waypoints.setLooped(!waypoints.getLooped());
             putValue(Action.NAME,
-                     (context.waypoint.isLooped())? "Looping Off" : "Looping On");
+                     (waypoints.getLooped())? "Looping Off" : "Looping On");
         }
     };
     private Action previousWaypoint = new AbstractAction() {
@@ -298,7 +301,7 @@ class WaypointPanel extends NinePatchPanel implements ContextViewer {
             putValue(Action.SHORT_DESCRIPTION, text);
         }
         public void actionPerformed(ActionEvent e) {
-            setSelectedWaypoint(selectedWaypoint-1);
+            waypoints.setSelected(waypoints.getSelected()-1);
             updateDisplay();
             map.repaint();
         }
@@ -310,7 +313,7 @@ class WaypointPanel extends NinePatchPanel implements ContextViewer {
             putValue(Action.SHORT_DESCRIPTION, text);
         }
         public void actionPerformed(ActionEvent e) {
-            setSelectedWaypoint(selectedWaypoint+1);
+            waypoints.setSelected(waypoints.getSelected()+1);
             updateDisplay();
             map.repaint();
         }
@@ -342,7 +345,6 @@ class WaypointPanel extends NinePatchPanel implements ContextViewer {
             } catch (XMLStreamException ex) {
                 System.err.println(ex.getMessage());
             }
-            context.waypointUpdated();
         }
     };
     private Action interpretLocationAction = new AbstractAction() {
@@ -360,7 +362,7 @@ class WaypointPanel extends NinePatchPanel implements ContextViewer {
             putValue(Action.NAME, text);
         }
         public void actionPerformed(ActionEvent e) {
-            context.waypoint.setTarget(selectedWaypoint);
+            waypoints.setTarget(waypoints.getSelected());
         }
     };
     private Action newWaypoint = new AbstractAction() {
@@ -369,8 +371,9 @@ class WaypointPanel extends NinePatchPanel implements ContextViewer {
             putValue(Action.NAME, text);
         }
         public void actionPerformed(ActionEvent e) {
-            context.waypoint.add(
-            	new Dot(context.waypoint.get(selectedWaypoint)), selectedWaypoint);
+            int selectedWaypoint = waypoints.getSelected();
+            waypoints.add(
+            	new Dot(waypoints.get(selectedWaypoint).dot()), selectedWaypoint);
         }
     };
     private Action openDataPanel = new AbstractAction() {
@@ -397,7 +400,7 @@ class WaypointPanel extends NinePatchPanel implements ContextViewer {
             putValue(Action.NAME, text);
         }
         public void actionPerformed(ActionEvent e) {
-            Graph graph = new Graph(context.telemetry.getDataSources(), false);
+            Graph graph = new Graph(context.getTelemetryDataSources(), false);
             graph.setPreferredSize(new Dimension(500, 300));
             JFrame gFrame = new JFrame("Telemetry Graph");
             gFrame.add(graph);
