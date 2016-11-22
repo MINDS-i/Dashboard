@@ -35,11 +35,11 @@ public class HorizonWidgets{
          *   until a more general way is implemented.
          */
         JPanel container = new JPanel(){
-            private NinePatch np = ctx.theme.screenPatch;
-            private final int LEFT_MARGIN   = 13;
-            private final int RIGHT_MARGIN  = 13;
-            private final int TOP_MARGIN    = 9;
-            private final int BOTTOM_MARGIN = 46;
+            private NinePatch np = ctx.theme.horizonBorder;
+            private final int LEFT_MARGIN   = 8;
+            private final int RIGHT_MARGIN  = 8;
+            private final int TOP_MARGIN    = 8;
+            private final int BOTTOM_MARGIN = 8;
             private Rectangle drawRect = new Rectangle(
                 LEFT_MARGIN,
                 TOP_MARGIN,

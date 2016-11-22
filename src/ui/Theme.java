@@ -37,6 +37,7 @@ public class Theme {
     public NinePatch buttonPress;
     public NinePatch panelPatch;
     public NinePatch screenPatch;
+    public NinePatch horizonBorder;
     public Color textColor;
     public Theme(Context ctx) {
         try {
@@ -62,6 +63,7 @@ public class Theme {
             buttonPress      = NinePatch.loadFrom(Paths.get(np+ctx.getResource("button_pressed")));
             panelPatch       = NinePatch.loadFrom(Paths.get(np+ctx.getResource("display_panel")));
             screenPatch      = NinePatch.loadFrom(Paths.get(np+ctx.getResource("info_screen")));
+            horizonBorder    = NinePatch.loadFrom(Paths.get(np+ctx.getResource("horizon_border")));
             text             = Font.createFont(Font.TRUETYPE_FONT,
                                                new File(ttf+ctx.getResource("text_font")));
             number           = Font.createFont(Font.TRUETYPE_FONT,
