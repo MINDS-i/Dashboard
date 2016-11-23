@@ -35,8 +35,8 @@ import jssc.SerialPortException;
 import jssc.SerialPortList;
 
 public class Dashboard implements Runnable {
-    private static final int START_WIDTH  = 820; //default window width
-    private static final int START_HEIGHT = 820; //default window height
+    private static final int START_WIDTH  = 1200; //default window width
+    private static final int START_HEIGHT = 900; //default window height
     private Context context;
 
     private TelemetryWidget dataWidget;
@@ -130,7 +130,7 @@ public class Dashboard implements Runnable {
         JPanel messageBox = createAlertBox();
 
         MapPanel mapPanel = new MapPanel(context,
-                                         new Point(0,0),
+                                         new Point(-100,40),
                                          4, // default zoom level
                                          serialPanel,
                                          createRightPanel(),
