@@ -5,7 +5,7 @@ import com.ui.ninePatch.*;
 import com.ui.ArtificialHorizon;
 import com.Context;
 import static com.ui.FontUtils.*;
-import com.serial.Serial;
+import static com.serial.Serial.*;
 
 import java.io.Reader;
 import java.io.FileReader;
@@ -26,37 +26,40 @@ public class RadioWidget{
      *   lines as bar graphs in a `size`^2 region
      */
     public static JPanel create(Context ctx, int size){
+        int num_channels = 5;
+        int[] telemetryChannels = {RDPITCH, RDROLL, RDYAW, RDTHROTTLE, RDGEAR};
+        String[] labels = {"P", "R", "Y", "T", "S"};
+
+        Bars b = new Bars(ctx.theme.text, num_channels, labels, ctx.theme.textColor);
+
+        for(int i=0; i<num_channels; i++){
+            final Integer idx = i;
+            ctx.telemetry.registerListener(telemetryChannels[i],
+                (double d) -> { b.data[idx]=(float)d/180f; });
+        }
+
         JPanel container = new TransparentPanel(ctx, size);
-
-        Bars b = new Bars(ctx.theme.text);
         container.add(b);
-
-        ctx.telemetry.registerListener(Serial.RDPITCH,
-            (double d) -> { b.data[0]=(float)d/180.0f; });
-        ctx.telemetry.registerListener(Serial.RDROLL,
-            (double d) -> { b.data[1]=(float)d/180.0f; });
-        ctx.telemetry.registerListener(Serial.RDYAW,
-            (double d) -> { b.data[2]=(float)d/180.0f; });
-        ctx.telemetry.registerListener(Serial.RDTHROTTLE,
-            (double d) -> { b.data[3]=(float)d/180.0f; });
-        ctx.telemetry.registerListener(Serial.RDGEAR,
-            (double d) -> { b.data[4]=(float)d/180.0f; });
-
         return container;
     }
 
     private static class Bars extends JPanel{
-        private static final int NUM_BARS = 5;
-        float[] data = {0.0f, 0.25f, 0.5f, 0.75f, 1.0f};
-        String[] labels = {"P", "R", "Y", "T", "G"};
+        int numBars;
+        float[] data;
+        String[] labels;
         private static final Color background = new Color(0xDFDFDF);
-        private static final Color fillColor = new Color(0x5B93C5);
-        private static final Color emptyBar = new Color(0xbababa);
+        private static final Color emptyBar = new Color(0xBABABA);
         private static final Color borderColor = Color.BLACK;
         private static final Stroke borderStroke = new BasicStroke(1.5f);
+        private static final int MARGIN = 6;
+        private Color fillColor;
         private Font font;
-        Bars(Font font){
+        Bars(Font font, int numBars, String[] labels, Color fillColor){
             this.font = font;
+            this.labels = labels;
+            this.numBars = numBars;
+            this.fillColor = fillColor;
+            this.data = new float[numBars];
         }
 
         @Override
@@ -68,34 +71,36 @@ public class RadioWidget{
             g2d.setColor(background);
             g2d.fillRect(0,0,getWidth(),getHeight());
 
-            g2d.setColor(Color.BLACK);
-            int spacing = getWidth()/NUM_BARS;
-            for(int i=0; i<NUM_BARS; i++){
+            int spacing = getWidth()/numBars;
+            for(int i=0; i<numBars; i++){
                 fillBar(g2d, i*spacing, spacing, data[i], labels[i]);
             }
         }
 
         private void fillBar(Graphics2D g, int xpos, int width, float mark, String label){
-            int margin = 6;
             int textHeight = getHeight()/5;
-            int barTop = margin+textHeight;
-
-            int barWidth = width-2*margin;
-            int barHeight = getHeight()-barTop-margin;
-
-            drawString(DrawPoint.TopCenter, g, label, xpos+width/2, margin);
-
+            int barTop = textHeight;
+            int barWidth = width-2*MARGIN;
+            int barHeight = getHeight()-barTop-MARGIN;
+            int barCenter = barTop+barHeight/2;
+            int barRightPos = xpos+MARGIN+barWidth;
             int fillHeight = (int) (((float)barHeight)*(1.0-mark));
 
+            // Label String
+            g.setColor(borderColor);
+            drawString(DrawPoint.TopCenter, g, label, xpos+width/2, 0);
+            // Empty part of the bar fill
             g.setColor(emptyBar);
-            g.fillRect(xpos+margin, barTop, barWidth, fillHeight);
+            g.fillRect(xpos+MARGIN, barTop, barWidth, fillHeight);
+            // Fill part of the bar fill
             g.setColor(fillColor);
-            g.fillRect(xpos+margin, barTop+fillHeight, barWidth, barHeight-fillHeight);
-
+            g.fillRect(xpos+MARGIN, barTop+fillHeight, barWidth, barHeight-fillHeight);
+            // Bar Outline
             g.setColor(borderColor);
             g.setStroke(borderStroke);
-            g.drawRect(xpos+margin, barTop, barWidth, barHeight);
-            g.drawLine(xpos+margin, barTop+barHeight/2, xpos+margin+barWidth, barTop+barHeight/2);
+            g.drawRect(xpos+MARGIN, barTop, barWidth, barHeight);
+            // Center Line
+            g.drawLine(xpos+MARGIN, barCenter, barRightPos, barCenter);
         }
     }
 }
