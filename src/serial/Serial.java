@@ -39,10 +39,15 @@ public class Serial {
     public static final int VOLTAGE       = 6;
     public static final int AMPERAGE      = 7;
     public static final int ALTITUDE      = 8;
-    public static final int HOMELATITUDE  = 9;
-    public static final int HOMELONGITUDE = 10;
-    public static final int HOMEALTITUDE  = 11;
-    public static final int DELTAALTITUDE = 12;
+    public static final int RDTHROTTLE    = 9;
+    public static final int RDPITCH       = 10;
+    public static final int RDROLL        = 11;
+    public static final int RDYAW         = 12;
+    public static final int RDGEAR        = 13;
+    public static final int HOMELATITUDE  = 14;
+    public static final int HOMELONGITUDE = 15;
+    public static final int HOMEALTITUDE  = 16;
+    public static final int DELTAALTITUDE = 17;
 
     public static final int	MAX_WAYPOINTS		= 64;
     public static final int	MAX_SETTINGS		= 64;

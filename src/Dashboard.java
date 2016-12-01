@@ -37,6 +37,7 @@ import jssc.SerialPortList;
 public class Dashboard implements Runnable {
     private static final int START_WIDTH  = 1200; //default window width
     private static final int START_HEIGHT = 900; //default window height
+    private static final int WIDGET_SIZE = 140;
     private Context context;
 
     private TelemetryWidget dataWidget;
@@ -203,7 +204,7 @@ public class Dashboard implements Runnable {
         if(context.getResource("widget_type", "Angles").equals("Horizon")){
             // Initialize the horizon widget
             JPanel horizon =
-                HorizonWidgets.makeHorizonWidget(context, 140, (ArtificialHorizon ah)->{
+                HorizonWidgets.makeHorizonWidget(context, WIDGET_SIZE, (ArtificialHorizon ah)->{
                     registerHorizonListeners(ah, false);
                 });
             // Add call back to pop out a new horizon window when clicked
@@ -217,6 +218,7 @@ public class Dashboard implements Runnable {
             });
             // Add to the panel
             dashPanel.add(horizon);
+            dashPanel.add(RadioWidget.create(context, WIDGET_SIZE));
         } else {
             dashPanel.add(
                 AngleWidget.createDial(

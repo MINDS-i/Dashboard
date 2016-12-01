@@ -28,36 +28,7 @@ public class HorizonWidgets{
      *   so it can be linked to the data input side/configured as needed
      */
     public static JPanel makeHorizonWidget(Context ctx, int size, SetupCallback sc){
-        /**
-         * The drawable margins are actually a property of the nine patch
-         *   resource's images, but the patches currently don't have a way
-         *   of storing that information so this will make it look correctly
-         *   until a more general way is implemented.
-         */
-        JPanel container = new JPanel(){
-            private NinePatch np = ctx.theme.horizonBorder;
-            private final int LEFT_MARGIN   = 8;
-            private final int RIGHT_MARGIN  = 8;
-            private final int TOP_MARGIN    = 8;
-            private final int BOTTOM_MARGIN = 8;
-            private Rectangle drawRect = new Rectangle(
-                LEFT_MARGIN,
-                TOP_MARGIN,
-                size-RIGHT_MARGIN-LEFT_MARGIN,
-                size-BOTTOM_MARGIN-TOP_MARGIN
-                );
-            @Override
-            public void paint(Graphics g) {
-                Graphics2D g2d = (Graphics2D) g.create();
-                g2d.setClip(drawRect);
-                g2d.translate(-size/2+drawRect.getCenterX(),
-                              -size/2+drawRect.getCenterY());
-                super.paint(g2d);
-                g2d.dispose();
-
-                np.paintIn(g, getWidth(), getHeight());
-            }
-        };
+        JPanel container = new TransparentPanel(ctx, size);
 
         ArtificialHorizon horizon = new ArtificialHorizon(
             ()->{container.repaint();}
@@ -65,9 +36,7 @@ public class HorizonWidgets{
         sc.setup(horizon);
 
         container.add(horizon);
-        container.setPreferredSize(new Dimension(size,size));
         horizon.setPreferredSize(new Dimension(size,size));
-        container.setOpaque(false);
         return container;
     }
 
