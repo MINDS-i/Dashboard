@@ -37,17 +37,13 @@ public class TransparentPanel extends JPanel {
             );
         setPreferredSize(new Dimension(size,size));
         setOpaque(false);
+        setBorder(new EmptyBorder(TOP_MARGIN, LEFT_MARGIN, BOTTOM_MARGIN, RIGHT_MARGIN));
+        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
     }
 
     @Override
     public void paint(Graphics g) {
-        Graphics2D g2d = (Graphics2D) g.create();
-        g2d.setClip(drawRect);
-        g2d.translate(-size/2+drawRect.getCenterX(),
-                      -size/2+drawRect.getCenterY());
-        super.paint(g2d);
-        g2d.dispose();
-
+        super.paint(g);
         np.paintIn(g, getWidth(), getHeight());
     }
 }
