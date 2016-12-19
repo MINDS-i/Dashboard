@@ -19,25 +19,36 @@ public class SystemConfigWindow {
 
     public SystemConfigWindow(Context cxt) {
         this.context = cxt;
+        // make frame and vertical box container
         JFrame frame = new JFrame("Configuration");
-
         JPanel container = new JPanel();
         container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
 
+        // Add ground/air switch panel
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(new JButton(toggleLocale));
         if(isWindows())
             buttonPanel.add(new JButton(driverExec));
         container.add(buttonPanel);
 
+        // Add radio configuration area
         JPanel lpanel = new JPanel();
         lpanel.add(new JLabel("---- Radio Configuration ----"));
         container.add(lpanel);
-
         container.add(new RadioConfigScreen());
-
         container.add(Box.createRigidArea(new Dimension(0,10)));
 
+        // Add version numbers
+        String versionString = String.format(
+            "MINDS-i Dashboard | Version %s | %s",
+            context.getResource("version_id"),
+            context.getResource("release_date"));
+        System.out.println(versionString);
+        JLabel versionPane = new JLabel(versionString);
+        versionPane.setAlignmentX(Component.CENTER_ALIGNMENT);
+        container.add(versionPane);
+
+        // Add copy right notices
         JTextPane copyRights = new JTextPane();
         Font tmp = copyRights.getFont();
         copyRights.setFont( tmp.deriveFont(9f) );
