@@ -66,8 +66,8 @@ public class SystemConfigWindow {
         frame.setVisible(true);
     }
     private boolean isWindows() {
-        String OS = System.getProperty("os.name");
-        return OS.startsWith("Windows");
+        String osname = System.getProperty("os.name");
+        return osname.toLowerCase().contains("windows");
     }
     private Action toggleLocale = new AbstractAction() {
         {
