@@ -112,6 +112,9 @@
           <arg value="${DroneLibsDir}"/>
           <arg value="${resourceDir}"/>
         </exec>
+        <exec executable="${configDateUpdater}">
+          <arg value="${versionDateFile}"/>
+        </exec>
     </target>
 
     <target name="export_graph" depends="compile">
