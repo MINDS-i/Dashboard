@@ -15,6 +15,7 @@ Code and Software is under apache license 2.0
         in the configuration menu.
         Other operating systems frequently work without modification.
  * Configure your Telemetry Radios
+ 
 #### Each Flight:
  * Connect the telemetry radio to the computer
  * Turn on your drone
