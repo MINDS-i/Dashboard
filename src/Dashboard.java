@@ -197,7 +197,6 @@ public class Dashboard implements Runnable {
         dashPanel.setLayout(new BoxLayout(dashPanel, BoxLayout.PAGE_AXIS));
 
         dashPanel.add(dataWidget);
-        System.out.println(context.getResource("widget_type", "Angles"));
         dashPanel.add(
             AngleWidget.createDial(
                 context, Serial.HEADING, context.theme.roverTop));

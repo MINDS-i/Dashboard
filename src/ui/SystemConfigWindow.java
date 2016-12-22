@@ -43,7 +43,6 @@ public class SystemConfigWindow {
             "MINDS-i Dashboard | Version %s | %s",
             context.getResource("version_id"),
             context.getResource("release_date"));
-        System.out.println(versionString);
         JLabel versionPane = new JLabel(versionString);
         versionPane.setAlignmentX(Component.CENTER_ALIGNMENT);
         container.add(versionPane);
