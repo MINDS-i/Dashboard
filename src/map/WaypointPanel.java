@@ -18,7 +18,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.logging.*;
 import javax.imageio.*;
 import javax.swing.*;
@@ -42,6 +42,7 @@ class WaypointPanel extends NinePatchPanel {
         super(cxt.theme.panelPatch);
         map = mapPanel;
         context = cxt;
+        makeActions();
         waypoints = context.getWaypointList();
         setOpaque(false);
         LayoutManager layout = new BoxLayout(this, BoxLayout.PAGE_AXIS);
@@ -59,6 +60,30 @@ class WaypointPanel extends NinePatchPanel {
             @Override public void unusedEvent() { updateDisplay(); }
         });
         updateDisplay();
+
+    }
+
+    private void makeActions(){
+        nextTileServer = new AbstractAction() {
+            java.util.List<String> serverLabels
+                = new LinkedList<String>(map.tileServerNames());
+            { updateLabel();
+            }
+            private void updateLabel(){
+                putValue(Action.NAME, serverLabels.get(0));
+            }
+            public void actionPerformed(ActionEvent e) {
+                // cycle current server to the back of the list
+                String server = serverLabels.get(0);
+                serverLabels.remove(0);
+                serverLabels.add(server);
+                // switch the map's server
+                map.switchToServer(server);
+
+                updateLabel();
+                map.repaint();
+            }
+        };
     }
 
     public void updateDisplay() {
@@ -266,21 +291,7 @@ class WaypointPanel extends NinePatchPanel {
             map.zoomOut(new Point(map.getWidth() / 2, map.getHeight() / 2));
         }
     };
-    private Action nextTileServer = new AbstractAction() {
-        String satMSG = "Satellite";
-        String mapMSG = "Street";
-        boolean state = false;
-        {
-            putValue(Action.NAME, (state)?satMSG:mapMSG);
-        }
-
-        public void actionPerformed(ActionEvent e) {
-            map.nextTileServer();
-            state = !state;
-            putValue(Action.NAME, (state)?satMSG:mapMSG);
-            map.repaint();
-        }
-    };
+    private Action nextTileServer;
     private Action toggleLooping = new AbstractAction() {
         {
             String text = "Looping On";

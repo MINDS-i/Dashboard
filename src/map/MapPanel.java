@@ -20,8 +20,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
+import java.util.*;
+import java.util.logging.*;
 import javax.imageio.*;
 import javax.swing.*;
 
@@ -29,12 +29,9 @@ public class MapPanel extends JPanel implements CoordinateTransform {
     private static final int TILE_SIZE = 256;
     private static final float ZOOM_FACTOR = 1.1f;
 
-    private MapSource[] mapSources = new MapSource[] {
-        new TileServer("http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.png"),
-        new TileServer("http://a.tile.thunderforest.com/outdoors/{z}/{x}/{y}.png"),
-    };
-    private int mapSourceIndex = 0;
-    private MapSource mapSource = mapSources[0];
+    private Map<String,MapSource> mapSources;
+    private String currentTileServerName = "";
+    private MapSource currentTileServer = new TileServer(currentTileServerName);
 
     private int zoom;
     private Point2D mapPosition = new Point2D.Double(0, 0);
@@ -45,6 +42,8 @@ public class MapPanel extends JPanel implements CoordinateTransform {
     private LayerManager  mll = new LayerManager();
     private WaypointPanel waypointPanel;
     private RoverPath     roverPath;
+
+    private final Logger iolog = Logger.getLogger("d.io");
 
     public MapPanel(Context cxt) {
         this(cxt, new Point(0, 0), 6, null, null, null);
@@ -62,7 +61,10 @@ public class MapPanel extends JPanel implements CoordinateTransform {
             @Override public void unusedEvent() { repaint(); }
         });
 
-        for(MapSource ms : mapSources) ms.addRepaintListener(this);
+        mapSources = importMapSources(cxt);
+        switchToServer(cxt.getResource("default_tile_server","satellite"));
+
+        for(MapSource ms : mapSources.values()) ms.addRepaintListener(this);
 
         border.setVgap(-20);
         setOpaque(true);
@@ -190,7 +192,7 @@ public class MapPanel extends JPanel implements CoordinateTransform {
      * Returns true if the new zoom is valid and the view has been changed
      */
     public boolean setZoom(int zoom) {
-        boolean valid = mapSource.isValidZoom(zoom);
+        boolean valid = currentTileServer.isValidZoom(zoom);
         if(valid) this.zoom = zoom;
         return valid;
     }
@@ -221,11 +223,23 @@ public class MapPanel extends JPanel implements CoordinateTransform {
         repaint();
     }
 
-    public void nextTileServer() {
-        mapSource.clear();
-        mapSourceIndex++;
-        if(mapSourceIndex >= mapSources.length) mapSourceIndex = 0;
-        mapSource = mapSources[mapSourceIndex];
+    /** Return a list of tile server names with the active server listed last */
+    public java.util.List<String> tileServerNames() {
+        java.util.List<String> list = new LinkedList<String>(mapSources.keySet());
+        list.remove(currentTileServerName);
+        list.add(currentTileServerName);
+        return list;
+    }
+
+    public void switchToServer(String serverName) {
+        if(mapSources.containsKey(serverName)){
+            currentTileServer.clear();
+            currentTileServerName = serverName;
+            currentTileServer = mapSources.get(serverName);
+        } else {
+            iolog.severe("No Tile Server Sources found for name "+serverName);
+        }
+
         repaint();
     }
 
@@ -234,7 +248,7 @@ public class MapPanel extends JPanel implements CoordinateTransform {
         super.paintComponent(gOrig);
         Graphics2D g = (Graphics2D) gOrig.create();
         try {
-            mapSource.paint(g,
+            currentTileServer.paint(g,
                             getMapPosPixels(),
                             zoom,
                             getWidth(),
@@ -243,6 +257,22 @@ public class MapPanel extends JPanel implements CoordinateTransform {
         } finally {
             g.dispose();
         }
+    }
+
+    // Load mapsources from property file specified
+    private Map<String,MapSource> importMapSources(Context ctx){
+        String sourceFile = ctx.getResource("tile_server_list");
+        if(sourceFile == null){
+            iolog.severe("Couldn't find tile server list resource path");
+        }
+
+        Map<String, MapSource> sources = new HashMap<String,MapSource>();
+        ResourceBundle rb = ctx.loadResourceBundle(sourceFile);
+        for(String key : rb.keySet()){
+            sources.put(key, new TileServer(rb.getString(key)));
+        }
+
+        return sources;
     }
 
     private class DragListener implements Layer, MouseWheelListener {
