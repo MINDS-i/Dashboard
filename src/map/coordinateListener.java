@@ -23,10 +23,8 @@ class coordinateListener implements DocumentListener, ActionListener {
     }
 
     public void insertUpdate(DocumentEvent e) {
-        field.setForeground(Color.BLUE);
     }
     public void removeUpdate(DocumentEvent e) {
-        field.setForeground(Color.BLUE);
     }
     public void changedUpdate(DocumentEvent e) {
     }

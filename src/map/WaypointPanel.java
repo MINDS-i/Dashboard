@@ -33,10 +33,30 @@ class WaypointPanel extends NinePatchPanel {
     private Context context;
     private MapPanel map;
     private WaypointList waypoints;
-    JTextField latitude;
-    JTextField longitude;
-    JTextField altitude;
+    TelemField latitude;
+    TelemField longitude;
+    TelemField altitude;
     JLabel waypointIndexDisplay;
+
+    private class TelemField extends JTextField{
+        float lastSetValue = Float.NaN;
+        @Override
+        public void setText(String newString){
+            super.setText(newString);
+            lastSetValue = Float.NaN;
+        }
+        void update(float newValue){
+            /**
+             * editable float fields will get their cursor reset unless
+             * updates from possible waypointlistener events only change
+             * the text when the dot moves
+             */
+            if(newValue != lastSetValue){
+                setText(Float.toString(newValue));
+                lastSetValue = newValue;
+            }
+        }
+    }
 
     public WaypointPanel(Context cxt, MapPanel mapPanel) {
         super(cxt.theme.panelPatch);
@@ -86,21 +106,26 @@ class WaypointPanel extends NinePatchPanel {
         };
     }
 
+    /**
+     * Update the selected dot text field displays
+     */
     public void updateDisplay() {
         int selectedWaypoint = waypoints.getSelected();
         ExtendedWaypoint w = waypoints.get(selectedWaypoint);
         Dot dot = w.dot();
 
         String indexField = (selectedWaypoint+1) + " / " + waypoints.size();
+        // special dots that don't represent waypoints show names instead of index
         switch(w.type()){
             case ROVER: indexField = "Robot"; break;
             case HOME: indexField = "Home "; break;
         }
         waypointIndexDisplay.setText(indexField);
 
-        latitude .setText(((float)dot.getLatitude())+"");
-        longitude.setText(((float)dot.getLongitude())+"");
-        altitude .setText(fixedToDouble(dot.getAltitude())+"");
+        latitude.update(  (float)dot.getLatitude() );
+        longitude.update( (float)dot.getLongitude() );
+        altitude.update(  (float)fixedToDouble(dot.getAltitude()) );
+
         latitude.setForeground(Color.BLACK);
         longitude.setForeground(Color.BLACK);
         altitude.setForeground(Color.BLACK);
@@ -163,9 +188,9 @@ class WaypointPanel extends NinePatchPanel {
             }
         }
         ArrayList<EditBoxSpec> editorBoxes = new ArrayList<EditBoxSpec>();
-        latitude  = new JTextField();
-        longitude = new JTextField();
-        altitude  = new JTextField();
+        latitude  = new TelemField();
+        longitude = new TelemField();
+        altitude  = new TelemField();
         editorBoxes.add(new EditBoxSpec(latitude , "Lat: "));
         editorBoxes.add(new EditBoxSpec(longitude, "Lng: "));
         editorBoxes.add(new EditBoxSpec(altitude , context.getResource("waypointExtra")+" "));
