@@ -83,44 +83,53 @@ public class SerialConnectPanel extends JPanel {
     private static final String BUTTON_DISCONNECTING = "Disabling ";
     private static final String BUTTON_DISCONNECTED  = " Connect  ";
     private boolean inProgress = false;
+    private final Object lock = new Object();
     private void connect() {
-        if(inProgress) {
-            System.err.println("Connect command issued while a change was in Progress");
-            return;
+        synchronized(lock) {
+            if (inProgress) {
+                System.err.println("Connect command issued while a change was in Progress");
+                return;
+            }
+            refreshButton.setEnabled(false);
+            dropDown.setEnabled(false);
+            connectButton.setEnabled(false);
+            connectButton.setText(BUTTON_CONNECTING);
+            inProgress = true;
         }
-        refreshButton.setEnabled(false);
-        dropDown.setEnabled(false);
-        connectButton.setEnabled(false);
-        connectButton.setText(BUTTON_CONNECTING);
-        inProgress = true;
         (new Thread(connectSerial)).start();
     }
     private void connectDone() {
-        refreshButton.setEnabled(false);
-        dropDown.setEnabled(false);
-        connectButton.setEnabled(true);
-        connectButton.setText(BUTTON_CONNECTED);
-        inProgress = false;
+        synchronized(lock) {
+            refreshButton.setEnabled(false);
+            dropDown.setEnabled(false);
+            connectButton.setEnabled(true);
+            connectButton.setText(BUTTON_CONNECTED);
+            inProgress = false;
+        }
     }
     private void disconnect() {
-        if(inProgress) {
-            System.err.println("Connect command issued while a change was in Progress");
-            return;
+        synchronized(lock) {
+            if(inProgress) {
+                System.err.println("Connect command issued while a change was in Progress");
+                return;
+            }
+            refreshButton.setEnabled(false);
+            dropDown.setEnabled(false);
+            connectButton.setEnabled(false);
+            connectButton.setText(BUTTON_DISCONNECTING);
+            inProgress = true;
         }
-        refreshButton.setEnabled(false);
-        dropDown.setEnabled(false);
-        connectButton.setEnabled(false);
-        connectButton.setText(BUTTON_DISCONNECTING);
-        inProgress = true;
         (new Thread(disconnectSerial)).start();
     }
     private void disconnectDone() {
-        refreshDropDown();
-        refreshButton.setEnabled(true);
-        dropDown.setEnabled(true);
-        connectButton.setEnabled(true);
-        connectButton.setText(BUTTON_DISCONNECTED);
-        inProgress = false;
+        synchronized(lock) {
+            refreshDropDown();
+            refreshButton.setEnabled(true);
+            dropDown.setEnabled(true);
+            connectButton.setEnabled(true);
+            connectButton.setText(BUTTON_DISCONNECTED);
+            inProgress = false;
+        }
     }
 
     private void refreshDropDown(){

@@ -154,9 +154,10 @@ class WaypointPanel extends NinePatchPanel {
         JButton looping 	= theme.makeButton(toggleLooping);
         JButton config      = theme.makeButton(openConfigWindow);
         JButton logPanelButton = theme.makeButton(logPanelAction);
+        JButton clearWaypoints = theme.makeButton(clearWaypointsAction);
         JComponent[] format = new JComponent[] {
             tileButton, dataPanel, graphButton,
-            reTarget, looping, config, logPanelButton
+            reTarget, looping, config, logPanelButton, clearWaypoints
         };
         for(JComponent jc : format) {
             jc.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -235,6 +236,8 @@ class WaypointPanel extends NinePatchPanel {
         add(logPanelButton);
         add(Box.createRigidArea(space));
         add(new JSeparator(SwingConstants.HORIZONTAL));
+        add(Box.createRigidArea(space));
+        add(clearWaypoints);
         add(Box.createRigidArea(space));
         add(selector);
         add(Box.createRigidArea(space));
@@ -410,6 +413,22 @@ class WaypointPanel extends NinePatchPanel {
             int selectedWaypoint = waypoints.getSelected();
             waypoints.add(
             	new Dot(waypoints.get(selectedWaypoint).dot()), selectedWaypoint);
+        }
+    };
+    private Action clearWaypointsAction = new AbstractAction() {
+        {
+            String text = "Clear Waypoints";
+            putValue(Action.NAME, text);
+        }
+        public void actionPerformed(ActionEvent e) {
+            // label the clear event as coming from the rover
+            // so we don't send waypoint update messages
+            // for every individual waypoint
+            // Instead we send an explicit clear message to the rover afterwards
+            waypoints.clear(WaypointListener.Source.REMOTE);
+            if (context.sender != null) {
+                context.sender.sendWaypointList();
+            }
         }
     };
     private Action openDataPanel = new AbstractAction() {

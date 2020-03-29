@@ -214,4 +214,12 @@ public class WaypointList {
     public void removeListener(WaypointListener l){
         listeners.remove(l);
     }
+    /**
+     * Cleares the waypoint list, passing source s through to listeners
+     */
+    public void clear(WaypointListener.Source s){
+        while (!waypoints.isEmpty()) {
+            remove(0, s);
+        }
+    }
 }

@@ -126,12 +126,14 @@ public class SerialSender {
     }
 
     public void sendWaypointList() {
-        seriallog.fine("Sending waypoint list");
-        sendingWaypointList = true;
         waypointListPosition = 0;
-        Message msg = Message.clearWaypoints();
-        sendMessage(msg);
-        advanceWaypointList(waypointListWaitingCode);
+        if(context.connected) {
+            seriallog.fine("Sending waypoint list");
+            sendingWaypointList = true;
+            Message msg = Message.clearWaypoints();
+            sendMessage(msg);
+            advanceWaypointList(waypointListWaitingCode);
+        }
     }
 
     private void advanceWaypointList(int confirm) {
