@@ -49,7 +49,9 @@
 
     <target name="compile" depends="init">
         <javac srcdir="${sourceDir}" destdir="${outputDir}"
-                includeantruntime="false" >
+                includeantruntime="false"
+                target="1.8"
+                source="1.8" >
             <classpath refid="class.path"/>
             <compilerarg value="-XDignore.symbol.file"/>
         </javac>
