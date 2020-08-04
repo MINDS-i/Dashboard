@@ -223,6 +223,19 @@ public class MapPanel extends JPanel implements CoordinateTransform {
         repaint();
     }
 
+    //TODO - CP - [Add Function] autoZoom
+    /*
+     * Name: autoZoom
+     * Priority: A
+     * Desc: 	Zoom map to it's lowest level at the specified coordinates
+     * Params: Point pivot
+     *
+     * Planning:
+     * - We don't want to repaint here. So I don't think we can utilize zoomIn so
+     * 	 easily. If I end up duplicating to much of it, maybe a refactor of zoomIn would
+     * 	 be a better idea, to help abstract out some functionality.
+     */
+    
     /** Return a list of tile server names with the active server listed last */
     public java.util.List<String> tileServerNames() {
         java.util.List<String> list = new LinkedList<String>(mapSources.keySet());

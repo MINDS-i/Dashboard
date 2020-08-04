@@ -22,3 +22,4 @@ resources/persist/*
 resources/tile_servers.properties
 .classpath
 .project
+.settings/org.eclipse.wst.sse.core.prefs

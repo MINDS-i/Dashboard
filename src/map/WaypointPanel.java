@@ -33,6 +33,7 @@ class WaypointPanel extends NinePatchPanel {
     private Context context;
     private MapPanel map;
     private WaypointList waypoints;
+    private javax.swing.Timer zoomTimer;
     TelemField latitude;
     TelemField longitude;
     TelemField altitude;
@@ -155,6 +156,11 @@ class WaypointPanel extends NinePatchPanel {
         JButton config      = theme.makeButton(openConfigWindow);
         JButton logPanelButton = theme.makeButton(logPanelAction);
         JButton clearWaypoints = theme.makeButton(clearWaypointsAction);
+        JButton zoomInButton = theme.makeButton(zoomInAction);
+        		zoomInButton.addMouseListener(zoomInMouseAdapter);
+        JButton zoomOutButton = theme.makeButton(zoomOutAction);
+        		zoomOutButton.addMouseListener(zoomOutMouseAdapter);
+
         JComponent[] format = new JComponent[] {
             tileButton, dataPanel, graphButton,
             reTarget, looping, config, logPanelButton, clearWaypoints
@@ -163,13 +169,13 @@ class WaypointPanel extends NinePatchPanel {
             jc.setAlignmentX(Component.CENTER_ALIGNMENT);
             jc.setMaximumSize(buttonSize);
         }
-
+        
         //make zoom button panel
         JPanel zoom = new JPanel(new FlowLayout());
         zoom.setOpaque(false);
-        zoom.add(theme.makeButton(zoomInAction));
-        zoom.add(theme.makeButton(zoomOutAction));
-
+        zoom.add(zoomInButton);
+        zoom.add(zoomOutButton);
+        
         //add selectedWaypoint flow layout
         JPanel selector = new JPanel(new BorderLayout());
         selector.setOpaque(false);
@@ -297,28 +303,81 @@ class WaypointPanel extends NinePatchPanel {
             lv.setVisible(true);
         }
     };
+    
     private Action zoomInAction = new AbstractAction() {
-        {
-            String text = "+";
-            putValue(Action.NAME, text);
-            putValue(Action.SHORT_DESCRIPTION, text);
-        }
-
-        public void actionPerformed(ActionEvent e) {
-            map.zoomIn(new Point(map.getWidth() / 2, map.getHeight() / 2));
-        }
+    	{
+    		String text = "+";
+    		putValue(Action.NAME, text);
+    		putValue(Action.SHORT_DESCRIPTION, text);
+    	}
+    	
+    	public void actionPerformed(ActionEvent e) {
+    	}
     };
+    
+    private MouseAdapter zoomInMouseAdapter = new MouseAdapter() {
+        	@Override
+        	public void mousePressed(MouseEvent me) {
+        		map.zoomIn(new Point(map.getWidth() / 2, map.getHeight() / 2));
+        		
+        		if(zoomTimer == null) {
+        			zoomTimer = new javax.swing.Timer(250, zoomInTimerAction);
+            		zoomTimer.start();	
+        		}
+        	}
+        	
+        	@Override
+        	public void mouseReleased(MouseEvent me) {
+        		if(zoomTimer != null) {
+        			zoomTimer.stop();
+        			zoomTimer = null;
+        		}
+           }
+    };
+    
+    private Action zoomInTimerAction = new AbstractAction() {
+    	public void actionPerformed(ActionEvent e) {
+    		map.zoomIn(new Point(map.getWidth() / 2, map.getHeight() / 2));
+    	}
+    };
+    
     private Action zoomOutAction = new AbstractAction() {
-        {
-            String text = "-";
-            putValue(Action.NAME, text);
-            putValue(Action.SHORT_DESCRIPTION, text);
-        }
-
-        public void actionPerformed(ActionEvent e) {
-            map.zoomOut(new Point(map.getWidth() / 2, map.getHeight() / 2));
-        }
+    	{
+          String text = "-";
+          putValue(Action.NAME, text);
+          putValue(Action.SHORT_DESCRIPTION, text);
+    	}
+    	
+    	public void actionPerformed(ActionEvent e) {
+    	}
     };
+
+    private MouseAdapter zoomOutMouseAdapter = new MouseAdapter() {
+    	@Override
+    	public void mousePressed(MouseEvent me) {
+    		map.zoomOut(new Point(map.getWidth() / 2, map.getHeight() / 2));
+    		
+    		if(zoomTimer == null) {
+    			zoomTimer = new javax.swing.Timer(250, zoomOutTimerAction);
+        		zoomTimer.start();
+    		}
+    	}
+    	
+    	@Override
+    	public void mouseReleased(MouseEvent me) {
+    		if(zoomTimer != null) {
+    			zoomTimer.stop();
+    			zoomTimer = null;
+    		}
+    	}	
+    };
+    
+    private Action zoomOutTimerAction = new AbstractAction() {	
+    	public void actionPerformed(ActionEvent e) {
+    		map.zoomOut(new Point(map.getWidth() / 2, map.getHeight() / 2));
+    	}
+    };
+    
     private Action nextTileServer;
     private Action toggleLooping = new AbstractAction() {
         {
