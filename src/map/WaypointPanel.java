@@ -160,6 +160,7 @@ class WaypointPanel extends NinePatchPanel {
         		zoomInButton.addMouseListener(zoomInMouseAdapter);
         JButton zoomOutButton = theme.makeButton(zoomOutAction);
         		zoomOutButton.addMouseListener(zoomOutMouseAdapter);
+        JButton zoomFullButton = theme.makeButton(zoomFullAction);
 
         JComponent[] format = new JComponent[] {
             tileButton, dataPanel, graphButton,
@@ -174,6 +175,7 @@ class WaypointPanel extends NinePatchPanel {
         JPanel zoom = new JPanel(new FlowLayout());
         zoom.setOpaque(false);
         zoom.add(zoomInButton);
+        zoom.add(zoomFullButton);
         zoom.add(zoomOutButton);
         
         //add selectedWaypoint flow layout
@@ -312,6 +314,7 @@ class WaypointPanel extends NinePatchPanel {
     	}
     	
     	public void actionPerformed(ActionEvent e) {
+    		//Do nothing, input handled by zoomInMouseAdapter
     	}
     };
     
@@ -349,6 +352,7 @@ class WaypointPanel extends NinePatchPanel {
     	}
     	
     	public void actionPerformed(ActionEvent e) {
+    		//Do nothing, input handled by zoomOutMouseAdapter
     	}
     };
 
@@ -375,6 +379,18 @@ class WaypointPanel extends NinePatchPanel {
     private Action zoomOutTimerAction = new AbstractAction() {	
     	public void actionPerformed(ActionEvent e) {
     		map.zoomOut(new Point(map.getWidth() / 2, map.getHeight() / 2));
+    	}
+    };
+    
+    private Action zoomFullAction = new AbstractAction() {
+    	{
+    		String text = "Full Zoom";
+    		putValue(Action.NAME, text);
+    		putValue(Action.SHORT_DESCRIPTION, text);
+    	}
+    	
+    	public void actionPerformed(ActionEvent e) {
+    		map.zoomFull(new Point(map.getWidth() / 2, map.getHeight() / 2));
     	}
     };
     

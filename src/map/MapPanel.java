@@ -197,10 +197,10 @@ public class MapPanel extends JPanel implements CoordinateTransform {
         return valid;
     }
 
-    public void zoomIn(Point pivot) {
+    public boolean zoomIn(Point pivot) {
         Point2D startLoc = getMapPosPixels();
         boolean success = setZoom((int)(getZoom()*ZOOM_FACTOR));
-        if(!success) return;
+        if(!success) return false;
         double dx = (pivot.x- getWidth()/2);
         double dy = (pivot.y-getHeight()/2);
         Point2D endLoc = new Point2D.Double(
@@ -208,6 +208,7 @@ public class MapPanel extends JPanel implements CoordinateTransform {
             startLoc.getY()*ZOOM_FACTOR + dy*(ZOOM_FACTOR-1.0) );
         setMapPosPixels(endLoc);
         repaint();
+        return true;
     }
 
     public void zoomOut(Point pivot) {
@@ -223,18 +224,9 @@ public class MapPanel extends JPanel implements CoordinateTransform {
         repaint();
     }
 
-    //TODO - CP - [Add Function] autoZoom
-    /*
-     * Name: autoZoom
-     * Priority: A
-     * Desc: 	Zoom map to it's lowest level at the specified coordinates
-     * Params: Point pivot
-     *
-     * Planning:
-     * - We don't want to repaint here. So I don't think we can utilize zoomIn so
-     * 	 easily. If I end up duplicating to much of it, maybe a refactor of zoomIn would
-     * 	 be a better idea, to help abstract out some functionality.
-     */
+    public void zoomFull(Point pivot) {
+    	while(zoomIn(new Point(getWidth() / 2, getHeight() / 2))) {}
+    }
     
     /** Return a list of tile server names with the active server listed last */
     public java.util.List<String> tileServerNames() {
