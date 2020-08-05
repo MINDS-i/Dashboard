@@ -24,12 +24,11 @@ public class SystemConfigWindow {
         JPanel container = new JPanel();
         container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
 
-        // Add ground/air switch panel
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.add(new JButton(toggleLocale));
-        if(isWindows())
-            buttonPanel.add(new JButton(driverExec));
-        container.add(buttonPanel);
+        // Add ui configuration area
+        JPanel uiTitlePanel = new JPanel();
+        uiTitlePanel.add(new JLabel("---- UI Configuration ----"));
+        container.add(uiTitlePanel);        
+        container.add(new UIConfigPanel(this.context, isWindows()));
 
         // Add radio configuration area
         JPanel lpanel = new JPanel();
