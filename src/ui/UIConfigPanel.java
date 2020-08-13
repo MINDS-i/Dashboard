@@ -3,6 +3,7 @@ package com.ui;
 
 import com.Context;
 
+import java.awt.Insets;
 import java.awt.Dimension;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
@@ -13,11 +14,11 @@ import javax.swing.*;
 
 public class UIConfigPanel extends JPanel {
 	
-	private static final int DEF_TEXT_FIELD_WIDTH = 6;
-	private static final int DEF_BUTTON_WIDTH = 200;
-	private static final int DEF_BUTTON_HEIGHT = 30;
+	private static final int DEF_TEXT_FIELD_WIDTH 	= 6;
+	private static final int DEF_BUTTON_WIDTH 		= 200;
+	private static final int DEF_BUTTON_HEIGHT 		= 30;
 	
-	private Context context;
+	private Context 	context;
 	
 	private JPanel 		buttonPanel;
 	private JButton		toggleButton;
@@ -31,12 +32,16 @@ public class UIConfigPanel extends JPanel {
 	private JTextField 	latField;
 	private JButton 	setHomeButton;
 	
-	
 	public UIConfigPanel(Context cxt, boolean isWindows) {
 		this.context = cxt;
 		
 		this.setLayout(new GridBagLayout());
+		//Constraints persist between component applications, so any properties we
+		//don't want more than one component to share need to be explicitly defined
+		//before being applied to that a compoenent.
+		
 		GridBagConstraints constraints = new GridBagConstraints();
+		constraints.insets = new Insets(0,5,0,5);
 		
 		toggleButton = new JButton(toggleLocaleAction);
 		toggleButton.setPreferredSize(
@@ -54,7 +59,7 @@ public class UIConfigPanel extends JPanel {
 			this.add(driverButton, constraints);	
 		}
 		
-		latLabel = new JLabel("Lattitiude:");
+		latLabel = new JLabel("Latitiude:");
 		constraints.gridx = 1;
 		constraints.gridy = 0;
 		this.add(latLabel, constraints);
@@ -78,6 +83,7 @@ public class UIConfigPanel extends JPanel {
 		constraints.gridx = 1;
 		constraints.gridy = 2;
 		constraints.gridwidth = 2;
+		constraints.fill = GridBagConstraints.HORIZONTAL;
 		this.add(setHomeButton, constraints);
 	}
 	

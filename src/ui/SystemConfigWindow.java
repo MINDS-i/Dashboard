@@ -67,29 +67,4 @@ public class SystemConfigWindow {
         String osname = System.getProperty("os.name");
         return osname.toLowerCase().contains("windows");
     }
-    private Action toggleLocale = new AbstractAction() {
-        {
-            String text = "Toggle ground/air mode";
-            putValue(Action.NAME, text);
-        }
-        public void actionPerformed(ActionEvent e) {
-            context.toggleLocale();
-            JFrame mf = new JFrame("message");
-            JOptionPane.showMessageDialog(mf, "Changes will take effect next launch");
-        }
-    };
-    private Action driverExec = new AbstractAction() {
-        {
-            String text = "Launch driver installer";
-            putValue(Action.NAME, text);
-        }
-        public void actionPerformed(ActionEvent e) {
-            String[] cmd = { "RadioDiversv2.12.06WHQL_Centified.exe" };
-            try {
-                Process p = Runtime.getRuntime().exec(cmd);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
-    };
 }
