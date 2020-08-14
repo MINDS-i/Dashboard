@@ -18,6 +18,7 @@ import java.util.*;
 import java.util.logging.*;
 import jssc.SerialPort;
 import jssc.SerialPortException;
+import java.awt.geom.Point2D;
 
 public class Context {
     public boolean connected;
@@ -155,6 +156,21 @@ public class Context {
         }
         saveProps();
     }
+    
+    public void setHome(String lat, String lng) {
+    	persist.setProperty("homeLat", lat);
+    	persist.setProperty("homeLng", lng);
+    	saveProps();
+    }
+    
+    public Point2D getHome() {
+    	String lat = (String) persist.getProperty("homeLat", "0.0");
+    	String lng = (String) persist.getProperty("homeLng", "0.0");
+    	
+    	return new Point2D.Double(Double.parseDouble(lat),
+    			Double.parseDouble(lng));
+    }
+    
     private void saveProps() {
         try(FileOutputStream file = new FileOutputStream(persistanceFile)) {
             persist.store(file, "");

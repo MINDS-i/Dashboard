@@ -9,6 +9,7 @@ import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
+import java.awt.geom.Point2D;
 import java.text.Format;
 import javax.swing.*;
 
@@ -17,6 +18,7 @@ public class UIConfigPanel extends JPanel {
 	private static final int DEF_TEXT_FIELD_WIDTH 	= 6;
 	private static final int DEF_BUTTON_WIDTH 		= 200;
 	private static final int DEF_BUTTON_HEIGHT 		= 30;
+	private static final String DEF_HOME_COORD		= "0.0";
 	
 	private Context 	context;
 	
@@ -24,9 +26,9 @@ public class UIConfigPanel extends JPanel {
 	private JButton		toggleButton;
 	private JButton		driverButton;
 	private JPanel 		homePanel;
-	private JPanel		lonPanel;
-	private JLabel 		lonLabel;
-	private JTextField 	lonField;
+	private JPanel		lngPanel;
+	private JLabel 		lngLabel;
+	private JTextField 	lngField;
 	private JPanel		latPanel;
 	private JLabel 		latLabel;
 	private JTextField 	latField;
@@ -59,6 +61,8 @@ public class UIConfigPanel extends JPanel {
 			this.add(driverButton, constraints);	
 		}
 		
+		Point2D homeCoords = context.getHome();
+		
 		latLabel = new JLabel("Latitiude:");
 		constraints.gridx = 1;
 		constraints.gridy = 0;
@@ -68,16 +72,18 @@ public class UIConfigPanel extends JPanel {
 		constraints.gridx = 2;
 		constraints.gridy = 0;
 		this.add(latField, constraints);
+		latField.setText(String.valueOf(homeCoords.getX()));
 		
-		lonLabel = new JLabel("Longitude:");
+		lngLabel = new JLabel("Longitude:");
 		constraints.gridx = 1;
 		constraints.gridy = 1;
-		this.add(lonLabel, constraints);
+		this.add(lngLabel, constraints);
 		
-		lonField = new JTextField(DEF_TEXT_FIELD_WIDTH);
+		lngField = new JTextField(DEF_TEXT_FIELD_WIDTH);
 		constraints.gridx = 2;
 		constraints.gridy = 1;
-		this.add(lonField, constraints);
+		this.add(lngField, constraints);
+		lngField.setText(String.valueOf(homeCoords.getY()));
 		
 		setHomeButton = new JButton(setHomeAction);
 		constraints.gridx = 1;
@@ -123,10 +129,23 @@ public class UIConfigPanel extends JPanel {
     	}
     	
     	public void actionPerformed(ActionEvent e) {
-    		//TODO - CP - Add home point save logic here.
-    			//Grab text field info
-    			//Save config however possible.
-    			//Inform user on success or failure
+    		String lat = latField.getText();
+    		String lng = lngField.getText();
+    		
+    		//If the input from the fields looks bad, use a default
+    		if(lat.isEmpty() || lat == null) {
+    			lat = DEF_HOME_COORD;
+    		}
+    		if(lng.isEmpty() || lng == null) {
+    			lng = DEF_HOME_COORD;
+    		}
+    		
+    		context.setHome(latField.getText(),
+    				lngField.getText());
+    		
+    		JFrame mf = new JFrame("message");
+            JOptionPane.showMessageDialog(mf, 
+            		"Home location has been set.");
     	}
     };
 }
