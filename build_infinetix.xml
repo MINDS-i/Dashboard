@@ -1,0 +1,131 @@
+<project xmlns:ivy="antlib:org.apache.ivy.ant" name="dashboard">
+    <property file="build.properties" />
+
+    <path id="class.path">
+        <pathelement location="${outputDir}"/>
+        <pathelement location="${packDir}"/>
+        <fileset dir="${libDir}">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+    <path id="class.testpath">
+        <path refid="class.path"/>
+        <fileset dir="${testLibDir}">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+    <manifestclasspath property="jar.classpath"
+                       jarfile="${outputJar}">
+        <classpath>
+            <pathelement location="${packDir}"/>
+        </classpath>
+    </manifestclasspath>
+
+    <target name="init">
+        <mkdir dir="${resourceDir}"/>
+        <mkdir dir="${sourceDir}"/>
+        <mkdir dir="${testDir}"/>
+        <mkdir dir="${outputDir}"/>
+        <mkdir dir="${libDir}"/>
+        <mkdir dir="${reportsDir}"/>
+        <mkdir dir="${testLibDir}"/>
+    </target>
+
+    <target name="clean" depends="init">
+        <delete dir="${outputDir}"/>
+        <delete dir="${libDir}"/>
+        <delete dir="${reportsDir}"/>
+        <delete file="${outputZip}"/>
+        <delete file="${outputJar}"/>
+        <ivy:cleancache />
+    </target>
+
+    <target name="retrieve" depends="init">
+        <ivy:retrieve conf="testing" pattern="${testLibDir}/[artifact].[ext]"/>
+        <ivy:retrieve conf="application" pattern="${libDir}/[artifact].[ext]"/>
+    </target>
+
+    <target name="compile" depends="init">
+        <javac srcdir="${sourceDir}" destdir="${outputDir}"
+                includeantruntime="false"
+                target="1.8"
+                source="1.8" >
+            <classpath refid="class.path"/>
+            <compilerarg value="-XDignore.symbol.file"/>
+        </javac>
+    </target>
+
+    <target name="run" depends="compile">
+        <!-- use "ant -Dmainclass=* run" to run a different class than main-->
+        <java classname="${mainclass}" fork="true">
+            <classpath refid="class.path"/>
+        </java>
+    </target>
+
+    <target name="release" depends="updateMessageDatabase,test">
+        <fail message="Failing tests; build aborted" if="test.failed"/>
+        <jar destfile="${outputJar}" basedir="${outputDir}">
+            <zipgroupfileset dir="${libDir}">
+                <include name="*.jar"/>
+            </zipgroupfileset>
+            <manifest>
+                <attribute name="Main-Class" value="${mainclass}"/>
+                <attribute name="Class-Path" value="${jar.classpath}" />
+            </manifest>
+        </jar>
+        <zip destfile="${outputZip}">
+            <zipfileset dir="${packDir}" prefix="${packDir}"/>
+            <zipfileset src="${packZip}"/>
+            <zipfileset dir="./" includes="${outputJar}"/>
+        </zip>
+        <delete dir="${outputDir}" />
+    </target>
+
+    <target name="compileTests" depends="compile">
+        <javac srcdir="${testDir}" destdir="${outputDir}"
+                includeantruntime="false" >
+            <classpath refid="class.testpath"/>
+            <compilerarg value="-XDignore.symbol.file"/>
+        </javac>
+    </target>
+
+    <target name="test" depends="compileTests">
+        <!-- use "ant -Dtest.match=* run" to run a subset of all tests -->
+        <property name="test.match" value="*"/>
+        <junit failureproperty="test.failed">
+            <classpath refid="class.testpath"/>
+            <formatter type="plain" usefile="false" />
+            <batchtest fork="yes" todir="${reportsDir}">
+                <fileset dir="${testDir}">
+                    <include name="**/${test.match}_test.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
+    <target name="updateMessageDatabase">
+        <exec executable="${pythonDir}"> 
+          <arg line="${msgDbTool}"/>
+          <arg value="${DroneLibsDir}"/>
+          <arg value="${MessageDbFile}"/>
+        </exec>
+        <exec executable="${pythonDir}">
+          <arg line="${settingsDbTool}"/>
+          <arg value="${DroneLibsDir}"/>
+          <arg value="${resourceDir}"/>
+        </exec>
+        <exec executable="${powerShellDir}">
+    	  <arg line="${configDateUpdater}"/>
+          <arg value="${versionDateFile}"/>
+        </exec>
+    </target>
+
+    <target name="export_graph" depends="compile">
+        <jar destfile="graph.jar">
+            <fileset dir="${outputDir}" includes="com/graph/*" />
+            <fileset dir="${outputDir}" includes="com/table/*" />
+        </jar>
+    </target>
+</project>
