@@ -76,6 +76,8 @@ public class Context {
         telemetry   = new TelemetryManager(this);
         telemLog    = new TelemetryLogger(this, telemetry);
 
+        loadHomeLocation();
+        
         // Patch the waypoint list into the serial sender
         waypoint.addListener(new WaypointListener(){
             @Override
@@ -187,6 +189,14 @@ public class Context {
         resources = loadResourceBundle("resources");
     }
 
+    public void loadHomeLocation() {
+    	Dot location = waypoint.getHome();
+    	Point2D home = getHomeProp();
+    	location.setLatitude(home.getX());
+    	location.setLongitude(home.getY());
+    	waypoint.setHome(location);
+    }
+    
     public void updatePort(SerialPort newPort) {
         closePort();
         port = newPort;

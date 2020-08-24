@@ -131,12 +131,13 @@ public class Dashboard implements Runnable {
         JPanel messageBox = createAlertBox();
 
         MapPanel mapPanel = new MapPanel(context,
-                                         new Point(-100,40),
-                                         4, // default zoom level
-                                         serialPanel,
-                                         createRightPanel(),
-                                         messageBox);
-
+        								 new Point((int)context.getHomeProp().getY(),
+        										   (int)context.getHomeProp().getX()),
+        								 4, // default zoom level
+        								 serialPanel,
+        								 createRightPanel(),
+        								 messageBox);
+        
         f.add(mapPanel);
         f.pack();
         f.setSize(START_WIDTH, START_HEIGHT);
