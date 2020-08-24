@@ -157,13 +157,13 @@ public class Context {
         saveProps();
     }
     
-    public void setHome(String lat, String lng) {
+    public void setHomeProp(String lat, String lng) {
     	persist.setProperty("homeLat", lat);
     	persist.setProperty("homeLng", lng);
     	saveProps();
     }
     
-    public Point2D getHome() {
+    public Point2D getHomeProp() {
     	String lat = (String) persist.getProperty("homeLat", "0.0");
     	String lng = (String) persist.getProperty("homeLng", "0.0");
     	

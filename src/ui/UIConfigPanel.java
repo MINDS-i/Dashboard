@@ -2,6 +2,7 @@ package com.ui;
 
 
 import com.Context;
+import com.map.*;
 
 import java.awt.Insets;
 import java.awt.Dimension;
@@ -61,7 +62,7 @@ public class UIConfigPanel extends JPanel {
 			this.add(driverButton, constraints);	
 		}
 		
-		Point2D homeCoords = context.getHome();
+		Point2D homeCoords = context.getHomeProp();
 		
 		latLabel = new JLabel("Latitiude:");
 		constraints.gridx = 1;
@@ -140,7 +141,13 @@ public class UIConfigPanel extends JPanel {
     			lng = DEF_HOME_COORD;
     		}
     		
-    		context.setHome(latField.getText(),
+    		WaypointList list = context.getWaypointList();
+    		Dot location = list.getHome();
+    		location.setLatitude(Double.parseDouble(lat));
+    		location.setLongitude(Double.parseDouble(lng));
+    		list.setHome(location);
+    		
+    		context.setHomeProp(latField.getText(),
     				lngField.getText());
     		
     		JFrame mf = new JFrame("message");
