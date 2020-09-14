@@ -384,7 +384,7 @@ class WaypointPanel extends NinePatchPanel {
     
     private Action zoomFullAction = new AbstractAction() {
     	{
-    		String text = "Full Zoom";
+    		String text = "Full";
     		putValue(Action.NAME, text);
     		putValue(Action.SHORT_DESCRIPTION, text);
     	}
