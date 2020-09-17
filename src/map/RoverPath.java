@@ -74,7 +74,7 @@ class RoverPath implements Layer {
             	
             	//TODO - CP - COMMAND ADD goes here
             	command = new WaypointCommandAdd(
-            			waypoints, new Dot(point), (waypoints.size() - 1), false);
+            			waypoints, new Dot(point), waypoints.size(), false);
             	
 //                waypoints.add(new Dot(point), waypoints.size());
 //                waypoints.setSelected(waypoints.size() - 1);
