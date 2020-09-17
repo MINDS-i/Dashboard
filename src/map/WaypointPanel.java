@@ -496,6 +496,8 @@ class WaypointPanel extends NinePatchPanel {
             putValue(Action.NAME, text);
         }
         public void actionPerformed(ActionEvent e) {
+        	//TODO - CP - COMMAND CLEAR goes here
+        	
             // label the clear event as coming from the rover
             // so we don't send waypoint update messages
             // for every individual waypoint

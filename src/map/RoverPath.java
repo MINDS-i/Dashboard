@@ -1,6 +1,8 @@
 package com.map;
 
 import static com.map.WaypointList.*;
+
+import com.map.command.*;
 import com.Context;
 import com.serial.Serial;
 import com.telemetry.TelemetryListener;
@@ -54,6 +56,9 @@ class RoverPath implements Layer {
     }
 
     public boolean onClick(MouseEvent e) {
+    	WaypointCommand command;
+    	boolean result = false;
+    	
         if(waypointsDisabled) return false;
 
         Point2D pixel = toP2D(e.getPoint());
@@ -66,35 +71,58 @@ class RoverPath implements Layer {
             int line = isOverLine(e.getPoint());
             if (line==Integer.MAX_VALUE) {
                 //click is not over an existing line
-                waypoints.add(new Dot(point), waypoints.size());
-                waypoints.setSelected(waypoints.size() - 1);
+            	
+            	//TODO - CP - COMMAND ADD goes here
+            	command = new WaypointCommandAdd(
+            			waypoints, new Dot(point), (waypoints.size() - 1), false);
+            	
+//                waypoints.add(new Dot(point), waypoints.size());
+//                waypoints.setSelected(waypoints.size() - 1);
             } else {
                 //click is over an existing line
-                waypoints.add(new Dot(point), line);
-                waypoints.setSelected(line);
-                if(line == 0){
+            	
+            	//TODO - CP - COMMAND ADD also here
+            	command = new WaypointCommandAdd(
+    					waypoints, new Dot(point), line, ((line == 0) ? true : false));
+            	
+//            	waypoints.add(new Dot(point), line);
+//                waypoints.setSelected(line);
+//                if(line == 0){
                     // When the rover is targeting point 0, an additional line=0
                     // can occur representing the line from the rover to the
                     // first waypoint. If a new dot is added in this location,
                     // the new dot should make itself the new target of the
                     // rover so the user can quickly add a new waypoint to
                     // the front of the line.
-                    waypoints.setTarget(line);
-                }
+//                    waypoints.setTarget(line);
+//                }
             }
-            return true;
+            
+            result = CommandManager.getInstance().process(command);
+//            return true;
         } else if ((e.getButton() == MouseEvent.BUTTON3) && (underneith != Integer.MAX_VALUE)) {
-            //right click on top of a point
-            waypoints.remove(underneith);
-            return true;
+           
+        	//TODO - CP - COMMAND REMOVE goes here
+        	//right click on top of a point
+            command = new WaypointCommandRemove(waypoints, underneith);
+        	
+            result = CommandManager.getInstance().process(command);
+            
+//        	waypoints.remove(underneith);
+//            return true;
+
         }
-        return false;
+        
+        return result;
     }
 
     private Dot draggedDot = null;
     private int draggedDotIdx = Integer.MAX_VALUE;
     private int downDot = Integer.MAX_VALUE;
 
+    //TODO - CP - COMMAND MOVE goes here? (If the difference between start and
+    //end locations is 0, then we should not add the command because nothing changed.
+    //This will avoid user confusion on an undo that would present no visible change.
     public boolean onPress(MouseEvent e) {
         Point pixel = e.getPoint();
         downDot = isOverDot(pixel, context.theme.waypointImage);
