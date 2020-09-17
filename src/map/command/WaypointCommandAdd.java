@@ -5,11 +5,10 @@ import com.map.command.WaypointCommand.CommandType;
 import com.map.Dot;
 
 /**
- * 
  * @author Chris Park @ Infinetix Corp.
  * Date: 9-14-2020
- * Description:
- *
+ * Description: Command responsible for adding a waypoint to the
+ * active sessions list.
  */
 public class WaypointCommandAdd extends WaypointCommand {
 	
@@ -45,8 +44,6 @@ public class WaypointCommandAdd extends WaypointCommand {
 	
 	@Override
 	public boolean redo() {
-		execute();
-		
-		return true;
+		return execute();
 	}
 }

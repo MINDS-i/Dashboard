@@ -119,23 +119,33 @@ class RoverPath implements Layer {
     private Dot draggedDot = null;
     private int draggedDotIdx = Integer.MAX_VALUE;
     private int downDot = Integer.MAX_VALUE;
-
+    private WaypointCommand moveCommand;
     //TODO - CP - COMMAND MOVE goes here? (If the difference between start and
     //end locations is 0, then we should not add the command because nothing changed.
     //This will avoid user confusion on an undo that would present no visible change.
     public boolean onPress(MouseEvent e) {
         Point pixel = e.getPoint();
+        
         downDot = isOverDot(pixel, context.theme.waypointImage);
+        
         if(downDot != Integer.MAX_VALUE) {
-            waypoints.setSelected(downDot);
+            
+        	waypoints.setSelected(downDot);
+            
             if(downDot < 0 || waypointsDisabled) {
                 // Disable dragging for non-waypoint line dots
                 downDot = Integer.MAX_VALUE;
             } else {
-                draggedDot = waypoints.get(downDot).dot();
+            	
+//                draggedDot = waypoints.get(downDot).dot();
+                
+                //Initialize moveCommand but wait for end location to process.
+                moveCommand = new WaypointCommandMove(waypoints, downDot);
             }
+            
             return true;
         }
+        
         return false;
     }
 
@@ -152,8 +162,12 @@ class RoverPath implements Layer {
     public void onRelease(MouseEvent e) {
         Point pixel = e.getPoint();
         if(draggedDotIdx != Integer.MAX_VALUE) {
-            waypoints.set(draggedDot, draggedDotIdx);
-            draggedDotIdx = Integer.MAX_VALUE;
+        	draggedDotIdx = Integer.MAX_VALUE;
+        	
+        	//Dot should now be at end location, so we can grab it and execute.
+        	moveCommand.finalize(new Dot(draggedDot), painter);
+        	moveCommand.execute();
+//            waypoints.set(draggedDot, draggedDotIdx);
         }
     }
 
