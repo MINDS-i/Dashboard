@@ -137,8 +137,7 @@ class RoverPath implements Layer {
                 downDot = Integer.MAX_VALUE;
             } else {
             	
-//                draggedDot = waypoints.get(downDot).dot();
-                
+                draggedDot = waypoints.get(downDot).dot();
                 //Initialize moveCommand but wait for end location to process.
                 moveCommand = new WaypointCommandMove(waypoints, downDot);
             }
@@ -166,7 +165,7 @@ class RoverPath implements Layer {
         	
         	//Dot should now be at end location, so we can grab it and execute.
         	moveCommand.finalize(new Dot(draggedDot), painter);
-        	moveCommand.execute();
+        	CommandManager.getInstance().process(moveCommand);
 //            waypoints.set(draggedDot, draggedDotIdx);
         }
     }
