@@ -28,7 +28,8 @@ public class WaypointCommandMove extends WaypointCommand {
 	 */
 	public boolean execute() {
 		if(endPoint == null) {
-			//TODO - CP - Throw Log here no endpoint here
+			System.err.print("WaypointCommandMove - Execution failure. ");
+			System.err.println("Endpoint was not set.");
 			return false;
 		}
 		
