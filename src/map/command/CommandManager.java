@@ -3,9 +3,6 @@ package com.map.command;
 import java.util.*;
 import com.map.command.WaypointCommand;
 
-
-//TODO - CP - Logging is needed any place that a failure result occurs.
-
 /**
  * @author Chris Park @ Infinetix Corp.
  * Date: 9-14-2020
@@ -46,10 +43,13 @@ public class CommandManager {
 		
 		result = command.execute();
 		
-		if(result == true) {
-			processedCommands.push(command);
-			revertedCommands.clear();
+		if(result == false) {
+			System.err.println("CommandManager - Process command failure.");
+			return false;
 		}
+		
+		processedCommands.push(command);
+		revertedCommands.clear();
 		
 		return result;
 	}
@@ -65,6 +65,8 @@ public class CommandManager {
 		boolean result;
 		
 		if(processedCommands.isEmpty()) {
+			System.err.println(
+					"CommandManager - Failed undo. processed queue is empty.");
 			return false;
 		}
 		
@@ -89,6 +91,8 @@ public class CommandManager {
 		boolean result;
 		
 		if(revertedCommands.isEmpty()) {
+			System.err.println(
+					"CommandManager - Failed redo. reverted queue is empty.");
 			return false;
 		}
 		
