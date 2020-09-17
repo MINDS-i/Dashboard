@@ -28,12 +28,10 @@ public class WaypointCommandAdd extends WaypointCommand {
 		// If this point was added to an existing line
 		// at index 0, make it the new target of the rover. 
 		if(isTarget == true) {
-			waypoints.setSelected(index);
 			waypoints.setTarget(index);
 		}
-		else {
-			waypoints.setSelected(index - 1);
-		}
+		
+		waypoints.setSelected(index);
 		
 		return true;
 	}

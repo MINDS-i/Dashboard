@@ -3,6 +3,9 @@ package com.map.command;
 import java.util.*;
 import com.map.command.WaypointCommand;
 
+
+//TODO - CP - Logging is needed any place that a failure result occurs.
+
 /**
  * @author Chris Park @ Infinetix Corp.
  * Date: 9-14-2020

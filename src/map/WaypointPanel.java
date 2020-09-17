@@ -1,6 +1,10 @@
 package com.map;
 
 import static com.map.WaypointList.*;
+
+import com.map.command.*;
+
+
 import com.Context;
 import com.Dashboard;
 import com.graph.Graph;
@@ -486,8 +490,16 @@ class WaypointPanel extends NinePatchPanel {
         }
         public void actionPerformed(ActionEvent e) {
             int selectedWaypoint = waypoints.getSelected();
-            waypoints.add(
-            	new Dot(waypoints.get(selectedWaypoint).dot()), selectedWaypoint);
+            
+//            waypoints.add(
+//            	new Dot(waypoints.get(selectedWaypoint).dot()), selectedWaypoint);
+            
+            WaypointCommand command = new WaypointCommandAdd(
+            		waypoints,
+            		new Dot(waypoints.get(selectedWaypoint).dot()),
+            		selectedWaypoint, 
+            		(selectedWaypoint == 0) ? true : false);
+            CommandManager.getInstance().process(command);
         }
     };
     private Action clearWaypointsAction = new AbstractAction() {

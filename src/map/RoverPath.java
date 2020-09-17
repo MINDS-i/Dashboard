@@ -77,7 +77,9 @@ class RoverPath implements Layer {
             			waypoints, new Dot(point), waypoints.size(), false);
             	
 //                waypoints.add(new Dot(point), waypoints.size());
-//                waypoints.setSelected(waypoints.size() - 1);
+            	//This size adjustment only happens in this add instance, so we
+            	//manually adjust the selected point for now.
+                waypoints.setSelected(waypoints.size() - 1);
             } else {
                 //click is over an existing line
             	
@@ -120,16 +122,15 @@ class RoverPath implements Layer {
     private int draggedDotIdx = Integer.MAX_VALUE;
     private int downDot = Integer.MAX_VALUE;
     private WaypointCommand moveCommand;
-    //TODO - CP - COMMAND MOVE goes here? (If the difference between start and
-    //end locations is 0, then we should not add the command because nothing changed.
+    //TODO - CP - COMMAND MOVE goes here 
+    //TEST - If the difference between start and
+    //end locations is 0, then we should not add the command because nothing was done.
     //This will avoid user confusion on an undo that would present no visible change.
     public boolean onPress(MouseEvent e) {
         Point pixel = e.getPoint();
-        
         downDot = isOverDot(pixel, context.theme.waypointImage);
         
         if(downDot != Integer.MAX_VALUE) {
-            
         	waypoints.setSelected(downDot);
             
             if(downDot < 0 || waypointsDisabled) {

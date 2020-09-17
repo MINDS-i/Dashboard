@@ -52,6 +52,8 @@ public abstract class WaypointCommand {
 	protected boolean repaint() {
 		
 		if(painter == null) {
+			//TODO - CP - throw log here, not being used by a 
+			//paintable command
 			return false;
 		}
 		
