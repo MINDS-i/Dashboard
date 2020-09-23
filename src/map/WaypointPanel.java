@@ -157,7 +157,7 @@ class WaypointPanel extends NinePatchPanel {
         final Dimension space = new Dimension(0,5);
         final Dimension buttonSize = new Dimension(140, 25);
 
-        //make all the buttons
+        //Make all buttons
         JButton tileButton 	= theme.makeButton(nextTileServer);
         JButton dataPanel 	= theme.makeButton(openDataPanel);
         JButton graphButton = theme.makeButton(buildGraph);
@@ -165,14 +165,22 @@ class WaypointPanel extends NinePatchPanel {
         JButton looping 	= theme.makeButton(toggleLooping);
         JButton config      = theme.makeButton(openConfigWindow);
         JButton logPanelButton = theme.makeButton(logPanelAction);
-        JButton clearWaypoints = theme.makeButton(clearWaypointsAction);
+        
         JButton zoomInButton = theme.makeButton(zoomInAction);
         		zoomInButton.addMouseListener(zoomInMouseAdapter);
         JButton zoomOutButton = theme.makeButton(zoomOutAction);
         		zoomOutButton.addMouseListener(zoomOutMouseAdapter);
         JButton zoomFullButton = theme.makeButton(zoomFullAction);
 
-
+        //Waypoint Options
+        JButton clearWaypoints = theme.makeButton(clearWaypointsAction);
+        JButton newButton = theme.makeButton(newWaypoint);
+        JButton enterButton = theme.makeButton(interpretLocationAction);
+        JButton undoButton = theme.makeButton(undoCommandAction);
+        JButton redoButton = theme.makeButton(redoCommandAction);
+        JButton saveButton = theme.makeButton(saveWaypoints);
+        JButton loadButton = theme.makeButton(loadWaypoints);
+        
         JComponent[] format = new JComponent[] {
             tileButton, dataPanel, graphButton,
             reTarget, looping, config, logPanelButton, clearWaypoints
@@ -207,6 +215,7 @@ class WaypointPanel extends NinePatchPanel {
                 this.label = label;
             }
         }
+        
         ArrayList<EditBoxSpec> editorBoxes = new ArrayList<EditBoxSpec>();
         latitude  = new TelemField();
         longitude = new TelemField();
@@ -236,17 +245,14 @@ class WaypointPanel extends NinePatchPanel {
             editorPanels.add(panel);
         }
 
-        //rows, cols, hgap, vgap
         JPanel waypointOptions = new JPanel(new GridLayout(3,2,5,5));
         waypointOptions.setOpaque(false);
-        waypointOptions.add(theme.makeButton(newWaypoint));
-        waypointOptions.add(theme.makeButton(interpretLocationAction));
-      
-        waypointOptions.add(theme.makeButton(undoCommandAction));
-        waypointOptions.add(theme.makeButton(redoCommandAction));
-        
-        waypointOptions.add(theme.makeButton(saveWaypoints));
-        waypointOptions.add(theme.makeButton(loadWaypoints));
+        waypointOptions.add(newButton);
+        waypointOptions.add(enterButton);      
+        waypointOptions.add(undoButton);
+        waypointOptions.add(redoButton);
+        waypointOptions.add(saveButton);
+        waypointOptions.add(loadButton);
 
         add(config);
         add(Box.createRigidArea(space));
