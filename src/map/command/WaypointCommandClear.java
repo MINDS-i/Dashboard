@@ -4,6 +4,7 @@ import com.Context;
 import com.map.WaypointList.*;
 import com.map.command.WaypointCommand.CommandType;
 import com.map.WaypointList;
+import com.map.Dot;
 
 /**
  * @author Chris Park @ Infinetix Corp.
@@ -18,18 +19,19 @@ public class WaypointCommandClear extends WaypointCommand {
 	public WaypointCommandClear(WaypointList waypoints, Context context) {
 		super(waypoints, CommandType.CLEAR);
 		this.context = context;
+		waypointsBackup = new WaypointList();
+		
+		//Backup the list for later redo
+		for(int i = 0; i < waypoints.size(); i++) {
+			waypointsBackup.add(waypoints.get(i).dot(), i);
+		}
 	}
 	
 	@Override
 	public boolean execute() {
-		//TODO - CP - Back up everything wiped out in clear event for undo
-			//Backup waypoints
-		
-		
-		
 		//Event is labeled as coming from the rover to avoid sending
-		//waypoint update messages for every point. Explicit clear message
-		//to the rover afterwards.
+		//waypoint update messages for every point. An explicit clear message
+		//is sent to the rover afterwards.
 		waypoints.clear(WaypointListener.Source.REMOTE);
 		
 		if(context.sender != null) {
@@ -43,15 +45,11 @@ public class WaypointCommandClear extends WaypointCommand {
 	public boolean undo() {
 		
 		//Add each waypoint from the backup one by one?
-		//Making sure that any coventions performed by an add are
-		//correctly followed. (maybe just use the add command?)
+		for(int i = 0; i < waypointsBackup.size(); i++) {
+			waypoints.add(waypointsBackup.get(i).dot(), i);
+		}
 		
-		//swap the waypoints back in and possibly repaint?
-		
-		//TODO - CP - Remove these once undo for clear is implemnented fully.
-		System.err.print("WaypointCommandClear - No implementation for ");
-		System.err.println("undo exists.");
-		return false;
+		return true;
 	}
 	
 	@Override

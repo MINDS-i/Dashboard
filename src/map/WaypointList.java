@@ -116,7 +116,7 @@ public class WaypointList {
      * if index is greater than the current length of the list, an
      * IndexOutOfBoundsException is thrown.
      */
-    public void add(Dot p, int index){
+    public void add(Dot p, int index) {
         add(p, index, WaypointListener.Source.LOCAL);
     }
     public void add(Dot p, int index, WaypointListener.Source s){

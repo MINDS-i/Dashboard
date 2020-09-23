@@ -313,6 +313,7 @@ class WaypointPanel extends NinePatchPanel {
             }
         } catch (NumberFormatException e) {}
     }
+    
     private Action logPanelAction = new AbstractAction() {
         LogViewer lv;
         Logger log;
@@ -555,8 +556,6 @@ class WaypointPanel extends NinePatchPanel {
         public void actionPerformed(ActionEvent e) {
         	WaypointCommand command = new WaypointCommandClear(waypoints, context);
         	CommandManager.getInstance().process(command);
-        	//Clear the tracked commands here until undo functionality is implemented.
-        	CommandManager.getInstance().clearTrackedCommands();
         }
     };
     
