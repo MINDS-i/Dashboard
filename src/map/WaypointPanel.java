@@ -4,7 +4,6 @@ import static com.map.WaypointList.*;
 
 import com.map.command.*;
 
-
 import com.Context;
 import com.Dashboard;
 import com.graph.Graph;
@@ -81,22 +80,29 @@ class WaypointPanel extends NinePatchPanel {
             }
         });
 
-        waypoints.addListener(new WaypointListener(){
-            @Override public void unusedEvent() { updateDisplay(); }
+        waypoints.addListener(new WaypointListener() {
+            @Override 
+            public void unusedEvent() {
+            	updateDisplay();
+            }
         });
+        
         updateDisplay();
-
     }
 
-    private void makeActions(){
+    private void makeActions() {
         nextTileServer = new AbstractAction() {
             java.util.List<String> serverLabels
                 = new LinkedList<String>(map.tileServerNames());
-            { updateLabel();
+            
+            { 
+            	updateLabel();
             }
-            private void updateLabel(){
+            
+            private void updateLabel() {
                 putValue(Action.NAME, serverLabels.get(0));
             }
+            
             public void actionPerformed(ActionEvent e) {
                 // cycle current server to the back of the list
                 String server = serverLabels.get(0);
@@ -166,6 +172,7 @@ class WaypointPanel extends NinePatchPanel {
         		zoomOutButton.addMouseListener(zoomOutMouseAdapter);
         JButton zoomFullButton = theme.makeButton(zoomFullAction);
 
+
         JComponent[] format = new JComponent[] {
             tileButton, dataPanel, graphButton,
             reTarget, looping, config, logPanelButton, clearWaypoints
@@ -230,10 +237,14 @@ class WaypointPanel extends NinePatchPanel {
         }
 
         //rows, cols, hgap, vgap
-        JPanel waypointOptions = new JPanel(new GridLayout(2,2,5,5));
+        JPanel waypointOptions = new JPanel(new GridLayout(3,2,5,5));
         waypointOptions.setOpaque(false);
         waypointOptions.add(theme.makeButton(newWaypoint));
         waypointOptions.add(theme.makeButton(interpretLocationAction));
+      
+        waypointOptions.add(theme.makeButton(undoCommandAction));
+        waypointOptions.add(theme.makeButton(redoCommandAction));
+        
         waypointOptions.add(theme.makeButton(saveWaypoints));
         waypointOptions.add(theme.makeButton(loadWaypoints));
 
@@ -399,6 +410,7 @@ class WaypointPanel extends NinePatchPanel {
     };
     
     private Action nextTileServer;
+    
     private Action toggleLooping = new AbstractAction() {
         {
             String text = "Looping On";
@@ -412,6 +424,7 @@ class WaypointPanel extends NinePatchPanel {
                      (waypoints.getLooped())? "Looping Off" : "Looping On");
         }
     };
+    
     private Action previousWaypoint = new AbstractAction() {
         {
             String text = "<";
@@ -424,6 +437,7 @@ class WaypointPanel extends NinePatchPanel {
             map.repaint();
         }
     };
+    
     private Action nextWaypoint = new AbstractAction() {
         {
             String text = ">";
@@ -436,6 +450,7 @@ class WaypointPanel extends NinePatchPanel {
             map.repaint();
         }
     };
+    
     private Action saveWaypoints = new AbstractAction() {
 
         {
@@ -451,6 +466,7 @@ class WaypointPanel extends NinePatchPanel {
             }
         }
     };
+    
     private Action loadWaypoints = new AbstractAction() {
         {
             String text = "Load";
@@ -465,6 +481,7 @@ class WaypointPanel extends NinePatchPanel {
             }
         }
     };
+    
     private Action interpretLocationAction = new AbstractAction() {
         {
             String text = "Enter";
@@ -474,6 +491,7 @@ class WaypointPanel extends NinePatchPanel {
             interpretLocationEntry();
         }
     };
+    
     private Action reTargetRover = new AbstractAction() {
         {
             String text = "Set Target";
@@ -483,6 +501,29 @@ class WaypointPanel extends NinePatchPanel {
             waypoints.setTarget(waypoints.getSelected());
         }
     };
+    
+    private Action undoCommandAction = new AbstractAction() {
+    	{
+    		String text = "Undo";
+    		putValue(Action.NAME, text);
+    	}
+    	
+    	public void actionPerformed(ActionEvent e) {
+    		CommandManager.getInstance().undo();
+    	}
+    };
+    
+    private Action redoCommandAction = new AbstractAction() {
+    	{
+    		String text = "Redo";
+    		putValue(Action.NAME, text);
+    	}
+    	
+    	public void actionPerformed(ActionEvent e) {
+    		CommandManager.getInstance().redo();
+    	}
+    };
+    
     private Action newWaypoint = new AbstractAction() {
         {
             String text = "New";
@@ -490,9 +531,6 @@ class WaypointPanel extends NinePatchPanel {
         }
         public void actionPerformed(ActionEvent e) {
             int selectedWaypoint = waypoints.getSelected();
-            
-//            waypoints.add(
-//            	new Dot(waypoints.get(selectedWaypoint).dot()), selectedWaypoint);
             
             WaypointCommand command = new WaypointCommandAdd(
             		waypoints,
@@ -502,24 +540,20 @@ class WaypointPanel extends NinePatchPanel {
             CommandManager.getInstance().process(command);
         }
     };
+    
     private Action clearWaypointsAction = new AbstractAction() {
         {
             String text = "Clear Waypoints";
             putValue(Action.NAME, text);
         }
         public void actionPerformed(ActionEvent e) {
-        	//TODO - CP - COMMAND CLEAR goes here
-        	
-            // label the clear event as coming from the rover
-            // so we don't send waypoint update messages
-            // for every individual waypoint
-            // Instead we send an explicit clear message to the rover afterwards
-            waypoints.clear(WaypointListener.Source.REMOTE);
-            if (context.sender != null) {
-                context.sender.sendWaypointList();
-            }
+        	WaypointCommand command = new WaypointCommandClear(waypoints, context);
+        	CommandManager.getInstance().process(command);
+        	//Clear the tracked commands here until undo functionality is implemented.
+        	CommandManager.getInstance().clearTrackedCommands();
         }
     };
+    
     private Action openDataPanel = new AbstractAction() {
         {
             String text = "Telemetry";
@@ -529,6 +563,7 @@ class WaypointPanel extends NinePatchPanel {
             final DataWindow window = new DataWindow(context);
         }
     };
+    
     private Action openConfigWindow = new AbstractAction() {
         {
             String text = "Configuration";
@@ -538,6 +573,7 @@ class WaypointPanel extends NinePatchPanel {
             final SystemConfigWindow window = new SystemConfigWindow(context);
         }
     };
+    
     private Action buildGraph = new AbstractAction() {
         {
             String text = "Graph";

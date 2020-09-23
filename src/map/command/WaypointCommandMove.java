@@ -15,13 +15,14 @@ public class WaypointCommandMove extends WaypointCommand {
 	public WaypointCommandMove(WaypointList waypoints, int index) {
 		super(waypoints, CommandType.MOVE);
 		
-		this.startPoint = new Dot(waypoints.get(index).dot()); //startPoint;
+		this.startPoint = new Dot(waypoints.get(index).dot());
 		this.endPoint = null;
 		this.painter = null;
 		this.index = index;
 	}
 	
 	/**
+	 * Moves the point to the 
 	 * @return Whether or not the operation was successful. In the
 	 * case of a failure, ensure that the end point was set before
 	 * attempting execution.

@@ -105,4 +105,10 @@ public class CommandManager {
 		
 		return result;
 	}
+	
+	public void clearTrackedCommands() {
+		processedCommands.clear();
+		revertedCommands.clear();
+	}
+	
 }

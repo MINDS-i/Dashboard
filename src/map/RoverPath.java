@@ -17,9 +17,9 @@ import javax.swing.*;
 
 
 class RoverPath implements Layer {
-    private static final Color ACTIVE_LINE_FILL = new Color(1.f,1.f,0.f,1f);
-    private static final Color PATH_LINE_FILL   = new Color(0f,0f,0f, 1f);
-    private static final Color LINE_BORDER      = new Color(.5f,.5f,.5f,0f);
+    private static final Color ACTIVE_LINE_FILL = new Color(1.f, 1.f, 0.f, 1f);
+    private static final Color PATH_LINE_FILL   = new Color(0f, 0f, 0f, 1f);
+    private static final Color LINE_BORDER      = new Color(0.5f, 0.5f, 0.5f, 0.0f);
     private static final int   LINE_WIDTH       = 10;
 
     private Context context;
