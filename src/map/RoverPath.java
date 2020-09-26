@@ -77,14 +77,14 @@ class RoverPath implements Layer {
             // Click is not over an existing line
             if (line == Integer.MAX_VALUE) {
             	command = new WaypointCommandAdd(
-            			waypoints, new Dot(point), waypoints.size(), false);
+            			waypoints, new Dot(point), waypoints.size(), true);
             	//Manually adjust for size vs index offset
                 waypoints.setSelected(waypoints.size() - 1);
             } 
             // Click is over an existing line
             else {
             	command = new WaypointCommandAdd(
-    					waypoints, new Dot(point), line, ((line == 0) ? true : false));
+    					waypoints, new Dot(point), line, true);
             }
             
             result = CommandManager.getInstance().process(command);
@@ -144,7 +144,7 @@ class RoverPath implements Layer {
         	draggedDotIdx = Integer.MAX_VALUE;
         	
         	//Dot should now be at end location, so we can grab it and execute.
-        	moveCommand.finalize(new Dot(draggedDot), painter);
+        	moveCommand.finalize(new Dot(draggedDot));
         	CommandManager.getInstance().process(moveCommand);
         }
     }

@@ -16,20 +16,18 @@ import com.map.Dot;
  */
 public abstract class WaypointCommand {
 
-	public enum CommandType {ADD, REMOVE, MOVE, CLEAR}
+	public enum CommandType {ADD, REMOVE, MOVE, EDIT, CLEAR}
 	
 	protected WaypointList waypoints;
 	protected CommandType type;
 	
 	// Add/Remove Vars
 	protected Dot point;
-	protected boolean isTarget;
 	protected int index;
 	
 	// Move Vars
 	protected Dot startPoint;
 	protected Dot endPoint;
-	protected Component painter;
 	
 	public WaypointCommand(WaypointList waypoints, CommandType type) {
 		this.waypoints = waypoints;
@@ -43,21 +41,8 @@ public abstract class WaypointCommand {
 	public CommandType getType() {
 		return type;
 	}
-	
-	public void finalize(Dot ep, Component painter) {
+
+	public void finalize(Dot ep) {
 		this.endPoint = ep; 
-		this.painter = painter;
-	}
-	
-	protected boolean repaint() {
-		
-		if(painter == null) {
-			System.err.print("WaypointCommand - Painter ref is null. ");
-			System.err.println("Possible misuse by non-paintable command");
-			return false;
-		}
-		
-		painter.repaint();
-		return true;
 	}
 }

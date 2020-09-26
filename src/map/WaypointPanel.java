@@ -166,6 +166,7 @@ class WaypointPanel extends NinePatchPanel {
         JButton config      = theme.makeButton(openConfigWindow);
         JButton logPanelButton = theme.makeButton(logPanelAction);
         
+        //Map Zoom Options
         JButton zoomInButton = theme.makeButton(zoomInAction);
         		zoomInButton.addMouseListener(zoomInMouseAdapter);
         JButton zoomOutButton = theme.makeButton(zoomOutAction);
@@ -289,12 +290,17 @@ class WaypointPanel extends NinePatchPanel {
     }
 
     public void interpretLocationEntry() {
+    	WaypointCommand command;
+    	
         try {
             int selectedWaypoint = waypoints.getSelected();
 
             if(selectedWaypoint < 0) // rover or home location selected
                 return;
 
+            //Grab waypoint info and create move command
+            command = new WaypointCommandEdit(waypoints, selectedWaypoint);
+            
             Double newLatitude  = Double.parseDouble(latitude.getText());
             Double newLongitude = Double.parseDouble(longitude.getText());
             Double tmpAltitude  = Double.parseDouble(altitude.getText());
@@ -303,13 +309,25 @@ class WaypointPanel extends NinePatchPanel {
             Point.Double newPosition = new Point.Double(newLongitude, newLatitude);
 
             if((newAltitude&0xffff) == newAltitude) {
-                waypoints.set(new Dot(newPosition, (short)newAltitude), selectedWaypoint);
+            	
+            	
+            	command.finalize(new Dot(newPosition, (short)newAltitude));
+            	CommandManager.getInstance().process(command);
+//                waypoints.set(new Dot(newPosition, (short)newAltitude), selectedWaypoint);
+                
                 //set to display reconverted value
                 altitude.setText(fixedToDouble(newAltitude)+"");
-            } else {
+            } 
+            else {
+            	
+            	
+            	
                 Dot newloc = waypoints.get(selectedWaypoint).dot();
                 newloc.setLocation(newPosition);
-                waypoints.set(newloc, selectedWaypoint);
+                
+                command.finalize(newloc);
+                CommandManager.getInstance().process(command);
+//                waypoints.set(newloc, selectedWaypoint);
             }
         } catch (NumberFormatException e) {}
     }
@@ -543,7 +561,8 @@ class WaypointPanel extends NinePatchPanel {
             		waypoints,
             		new Dot(waypoints.get(selectedWaypoint).dot()),
             		selectedWaypoint, 
-            		(selectedWaypoint == 0) ? true : false);
+            		false);
+
             CommandManager.getInstance().process(command);
         }
     };

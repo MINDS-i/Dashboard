@@ -225,10 +225,11 @@ public class MapPanel extends JPanel implements CoordinateTransform {
     }
 
     public void zoomFull(Point pivot) {
-    	while(zoomIn(new Point(getWidth() / 2, getHeight() / 2))) {
-    		setMapPosCoords(new Point((int)context.getHomeProp().getY(),
-		   			  (int)context.getHomeProp().getX()));
-    	}
+    	
+    	while(zoomIn(new Point(getWidth() / 2, getHeight() / 2))) {}
+    	setMapPosCoords(new Point2D.Double(context.getHomeProp().getY(),
+	   			  context.getHomeProp().getX()));
+    	repaint();
     }
     
     /** Return a list of tile server names with the active server listed last */

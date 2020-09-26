@@ -2,30 +2,33 @@ package com.map.command;
 
 import com.map.WaypointList;
 import com.map.command.WaypointCommand.CommandType;
+
+import java.awt.Component;
+
 import com.map.Dot;
 
 /**
  * @author Chris Park @ Infinetix Corp.
- * Date: 9-14-2020
- * Description: Command responsible for moving a waypoints location.
+ * Date: 9-25-2020
+ * Description: Command responsible for editing waypoint properties from the
+ * Waypoint Panel editable telemtry fields.
  *
  */
-public class WaypointCommandMove extends WaypointCommand {
+public class WaypointCommandEdit extends WaypointCommand {
 	
-	public WaypointCommandMove(WaypointList waypoints, int index) {
-		super(waypoints, CommandType.MOVE);
+	public WaypointCommandEdit(WaypointList waypoints, int index) {
+		super(waypoints, CommandType.EDIT);
 		
-		this.startPoint = new Dot(waypoints.get(index).dot());
+		this.startPoint = new Dot(
+				waypoints.get(index).dot().getLatitude(),
+				waypoints.get(index).dot().getLongitude(),
+				waypoints.get(index).dot().getAltitude());
+		
 		this.endPoint = null;
 		this.index = index;
-	}
+	} 
 	
-	/**
-	 * Moves the point to the 
-	 * @return Whether or not the operation was successful. In the
-	 * case of a failure, ensure that the end point was set before
-	 * attempting execution.
-	 */
+	@Override
 	public boolean execute() {
 		if(endPoint == null) {
 			System.err.print("WaypointCommandMove - Execution failure. ");
@@ -46,5 +49,5 @@ public class WaypointCommandMove extends WaypointCommand {
 	@Override
 	public boolean redo() {
 		return execute();
-	}
+	}	
 }

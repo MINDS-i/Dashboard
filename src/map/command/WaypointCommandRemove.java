@@ -12,13 +12,11 @@ import com.map.Dot;
  */
 public class WaypointCommandRemove extends WaypointCommand {
 	
-	public WaypointCommandRemove(WaypointList waypoints, 
-			int index) {
+	public WaypointCommandRemove(WaypointList waypoints, int index) {
 		super(waypoints, CommandType.REMOVE);
 		
 		this.index = index;
 		this.point = waypoints.get(index).dot();
-		this.isTarget = (index == 0) ? true : false;
 	}
 	
 	@Override
@@ -35,7 +33,7 @@ public class WaypointCommandRemove extends WaypointCommand {
 		
 		// If this point was added to an existing line
 		// at index 0, make it the new target of the rover. 
-		if(isTarget == true) {
+		if(index == 0) {
 			waypoints.setTarget(index);
 		}
 		

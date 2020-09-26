@@ -11,14 +11,15 @@ import com.map.Dot;
  * active sessions list.
  */
 public class WaypointCommandAdd extends WaypointCommand {
+	protected boolean isClick;
 	
 	public WaypointCommandAdd(WaypointList waypoints, Dot point, 
-			int index, boolean isTarget) {
+			int index, boolean isClick) {
 		super(waypoints, CommandType.ADD);
 		
 		this.point = point;
 		this.index = index;
-		this.isTarget = isTarget;
+		this.isClick = isClick;
 	}
 	
 	@Override
@@ -27,11 +28,14 @@ public class WaypointCommandAdd extends WaypointCommand {
 		
 		// If this point was added to an existing line
 		// at index 0, make it the new target of the rover. 
-		if(isTarget == true) {
-			waypoints.setTarget(index);
+		if(isClick == true) {
+			if(index == 0) {
+				waypoints.setTarget(index);
+			}
+			
+			waypoints.setSelected(index);	
 		}
 		
-		waypoints.setSelected(index);
 		
 		return true;
 	}
