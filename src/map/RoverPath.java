@@ -29,6 +29,13 @@ class RoverPath implements Layer {
     private Component painter;
     private boolean waypointsDisabled = false;
 
+    
+    //Movement action vars (Press, Drag, Release)
+    private Dot draggedDot = null;
+    private int draggedDotIdx = Integer.MAX_VALUE;
+    private int downDot = Integer.MAX_VALUE;
+    private WaypointCommand moveCommand;
+    
     RoverPath(Context c, CoordinateTransform cT, WaypointList waypoints,
     		Component painter) {
         context = c;
@@ -56,7 +63,7 @@ class RoverPath implements Layer {
     }
 
     public boolean onClick(MouseEvent e) {
-    	WaypointCommand command;
+    	WaypointCommand command = null;
     	boolean result = false;
     	
         if(waypointsDisabled) {
@@ -71,10 +78,9 @@ class RoverPath implements Layer {
         && (underneath == Integer.MAX_VALUE)) {
 
             Point2D point = mapTransform.mapPosition(pixel);
-
             int line = isOverLine(e.getPoint());
             
-            // Click is not over an existing line
+            // Click is NOT over an existing line
             if (line == Integer.MAX_VALUE) {
             	command = new WaypointCommandAdd(
             			waypoints, new Dot(point), waypoints.size(), true);
@@ -86,24 +92,18 @@ class RoverPath implements Layer {
             	command = new WaypointCommandAdd(
     					waypoints, new Dot(point), line, true);
             }
-            
-            result = CommandManager.getInstance().process(command);
         } 
         // Right click on top of a point
         else if ((e.getButton() == MouseEvent.BUTTON3) 
         		&& (underneath != Integer.MAX_VALUE)) {
-        	
             command = new WaypointCommandRemove(waypoints, underneath);
-            result = CommandManager.getInstance().process(command);
+        }
+        else {
+        	return false;
         }
         
-        return result;
+        return CommandManager.getInstance().process(command); 
     }
-
-    private Dot draggedDot = null;
-    private int draggedDotIdx = Integer.MAX_VALUE;
-    private int downDot = Integer.MAX_VALUE;
-    private WaypointCommand moveCommand;
 
     public boolean onPress(MouseEvent e) {
         Point pixel = e.getPoint();

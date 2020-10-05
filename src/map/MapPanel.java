@@ -188,6 +188,7 @@ public class MapPanel extends JPanel implements CoordinateTransform {
     public int getZoom() {
         return zoom;
     }
+    
     /**
      * Returns true if the new zoom is valid and the view has been changed
      */

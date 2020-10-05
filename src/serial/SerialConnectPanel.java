@@ -9,7 +9,8 @@ import javax.swing.*;
 import java.util.*;
 
 public class SerialConnectPanel extends JPanel {
-    private static class BaudRate {
+    
+	private static class BaudRate {
         public String name;
         public int id;
         BaudRate(String name, int id) {
@@ -21,6 +22,7 @@ public class SerialConnectPanel extends JPanel {
             return name;
         }
     }
+	
     private static BaudRate[] rates = new BaudRate[] {
         new BaudRate("110   ",SerialPort.BAUDRATE_110    ),
         new BaudRate("300   ",SerialPort.BAUDRATE_300    ),
@@ -34,6 +36,7 @@ public class SerialConnectPanel extends JPanel {
         new BaudRate("57600 ",SerialPort.BAUDRATE_57600  ),
         new BaudRate("115200",SerialPort.BAUDRATE_115200 )
     };
+    
     private int baudRate = Serial.BAUD;
     private boolean showBaudPanel = false;
     private SerialEventListener listener;
@@ -50,6 +53,7 @@ public class SerialConnectPanel extends JPanel {
         dropDown = new JComboBox<String>();
         addSerialList(dropDown);
         baudSelect = new JComboBox<BaudRate>(rates);
+        
         //if the protocol spec'd baud rate is in the list, choose it
         for(int i=0; i<rates.length; i++) {
             if(rates[i].id == Serial.BAUD) {
@@ -57,6 +61,7 @@ public class SerialConnectPanel extends JPanel {
                 break;
             }
         }
+        
         baudSelect.setVisible(false);
         add(refreshButton);
         add(dropDown);
@@ -98,6 +103,7 @@ public class SerialConnectPanel extends JPanel {
         }
         (new Thread(connectSerial)).start();
     }
+    
     private void connectDone() {
         synchronized(lock) {
             refreshButton.setEnabled(false);
@@ -107,6 +113,7 @@ public class SerialConnectPanel extends JPanel {
             inProgress = false;
         }
     }
+    
     private void disconnect() {
         synchronized(lock) {
             if(inProgress) {
@@ -121,6 +128,7 @@ public class SerialConnectPanel extends JPanel {
         }
         (new Thread(disconnectSerial)).start();
     }
+    
     private void disconnectDone() {
         synchronized(lock) {
             refreshDropDown();
