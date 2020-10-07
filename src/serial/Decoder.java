@@ -5,6 +5,8 @@ import java.io.InputStream;
 
 /**
  * Decodes packets of the form <header+><signifier>data<checksum+><footer+>
+ * For the purposes of this decoder, routines that match the header also 
+ * include the signifier byte
  */
 public class Decoder {
     private final InputStream input;
@@ -23,6 +25,7 @@ public class Decoder {
             claimee = claimer;
         }
     }
+    
     private List<Packet> foundHeaders = new ArrayList<Packet>();
     private List<Byte>   buffer = new ArrayList<Byte>();
 
@@ -32,42 +35,63 @@ public class Decoder {
         this.footer = tail;
         this.sum    = sum;
     }
+    
     /**
      * Read new bytes from the input stream, dispatching messages as it goes
      */
     public void update() {
-        //accept bytes from input
         int oldPos = buffer.size()-1;
+        
         while(true) {
             int data;
+            
             try {
                 data = input.read();
-            } catch (Exception e) {
+            } 
+            catch (Exception e) {
                 e.printStackTrace();
                 break;
             }
-            if(data == -1) break;
+            
+            if(data == -1) { 
+            	break;
+            }
+            
             buffer.add((byte)data);
         }
+        
         parse(oldPos);
     }
 
     private void parse(int oldPos) {
         //because the header includes one byte beyond the "header" buffer,
-        //it isn't matched until the header was matched one byte ago
-        for(int i=oldPos+1; i<buffer.size(); i++) {
-            if (match(header, i-1)) foundHeader(i);
-            if (match(footer, i  )) foundFooter(i);
+        //(Signifier byte) it isn't matched until the header was matched one byte ago
+        for(int i = (oldPos + 1); i < buffer.size(); i++) {
+            if (match(header, (i - 1))) {
+            	foundHeader(i);
+            }
+            
+            if (match(footer, i)) { 
+            	foundFooter(i);
+            }
         }
+        
         cleanBuffers();
     }
 
     //check if pattern appears in buffer, ending at searchPos
     private boolean match(byte[] pattern, int searchPos) {
-        if(searchPos < pattern.length-1) return false;
-        for(int i=0; i<pattern.length; i++) {
-            if(buffer.get(searchPos-i) != pattern[pattern.length-1-i]) return false;
+    	
+        if(searchPos < (pattern.length - 1))  {
+        	return false;
         }
+        
+        for(int i = 0; i < pattern.length; i++) {
+            if(buffer.get(searchPos - i) != pattern[(pattern.length - 1 - i)]) {
+            	return false;
+            }
+        }
+        
         return true;
     }
 
@@ -75,6 +99,7 @@ public class Decoder {
     //if so, add to the header list
     private void foundHeader(int pos) {
         byte sig = buffer.get(pos);
+        
         for(PacketReader r : readers) {
             int len = r.claim(sig);
             if(len != -1) {
@@ -87,22 +112,35 @@ public class Decoder {
     //check for valid checksum with possible headers
     //then send to handler on a match
     private void foundFooter(int pos) {
-        int footerPos   = pos - (footer.length);
-        int checksumPos = footerPos - (sum.length()-1);
+        int footerPos   = (pos - footer.length);
+        int checksumPos = (footerPos - (sum.length() - 1));
+        
         //try and match the footer and checksum to a previous header
-        for(int i=0; i < foundHeaders.size(); i++) {
+        for(int i = 0; i < foundHeaders.size(); i++) {
             Packet p = foundHeaders.get(i);
-            int packLen = checksumPos-p.startPos;
-            if(packLen < 0) continue; //packet doesn't have both type byte and checksum
-            if(packLen > p.maxLength) continue; //packet exceeds max length specified
+            int packLen = (checksumPos - p.startPos);
+            
+            //packet doesn't have both type byte and checksum
+            if(packLen < 0) {
+            	continue; 
+            }
+            
+            //packet exceeds max length specified
+            if(packLen > p.maxLength) {
+            	continue;
+            }
 
             byte[] data = new byte[packLen];
-            for(int b=0; b<packLen; b++) data[b] = buffer.get(p.startPos+b);
+            
+            for(int b = 0; b < packLen; b++) {
+            	data[b] = buffer.get(p.startPos + b);
+            }
+            
             //calculate and match checksum
             byte[] checksum = sum.calc(data);
             if(match(checksum, footerPos)) {
                 //remove older headers and call handler
-                foundHeaders.subList(0, i+1).clear();
+                foundHeaders.subList(0, (i + 1)).clear();
                 p.claimee.handle(data);
                 return;
             }
@@ -110,16 +148,22 @@ public class Decoder {
     }
 
     private void cleanBuffers() {
-        int removed = Math.max(buffer.size() - header.length, 0);
-        for(Iterator<Packet> iter = foundHeaders.listIterator(); iter.hasNext();) {
+        int removed = Math.max((buffer.size() - header.length), 0);
+        
+        for(Iterator<Packet> iter = foundHeaders.listIterator(); iter.hasNext(); ) {
             Packet p = iter.next();
-            if(buffer.size() - p.startPos > p.maxLength) {
-                iter.remove(); //remove packets past their max length
-            } else {
+            
+            if((buffer.size() - p.startPos) > p.maxLength) {
+            	//remove packets past their max length
+            	iter.remove();
+            } 
+            else {
                 removed = Math.min(removed, p.startPos);
             }
         }
+        
         buffer.subList(0, removed).clear();
+        
         for(Packet p : foundHeaders) {
             p.startPos -= removed;
         }
@@ -128,7 +172,8 @@ public class Decoder {
     public void close() {
         try {
             input.close();
-        } catch (Exception e) {
+        } 
+        catch (Exception e) {
             e.printStackTrace();
         }
     }
