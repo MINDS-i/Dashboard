@@ -13,10 +13,12 @@ public class SerialConnectPanel extends JPanel {
 	private static class BaudRate {
         public String name;
         public int id;
+        
         BaudRate(String name, int id) {
             this.name = name;
             this.id = id;
         }
+        
         @Override
         public String toString() {
             return name;
@@ -55,7 +57,7 @@ public class SerialConnectPanel extends JPanel {
         baudSelect = new JComboBox<BaudRate>(rates);
         
         //if the protocol spec'd baud rate is in the list, choose it
-        for(int i=0; i<rates.length; i++) {
+        for(int i = 0; i < rates.length; i++) {
             if(rates[i].id == Serial.BAUD) {
                 baudSelect.setSelectedIndex(i);
                 break;
@@ -95,6 +97,7 @@ public class SerialConnectPanel extends JPanel {
                 System.err.println("Connect command issued while a change was in Progress");
                 return;
             }
+            
             refreshButton.setEnabled(false);
             dropDown.setEnabled(false);
             connectButton.setEnabled(false);
@@ -120,6 +123,7 @@ public class SerialConnectPanel extends JPanel {
                 System.err.println("Connect command issued while a change was in Progress");
                 return;
             }
+            
             refreshButton.setEnabled(false);
             dropDown.setEnabled(false);
             connectButton.setEnabled(false);
@@ -152,7 +156,10 @@ public class SerialConnectPanel extends JPanel {
             putValue(Action.SHORT_DESCRIPTION, text);
         }
         public void actionPerformed(ActionEvent e) {
-            if(inProgress) return;
+            if(inProgress) {
+            	return;
+            }
+            
             refreshDropDown();
             SerialConnectPanel.this.updateUI();
         }
@@ -160,6 +167,7 @@ public class SerialConnectPanel extends JPanel {
 
     private void addSerialList(JComboBox<String> box) {
         String[] portNames = SerialPortList.getPortNames();
+        
         for(int i = 0; i < portNames.length; i++) {
             box.addItem(portNames[i]);
         }
@@ -172,8 +180,12 @@ public class SerialConnectPanel extends JPanel {
             putValue(Action.SHORT_DESCRIPTION, text);
         }
         public void actionPerformed(ActionEvent e) {
-            if (connectedPort == null) connect();
-            else disconnect();
+            if (connectedPort == null) {
+            	connect();
+            }
+            else {
+            	disconnect();
+            }
         }
     };
 
@@ -182,7 +194,10 @@ public class SerialConnectPanel extends JPanel {
             String portName = (String)dropDown.getSelectedItem();
             String[] validNames = SerialPortList.getPortNames();
             boolean nameStillExists = false;
-            for(String s : validNames) nameStillExists |= s.equals(portName);
+            
+            for(String s : validNames) {
+            	nameStillExists |= s.equals(portName);
+            }
 
             if (!nameStillExists) {
                 disconnectDone();
@@ -198,11 +213,17 @@ public class SerialConnectPanel extends JPanel {
                     baudRate = ((BaudRate)baudSelect.getSelectedItem()).id;
                 }
 
-                serialPort.setParams(baudRate,              SerialPort.DATABITS_8,
-                                     SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
-                serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN |
-                                              SerialPort.FLOWCONTROL_RTSCTS_OUT);
-            } catch(SerialPortException ex) {
+                serialPort.setParams(
+                		baudRate, 
+                		SerialPort.DATABITS_8,
+                		SerialPort.STOPBITS_1,
+                		SerialPort.PARITY_NONE);
+                
+                serialPort.setFlowControlMode(
+                		SerialPort.FLOWCONTROL_RTSCTS_IN |
+                		SerialPort.FLOWCONTROL_RTSCTS_OUT);
+            } 
+            catch(SerialPortException ex) {
                 System.err.println(ex.getMessage());
                 return;
             }
@@ -219,7 +240,8 @@ public class SerialConnectPanel extends JPanel {
 
             try {
                 connectedPort.closePort();
-            } catch (Exception e) {
+            } 
+            catch (Exception e) {
                 e.printStackTrace();
             }
 
