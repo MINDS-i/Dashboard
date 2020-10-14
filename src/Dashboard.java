@@ -188,7 +188,8 @@ public class Dashboard implements Runnable {
     private JPanel createRightPanel() {
         try {
             dataWidget = TelemetryWidget.fromXML(context, "telemetryWidetSpec");
-        } catch(Exception e) {
+        } 
+        catch(Exception e) {
             iolog.severe("Failed to load telemetry widget line spec "+e);
             e.printStackTrace();
         }
@@ -198,28 +199,31 @@ public class Dashboard implements Runnable {
         dashPanel.setLayout(new BoxLayout(dashPanel, BoxLayout.PAGE_AXIS));
 
         dashPanel.add(dataWidget);
-        dashPanel.add(
-            AngleWidget.createDial(
-                context, Serial.HEADING, context.theme.roverTop));
-        if(context.getResource("widget_type", "Angles").equals("Horizon")){
+        dashPanel.add(AngleWidget.createDial(
+        		context, Serial.HEADING, context.theme.roverTop));
+        
+        if(context.getResource("widget_type", "Angles").equals("Horizon")) {
             // Initialize the horizon widget
             JPanel horizon =
-                HorizonWidgets.makeHorizonWidget(context, WIDGET_SIZE, (ArtificialHorizon ah)->{
-                    registerHorizonListeners(ah, false);
-                });
+                HorizonWidgets.makeHorizonWidget(context, WIDGET_SIZE, 
+                		(ArtificialHorizon ah)->{registerHorizonListeners(ah, false);});
+            
             // Add call back to pop out a new horizon window when clicked
-            horizon.addMouseListener(new MouseAdapter(){
+            horizon.addMouseListener(new MouseAdapter() {
                 @Override
-                public void mouseClicked(MouseEvent e){
-                    HorizonWidgets.makeHorizonWindow(context, (ArtificialHorizon ah)->{
-                        registerHorizonListeners(ah, true);
-                    }).setVisible(true);
+                public void mouseClicked(MouseEvent e) {
+                    HorizonWidgets.makeHorizonWindow(context, 
+                    		(ArtificialHorizon ah)->{
+                    			registerHorizonListeners(ah, true);}).setVisible(true);
                 }
             });
             // Add to the panel
             dashPanel.add(horizon);
             dashPanel.add(RadioWidget.create(context, WIDGET_SIZE));
-        } else {
+            
+            //TODO - CP - Add new telemetry widgets for rover here.
+        } 
+        else {
             dashPanel.add(
                 AngleWidget.createDial(
                     context, Serial.PITCH, context.theme.roverSide));

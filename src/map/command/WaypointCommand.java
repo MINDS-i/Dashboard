@@ -16,7 +16,7 @@ import com.map.Dot;
  */
 public abstract class WaypointCommand {
 
-	public enum CommandType {ADD, REMOVE, MOVE, EDIT, CLEAR}
+	public enum CommandType {ADD, REMOVE, MOVE, EDIT, CLEAR, TARGET};
 	
 	protected WaypointList waypoints;
 	protected CommandType type;
