@@ -46,7 +46,8 @@ public class SerialSender {
                                     "Connection failed; Rover unware of "+
                                     msg.toString()+
                                     "!");
-                            } else {
+                            } 
+                            else {
                                 resendMessage(msg);
                             }
                         }
@@ -135,7 +136,7 @@ public class SerialSender {
             advanceWaypointList(waypointListWaitingCode);
         }
     }
-
+    
     private void advanceWaypointList(int confirm) {
         if(confirm == waypointListWaitingCode) {
             if(waypointListPosition >= context.getWaypointList().size()) {
@@ -153,6 +154,22 @@ public class SerialSender {
         }
     }
 
+    public void changeMovement(boolean shouldMove) {
+    	Message msg;
+    	
+    	if(context.connected) {
+    		if(shouldMove) {
+        		msg = Message.startDriving();
+        		System.err.println("Sending Start Message");
+        	}
+        	else {
+        		msg = Message.stopDriving();
+        		System.err.println("Sending Stop Message");
+        	}
+    		sendMessage(msg);
+    	} 
+    }
+    
     public void sendSync() {
         Message msg = Message.syncMessage(Serial.SYNC_REQUEST);
         sendMessage(msg);

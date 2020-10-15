@@ -43,6 +43,7 @@ public class SerialParser implements SerialPortEventListener {
 
     public void updatePort() {
         InputStream serial = new SerialInputStream(context.port());
+        
         Checksum check = new Checksum() {
             public byte[] calc(byte[] plaintext) {
                 return Serial.fletcher16bytes(plaintext);
@@ -51,6 +52,7 @@ public class SerialParser implements SerialPortEventListener {
                 return 2;
             }
         };
+        
         decoder = new Decoder(serial, Serial.HEADER, Serial.FOOTER, check);
         decoder.addPacketReader(new DataReader());
         decoder.addPacketReader(new WordReader());
@@ -58,7 +60,8 @@ public class SerialParser implements SerialPortEventListener {
 
         try {
             context.port().addEventListener(this);
-        } catch(SerialPortException ex) {
+        } 
+        catch(SerialPortException ex) {
             seriallog.severe(ex.getMessage());
         }
     }
@@ -96,10 +99,12 @@ public class SerialParser implements SerialPortEventListener {
     }*/
 
     private class DataReader implements PacketReader {
+    	
         public int claim(byte data) {
             if(Serial.getMsgType(data) == Serial.DATA_TYPE) return 255;
             else return -1;
         }
+        
         public void handle(byte[] msg) {
             int subtype = Serial.getSubtype(msg[0]);
             int index   = msg[1];
@@ -118,28 +123,32 @@ public class SerialParser implements SerialPortEventListener {
             }
         }
     }
+    
     private class WordReader implements PacketReader {
-        public int claim(byte data) {
+    	
+    	public int claim(byte data) {
             if(Serial.getMsgType(data) == Serial.WORD_TYPE) return 255;
             else return -1;
         }
-        public void handle(byte[] msg) {
+        
+    	public void handle(byte[] msg) {
             int subtype = Serial.getSubtype(msg[0]);
-            byte a = (byte)(msg[1]&0xff);
-            byte b = (byte)(msg[2]&0xff);
-            int join = ( ((int)(a<<8)&0xFF00) | ((int)(b&0xFF)) );
+            byte a = (byte)(msg[1] & 0xff);
+            byte b = (byte)(msg[2] & 0xff);
+            int join = ( ((int)(a << 8) & 0xFF00) | ((int)(b & 0xFF)) );
+           
             switch(subtype) {
                 case Serial.CONFIRMATION:
                     context.sender.notifyOfConfirm(join);
                     break;
-                case Serial.SYNC_WORD: {
-                        if(a == Serial.SYNC_REQUEST) {
-                            Message message = Message.syncMessage(Serial.SYNC_RESPOND);
-                            context.sender.sendMessage(message);
-                            context.onConnection();
-                        } else if (a == Serial.SYNC_RESPOND) { //resync seen
-                            context.onConnection();
-                        }
+                case Serial.SYNC_WORD:
+                	if(a == Serial.SYNC_REQUEST) {
+                		Message message = Message.syncMessage(Serial.SYNC_RESPOND);
+                        context.sender.sendMessage(message);
+                        context.onConnection();
+                    } 
+                    else if (a == Serial.SYNC_RESPOND) { //resync seen
+                        context.onConnection();
                     }
                     break;
                 case Serial.COMMAND_WORD:
@@ -147,14 +156,19 @@ public class SerialParser implements SerialPortEventListener {
                         if(b < 0 || b >= waypoints.size()){
                             seriallog.severe("Rover transmitted inconsistent target; resyncing");
                             context.sender.sendWaypointList();
-                        } else {
+                        } 
+                        else {
                             waypoints.setTarget(b, WaypointListener.Source.REMOTE);
                         }
                     }
                     break;
+                case Serial.STATE_WORD:
+                	//TODO - CP - Implement state handling here
+                	break;
             }
         }
     }
+    
     private class StringReader implements PacketReader {
         private StateMap sm;
         {

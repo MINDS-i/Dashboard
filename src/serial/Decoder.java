@@ -40,7 +40,7 @@ public class Decoder {
      * Read new bytes from the input stream, dispatching messages as it goes
      */
     public void update() {
-        int oldPos = buffer.size()-1;
+        int oldPos = (buffer.size() - 1);
         
         while(true) {
             int data;

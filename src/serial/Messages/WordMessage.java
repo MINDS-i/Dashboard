@@ -17,15 +17,17 @@ public class WordMessage extends Message {
         content[2]  = b;
         buildChecksum();
 
-        subType = a;
+        this.subType = a;
     }
     public WordMessage(int subtype, int ab) {
         this(subtype, (byte)((subtype>>8)&0xff), (byte)((subtype)&0xff) );
     }
+    
     @Override
     public boolean needsConfirm() {
         return false;
     }
+    
     @Override
     public String toString() {
         switch(msgType) {
@@ -34,10 +36,11 @@ public class WordMessage extends Message {
             case Serial.SYNC_WORD:
                 return "Syncronization Message";
             case Serial.COMMAND_WORD:
-                return nameCommand(subType);
+                return nameCommand(this.subType);
         }
         return "Word Message";
     }
+    
     private String nameCommand(int command) {
         switch (command) {
             case Serial.ESTOP_CMD:
@@ -50,7 +53,11 @@ public class WordMessage extends Message {
                 return "Clear Waypoints Command";
             case Serial.DELETE_CMD:
                 return "Delete Waypoint Command";
+            case Serial.STOP_CMD:
+            	return "Stop Movement Command";
+            case Serial.START_CMD:
+            	return "Start Movement Command";
         }
         return "Command Message";
-    }
+    }    
 }

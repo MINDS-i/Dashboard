@@ -42,14 +42,16 @@ class WaypointPanel extends NinePatchPanel {
     TelemField altitude;
     JLabel waypointIndexDisplay;
 
-    private class TelemField extends JTextField{
+    private class TelemField extends JTextField {
         float lastSetValue = Float.NaN;
+        
         @Override
-        public void setText(String newString){
+        public void setText(String newString) {
             super.setText(newString);
             lastSetValue = Float.NaN;
         }
-        void update(float newValue){
+        
+        void update(float newValue) {
             /**
              * editable float fields will get their cursor reset unless
              * updates from possible waypointlistener events only change
@@ -165,6 +167,8 @@ class WaypointPanel extends NinePatchPanel {
         JButton looping 	= theme.makeButton(toggleLooping);
         JButton config      = theme.makeButton(openConfigWindow);
         JButton logPanelButton = theme.makeButton(logPanelAction);
+        JButton startButton	= theme.makeButton(startMoving);
+        JButton stopButton	= theme.makeButton(stopMoving);
         
         //Map Zoom Options
         JButton zoomInButton = theme.makeButton(zoomInAction);
@@ -246,7 +250,7 @@ class WaypointPanel extends NinePatchPanel {
             editorPanels.add(panel);
         }
 
-        JPanel waypointOptions = new JPanel(new GridLayout(3,2,5,5));
+        JPanel waypointOptions = new JPanel(new GridLayout(4,2,5,5));
         waypointOptions.setOpaque(false);
         waypointOptions.add(newButton);
         waypointOptions.add(enterButton);      
@@ -254,6 +258,8 @@ class WaypointPanel extends NinePatchPanel {
         waypointOptions.add(redoButton);
         waypointOptions.add(saveButton);
         waypointOptions.add(loadButton);
+        waypointOptions.add(startButton);
+        waypointOptions.add(stopButton);
 
         add(config);
         add(Box.createRigidArea(space));
@@ -441,9 +447,36 @@ class WaypointPanel extends NinePatchPanel {
         public void actionPerformed(ActionEvent e) {
             waypoints.setLooped(!waypoints.getLooped());
             putValue(Action.NAME,
-                     (waypoints.getLooped())? "Looping Off" : "Looping On");
+                     (waypoints.getLooped()) ? "Looping Off" : "Looping On");
         }
     };
+    
+    private Action startMoving = new AbstractAction() {
+    	{
+    		String text = "Start";
+    		putValue(Action.NAME, text);
+    		putValue(Action.SHORT_DESCRIPTION, text);
+    	}
+    	
+    	public void actionPerformed(ActionEvent e) {
+    		context.sender.changeMovement(true);
+    	}
+    	
+    	
+    };
+    
+    private Action stopMoving = new AbstractAction() {
+    	{
+    		String text = "Stop";
+    		putValue(Action.NAME, text);
+    		putValue(Action.SHORT_DESCRIPTION, text);
+    	}    	
+    	
+    	public void actionPerformed(ActionEvent e) {
+    		context.sender.changeMovement(false);
+    	}
+    };
+    
     
     private Action previousWaypoint = new AbstractAction() {
         {

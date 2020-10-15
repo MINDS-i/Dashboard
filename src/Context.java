@@ -99,11 +99,13 @@ public class Context {
                 }
                 sender.sendMessage(tosend);
             }
+            
             @Override
             public void targetChanged(Source s, int targetIndex) {
                 if(s == Source.REMOTE) return;
                 sender.sendMessage(Message.setTarget((byte) targetIndex));
             }
+            
             @Override
             public void loopModeSet(Source s, boolean isLooped) {
                 if(s == Source.REMOTE) return;

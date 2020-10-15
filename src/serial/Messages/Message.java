@@ -69,7 +69,7 @@ public class Message {
     public String toString() {
         return "A message";
     }
-
+    
     public static Message setWaypoint(byte index, Dot dot) {
         return new WaypointMessage(Serial.ALTER_WAYPOINT, index, dot);
     }
@@ -112,4 +112,12 @@ public class Message {
     public static Message deleteWaypoint(byte index) {
         return new WordMessage(Serial.COMMAND_WORD, Serial.DELETE_CMD, index);
     }
+    
+    public static Message stopDriving() {
+    	return new WordMessage(Serial.COMMAND_WORD, Serial.STOP_CMD, (byte)0);
+    }
+    public static Message startDriving() {
+    	return new WordMessage(Serial.COMMAND_WORD, Serial.START_CMD, (byte)0);
+    }
+    
 }
