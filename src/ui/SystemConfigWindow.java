@@ -78,8 +78,4 @@ public class SystemConfigWindow {
     public boolean getVisible() {
     	return frame.isVisible();
     }
-    
-//    public void setVisible(boolean visible) {
-//    	frame.setVisible(visible);
-//    }
 }

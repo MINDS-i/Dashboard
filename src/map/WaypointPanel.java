@@ -574,13 +574,21 @@ class WaypointPanel extends NinePatchPanel {
         }
     };
     
+    private DataWindow dataWindow;
     private Action openDataPanel = new AbstractAction() {
         {
             String text = "Telemetry";
             putValue(Action.NAME, text);
         }
         public void actionPerformed(ActionEvent e) {
-            final DataWindow window = new DataWindow(context);
+        	
+        	//Avoid duplicate window. Bring to front if already visible
+        	if(dataWindow != null && dataWindow.getVisible() == true) {
+        		dataWindow.toFront();
+        		return;
+        	}
+        	
+        	dataWindow = new DataWindow(context);
         }
     };
     
@@ -592,8 +600,7 @@ class WaypointPanel extends NinePatchPanel {
         }
         public void actionPerformed(ActionEvent e) {
         	
-        	//If the window already exists, don't make a new one,
-        	//just move it to the front.
+        	//Avoid duplicate window. Bring to front if already visible
         	if(configWindow != null && configWindow.getVisible() == true) {
         		configWindow.toFront();
         		return;
