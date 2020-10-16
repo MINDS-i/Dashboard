@@ -20,6 +20,7 @@ public class WaypointList {
         public void changed(WaypointListener.Source s, Dot p, int index, Action a) { unusedEvent(); }
         public void targetChanged(WaypointListener.Source s, int target) { unusedEvent(); }
         public void loopModeSet(WaypointListener.Source s, boolean isLooped) { unusedEvent(); }
+        
     }
 
 
@@ -221,5 +222,7 @@ public class WaypointList {
         while (!waypoints.isEmpty()) {
             remove(0, s);
         }
+        //TODO - CP - Add listener to update button text here?
+        //For each listener sub'd to stop event, update the button state
     }
 }

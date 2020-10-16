@@ -167,8 +167,7 @@ class WaypointPanel extends NinePatchPanel {
         JButton looping 	= theme.makeButton(toggleLooping);
         JButton config      = theme.makeButton(openConfigWindow);
         JButton logPanelButton = theme.makeButton(logPanelAction);
-        JButton startButton	= theme.makeButton(startMoving);
-        JButton stopButton	= theme.makeButton(stopMoving);
+        JButton missionButton = theme.makeButton(toggleMovement);
         
         //Map Zoom Options
         JButton zoomInButton = theme.makeButton(zoomInAction);
@@ -188,7 +187,8 @@ class WaypointPanel extends NinePatchPanel {
         
         JComponent[] format = new JComponent[] {
             tileButton, dataPanel, graphButton,
-            reTarget, looping, config, logPanelButton, clearWaypoints
+            reTarget, looping, config, logPanelButton,
+            clearWaypoints, missionButton
         };
         for(JComponent jc : format) {
             jc.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -250,7 +250,11 @@ class WaypointPanel extends NinePatchPanel {
             editorPanels.add(panel);
         }
 
-        JPanel waypointOptions = new JPanel(new GridLayout(4,2,5,5));
+        int COLS = 3;
+        int ROWS = 2;
+        int PADDING = 5;
+        JPanel waypointOptions = new JPanel(
+        		new GridLayout(COLS, ROWS, PADDING, PADDING));
         waypointOptions.setOpaque(false);
         waypointOptions.add(newButton);
         waypointOptions.add(enterButton);      
@@ -258,8 +262,6 @@ class WaypointPanel extends NinePatchPanel {
         waypointOptions.add(redoButton);
         waypointOptions.add(saveButton);
         waypointOptions.add(loadButton);
-        waypointOptions.add(startButton);
-        waypointOptions.add(stopButton);
 
         add(config);
         add(Box.createRigidArea(space));
@@ -286,6 +288,8 @@ class WaypointPanel extends NinePatchPanel {
         add(reTarget);
         add(Box.createRigidArea(space));
         add(looping);
+        add(Box.createRigidArea(space));
+        add(missionButton);
     }
 
     private double fixedToDouble(int i) {
@@ -451,29 +455,25 @@ class WaypointPanel extends NinePatchPanel {
         }
     };
     
-    private Action startMoving = new AbstractAction() {
+    boolean isUnitMoving = false;
+    private Action toggleMovement = new AbstractAction() {
     	{
-    		String text = "Start";
+    		String text = "Start Mission";
     		putValue(Action.NAME, text);
-    		putValue(Action.SHORT_DESCRIPTION, text);
+    		putValue(Action.SHORT_DESCRIPTION, "Start/Stop Mission");
     	}
     	
     	public void actionPerformed(ActionEvent e) {
-    		context.sender.changeMovement(true);
-    	}
-    	
-    	
-    };
-    
-    private Action stopMoving = new AbstractAction() {
-    	{
-    		String text = "Stop";
-    		putValue(Action.NAME, text);
-    		putValue(Action.SHORT_DESCRIPTION, text);
-    	}    	
-    	
-    	public void actionPerformed(ActionEvent e) {
-    		context.sender.changeMovement(false);
+    		if(isUnitMoving) {
+    			context.sender.changeMovement(false);
+    			putValue(Action.NAME, "Start Mission");
+    			isUnitMoving = false;
+    		}
+    		else {
+    			context.sender.changeMovement(true);
+    			putValue(Action.NAME, "Stop Mission");
+    			isUnitMoving = true;
+    		}
     	}
     };
     
@@ -604,6 +604,7 @@ class WaypointPanel extends NinePatchPanel {
         public void actionPerformed(ActionEvent e) {
         	WaypointCommand command = new WaypointCommandClear(waypoints, context);
         	CommandManager.getInstance().process(command);
+        	
         }
     };
     
