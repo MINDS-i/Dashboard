@@ -36,6 +36,7 @@ public class WaypointCommandClear extends WaypointCommand {
 		
 		if(context.sender != null) {
 			context.sender.sendWaypointList();
+			context.sender.changeMovement(false);
 		}
 		
 		return true;
