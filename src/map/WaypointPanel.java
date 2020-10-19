@@ -573,13 +573,20 @@ class WaypointPanel extends NinePatchPanel {
         }
     };
     
+    private DataWindow dataWindow;
     private Action openDataPanel = new AbstractAction() {
         {
             String text = "Telemetry";
             putValue(Action.NAME, text);
         }
         public void actionPerformed(ActionEvent e) {
-            final DataWindow window = new DataWindow(context);
+        	
+        	if(dataWindow != null && dataWindow.getVisible() == true) {
+        		dataWindow.toFront();
+        		return;
+        	}
+        	
+        	dataWindow = new DataWindow(context);
         }
     };
     

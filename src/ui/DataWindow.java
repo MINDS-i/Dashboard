@@ -41,9 +41,11 @@ public class DataWindow implements ActionListener {
     private JTextField	  	 logInput;
     private JTextComponent	 descriptionBox;
 
+    private JFrame frame;
+    
     public DataWindow(Context cxt) {
         context = cxt;
-        JFrame frame = new JFrame("Telemetry");
+        frame = new JFrame("Telemetry");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setSize(WINDOW_X,WINDOW_Y);
         JPanel panel = new JPanel();
@@ -270,5 +272,13 @@ public class DataWindow implements ActionListener {
         } catch (NumberFormatException e) {
             logInput.setText(Integer.toString(context.telemLog.getPeriod()));
         }
+    }
+    
+    public void toFront() {
+    	frame.toFront();
+    }
+    
+    public boolean getVisible() {
+    	return frame.isVisible();
     }
 }
