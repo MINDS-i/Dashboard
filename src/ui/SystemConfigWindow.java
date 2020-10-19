@@ -12,6 +12,8 @@ import javax.swing.text.*;
 
 public class SystemConfigWindow {
     private Context context;
+    private JFrame frame;
+    
     protected static final String COPY_RIGHT_TEXT =
         "Map data courtesy of\n" +
         "Esri, DigitalGlobe, Earthstar Geographics, CNES/Airbus DS, GeoEye, USDA FSA, USGS, Getmapping, Aerogrid, IGN, IGP, and the GIS User Community\n"+
@@ -20,7 +22,7 @@ public class SystemConfigWindow {
     public SystemConfigWindow(Context cxt) {
         this.context = cxt;
         // make frame and vertical box container
-        JFrame frame = new JFrame("Configuration");
+        frame = new JFrame("Configuration");
         JPanel container = new JPanel();
         container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
 
@@ -63,8 +65,17 @@ public class SystemConfigWindow {
         frame.pack();
         frame.setVisible(true);
     }
+    
     private boolean isWindows() {
         String osname = System.getProperty("os.name");
         return osname.toLowerCase().contains("windows");
+    }
+    
+    public void toFront() {
+    	frame.toFront();
+    }
+    
+    public boolean getVisible() {
+    	return frame.isVisible();
     }
 }

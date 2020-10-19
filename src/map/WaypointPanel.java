@@ -583,13 +583,22 @@ class WaypointPanel extends NinePatchPanel {
         }
     };
     
+    private SystemConfigWindow configWindow;
     private Action openConfigWindow = new AbstractAction() {
         {
             String text = "Configuration";
             putValue(Action.NAME, text);
         }
         public void actionPerformed(ActionEvent e) {
-            final SystemConfigWindow window = new SystemConfigWindow(context);
+        	
+        	//If the window already exits, don't make a new one,
+        	//just move it to the front.
+        	if(configWindow != null && configWindow.getVisible() == true) {
+        		configWindow.toFront();
+        		return;
+        	}
+        	
+        	configWindow = new SystemConfigWindow(context);
         }
     };
     
