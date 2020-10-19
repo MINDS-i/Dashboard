@@ -83,14 +83,14 @@ class RoverPath implements Layer {
             // Click is NOT over an existing line
             if (line == Integer.MAX_VALUE) {
             	command = new WaypointCommandAdd(
-            			waypoints, new Dot(point), waypoints.size(), true);
+            			waypoints, new Dot(point), waypoints.size());
             	//Manually adjust for size vs index offset
                 waypoints.setSelected(waypoints.size() - 1);
             } 
             // Click is over an existing line
             else {
             	command = new WaypointCommandAdd(
-    					waypoints, new Dot(point), line, true);
+    					waypoints, new Dot(point), line);
             }
         } 
         // Right click on top of a point

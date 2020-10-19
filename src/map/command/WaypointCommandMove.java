@@ -26,6 +26,7 @@ public class WaypointCommandMove extends WaypointCommand {
 	 * case of a failure, ensure that the end point was set before
 	 * attempting execution.
 	 */
+	@Override
 	public boolean execute() {
 		if(endPoint == null) {
 			System.err.print("WaypointCommandMove - Execution failure. ");
