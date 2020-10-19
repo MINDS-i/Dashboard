@@ -11,15 +11,12 @@ import com.map.Dot;
  * active sessions list.
  */
 public class WaypointCommandAdd extends WaypointCommand {
-	protected boolean isClick;
 	
-	public WaypointCommandAdd(WaypointList waypoints, Dot point, 
-			int index, boolean isClick) {
+	public WaypointCommandAdd(WaypointList waypoints, Dot point, int index) {
 		super(waypoints, CommandType.ADD);
 		
 		this.point = point;
 		this.index = index;
-		this.isClick = isClick;
 	}
 	
 	@Override

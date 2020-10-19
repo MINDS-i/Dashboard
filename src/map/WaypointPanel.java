@@ -313,21 +313,16 @@ class WaypointPanel extends NinePatchPanel {
             	
             	command.finalize(new Dot(newPosition, (short)newAltitude));
             	CommandManager.getInstance().process(command);
-//                waypoints.set(new Dot(newPosition, (short)newAltitude), selectedWaypoint);
-                
+
                 //set to display reconverted value
                 altitude.setText(fixedToDouble(newAltitude)+"");
             } 
             else {
-            	
-            	
-            	
                 Dot newloc = waypoints.get(selectedWaypoint).dot();
                 newloc.setLocation(newPosition);
                 
                 command.finalize(newloc);
                 CommandManager.getInstance().process(command);
-//                waypoints.set(newloc, selectedWaypoint);
             }
         } catch (NumberFormatException e) {}
     }
@@ -523,7 +518,8 @@ class WaypointPanel extends NinePatchPanel {
             putValue(Action.NAME, text);
         }
         public void actionPerformed(ActionEvent e) {
-            waypoints.setTarget(waypoints.getSelected());
+        	WaypointCommand command = new WaypointCommandTarget(waypoints);
+        	CommandManager.getInstance().process(command);
         }
     };
     
@@ -560,8 +556,7 @@ class WaypointPanel extends NinePatchPanel {
             WaypointCommand command = new WaypointCommandAdd(
             		waypoints,
             		new Dot(waypoints.get(selectedWaypoint).dot()),
-            		selectedWaypoint, 
-            		false);
+            		selectedWaypoint);
 
             CommandManager.getInstance().process(command);
         }
