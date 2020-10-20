@@ -21,6 +21,6 @@ sourceExtraction/__pycache__/
 DashBoard.zip
 resources/persist/*
 resources/tile_servers.properties
-.classpath
 .project
+.classpath
 .settings/org.eclipse.wst.sse.core.prefs
