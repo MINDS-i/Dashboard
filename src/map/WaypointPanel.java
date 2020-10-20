@@ -100,7 +100,9 @@ class WaypointPanel extends NinePatchPanel {
             }
             
             private void updateLabel() {
-                putValue(Action.NAME, serverLabels.get(0));
+            	String text = serverLabels.get(0);
+            	text = text.substring(0, 1).toUpperCase() + text.substring(1);
+            	putValue(Action.NAME, text);
             }
             
             public void actionPerformed(ActionEvent e) {
