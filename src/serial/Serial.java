@@ -20,6 +20,7 @@ public class Serial {
     public static final int CONFIRMATION   = 0x0;
     public static final int SYNC_WORD      = 0x1;
     public static final int COMMAND_WORD   = 0x2;
+    public static final int STATE_WORD	   = 0x3;
     
     //string type
     public static final int ERROR_STRING   = 0x0;
@@ -31,6 +32,30 @@ public class Serial {
     public static final byte LOOPING_CMD  = 0x2;
     public static final byte CLEAR_CMD    = 0x3;
     public static final byte DELETE_CMD   = 0x4;
+    public static final byte STOP_CMD 	  = 0x5;
+    public static final byte START_CMD	  = 0x6;
+    
+    //state types
+    public static final byte APM_STATE	  = 0x0;
+    public static final byte DRIVE_STATE  = 0x1;
+    public static final byte AUTO_STATE	  = 0x2;
+    
+    //APM state sub values
+    public static final byte APM_STATE_INIT 		= 0x0;
+    public static final byte APM_STATE_SELF_TEST 	= 0x1;
+    public static final byte APM_STATE_DRIVE 		= 0x2;
+    
+    //drive state sub values
+    public static final byte DRIVE_STATE_STOP 	= 0x0;
+    public static final byte DRIVE_STATE_AUTO 	= 0x1;
+    public static final byte DRIVE_STATE_RADIO 	= 0x2;
+    
+    //auto state sub values
+    public static final byte AUTO_STATE_FULL 		= 0x0;
+    public static final byte AUTO_STATE_CAUTION 	= 0x1;
+    public static final byte AUTO_STATE_AVOID 		= 0x2;
+    public static final byte AUTO_STATE_APPROACH 	= 0x3;
+    public static final byte AUTO_STATE_STALLED 	= 0x4;
     
     //sync
     public static final byte SYNC_REQUEST = 0x00;

@@ -183,11 +183,14 @@ class WaypointPanel extends NinePatchPanel {
         JButton redoButton = theme.makeButton(redoCommandAction);
         JButton saveButton = theme.makeButton(saveWaypoints);
         JButton loadButton = theme.makeButton(loadWaypoints);
+        JButton missionButton = theme.makeButton(toggleMovement);
         
         JComponent[] format = new JComponent[] {
             tileButton, dataPanel, graphButton,
-            reTarget, looping, config, logPanelButton, clearWaypoints
+            reTarget, looping, config, logPanelButton,
+            clearWaypoints, missionButton
         };
+        
         for(JComponent jc : format) {
             jc.setAlignmentX(Component.CENTER_ALIGNMENT);
             jc.setMaximumSize(buttonSize);
@@ -248,7 +251,11 @@ class WaypointPanel extends NinePatchPanel {
             editorPanels.add(panel);
         }
 
-        JPanel waypointOptions = new JPanel(new GridLayout(3,2,5,5));
+        int COLS = 3;
+        int ROWS = 2;
+        int PADDING = 5;
+        JPanel waypointOptions = new JPanel(
+        		new GridLayout(COLS, ROWS, PADDING, PADDING));
         waypointOptions.setOpaque(false);
         waypointOptions.add(newButton);
         waypointOptions.add(enterButton);      
@@ -282,6 +289,8 @@ class WaypointPanel extends NinePatchPanel {
         add(reTarget);
         add(Box.createRigidArea(space));
         add(looping);
+        add(Box.createRigidArea(space));
+        add(missionButton);
     }
 
     private double fixedToDouble(int i) {
@@ -445,6 +454,28 @@ class WaypointPanel extends NinePatchPanel {
             putValue(Action.NAME,
                      (waypoints.getLooped())? "Looping Off" : "Looping On");
         }
+    };
+    
+    private boolean isUnitMoving = false;
+    private Action toggleMovement = new AbstractAction() {
+    	{
+    		String text = "Start Mission";
+    		putValue(Action.NAME, text);
+    		putValue(Action.SHORT_DESCRIPTION, "Start/Stop Mission");
+    	}
+    	
+    	public void actionPerformed(ActionEvent e) {
+    		if(isUnitMoving) {
+    			context.sender.changeMovement(false);
+    			putValue(Action.NAME, "Start Mission");
+    			isUnitMoving = false;
+    		}
+    		else {
+    			context.sender.changeMovement(true);
+    			putValue(Action.NAME, "Stop Mission");
+    			isUnitMoving = true;
+    		}
+    	}
     };
     
     private Action previousWaypoint = new AbstractAction() {

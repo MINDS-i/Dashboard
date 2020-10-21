@@ -153,6 +153,24 @@ public class SerialSender {
         }
     }
 
+    public void changeMovement(boolean shouldMove) {
+    	Message msg;
+    	
+    	if(context.connected) {
+    		if(shouldMove) {
+    			msg = Message.startDriving();
+    			System.err.println("Sending start driving message.");
+    		}
+    		else {
+    			msg = Message.stopDriving();
+    			System.err.println("Sending stop driving message.");
+    		}
+    		
+    		sendMessage(msg);
+    	}
+    	
+    }
+    
     public void sendSync() {
         Message msg = Message.syncMessage(Serial.SYNC_REQUEST);
         sendMessage(msg);
