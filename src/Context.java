@@ -37,9 +37,9 @@ public class Context {
     private Properties persist;
 
     private static final File persistanceFile =
-        new File("./resources/persist/persist.properties");
+            new File(System.getProperty("user.home") + "\\AppData\\persist.properties");
+    
     private final String instanceLogName;
-
     private final Logger ioerr = Logger.getLogger("d.io");
 
     public Context(Dashboard dashboard) {
@@ -50,20 +50,23 @@ public class Context {
         Calendar cal = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("MMdd_HHmm_yyyyGG");
         instanceLogName = sdf.format(cal.getTime());
-
+        
         persist = new Properties();
         try {
             if(!persistanceFile.exists()) {
                 persistanceFile.getParentFile().mkdirs();
                 persistanceFile.createNewFile();
             }
+            
             InputStream is =new FileInputStream(persistanceFile);
             persist.load(is);
             is.close();
-        } catch (Exception e) {
+        } 
+        catch (Exception e) {
             ioerr.severe("Failed to open and read persistance file");
             e.printStackTrace();
-        } finally {
+        } 
+        finally {
             loadLocale(); // defaults to "air" mode
         }
 
