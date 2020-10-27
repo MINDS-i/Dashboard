@@ -37,7 +37,7 @@ public class Context {
     private Properties persist;
 
     private static final File persistanceFile =
-            new File(System.getProperty("user.home") + "\\AppData\\persist.properties");
+            new File(System.getProperty("user.home") + "\\AppData\\Local\\MINDS-i Dashboard\\persist.properties");
     
     private final String instanceLogName;
     private final Logger ioerr = Logger.getLogger("d.io");
