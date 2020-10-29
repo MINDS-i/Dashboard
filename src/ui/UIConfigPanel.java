@@ -48,7 +48,7 @@ public class UIConfigPanel extends JPanel {
 		
 		toggleButton = new JButton(toggleLocaleAction);
 		toggleButton.setPreferredSize(
-				new Dimension(DEF_BUTTON_WIDTH,DEF_BUTTON_HEIGHT));
+				new Dimension(DEF_BUTTON_WIDTH, DEF_BUTTON_HEIGHT));
 		constraints.gridx = 0;
 		constraints.gridy = 0;
 		this.add(toggleButton, constraints);
@@ -56,7 +56,7 @@ public class UIConfigPanel extends JPanel {
 		if(isWindows) {
 			driverButton = new JButton(driverExecAction);
 			driverButton.setPreferredSize(
-					new Dimension(DEF_BUTTON_WIDTH,DEF_BUTTON_HEIGHT));
+					new Dimension(DEF_BUTTON_WIDTH, DEF_BUTTON_HEIGHT));
 			constraints.gridx = 0;
 			constraints.gridy = 1;
 			this.add(driverButton, constraints);	
