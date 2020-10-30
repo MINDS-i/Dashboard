@@ -57,9 +57,9 @@ public class Serial {
     public static final byte AUTO_STATE_STALLED 	= 0x2;
     
     //auto flags sub values
-    public static final byte AUTO_STATE_FLAGS_NONE		= 0x00000000;
-    public static final byte AUTO_STATE_FLAGS_AVOID 	= 0x00000001;
-    public static final byte AUTO_STATE_FLAGS_APPROACH 	= 0x00000010;
+    public static final byte AUTO_STATE_FLAGS_NONE		= 0B00;
+    public static final byte AUTO_STATE_FLAGS_AVOID 	= 0B01;
+    public static final byte AUTO_STATE_FLAGS_APPROACH 	= 0B10;
     
     //sync
     public static final byte SYNC_REQUEST = 0x00;

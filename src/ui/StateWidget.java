@@ -98,8 +98,8 @@ public class StateWidget extends JPanel {
 	}
 	
 	private void setFlagState(byte substate) {
-		boolean avoid 	 = ((substate & 0x00000001) > 0 ) ? true : false;
-		boolean approach = ((substate & 0x00000010) > 0 ) ? true : false;
+		boolean avoid = ((substate & Serial.AUTO_STATE_FLAGS_AVOID) > 0 ) ? true : false;
+		boolean approach = ((substate & Serial.AUTO_STATE_FLAGS_APPROACH) > 0 ) ? true : false;
 		
 		if(avoid && approach) {
 			flagStateStr = "FLAG - Approach & Avoid";
@@ -107,11 +107,11 @@ public class StateWidget extends JPanel {
 		}
 		else if(approach) {
 			flagStateStr = "FLAG - Approach";
-			//Severity Standard. Approaching an obstacle, slowing down?
+			//Severity Medium. Approaching an obstacle, slowing down?
 		}
 		else if(avoid) {
 			flagStateStr = "FLAG - Avoid";
-			//Severity Standard. Avoiding an obstacle? 
+			//Severity Medium. Avoiding an obstacle? 
 		}
 		else {
 			flagStateStr = "FLAG - None";
