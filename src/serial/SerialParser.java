@@ -164,12 +164,8 @@ public class SerialParser implements SerialPortEventListener {
                     }
                     break;
                 
-                //TODO - CP - Update the StateWidget through the Dashboard here (context->Dashboard->StateWidget).
                 case Serial.STATE_WORD: //Subtype
-                	//Send A and B to the state widget to update the visible readout.
-                	
-                	//Should look something like this...
-                	//context.dash.satewidget.update(a, b);
+                	context.dash.stateWidget.update(a,b);
                 	break;
             }
         }

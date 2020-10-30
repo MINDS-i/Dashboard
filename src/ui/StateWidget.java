@@ -19,6 +19,12 @@ public class StateWidget extends JPanel {
 	private Context context;
 	private JFrame infoFrame;
 	
+	
+	private JLabel apmLabel;
+	private JLabel driveLabel;
+	private JLabel autoLabel;
+	private JLabel flagLabel;
+	
 	private String apmStateStr;
 	private String driveStateStr;
 	private String autoStateStr;
@@ -27,10 +33,22 @@ public class StateWidget extends JPanel {
 	public StateWidget(Context ctx) {
 		context = ctx;
 		
-		apmStateStr 	= "Uninitialized";
-		driveStateStr 	= "Uninitialized";
-		autoStateStr 	= "Uninitialized";
-		flagStateStr 	= "Uninitialized";
+		apmStateStr 	= "APM - Uninit";
+		driveStateStr 	= "DRIVE - Uninit";
+		autoStateStr 	= "AUTO - Uninit";
+		flagStateStr 	= "FLAGS - None";
+		
+		apmLabel 	= new JLabel(apmStateStr);
+		driveLabel 	= new JLabel(driveStateStr);
+		autoLabel 	= new JLabel(autoStateStr);
+		flagLabel 	= new JLabel(flagStateStr);
+		
+		
+		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		this.add(apmLabel);
+		this.add(driveLabel);
+		this.add(autoLabel);
+		this.add(flagLabel);
 	}
 
 	public void update(byte state, byte substate) {
@@ -46,75 +64,86 @@ public class StateWidget extends JPanel {
 				break;
 			case Serial.AUTO_FLAGS:
 				setFlagState(substate);
+				break;
+			default:
+				System.err.println("Error - Unrecognized State");
 		}
 	}
 	
 	private void setAPMState(byte substate) {
+		System.err.println("StateWidget - Updating APM State");
+		
 		switch(substate) {
 			case Serial.APM_STATE_INIT:
-				apmStateStr = "APM - Initializing";
+				apmLabel.setText("APM - Initializing");
 				break;
 			case Serial.APM_STATE_SELF_TEST:
-				apmStateStr= "APM - Performing Self Test";
+				apmLabel.setText("APM - Performing Self Test");
 				break;
 			case Serial.APM_STATE_DRIVE:
-				apmStateStr = "APM - Driving";
+				apmLabel.setText("APM - Driving");
 				break;
 			default:
-				apmStateStr = "APM - No details or unrecognized state";
+				apmLabel.setText("APM - Unknown State");
 		}
 	}
 	
 	private void setDriveState(byte substate) {
+		System.err.println("StateWidget - Updating Drive State");
+		
 		switch(substate) {
 			case Serial.DRIVE_STATE_STOP:
-				driveStateStr = "Drive - Stopped";
+				driveLabel.setText("DRIVE - Stopped");
 				break;
 			case Serial.DRIVE_STATE_AUTO:
-				driveStateStr = "Drive - Auto Mode";
+				driveLabel.setText("DRIVE - Auto Mode");
 				break;
 			case Serial.DRIVE_STATE_RADIO:
-				driveStateStr = "Drive - Radio Manual Mode";
+				driveLabel.setText("DRIVE - Radio Manual Mode");
 				break;
 			default:
-				driveStateStr = "Drive - No details or unrecognized state";
+				driveLabel.setText("DRIVE - Unknown State");
 		}
 	}
 	
 	private void setAutoState(byte substate) {
+		System.err.println("StateWidget - Updating Auto State");
+		
 		switch(substate) {
 			case Serial.AUTO_STATE_FULL:
-				autoStateStr = "AUTO - Full";
+				autoLabel.setText("AUTO - Full");
 				break;
 			case Serial.AUTO_STATE_CAUTION:
-				autoStateStr = "AUTO - Caution";
+				autoLabel.setText("AUTO - Caution");
 				break;
 			case Serial.AUTO_STATE_STALLED:
-				autoStateStr = "AUTO - Stalled";
+				autoLabel.setText("AUTO - Stalled");
 				break;
 			default:
-				autoStateStr = "AUTO - No details or unrecognized state.";
+				autoLabel.setText("AUTO - Unknown State");
 		}
 	}
 	
 	private void setFlagState(byte substate) {
-		boolean avoid = ((substate & Serial.AUTO_STATE_FLAGS_AVOID) > 0 ) ? true : false;
+		boolean avoid    = ((substate & Serial.AUTO_STATE_FLAGS_AVOID) 	  > 0 ) ? true : false;
 		boolean approach = ((substate & Serial.AUTO_STATE_FLAGS_APPROACH) > 0 ) ? true : false;
 		
+		System.out.println("StateWidget - Updating Flag State");
+		
 		if(avoid && approach) {
-			flagStateStr = "FLAG - Approach & Avoid";
+			flagLabel.setText("FLAG - Approach & Avoid");
 			//Severity High. Approaching a clear obstable? 
 		}
 		else if(approach) {
-			flagStateStr = "FLAG - Approach";
+			flagLabel.setText("FLAG - Approach");
 			//Severity Medium. Approaching an obstacle, slowing down?
 		}
 		else if(avoid) {
-			flagStateStr = "FLAG - Avoid";
+			flagLabel.setText("FLAG - Avoid");
 			//Severity Medium. Avoiding an obstacle? 
 		}
 		else {
-			flagStateStr = "FLAG - None";
+			flagLabel.setText("FLAG - None");
 			//Severity Low. No hazards detected?
 		}
 	}

@@ -42,6 +42,9 @@ public class Dashboard implements Runnable {
 
     private TelemetryWidget dataWidget;
 
+    //TODO - CP - Change this to private and make a getter that can be called
+    public StateWidget stateWidget;
+    
     private final Logger seriallog = Logger.getLogger("d.serial");
     private final Logger iolog = Logger.getLogger("d.io");
     private final Logger rootlog = Logger.getLogger("d");
@@ -229,11 +232,8 @@ public class Dashboard implements Runnable {
                     context, Serial.ROLL, context.theme.roverFront));
         }
 
-        //TODO - CP - Create the StateWidget and add it to the dash panel here?
-        /*
-         * StateWidget stateWidget = new StateWidget(context);
-         * dashPanel.add(stateWidget);
-         */
+        stateWidget = new StateWidget(context);
+        dashPanel.add(stateWidget);
         
         return dashPanel;
     }
