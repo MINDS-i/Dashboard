@@ -17,22 +17,106 @@ import com.serial.Serial;
  */
 public class StateWidget extends JPanel {
 	private Context context;
-	private byte currentState;
-	private byte currentSubState;
-	
 	private JFrame infoFrame;
-	private String stateInfoStr;
+	
+	private String apmStateStr;
+	private String driveStateStr;
+	private String autoStateStr;
+	private String flagStateStr;
 	
 	public StateWidget(Context ctx) {
 		context = ctx;
-		//Default state and substate to something inactive here?
+		
+		apmStateStr 	= "Uninitialized";
+		driveStateStr 	= "Uninitialized";
+		autoStateStr 	= "Uninitialized";
+		flagStateStr 	= "Uninitialized";
 	}
 
-	
 	public void update(byte state, byte substate) {
-		currentState = state;
-		currentSubState = substate;
-		updateStateInfo();
+		switch(state) {
+			case Serial.APM_STATE:
+				setAPMState(substate);
+				break;
+			case Serial.DRIVE_STATE:
+				setDriveState(substate);
+				break;
+			case Serial.AUTO_STATE:
+				setAutoState(substate);
+				break;
+			case Serial.AUTO_FLAGS:
+				setFlagState(substate);
+		}
+	}
+	
+	private void setAPMState(byte substate) {
+		switch(substate) {
+			case Serial.APM_STATE_INIT:
+				apmStateStr = "APM - Initializing";
+				break;
+			case Serial.APM_STATE_SELF_TEST:
+				apmStateStr= "APM - Performing Self Test";
+				break;
+			case Serial.APM_STATE_DRIVE:
+				apmStateStr = "APM - Driving";
+				break;
+			default:
+				apmStateStr = "APM - No details or unrecognized state";
+		}
+	}
+	
+	private void setDriveState(byte substate) {
+		switch(substate) {
+			case Serial.DRIVE_STATE_STOP:
+				driveStateStr = "Drive - Stopped";
+				break;
+			case Serial.DRIVE_STATE_AUTO:
+				driveStateStr = "Drive - Auto Mode";
+				break;
+			case Serial.DRIVE_STATE_RADIO:
+				driveStateStr = "Drive - Radio Manual Mode";
+				break;
+			default:
+				driveStateStr = "Drive - No details or unrecognized state";
+		}
+	}
+	
+	private void setAutoState(byte substate) {
+		switch(substate) {
+			case Serial.AUTO_STATE_FULL:
+				autoStateStr = "AUTO - Full";
+				break;
+			case Serial.AUTO_STATE_CAUTION:
+				autoStateStr = "AUTO - Caution";
+				break;
+			case Serial.AUTO_STATE_STALLED:
+				autoStateStr = "AUTO - Stalled";
+				break;
+			default:
+				autoStateStr = "AUTO - No details or unrecognized state.";
+		}
+	}
+	
+	private void setFlagState(byte substate) {
+		boolean avoid 	 = ((substate & 0x00000001) > 0 ) ? true : false;
+		boolean approach = ((substate & 0x00000010) > 0 ) ? true : false;
+		
+		if(avoid && approach) {
+			flagStateStr = "FLAG - Approach & Avoid";
+			//Severity High. Approaching a clear obstable? 
+		}
+		else if(approach) {
+			flagStateStr = "FLAG - Approach";
+			//Severity Standard. Approaching an obstacle, slowing down?
+		}
+		else if(avoid) {
+			flagStateStr = "FLAG - Avoid";
+			//Severity Standard. Avoiding an obstacle? 
+		}
+		else {
+			flagStateStr = "FLAG - None";
+			//Severity Low. No hazards detected?
+		}
 	}
 	
 	private MouseAdapter stateDetailsMouseAdapter = new MouseAdapter() {
@@ -45,96 +129,9 @@ public class StateWidget extends JPanel {
 			}
 			else {
 				infoFrame = new JFrame("state info");
-				JOptionPane.showMessageDialog(infoFrame, stateInfoStr);
+				JOptionPane.showMessageDialog(infoFrame, "Click Info String Here");
 			}
 		}
 	};
 	
-	private void updateStateInfo() {
-		switch(currentState) {
-			case Serial.APM_STATE:
-				setAPMStateInfo();
-				//Update Color A
-				break;
-			case Serial.DRIVE_STATE:
-				setDriveStateInfo();
-				//Update Color B
-				break;
-			case Serial.AUTO_STATE:
-				setAutoStateInfo();
-				//Update Color C
-				break;
-			default:
-				stateInfoStr = "No details or unrecognized state.";
-				//Update Color Default for primary and secondary
-		}
-	}
-	
-	private void setAPMStateInfo() {
-		switch(currentSubState) {
-			case Serial.APM_STATE_INIT:
-				stateInfoStr = "";
-				//Update Secondary Color
-				break;
-			case Serial.APM_STATE_SELF_TEST:
-				stateInfoStr = "";
-				//Update Secondary Color
-				break;
-			case Serial.APM_STATE_DRIVE:
-				//Update Secondary Color
-				stateInfoStr = "";
-				break;
-			default:
-				stateInfoStr = "No details or unrecognized state.";
-				//Update Secondary Color
-		}
-	}
-	
-	private void setDriveStateInfo() {
-		switch(currentSubState) {
-			case Serial.DRIVE_STATE_STOP:
-				stateInfoStr = "";
-				//Update Secondary Color
-				break;
-			case Serial.DRIVE_STATE_AUTO:
-				stateInfoStr = "";
-				//Update Secondary Color
-				break;
-			case Serial.DRIVE_STATE_RADIO:
-				stateInfoStr = "";
-				//Update Secondary Color
-				break;
-			default:
-				stateInfoStr = "No details or unrecognized state.";
-				//Update Secondary Color
-		}
-	}
-	
-	private void setAutoStateInfo() {
-		switch(currentSubState) {
-			case Serial.AUTO_STATE_FULL:
-				stateInfoStr = "";
-				//Update Secondary Color
-				break;
-			case Serial.AUTO_STATE_CAUTION:
-				stateInfoStr = "";
-				//Update Secondary Color
-				break;
-			case Serial.AUTO_STATE_AVOID:
-				stateInfoStr = "";
-				//Update Secondary Color
-				break;
-			case Serial.AUTO_STATE_APPROACH:
-				stateInfoStr = "";
-				//Update Secondary Color
-				break;
-			case Serial.AUTO_STATE_STALLED:
-				stateInfoStr = "";
-				//Update Secondary Color
-				break;
-			default:
-				stateInfoStr = "No details or unrecognized state.";
-				//Update Secondary Color
-		}
-	}
 }

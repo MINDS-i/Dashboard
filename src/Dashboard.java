@@ -229,6 +229,12 @@ public class Dashboard implements Runnable {
                     context, Serial.ROLL, context.theme.roverFront));
         }
 
+        //TODO - CP - Create the StateWidget and add it to the dash panel here?
+        /*
+         * StateWidget stateWidget = new StateWidget(context);
+         * dashPanel.add(stateWidget);
+         */
+        
         return dashPanel;
     }
 

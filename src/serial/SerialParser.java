@@ -166,28 +166,10 @@ public class SerialParser implements SerialPortEventListener {
                 
                 //TODO - CP - Update the StateWidget through the Dashboard here (context->Dashboard->StateWidget).
                 case Serial.STATE_WORD: //Subtype
-                	switch(a) {
-                		case Serial.APM_STATE:
-                			//Possible b States:
-                				//-INIT
-                    			//-SELF_TEST
-                    			//-DRIVE - transitional?
-                			break;
-                		case Serial.DRIVE_STATE:
-                    		//Possible b states
-                				//-STOP
-                    			//-AUTO - transitional?
-                    			//-RADIO
-                			break;
-                		case Serial.AUTO_STATE:
-                    		//Possible b states (how do we get back from here? on stop?)
-                				//-FULL
-                    			//-CAUTION
-                    			//-AVOID
-                    			//-APPROACH
-                    			//-STALLED
-                			break;
-                	}
+                	//Send A and B to the state widget to update the visible readout.
+                	
+                	//Should look something like this...
+                	//context.dash.satewidget.update(a, b);
                 	break;
             }
         }
