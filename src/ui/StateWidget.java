@@ -113,8 +113,8 @@ public class StateWidget extends JPanel {
 			case Serial.AUTO_STATE_FULL:
 				autoLabel.setText("AUTO - Full");
 				break;
-			case Serial.AUTO_STATE_CAUTION:
-				autoLabel.setText("AUTO - Caution");
+			case Serial.AUTO_STATE_AVOID:
+				autoLabel.setText("AUTO - Avoid");
 				break;
 			case Serial.AUTO_STATE_STALLED:
 				autoLabel.setText("AUTO - Stalled");
@@ -124,22 +124,23 @@ public class StateWidget extends JPanel {
 		}
 	}
 	
+	//TODO - CP - Update flag string AND set an icon indicating severity level
 	private void setFlagState(byte substate) {
-		boolean avoid    = ((substate & Serial.AUTO_STATE_FLAGS_AVOID) 	  > 0 ) ? true : false;
+		boolean caution  = ((substate & Serial.AUTO_STATE_FLAGS_CAUTION)  > 0 ) ? true : false;
 		boolean approach = ((substate & Serial.AUTO_STATE_FLAGS_APPROACH) > 0 ) ? true : false;
 		
 		System.out.println("StateWidget - Updating Flag State");
 		
-		if(avoid && approach) {
-			flagLabel.setText("FLAG - Approach & Avoid");
+		if(caution && approach) {
+			flagLabel.setText("FLAG - Approach & Caution");
 			//Severity High. Approaching a clear obstable? 
 		}
 		else if(approach) {
 			flagLabel.setText("FLAG - Approach");
 			//Severity Medium. Approaching an obstacle, slowing down?
 		}
-		else if(avoid) {
-			flagLabel.setText("FLAG - Avoid");
+		else if(caution) {
+			flagLabel.setText("FLAG - Caution");
 			//Severity Medium. Avoiding an obstacle? 
 		}
 		else {
