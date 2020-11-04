@@ -6,6 +6,7 @@ import javax.swing.*;
 
 import com.Context;
 import com.serial.Serial;
+import com.ui.ninePatch.NinePatchPanel;
 
 /**
  * @author Chris Park @ Infinetix Corp.
@@ -13,7 +14,7 @@ import com.serial.Serial;
  * Description: Dashboard Widget used to display the current state of a connected unit as
  * described over serial communication.
  */
-public class StateWidget extends JPanel {
+public class StateWidget extends NinePatchPanel {
 	private Context context;
 	private JFrame infoFrame;
 	
@@ -22,25 +23,53 @@ public class StateWidget extends JPanel {
 	private JLabel autoLabel;
 	private JLabel flagLabel;
 	
+	protected static final int BORDER_SIZE = 25;
+	
 	/**
 	 * Class constructor
 	 * @param ctx - The application context
 	 */
 	public StateWidget(Context ctx) {
+		super(ctx.theme.panelPatch);
 		context = ctx;
+		initPanel();
+	}
+
+	/**
+	 * Construct and place the visual elements of the widget
+	 */
+	private void initPanel() {
+//		Theme theme 		= context.theme;
+		Dimension spacer 	= new Dimension(0, 5);
+		Dimension labelSize = new Dimension(80, 25);
 		
 		apmLabel 	= new JLabel("APM - Uninit");
 		driveLabel 	= new JLabel("DRIVE - Uninit");
 		autoLabel 	= new JLabel("AUTO - Uninit");
 		flagLabel 	= new JLabel("FLAGS - None");
 		
-		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		JComponent[] formatList = new JComponent[] {
+			apmLabel, driveLabel, autoLabel, flagLabel	
+		};
+		
+		for(JComponent jc : formatList) {
+			jc.setAlignmentX(Component.CENTER_ALIGNMENT);
+			jc.setMaximumSize(labelSize);
+		}
+		
+		this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+		this.setBorder(BorderFactory.createEmptyBorder(
+				BORDER_SIZE, BORDER_SIZE,BORDER_SIZE, BORDER_SIZE));
+		
 		this.add(apmLabel);
+		this.add(Box.createRigidArea(spacer));
 		this.add(driveLabel);
+		this.add(Box.createRigidArea(spacer));
 		this.add(autoLabel);
+		this.add(Box.createRigidArea(spacer));
 		this.add(flagLabel);
 	}
-
+	
 	/**
 	 * Updates the internal state of the widget using byte data received from
 	 * serial communications with a device.
@@ -164,7 +193,7 @@ public class StateWidget extends JPanel {
 	
 	/**
 	 * Generates an information panel on click describing the warnings, errors,
-	 * and details of teh current state.
+	 * and details of the current state.
 	 */
 	private MouseAdapter stateDetailsMouseAdapter = new MouseAdapter() {
 		@Override

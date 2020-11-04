@@ -364,6 +364,10 @@ class WaypointPanel extends NinePatchPanel {
     	}
     };
     
+    /**
+     * Starts a periodic timer while the mouse button is held which
+     * triggers repeated zoom in actions. The timer is stopped on release.
+     */
     private MouseAdapter zoomInMouseAdapter = new MouseAdapter() {
         	@Override
         	public void mousePressed(MouseEvent me) {
@@ -384,6 +388,9 @@ class WaypointPanel extends NinePatchPanel {
            }
     };
     
+    /**
+     * The zoom action performed when a zoomIn Timer is triggered
+     */
     private Action zoomInTimerAction = new AbstractAction() {
     	public void actionPerformed(ActionEvent e) {
     		map.zoomIn(new Point(map.getWidth() / 2, map.getHeight() / 2));
@@ -402,6 +409,10 @@ class WaypointPanel extends NinePatchPanel {
     	}
     };
 
+    /**
+     * Starts a periodic timer while the mouse button is held which
+     * triggers repeated zoom out actions. The timer is stopped on release.
+     */
     private MouseAdapter zoomOutMouseAdapter = new MouseAdapter() {
     	@Override
     	public void mousePressed(MouseEvent me) {
@@ -422,12 +433,18 @@ class WaypointPanel extends NinePatchPanel {
     	}	
     };
     
+    /**
+     * The zoom action performed when a zoomOut Timer is triggered
+     */
     private Action zoomOutTimerAction = new AbstractAction() {	
     	public void actionPerformed(ActionEvent e) {
     		map.zoomOut(new Point(map.getWidth() / 2, map.getHeight() / 2));
     	}
     };
     
+    /**
+     * Zooms the map to the closest level.
+     */
     private Action zoomFullAction = new AbstractAction() {
     	{
     		String text = "Full";
@@ -456,6 +473,9 @@ class WaypointPanel extends NinePatchPanel {
         }
     };
     
+    /**
+     * Action that starts or stops a unit for the currently active mission.
+     */
     private boolean isUnitMoving = false;
     private Action toggleMovement = new AbstractAction() {
     	{
@@ -556,6 +576,10 @@ class WaypointPanel extends NinePatchPanel {
         }
     };
     
+    /**
+     * Action responsible for triggering an undo operation on the
+     * last command performed.
+     */
     private Action undoCommandAction = new AbstractAction() {
     	{
     		String text = "Undo";
@@ -567,6 +591,10 @@ class WaypointPanel extends NinePatchPanel {
     	}
     };
     
+    /**
+     * Action responsible for triggering a redo action on the
+     * last command undone.
+     */
     private Action redoCommandAction = new AbstractAction() {
     	{
     		String text = "Redo";
