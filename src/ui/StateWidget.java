@@ -8,41 +8,31 @@ import com.Context;
 import com.serial.Serial;
 
 /**
- * 
  * @author Chris Park @ Infinetix Corp.
  * Date: 10-28-20
  * Description: Dashboard Widget used to display the current state of a connected unit as
  * described over serial communication.
- *
  */
 public class StateWidget extends JPanel {
 	private Context context;
 	private JFrame infoFrame;
-	
 	
 	private JLabel apmLabel;
 	private JLabel driveLabel;
 	private JLabel autoLabel;
 	private JLabel flagLabel;
 	
-	private String apmStateStr;
-	private String driveStateStr;
-	private String autoStateStr;
-	private String flagStateStr;
-	
+	/**
+	 * Class constructor
+	 * @param ctx - The application context
+	 */
 	public StateWidget(Context ctx) {
 		context = ctx;
 		
-		apmStateStr 	= "APM - Uninit";
-		driveStateStr 	= "DRIVE - Uninit";
-		autoStateStr 	= "AUTO - Uninit";
-		flagStateStr 	= "FLAGS - None";
-		
-		apmLabel 	= new JLabel(apmStateStr);
-		driveLabel 	= new JLabel(driveStateStr);
-		autoLabel 	= new JLabel(autoStateStr);
-		flagLabel 	= new JLabel(flagStateStr);
-		
+		apmLabel 	= new JLabel("APM - Uninit");
+		driveLabel 	= new JLabel("DRIVE - Uninit");
+		autoLabel 	= new JLabel("AUTO - Uninit");
+		flagLabel 	= new JLabel("FLAGS - None");
 		
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		this.add(apmLabel);
@@ -51,6 +41,12 @@ public class StateWidget extends JPanel {
 		this.add(flagLabel);
 	}
 
+	/**
+	 * Updates the internal state of the widget using byte data received from
+	 * serial communications with a device.
+	 * @param state - The main state type being updated
+	 * @param substate - The main state variation to be updated to
+	 */
 	public void update(byte state, byte substate) {
 		switch(state) {
 			case Serial.APM_STATE:
@@ -70,6 +66,10 @@ public class StateWidget extends JPanel {
 		}
 	}
 	
+	/**
+	 * Sets the current APM state.
+	 * @param substate - The state variation to be set
+	 */
 	private void setAPMState(byte substate) {
 		System.err.println("StateWidget - Updating APM State");
 		
@@ -88,6 +88,10 @@ public class StateWidget extends JPanel {
 		}
 	}
 	
+	/**
+	 * Sets the current Drive state.
+	 * @param substate - The state variation to be set
+	 */
 	private void setDriveState(byte substate) {
 		System.err.println("StateWidget - Updating Drive State");
 		
@@ -106,6 +110,10 @@ public class StateWidget extends JPanel {
 		}
 	}
 	
+	/**
+	 * Sets the current Auto state.
+	 * @param substate - The state variation to be set
+	 */
 	private void setAutoState(byte substate) {
 		System.err.println("StateWidget - Updating Auto State");
 		
@@ -125,6 +133,11 @@ public class StateWidget extends JPanel {
 	}
 	
 	//TODO - CP - Update flag string AND set an icon indicating severity level
+	
+	/**
+	 * Sets the current state flag if any.
+	 * @param substate - The flag type to be set
+	 */
 	private void setFlagState(byte substate) {
 		boolean caution  = ((substate & Serial.AUTO_STATE_FLAGS_CAUTION)  > 0 ) ? true : false;
 		boolean approach = ((substate & Serial.AUTO_STATE_FLAGS_APPROACH) > 0 ) ? true : false;
@@ -149,6 +162,10 @@ public class StateWidget extends JPanel {
 		}
 	}
 	
+	/**
+	 * Generates an information panel on click describing the warnings, errors,
+	 * and details of teh current state.
+	 */
 	private MouseAdapter stateDetailsMouseAdapter = new MouseAdapter() {
 		@Override
 		public void mousePressed(MouseEvent me) {

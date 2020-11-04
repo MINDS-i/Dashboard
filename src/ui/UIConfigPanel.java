@@ -1,6 +1,5 @@
 package com.ui;
 
-
 import com.Context;
 import com.map.*;
 
@@ -14,6 +13,15 @@ import java.awt.geom.Point2D;
 import java.text.Format;
 import javax.swing.*;
 
+
+/**
+ * 
+ * @author Chris Park @ Infinetix Corp.
+ * Date: 09-2020
+ * Description: UI Panel responsible for providing UI focused options to the user.
+ * Allows for toggling air/ground mode, and saving the current Home location to persistent
+ * settings. 
+ */
 public class UIConfigPanel extends JPanel {
 	
 	private static final int DEF_TEXT_FIELD_WIDTH 	= 6;
@@ -35,6 +43,11 @@ public class UIConfigPanel extends JPanel {
 	private JTextField 	latField;
 	private JButton 	setHomeButton;
 	
+	/**
+	 * Class constructor
+	 * @param cxt - the application context
+	 * @param isWindows - boolean check to see if the application is running in windows
+	 */
 	public UIConfigPanel(Context cxt, boolean isWindows) {
 		this.context = cxt;
 		
@@ -94,6 +107,10 @@ public class UIConfigPanel extends JPanel {
 		this.add(setHomeButton, constraints);
 	}
 	
+	/**
+	 * Action used to toggle the user interface between Air and Ground mode.
+	 * Requires a program restart for the setting to take effect.
+	 */
     private Action toggleLocaleAction = new AbstractAction() {
         {
             String text = "Toggle ground/air mode";
@@ -107,6 +124,10 @@ public class UIConfigPanel extends JPanel {
         }
     };
     
+    /**
+     * Action used to install the Required Radio Telemtry drivers.
+     * (Deprecated) - This is now handled by the program installer. 
+     */
     private Action driverExecAction = new AbstractAction() {
         {
             String text = "Launch driver installer";
@@ -122,6 +143,10 @@ public class UIConfigPanel extends JPanel {
         }
     };
     
+    /**
+     * Action used to set the home longitude and latitude and save it to persistent 
+     * settings.
+     */
     private Action setHomeAction = new AbstractAction() {
     	{
     		String text = "Set Home";

@@ -12,6 +12,12 @@ import com.map.Dot;
  */
 public class WaypointCommandAdd extends WaypointCommand {
 	
+	/**
+	 * Constructor
+	 * @param waypoints - List of current navigational waypoints.
+	 * @param point - Waypoint to be manually edited by this command
+	 * @param index - index in the waypoint list of the waypoint being added.
+	 */
 	public WaypointCommandAdd(WaypointList waypoints, Dot point, int index) {
 		super(waypoints, CommandType.ADD);
 		
@@ -19,6 +25,10 @@ public class WaypointCommandAdd extends WaypointCommand {
 		this.index = index;
 	}
 	
+	/**
+	 * Adds a new waypoint at the specified location. 
+	 * @return Boolean - Whether or not the command was executed successfully.
+	 */
 	@Override
 	public boolean execute() {
 		waypoints.add(point, index);
@@ -33,6 +43,10 @@ public class WaypointCommandAdd extends WaypointCommand {
 		return true;
 	}
 	
+	/**
+	 * Removes the added waypoint described by this command.
+	 * @return Boolean - Whether or not the operation was successful.
+	 */
 	@Override
 	public boolean undo() {
 		waypoints.remove(index);
@@ -40,6 +54,10 @@ public class WaypointCommandAdd extends WaypointCommand {
 		return true;
 	}
 	
+	/**
+	 * Re-adds the detailed waypoint to the list.
+	 * @return Boolean - Whether or not the operation was successful.
+	 */
 	@Override
 	public boolean redo() {
 		return execute();

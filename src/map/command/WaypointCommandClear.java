@@ -16,6 +16,11 @@ public class WaypointCommandClear extends WaypointCommand {
 	protected WaypointList waypointsBackup;
 	protected Context context;
 	
+	/**
+	 * Constructor
+	 * @param waypoints - List of current navigational waypoints.
+	 * @param context - Application context
+	 */
 	public WaypointCommandClear(WaypointList waypoints, Context context) {
 		super(waypoints, CommandType.CLEAR);
 		this.context = context;
@@ -27,6 +32,10 @@ public class WaypointCommandClear extends WaypointCommand {
 		}
 	}
 	
+	/**
+	 * Clears the waypoint list.
+	 * @return Boolean - Whether or not the command was successful.
+	 */
 	@Override
 	public boolean execute() {
 		//Event is labeled as coming from the rover to avoid sending
@@ -42,6 +51,10 @@ public class WaypointCommandClear extends WaypointCommand {
 		return true;
 	}
 	
+	/**
+	 * Restores the waypoint list to its previous state before being cleared.
+	 * @return Boolean - Whether or not the operation was successful.
+	 */
 	@Override
 	public boolean undo() {
 		
@@ -53,6 +66,10 @@ public class WaypointCommandClear extends WaypointCommand {
 		return true;
 	}
 	
+	/**
+	 * Re-clears the waypoint list.
+	 * @return Boolean - Whether or not the operation was successful.
+	 */
 	@Override
 	public boolean redo() {
 		return execute();
