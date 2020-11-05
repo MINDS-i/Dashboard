@@ -41,7 +41,7 @@ public class StateWidget extends NinePatchPanel {
 	private void initPanel() {
 //		Theme theme 		= context.theme;
 		Dimension spacer 	= new Dimension(0, 5);
-		Dimension labelSize = new Dimension(80, 25);
+		Dimension labelSize = new Dimension(140, 25);
 		
 		apmLabel 	= new JLabel("APM - Uninit");
 		driveLabel 	= new JLabel("DRIVE - Uninit");
@@ -100,7 +100,7 @@ public class StateWidget extends NinePatchPanel {
 	 * @param substate - The state variation to be set
 	 */
 	private void setAPMState(byte substate) {
-		System.err.println("StateWidget - Updating APM State");
+//		System.err.println("StateWidget - Updating APM State");
 		
 		switch(substate) {
 			case Serial.APM_STATE_INIT:
@@ -114,6 +114,7 @@ public class StateWidget extends NinePatchPanel {
 				break;
 			default:
 				apmLabel.setText("APM - Unknown State");
+				System.err.println("State value: " + substate);
 		}
 	}
 	
@@ -122,7 +123,7 @@ public class StateWidget extends NinePatchPanel {
 	 * @param substate - The state variation to be set
 	 */
 	private void setDriveState(byte substate) {
-		System.err.println("StateWidget - Updating Drive State");
+//		System.err.println("StateWidget - Updating Drive State");
 		
 		switch(substate) {
 			case Serial.DRIVE_STATE_STOP:
@@ -144,7 +145,7 @@ public class StateWidget extends NinePatchPanel {
 	 * @param substate - The state variation to be set
 	 */
 	private void setAutoState(byte substate) {
-		System.err.println("StateWidget - Updating Auto State");
+//		System.err.println("StateWidget - Updating Auto State");
 		
 		switch(substate) {
 			case Serial.AUTO_STATE_FULL:
@@ -171,7 +172,7 @@ public class StateWidget extends NinePatchPanel {
 		boolean caution  = ((substate & Serial.AUTO_STATE_FLAGS_CAUTION)  > 0 ) ? true : false;
 		boolean approach = ((substate & Serial.AUTO_STATE_FLAGS_APPROACH) > 0 ) ? true : false;
 		
-		System.out.println("StateWidget - Updating Flag State");
+//		System.out.println("StateWidget - Updating Flag State");
 		
 		if(caution && approach) {
 			flagLabel.setText("FLAG - Approach & Caution");

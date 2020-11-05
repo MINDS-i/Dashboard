@@ -42,19 +42,19 @@ public class Serial {
     public static final byte AUTO_FLAGS	  = 0x3;
     
     //APM state sub values
-    public static final byte APM_STATE_INIT 		= 0x0;
-    public static final byte APM_STATE_SELF_TEST 	= 0x1;
-    public static final byte APM_STATE_DRIVE 		= 0x2;
+    public static final byte APM_STATE_INIT 		= 0x1;
+    public static final byte APM_STATE_SELF_TEST 	= 0x2;
+    public static final byte APM_STATE_DRIVE 		= 0x3;
     
     //drive state sub values
-    public static final byte DRIVE_STATE_STOP 	= 0x0;
-    public static final byte DRIVE_STATE_AUTO 	= 0x1;
-    public static final byte DRIVE_STATE_RADIO 	= 0x2;
+    public static final byte DRIVE_STATE_STOP 		= 0x1;
+    public static final byte DRIVE_STATE_AUTO 		= 0x2;
+    public static final byte DRIVE_STATE_RADIO 		= 0x3;
     
     //auto state sub values
-    public static final byte AUTO_STATE_FULL 		= 0x0;
-    public static final byte AUTO_STATE_AVOID		= 0x1;
-    public static final byte AUTO_STATE_STALLED 	= 0x2;
+    public static final byte AUTO_STATE_FULL 		= 0x1;
+    public static final byte AUTO_STATE_AVOID		= 0x2;
+    public static final byte AUTO_STATE_STALLED 	= 0x3;
     
     //auto flags sub values
     public static final byte AUTO_STATE_FLAGS_NONE		= 0B00;
