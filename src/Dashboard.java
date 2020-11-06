@@ -205,6 +205,7 @@ public class Dashboard implements Runnable {
         dashPanel.add(
             AngleWidget.createDial(
                 context, Serial.HEADING, context.theme.roverTop));
+        
         if(context.getResource("widget_type", "Angles").equals("Horizon")){
             // Initialize the horizon widget
             JPanel horizon =
@@ -220,10 +221,12 @@ public class Dashboard implements Runnable {
                     }).setVisible(true);
                 }
             });
+            
             // Add to the panel
             dashPanel.add(horizon);
             dashPanel.add(RadioWidget.create(context, WIDGET_SIZE));
-        } else {
+        } 
+        else {
             dashPanel.add(
                 AngleWidget.createDial(
                     context, Serial.PITCH, context.theme.roverSide));

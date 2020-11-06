@@ -1,5 +1,6 @@
 package com.ui;
 
+import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -41,13 +42,15 @@ public class StateWidget extends NinePatchPanel {
 	private void initPanel() {
 //		Theme theme 		= context.theme;
 		Dimension spacer 	= new Dimension(0, 5);
-		Dimension labelSize = new Dimension(140, 25);
+		Dimension labelSize = new Dimension(90, 25);
 		
-		apmLabel 	= new JLabel("APM - Uninit");
-		driveLabel 	= new JLabel("DRIVE - Uninit");
-		autoLabel 	= new JLabel("AUTO - Uninit");
-		flagLabel 	= new JLabel("FLAGS - None");
+		apmLabel 	= new JLabel("APM - ??");
+		driveLabel 	= new JLabel("DRV - ??");
+		autoLabel 	= new JLabel("AUT - ??");
+		flagLabel 	= new JLabel("FLG - None");
 		
+		
+		ArrayList<JPanel> statePanels = new ArrayList<JPanel>();
 		JComponent[] formatList = new JComponent[] {
 			apmLabel, driveLabel, autoLabel, flagLabel	
 		};
@@ -55,19 +58,25 @@ public class StateWidget extends NinePatchPanel {
 		for(JComponent jc : formatList) {
 			jc.setAlignmentX(Component.CENTER_ALIGNMENT);
 			jc.setMaximumSize(labelSize);
+			
+			JPanel panel = new JPanel();
+			panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
+			panel.setPreferredSize(labelSize);
+			panel.setOpaque(false);
+			panel.add(jc);
+			
+			statePanels.add(panel);
+			
 		}
 		
 		this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 		this.setBorder(BorderFactory.createEmptyBorder(
 				BORDER_SIZE, BORDER_SIZE,BORDER_SIZE, BORDER_SIZE));
-		
-		this.add(apmLabel);
-		this.add(Box.createRigidArea(spacer));
-		this.add(driveLabel);
-		this.add(Box.createRigidArea(spacer));
-		this.add(autoLabel);
-		this.add(Box.createRigidArea(spacer));
-		this.add(flagLabel);
+
+		for(JPanel panel : statePanels) {
+			this.add(panel);
+			this.add(Box.createRigidArea(spacer));
+		}
 	}
 	
 	/**
@@ -104,16 +113,16 @@ public class StateWidget extends NinePatchPanel {
 		
 		switch(substate) {
 			case Serial.APM_STATE_INIT:
-				apmLabel.setText("APM - Initializing");
+				apmLabel.setText("APM - Init");
 				break;
 			case Serial.APM_STATE_SELF_TEST:
-				apmLabel.setText("APM - Performing Self Test");
+				apmLabel.setText("APM - Self Test");
 				break;
 			case Serial.APM_STATE_DRIVE:
 				apmLabel.setText("APM - Driving");
 				break;
 			default:
-				apmLabel.setText("APM - Unknown State");
+				apmLabel.setText("APM - Unknown");
 				System.err.println("State value: " + substate);
 		}
 	}
@@ -127,16 +136,16 @@ public class StateWidget extends NinePatchPanel {
 		
 		switch(substate) {
 			case Serial.DRIVE_STATE_STOP:
-				driveLabel.setText("DRIVE - Stopped");
+				driveLabel.setText("DRV - Stopped");
 				break;
 			case Serial.DRIVE_STATE_AUTO:
-				driveLabel.setText("DRIVE - Auto Mode");
+				driveLabel.setText("DRV - Auto");
 				break;
 			case Serial.DRIVE_STATE_RADIO:
-				driveLabel.setText("DRIVE - Radio Manual Mode");
+				driveLabel.setText("DRV - Manual");
 				break;
 			default:
-				driveLabel.setText("DRIVE - Unknown State");
+				driveLabel.setText("DRV - Unknown");
 		}
 	}
 	
@@ -149,16 +158,16 @@ public class StateWidget extends NinePatchPanel {
 		
 		switch(substate) {
 			case Serial.AUTO_STATE_FULL:
-				autoLabel.setText("AUTO - Full");
+				autoLabel.setText("AUT - Full");
 				break;
 			case Serial.AUTO_STATE_AVOID:
-				autoLabel.setText("AUTO - Avoid");
+				autoLabel.setText("AUT - Avoid");
 				break;
 			case Serial.AUTO_STATE_STALLED:
-				autoLabel.setText("AUTO - Stalled");
+				autoLabel.setText("AUT - Stalled");
 				break;
 			default:
-				autoLabel.setText("AUTO - Unknown State");
+				autoLabel.setText("AUT - Unknown State");
 		}
 	}
 	
@@ -175,19 +184,19 @@ public class StateWidget extends NinePatchPanel {
 //		System.out.println("StateWidget - Updating Flag State");
 		
 		if(caution && approach) {
-			flagLabel.setText("FLAG - Approach & Caution");
+			flagLabel.setText("FLG - App. & Caut.");
 			//Severity High. Approaching a clear obstable? 
 		}
 		else if(approach) {
-			flagLabel.setText("FLAG - Approach");
+			flagLabel.setText("FLG - Approach");
 			//Severity Medium. Approaching an obstacle, slowing down?
 		}
 		else if(caution) {
-			flagLabel.setText("FLAG - Caution");
+			flagLabel.setText("FLG - Caution");
 			//Severity Medium. Avoiding an obstacle? 
 		}
 		else {
-			flagLabel.setText("FLAG - None");
+			flagLabel.setText("FLG - None");
 			//Severity Low. No hazards detected?
 		}
 	}
