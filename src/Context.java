@@ -159,6 +159,10 @@ public class Context {
         saveProps();
     }
     
+    public String getCurrentLocale() {
+    	return (String) persist.get("subject");
+    }
+    
     public void setHomeProp(String lat, String lng) {
     	persist.setProperty("homeLat", lat);
     	persist.setProperty("homeLng", lng);

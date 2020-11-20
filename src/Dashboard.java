@@ -190,20 +190,30 @@ public class Dashboard implements Runnable {
     }
 
     private JPanel createRightPanel() {
+    	JPanel dashPanel = new JPanel();
+        dashPanel.setOpaque(false);
+        dashPanel.setLayout(new BoxLayout(dashPanel, BoxLayout.PAGE_AXIS));
+    	
+        //Add Telemetry Data Widget (Ground or Air)
         try {
-            dataWidget = TelemetryWidget.fromXML(context, "telemetryWidetSpec");
-        } catch(Exception e) {
+        	if(context.getCurrentLocale() == "ground") {
+        		dataWidget = TelemetryWidget.fromXML(context, "telemetryWidgetGnd");
+        	}
+        	else {
+        		dataWidget = TelemetryWidget.fromXML(context, "telemetryWidgetAir");	
+        	}
+        } 
+        catch(Exception e) {
             iolog.severe("Failed to load telemetry widget line spec "+e);
             e.printStackTrace();
         }
-
-        JPanel dashPanel = new JPanel();
-        dashPanel.setOpaque(false);
-        dashPanel.setLayout(new BoxLayout(dashPanel, BoxLayout.PAGE_AXIS));
-
         dashPanel.add(dataWidget);
-        dashPanel.add(
-            AngleWidget.createDial(
+        
+        //TODO - CP - Add State widget here
+        stateWidget = new StateWidget(context);
+        dashPanel.add(stateWidget);        
+        
+        dashPanel.add(AngleWidget.createDial(
                 context, Serial.HEADING, context.theme.roverTop));
         
         if(context.getResource("widget_type", "Angles").equals("Horizon")){
@@ -235,9 +245,6 @@ public class Dashboard implements Runnable {
                     context, Serial.ROLL, context.theme.roverFront));
         }
 
-        stateWidget = new StateWidget(context);
-        dashPanel.add(stateWidget);
-        
         return dashPanel;
     }
 

@@ -15,9 +15,12 @@ import com.ui.ninePatch.NinePatchPanel;
  * Description: Dashboard Widget used to display the current state of a connected unit as
  * described over serial communication.
  */
-public class StateWidget extends NinePatchPanel {
+public class StateWidget extends JPanel {
 	//Constants
-	protected static final int BORDER_SIZE = 25;
+	protected static final int BORDER_SIZE = 0;
+	//TODO - CP - Replace this with a settable line width for future xml integration
+	protected static final int LINE_WIDTH = 8;
+	
 	
 	private Context context;
 	private JFrame infoFrame;
@@ -37,15 +40,21 @@ public class StateWidget extends NinePatchPanel {
 	 * @param ctx - The application context
 	 */
 	public StateWidget(Context ctx) {
-		super(ctx.theme.panelPatch);
 		context = ctx;
 		initPanel();
 	}
 
 	/**
-	 * Construct and place the visual elements of the widget
+	 * Construct and place the visual layout elements of the widget. Sets
+	 * properties of the elements such as size and format restrictions, 
+	 * dimensional spacing, and border insets.
 	 */
 	private void initPanel() {
+		float fontSize = 16.0f;
+		Font font = context.theme.text.deriveFont(fontSize);
+		
+		
+		
 		Dimension spacer 	= new Dimension(0, 5);
 		Dimension labelSize = new Dimension(90, 25);
 		Dimension panelSize = new Dimension(90, 25);
@@ -55,10 +64,29 @@ public class StateWidget extends NinePatchPanel {
 				BORDER_SIZE, BORDER_SIZE,BORDER_SIZE, BORDER_SIZE));
 
 		//Configure state labels
-		apmLabel 	= new JLabel("APM - ??");
-		driveLabel 	= new JLabel("DRV - ??");
-		autoLabel 	= new JLabel("AUT - ??");
-		flagLabel 	= new JLabel("FLG - None");
+		apmLabel 	= new JLabel("Apm:--");
+		apmLabel.setFont(font);
+		apmLabel.setForeground(Color.decode("0xEA8300"));
+		apmLabel.setBackground(Color.decode("0xDFDFDF"));
+		apmLabel.setOpaque(true);
+		
+		driveLabel 	= new JLabel("Drv:--");
+		driveLabel.setFont(font);
+		driveLabel.setForeground(Color.decode("0xEA8300"));
+		driveLabel.setBackground(Color.decode("0xEEEEEE"));
+		driveLabel.setOpaque(true);
+		
+		autoLabel 	= new JLabel("Aut:--");
+		autoLabel.setFont(font);
+		autoLabel.setForeground(Color.decode("0xEA8300"));
+		autoLabel.setBackground(Color.decode("0xDFDFDF"));
+		autoLabel.setOpaque(true);
+		
+		flagLabel 	= new JLabel("Flg:None");
+		flagLabel.setFont(font);
+		flagLabel.setForeground(Color.decode("0xEA8300"));
+		flagLabel.setBackground(Color.decode("0xEEEEEE"));
+		flagLabel.setOpaque(true);
 		
 		JComponent[] labelList = new JComponent[] {
 			apmLabel, driveLabel, autoLabel, flagLabel	
@@ -110,7 +138,7 @@ public class StateWidget extends NinePatchPanel {
 	 * Updates the internal state of the widget using byte data received from
 	 * serial communications with a device.
 	 * @param state - The main state type being updated
-	 * @param substate - The main state variation to be updated to
+	 * @param substate - The sub state variation to be updated to
 	 */
 	public void update(byte state, byte substate) {
 		switch(state) {
@@ -133,114 +161,125 @@ public class StateWidget extends NinePatchPanel {
 	
 	/**
 	 * Sets the current APM state.
-	 * @param substate - The state variation to be set
+	 * @param substate - The sub state variation to be set
 	 */
 	private void setAPMState(byte substate) {
-//		System.err.println("StateWidget - Updating APM State");
+		int finalWidth;
+		String fmt;
+		String fmtStr = "Apm:%s";
 		
+		System.err.println("StateWidget - Updating APM State");
 		switch(substate) {
 			case Serial.APM_STATE_INIT:
-				apmLabel.setText("APM - Init");
-				apmPanel.setBackground(Color.white);
+				fmt = String.format(fmtStr, "Init");
+				finalWidth = Math.min(fmt.length(), LINE_WIDTH);
 				break;
 			case Serial.APM_STATE_SELF_TEST:
-				apmLabel.setText("APM - Self Test");
-				apmPanel.setBackground(Color.white);
+				
+				fmt = String.format(fmtStr, "Self Test");
+				finalWidth = Math.min(fmt.length(), LINE_WIDTH);
 				break;
 			case Serial.APM_STATE_DRIVE:
-				apmLabel.setText("APM - Driving");
-				apmPanel.setBackground(Color.green);
+				fmt = String.format(fmtStr, "Driving");
+				finalWidth = Math.min(fmt.length(), LINE_WIDTH);
 				break;
 			default:
-				apmLabel.setText("APM - Unknown");
-				apmPanel.setBackground(Color.red);
+				fmt = String.format(fmtStr, "Unknown");
+				finalWidth = Math.min(fmt.length(), LINE_WIDTH);
 		}
+		apmLabel.setText(fmt.substring(0, finalWidth));
 	}
 	
 	/**
 	 * Sets the current Drive state.
-	 * @param substate - The state variation to be set
+	 * @param substate - The sub state variation to be set
 	 */
 	private void setDriveState(byte substate) {
-//		System.err.println("StateWidget - Updating Drive State");
+		int finalWidth;
+		String fmt;
+		String fmtStr = "Drv:%s";
 		
+//		System.err.println("StateWidget - Updating Drive State");
 		switch(substate) {
 			case Serial.DRIVE_STATE_STOP:
-				driveLabel.setText("DRV - Stopped");
-				drivePanel.setBackground(Color.white);
+				fmt = String.format(fmtStr, "Stopped");
+				finalWidth = Math.min(fmt.length(), LINE_WIDTH);
 				break;
 			case Serial.DRIVE_STATE_AUTO:
-				driveLabel.setText("DRV - Auto");
-				drivePanel.setBackground(Color.green);
+				fmt = String.format(fmtStr, "Auto");
+				finalWidth = Math.min(fmt.length(), LINE_WIDTH);
 				break;
 			case Serial.DRIVE_STATE_RADIO:
-				driveLabel.setText("DRV - Manual");
-				drivePanel.setBackground(Color.green);
+				fmt = String.format(fmtStr, "Manual");
+				finalWidth = Math.min(fmt.length(), LINE_WIDTH);
 				break;
 			default:
-				driveLabel.setText("DRV - Unknown");
-				drivePanel.setBackground(Color.red);
+				fmt = String.format(fmtStr, "Unknown");
+				finalWidth = Math.min(fmt.length(), LINE_WIDTH);
 		}
+		driveLabel.setText(fmt.substring(0, finalWidth));
 	}
 	
 	/**
 	 * Sets the current Auto state.
-	 * @param substate - The state variation to be set
+	 * @param substate - The sub state variation to be set
 	 */
 	private void setAutoState(byte substate) {
-//		System.err.println("StateWidget - Updating Auto State");
+		int finalWidth;
+		String fmt;
+		String fmtStr = "Aut:%s";
 		
+//		System.err.println("StateWidget - Updating Auto State");
 		switch(substate) {
 			case Serial.AUTO_STATE_FULL:
-				autoLabel.setText("AUT - Full");
-				autoPanel.setBackground(Color.green);
+				fmt = String.format(fmtStr, "Full");
+				finalWidth = Math.min(fmt.length(), LINE_WIDTH);
 				break;
 			case Serial.AUTO_STATE_AVOID:
-				autoLabel.setText("AUT - Avoid");
-				autoPanel.setBackground(Color.yellow);
+				fmt = String.format(fmtStr, "Avoid");
+				finalWidth = Math.min(fmt.length(), LINE_WIDTH);
 				break;
 			case Serial.AUTO_STATE_STALLED:
-				autoLabel.setText("AUT - Stalled");
-				autoPanel.setBackground(Color.red);
+				fmt = String.format(fmtStr, "Stalled");
+				finalWidth = Math.min(fmt.length(), LINE_WIDTH);
 				break;
 			default:
-				autoLabel.setText("AUT - Unknown State");
-				autoPanel.setBackground(Color.red);
+				fmt = String.format(fmtStr, "Unknown");
+				finalWidth = Math.min(fmt.length(), LINE_WIDTH);
 		}
+		autoLabel.setText(fmt.substring(0, finalWidth));
 	}
-	
-	//TODO - CP - Update flag string AND set an icon indicating severity level
 	
 	/**
 	 * Sets the current state flag if any.
 	 * @param substate - The flag type to be set
 	 */
 	private void setFlagState(byte substate) {
+		int finalWidth;
+		String fmt;
+		String fmtStr = "Flg:%s";
+		
 		boolean caution  = ((substate & Serial.AUTO_STATE_FLAGS_CAUTION)  > 0 ) ? true : false;
 		boolean approach = ((substate & Serial.AUTO_STATE_FLAGS_APPROACH) > 0 ) ? true : false;
 		
 //		System.out.println("StateWidget - Updating Flag State");
-		
 		if(caution && approach) {
-			flagLabel.setText("FLG - App. & Caut.");
-			flagPanel.setBackground(Color.yellow);
-			//Severity High. Approaching a clear obstable? 
+			fmt = String.format(fmtStr, "App. & Caut.");
+			finalWidth = Math.min(fmt.length(), LINE_WIDTH);
 		}
 		else if(approach) {
-			flagLabel.setText("FLG - Approach");
-			flagPanel.setBackground(Color.yellow);
-			//Severity Medium. Approaching an obstacle, slowing down?
+			fmt = String.format(fmtStr, "Approach");
+			finalWidth = Math.min(fmt.length(), LINE_WIDTH);
 		}
 		else if(caution) {
-			flagLabel.setText("FLG - Caution");
-			flagPanel.setBackground(Color.yellow);
-			//Severity Medium. Avoiding an obstacle? 
+			fmt = String.format(fmtStr, "Caution");
+			finalWidth = Math.min(fmt.length(), LINE_WIDTH); 
 		}
 		else {
-			flagLabel.setText("FLG - None");
-			flagPanel.setBackground(Color.green);
-			//Severity Low. No hazards detected?
+			fmt = String.format(fmtStr, "None");
+			finalWidth = Math.min(fmt.length(), LINE_WIDTH);
 		}
+		flagLabel.setText(fmt.substring(0, finalWidth));
 	}
 	
 	/**
