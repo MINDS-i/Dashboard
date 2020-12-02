@@ -127,12 +127,13 @@ public class TelemetryDataWidget extends UIWidget {
 		
         JPanel panel = new JPanel();
         panel.setBorder(insets);
+        panel.setPreferredSize(new Dimension(100, (20 * items.size())));
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
         panel.setOpaque(false);
 
         Font font = ctx.theme.text.deriveFont(fontSize);
 
-        for(LineItem i : items){
+        for(LineItem i : items) {
             Line l = new Line(ctx, i.getFormatString());
             l.setFont(font);
             l.setForeground(textColor);

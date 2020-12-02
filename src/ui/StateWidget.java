@@ -17,9 +17,14 @@ import com.ui.ninePatch.NinePatchPanel;
  */
 public class StateWidget extends UIWidget {
 	//Constants
-	protected static final int BORDER_SIZE = 0;
-	//TODO - CP - Replace this with a settable line width for future xml integration
-	protected static final int LINE_WIDTH = 8;
+	protected static final int BORDER_SIZE 	= 0;
+	protected static final int LINE_WIDTH 	= 14;
+	protected static final float FONT_SIZE 	= 14.0f;
+	
+	//Color Defaults
+	protected static final Color DEF_FONT_COLOR	  = Color.decode("0xEA8300");
+	protected static final Color DEF_BACK_COLOR_A = Color.decode("0xDFDFDF");
+	protected static final Color DEF_BACK_COLOR_B = Color.decode("0xEEEEEE");
 	
 	private JFrame infoFrame;
 	
@@ -38,7 +43,6 @@ public class StateWidget extends UIWidget {
 	 * @param ctx - The application context
 	 */
 	public StateWidget(Context ctx) {
-//		context = ctx;
 		super(ctx);
 		initPanel();
 	}
@@ -49,12 +53,8 @@ public class StateWidget extends UIWidget {
 	 * dimensional spacing, and border insets.
 	 */
 	private void initPanel() {
-		float fontSize = 16.0f;
-		Font font = context.theme.text.deriveFont(fontSize);
-		
-		Dimension spacer 	= new Dimension(0, 5);
-		Dimension labelSize = new Dimension(90, 25);
-		Dimension panelSize = new Dimension(90, 25);
+		Font font = context.theme.text.deriveFont(FONT_SIZE);
+		Dimension labelSize = new Dimension(100, 20);
 		
 		this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 		this.setBorder(BorderFactory.createEmptyBorder(
@@ -63,26 +63,26 @@ public class StateWidget extends UIWidget {
 		//Configure state labels
 		apmLabel 	= new JLabel("Apm:--");
 		apmLabel.setFont(font);
-		apmLabel.setForeground(Color.decode("0xEA8300"));
-		apmLabel.setBackground(Color.decode("0xDFDFDF"));
+		apmLabel.setForeground(DEF_FONT_COLOR);
+		apmLabel.setBackground(DEF_BACK_COLOR_A);
 		apmLabel.setOpaque(true);
 		
 		driveLabel 	= new JLabel("Drv:--");
 		driveLabel.setFont(font);
-		driveLabel.setForeground(Color.decode("0xEA8300"));
-		driveLabel.setBackground(Color.decode("0xEEEEEE"));
+		driveLabel.setForeground(DEF_FONT_COLOR);
+		driveLabel.setBackground(DEF_BACK_COLOR_B);
 		driveLabel.setOpaque(true);
 		
 		autoLabel 	= new JLabel("Aut:--");
 		autoLabel.setFont(font);
-		autoLabel.setForeground(Color.decode("0xEA8300"));
-		autoLabel.setBackground(Color.decode("0xDFDFDF"));
+		autoLabel.setForeground(DEF_FONT_COLOR);
+		autoLabel.setBackground(DEF_BACK_COLOR_A);
 		autoLabel.setOpaque(true);
 		
 		flagLabel 	= new JLabel("Flg:None");
 		flagLabel.setFont(font);
-		flagLabel.setForeground(Color.decode("0xEA8300"));
-		flagLabel.setBackground(Color.decode("0xEEEEEE"));
+		flagLabel.setForeground(DEF_FONT_COLOR);
+		flagLabel.setBackground(DEF_BACK_COLOR_B);
 		flagLabel.setOpaque(true);
 		
 		JComponent[] labelList = new JComponent[] {
@@ -90,36 +90,39 @@ public class StateWidget extends UIWidget {
 		};
 		
 		for(JComponent jc : labelList) {
-			jc.setAlignmentX(Component.CENTER_ALIGNMENT);
 			jc.setMaximumSize(labelSize);
 		}
 		
 		//Configure state panels
 		ArrayList<JPanel> statePanels = new ArrayList<JPanel>();
 		apmPanel = new JPanel();
+		apmPanel.setBorder(insets);
 		apmPanel.setLayout(new BoxLayout(apmPanel, BoxLayout.LINE_AXIS));
-		apmPanel.setPreferredSize(panelSize);
+		apmPanel.setPreferredSize(labelSize);
 		apmPanel.setOpaque(true);
 		apmPanel.add(apmLabel);
 		statePanels.add(apmPanel);
 		
 		drivePanel = new JPanel();
+		drivePanel.setBorder(insets);
 		drivePanel.setLayout(new BoxLayout(drivePanel, BoxLayout.LINE_AXIS));
-		drivePanel.setPreferredSize(panelSize);
+		drivePanel.setPreferredSize(labelSize);
 		drivePanel.setOpaque(true);
 		drivePanel.add(driveLabel);
 		statePanels.add(drivePanel);
 		
 		autoPanel = new JPanel();
+		autoPanel.setBorder(insets);
 		autoPanel.setLayout(new BoxLayout(autoPanel, BoxLayout.LINE_AXIS));
-		autoPanel.setPreferredSize(panelSize);
+		autoPanel.setPreferredSize(labelSize);
 		autoPanel.setOpaque(true);
 		autoPanel.add(autoLabel);
 		statePanels.add(autoPanel);
 		
 		flagPanel = new JPanel();
+		flagPanel.setBorder(insets);
 		flagPanel.setLayout(new BoxLayout(flagPanel, BoxLayout.LINE_AXIS));
-		flagPanel.setPreferredSize(panelSize);
+		flagPanel.setPreferredSize(labelSize);
 		flagPanel.setOpaque(true);
 		flagPanel.add(flagLabel);
 		statePanels.add(flagPanel);
@@ -127,7 +130,7 @@ public class StateWidget extends UIWidget {
 		//Add panels to widget
 		for(JPanel panel : statePanels) {
 			this.add(panel);
-			this.add(Box.createRigidArea(spacer));
+//			this.add(Box.createRigidArea(spacer));
 		}
 	}
 	
@@ -280,7 +283,7 @@ public class StateWidget extends UIWidget {
 	}
 	
 	/**
-	 * Generates an information panel on click describing the warnings, errors,
+	 * Generates an information panel on click describing any warnings, errors,
 	 * and details of the current state.
 	 */
 	private MouseAdapter stateDetailsMouseAdapter = new MouseAdapter() {

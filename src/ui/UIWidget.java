@@ -29,16 +29,6 @@ public class UIWidget extends JPanel {
 		context = ctx;
 		insets =  new EmptyBorder(0, 0, 0, 0);
 	}
-	
-	/**
-	 * Class constructor that parses widget configuration 
-	 * via XML
-	 * @param ctx
-	 * @param resourceKey
-	 */
-	public UIWidget(Context ctx, String resourceKey) {
-		//TODO - CP - Flesh out XML routines to call from here.
-	} 
 
 	public void setInsets (int top, int left, int bottom, int right) {
 		insets = new EmptyBorder(top, left, bottom, right);

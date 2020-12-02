@@ -35,17 +35,19 @@ import jssc.SerialPortException;
 import jssc.SerialPortList;
 
 public class Dashboard implements Runnable {
+    //Standard References
+	private Context context;
+    
+	//Static Values
     private static final int START_WIDTH  = 1200; //default window width
     private static final int START_HEIGHT = 900; //default window height
     private static final int WIDGET_SIZE = 140;
-    private Context context;
 
-//    private TelemetryWidget dataWidget;
+    //UI Widgets
     private TelemetryDataWidget dataWidget;
-
-    //TODO - CP - Change this to private and make a getter that can be called
     public StateWidget stateWidget;
     
+    //Logging
     private final Logger seriallog = Logger.getLogger("d.serial");
     private final Logger iolog = Logger.getLogger("d.io");
     private final Logger rootlog = Logger.getLogger("d");
