@@ -15,14 +15,12 @@ import com.ui.ninePatch.NinePatchPanel;
  * Description: Dashboard Widget used to display the current state of a connected unit as
  * described over serial communication.
  */
-public class StateWidget extends JPanel {
+public class StateWidget extends UIWidget {
 	//Constants
 	protected static final int BORDER_SIZE = 0;
 	//TODO - CP - Replace this with a settable line width for future xml integration
 	protected static final int LINE_WIDTH = 8;
 	
-	
-	private Context context;
 	private JFrame infoFrame;
 	
 	//State readouts
@@ -40,7 +38,8 @@ public class StateWidget extends JPanel {
 	 * @param ctx - The application context
 	 */
 	public StateWidget(Context ctx) {
-		context = ctx;
+//		context = ctx;
+		super(ctx);
 		initPanel();
 	}
 

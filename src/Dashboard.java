@@ -40,7 +40,8 @@ public class Dashboard implements Runnable {
     private static final int WIDGET_SIZE = 140;
     private Context context;
 
-    private TelemetryWidget dataWidget;
+//    private TelemetryWidget dataWidget;
+    private TelemetryDataWidget dataWidget;
 
     //TODO - CP - Change this to private and make a getter that can be called
     public StateWidget stateWidget;
@@ -197,10 +198,10 @@ public class Dashboard implements Runnable {
         //Add Telemetry Data Widget (Ground or Air)
         try {
         	if(context.getCurrentLocale() == "ground") {
-        		dataWidget = TelemetryWidget.fromXML(context, "telemetryWidgetGnd");
+        		dataWidget = TelemetryDataWidget.fromXML(context, "telemetryWidgetGnd");
         	}
         	else {
-        		dataWidget = TelemetryWidget.fromXML(context, "telemetryWidgetAir");	
+        		dataWidget = TelemetryDataWidget.fromXML(context, "telemetryWidgetAir");
         	}
         } 
         catch(Exception e) {
@@ -209,7 +210,6 @@ public class Dashboard implements Runnable {
         }
         dashPanel.add(dataWidget);
         
-        //TODO - CP - Add State widget here
         stateWidget = new StateWidget(context);
         dashPanel.add(stateWidget);        
         
