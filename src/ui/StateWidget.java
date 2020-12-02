@@ -53,8 +53,6 @@ public class StateWidget extends JPanel {
 		float fontSize = 16.0f;
 		Font font = context.theme.text.deriveFont(fontSize);
 		
-		
-		
 		Dimension spacer 	= new Dimension(0, 5);
 		Dimension labelSize = new Dimension(90, 25);
 		Dimension panelSize = new Dimension(90, 25);

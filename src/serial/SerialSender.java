@@ -165,10 +165,8 @@ public class SerialSender {
     			msg = Message.stopDriving();
     			System.err.println("Sending stop driving message.");
     		}
-    		
     		sendMessage(msg);
     	}
-    	
     }
     
     public void sendSync() {
