@@ -12,9 +12,15 @@ import com.Context;
  * Date: 12-2-20
  * Description: Dashboard Widget child class used to display a units
  * ping sensor data.
- *
  */
 public class PingWidget extends UIWidget {
+	
+	//Constants
+	protected static final int NUM_SENSORS = 3;
+	protected static final int MIN_SENSOR_LEVEL = 0;
+	protected static final int MAX_SENSOR_LEVEL = 3;
+	
+	//Ping Sensor Indicators
 	protected Collection<BufferedImage> sensorA;
 	protected Collection<BufferedImage> sensorB;
 	protected Collection<BufferedImage> sensorC;
@@ -27,7 +33,33 @@ public class PingWidget extends UIWidget {
 	public PingWidget(Context ctx) {
 		super(ctx);
 		
+		
 	}
 	
+	public void update(int sensorIndex, int level) {
+		
+		//If not a valid sensor index, return
+		if(sensorIndex > (NUM_SENSORS - 1) || sensorIndex < 0) {
+			return;
+		}
+		
+		//If the level provided exceeds the allowed range then do nothing.
+		if(level > MAX_SENSOR_LEVEL || level < MIN_SENSOR_LEVEL) {
+			return;
+		}
+		
+		
+
+		//cases on level
+			// case 0
+				//show image at index 0, hide index 1, 2
+			// case 1
+				//Show image at index 0, 1, hide 2
+			// case 2
+				//show all
+			
+		
+		
+	}
 	
 }
