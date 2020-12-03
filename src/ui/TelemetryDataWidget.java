@@ -19,7 +19,7 @@ import java.awt.*;
  * 
  * @author Chris Park @ Infinetix Corp.
  * Date: 11-25-2020
- * Description: Widget Child class use for displaying Telemetry data.
+ * Description: Widget child class use for displaying Telemetry data.
  */
 public class TelemetryDataWidget extends UIWidget {
 	private int lineWidth;

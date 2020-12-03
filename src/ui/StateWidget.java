@@ -7,13 +7,12 @@ import javax.swing.*;
 
 import com.Context;
 import com.serial.Serial;
-import com.ui.ninePatch.NinePatchPanel;
 
 /**
  * @author Chris Park @ Infinetix Corp.
  * Date: 10-28-20
- * Description: Dashboard Widget used to display the current state of a connected unit as
- * described over serial communication.
+ * Description: Dashboard Widget child class used to display the 
+ * current state of a connected unit as described over serial communication.
  */
 public class StateWidget extends UIWidget {
 	//Constants

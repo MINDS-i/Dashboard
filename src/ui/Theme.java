@@ -29,6 +29,7 @@ public class Theme {
     public BufferedImage roverImage;
     public BufferedImage appIcon;
     public BufferedImage homeIcon;
+    public BufferedImage logoWatermark;
     public Font number;
     public Font text;
     public Font alertFont;
@@ -58,6 +59,7 @@ public class Theme {
             gaugeGlare       = ImageIO.read(new File(img+ctx.getResource("gauge_glare")));
             appIcon          = ImageIO.read(new File(img+ctx.getResource("app_icon")));
             homeIcon         = ImageIO.read(new File(img+ctx.getResource("home_icon")));
+            logoWatermark	 = ImageIO.read(new File(img+ctx.getResource("watermark")));
             buttonPatch      = NinePatch.loadFrom(Paths.get(np+ctx.getResource("button")));
             buttonHover      = NinePatch.loadFrom(Paths.get(np+ctx.getResource("button_hovered")));
             buttonPress      = NinePatch.loadFrom(Paths.get(np+ctx.getResource("button_pressed")));

@@ -132,6 +132,7 @@ public class Dashboard implements Runnable {
                 resetData();
             }
         };
+        
         SerialConnectPanel serialPanel = new SerialConnectPanel(connectActions);
         serialPanel.showBaudSelector(true);
         
@@ -247,6 +248,16 @@ public class Dashboard implements Runnable {
                     context, Serial.ROLL, context.theme.roverFront));
         }
 
+        //TODO - CP - Relocate this watermark to a corner position
+        //Watermark Image
+        BufferedImage watermark = context.theme.logoWatermark;
+        JLabel watermarkLabel = new JLabel(new ImageIcon(watermark));
+        watermarkLabel.setOpaque(false);
+        JPanel logo = new JPanel();
+        logo.setOpaque(false);
+        logo.add(watermarkLabel);
+        dashPanel.add(logo);
+        
         return dashPanel;
     }
 
