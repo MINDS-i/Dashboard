@@ -31,7 +31,8 @@ import javax.xml.stream.XMLStreamException;
 
 class WaypointPanel extends NinePatchPanel {
     protected static final int MOVE_STEP = 32;
-    protected static final int BDR_SIZE = 25;
+    protected static final int BDR_SIZE_TB = 20;
+    protected static final int BDR_SIZE_LR = 15;
     protected static final String NO_WAYPOINT_MSG = "N / A";
     private Context context;
     private MapPanel map;
@@ -71,7 +72,8 @@ class WaypointPanel extends NinePatchPanel {
         setOpaque(false);
         LayoutManager layout = new BoxLayout(this, BoxLayout.PAGE_AXIS);
         setLayout(layout);
-        setBorder(BorderFactory.createEmptyBorder(BDR_SIZE,BDR_SIZE,BDR_SIZE,BDR_SIZE));
+        setBorder(BorderFactory.createEmptyBorder(BDR_SIZE_TB, BDR_SIZE_LR,
+        		BDR_SIZE_TB, BDR_SIZE_LR));
         buildPanel();
         addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent me) {
