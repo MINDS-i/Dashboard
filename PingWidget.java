@@ -33,6 +33,22 @@ public class PingWidget extends UIWidget {
 	public PingWidget(Context ctx) {
 		super(ctx);
 		
+		sensorA.add(new BufferedImage(ctx.theme.pingGreen));
+		sensorA.add(new BufferedImage(ctx.theme.pingYellow));
+		sensorA.add(new BufferedImage(ctx.theme.pingRed));
+		
+		sensorB.add(new BufferedImage(ctx.theme.pingGreen));
+		sensorB.add(new BufferedImage(ctx.theme.pingYellow));
+		sensorB.add(new BufferedImage(ctx.theme.pingRed));
+		
+		sensorC.add(new BufferedImage(ctx.theme.pingGreen));
+		sensorC.add(new BufferedImage(ctx.theme.pingYellow));
+		sensorC.add(new BufferedImage(ctx.theme.pingRed));
+		
+		sensorD.add(new BufferedImage(ctx.theme.pingGreen));
+		sensorD.add(new BufferedImage(ctx.theme.pingYellow));
+		sensorD.add(new BufferedImage(ctx.theme.pingRed));
+		
 		
 	}
 	
@@ -57,8 +73,6 @@ public class PingWidget extends UIWidget {
 				//Show image at index 0, 1, hide 2
 			// case 2
 				//show all
-			
-		
 		
 	}
 	

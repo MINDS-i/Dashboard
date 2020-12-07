@@ -30,6 +30,9 @@ public class Theme {
     public BufferedImage appIcon;
     public BufferedImage homeIcon;
     public BufferedImage logoWatermark;
+    public BufferedImage pingRed;
+    public BufferedImage pingYellow;
+    public BufferedImage pingGreen;
     public Font number;
     public Font text;
     public Font alertFont;
@@ -60,6 +63,9 @@ public class Theme {
             appIcon          = ImageIO.read(new File(img+ctx.getResource("app_icon")));
             homeIcon         = ImageIO.read(new File(img+ctx.getResource("home_icon")));
             logoWatermark	 = ImageIO.read(new File(img+ctx.getResource("watermark")));
+            pingRed			 = ImageIO.read(new File(img+ctx.getResource("ping_red")));
+            pingYellow		 = ImageIO.read(new File(img+ctx.getResource("ping_yellow")));
+            pingGreen		 = ImageIO.read(new File(img+ctx.getResource("ping_green")));
             buttonPatch      = NinePatch.loadFrom(Paths.get(np+ctx.getResource("button")));
             buttonHover      = NinePatch.loadFrom(Paths.get(np+ctx.getResource("button_hovered")));
             buttonPress      = NinePatch.loadFrom(Paths.get(np+ctx.getResource("button_pressed")));
