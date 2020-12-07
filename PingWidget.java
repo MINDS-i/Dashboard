@@ -66,7 +66,7 @@ public class PingWidget extends UIWidget {
 		
 		
 
-		//cases on level
+		//cases (level)
 			// case 0
 				//show image at index 0, hide index 1, 2
 			// case 1
