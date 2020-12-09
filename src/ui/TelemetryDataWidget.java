@@ -16,10 +16,10 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 
+ * Adapted from source originally written by Brett Menzies
  * @author Chris Park @ Infinetix Corp.
  * Date: 11-25-2020
- * Description: Widget child class use for displaying Telemetry data.
+ * Description: Widget child class used for displaying Telemetry data.
  */
 public class TelemetryDataWidget extends UIWidget {
 	private int lineWidth;

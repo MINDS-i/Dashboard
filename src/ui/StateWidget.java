@@ -56,9 +56,11 @@ public class StateWidget extends UIWidget {
 		Dimension labelSize = new Dimension(100, 20);
 		
 		this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-		this.setBorder(BorderFactory.createEmptyBorder(
-				BORDER_SIZE, BORDER_SIZE,BORDER_SIZE, BORDER_SIZE));
+//		this.setBorder(BorderFactory.createEmptyBorder(
+//				BORDER_SIZE, BORDER_SIZE,BORDER_SIZE, BORDER_SIZE));
 
+//		this.setBorder(BorderFactory.createLineBorder(Color.black));
+		
 		//Configure state labels
 		apmLabel 	= new JLabel("Apm:--");
 		apmLabel.setFont(font);

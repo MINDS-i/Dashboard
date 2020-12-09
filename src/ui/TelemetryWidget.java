@@ -18,7 +18,7 @@ import java.text.ParseException;
 
 //TODO - CP - DEPRECATED - This class has been ported to the UIWidget Heirarchy, and is no longer
 //used. Once any necessary information that remains has been gleaned out it should
-//be removed
+//be removed. See the TelemetryDataWidget class instead.
 
 public class TelemetryWidget extends JPanel{
     // The top,left,bottom,right border widths of the nine patch image rendered
