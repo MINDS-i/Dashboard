@@ -16,9 +16,7 @@ import com.serial.Serial;
  */
 public class StateWidget extends UIWidget {
 	//Constants
-	protected static final int BORDER_SIZE 	= 0;
 	protected static final int LINE_WIDTH 	= 14;
-	protected static final float FONT_SIZE 	= 14.0f;
 	
 	//Color Defaults
 	protected static final Color DEF_FONT_COLOR	  = Color.decode("0xEA8300");
@@ -42,7 +40,7 @@ public class StateWidget extends UIWidget {
 	 * @param ctx - The application context
 	 */
 	public StateWidget(Context ctx) {
-		super(ctx);
+		super(ctx, "States");
 		initPanel();
 	}
 
@@ -55,10 +53,6 @@ public class StateWidget extends UIWidget {
 		Font font = context.theme.text.deriveFont(FONT_SIZE);
 		Dimension labelSize = new Dimension(100, 20);
 		
-		this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-//		this.setBorder(BorderFactory.createEmptyBorder(
-//				BORDER_SIZE, BORDER_SIZE,BORDER_SIZE, BORDER_SIZE));
-
 //		this.setBorder(BorderFactory.createLineBorder(Color.black));
 		
 		//Configure state labels
@@ -131,7 +125,6 @@ public class StateWidget extends UIWidget {
 		//Add panels to widget
 		for(JPanel panel : statePanels) {
 			this.add(panel);
-//			this.add(Box.createRigidArea(spacer));
 		}
 	}
 	

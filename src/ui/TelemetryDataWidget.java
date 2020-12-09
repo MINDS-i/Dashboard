@@ -22,6 +22,8 @@ import java.awt.*;
  * Description: Widget child class used for displaying Telemetry data.
  */
 public class TelemetryDataWidget extends UIWidget {
+	protected JPanel panel;
+	
 	private int lineWidth;
 	private Collection<Line> lines = new ArrayList<Line>();
 	
@@ -121,13 +123,12 @@ public class TelemetryDataWidget extends UIWidget {
 	 */
 	public TelemetryDataWidget(Context ctx, int lineWidth, float fontSize,
 			Color textColor, Collection<LineItem> items) {
-		super(ctx);
-		
+		super(ctx, "Telemetry");
 		this.lineWidth = lineWidth;
 		
-        JPanel panel = new JPanel();
+        panel = new JPanel();
         panel.setBorder(insets);
-        panel.setPreferredSize(new Dimension(100, (20 * items.size())));
+        panel.setPreferredSize(new Dimension(80, (20 * items.size())));
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
         panel.setOpaque(false);
 
