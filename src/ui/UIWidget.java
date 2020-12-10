@@ -2,14 +2,8 @@ package com.ui;
 
 import com.Context;
 
-import java.io.Reader;
-import java.io.FileReader;
-
 import javax.swing.*;
 import javax.swing.border.*;
-
-import javax.xml.stream.*;
-import java.text.ParseException;
 
 import java.awt.*;
 
@@ -22,11 +16,17 @@ import java.awt.*;
  */
 public class UIWidget extends JPanel {
 	//Constants
-	protected static final float FONT_SIZE 	= 14.0f;
+	protected static final float 	FONT_SIZE 	= 14.0f;
+	protected static final int 		BORDER_TOP = 0;
+	protected static final int 		BORDER_BOT = 0;
+	protected static final int 		BORDER_LFT = 0;
+	protected static final int 		BORDER_RHT = 0;
 	
+	//Standard Variables
 	protected Context context;
 	protected Border insets;
 	
+	//Title Panel and Label
 	protected JPanel titlePanel;
 	protected JLabel titleLabel;
 	
@@ -38,12 +38,13 @@ public class UIWidget extends JPanel {
 	 */
 	public UIWidget(Context ctx, String title) {
 		context = ctx;
-		insets =  new EmptyBorder(0, 0, 0, 0);
+		//Param order: Top, Left, Bottom, Right
+		insets =  new EmptyBorder(BORDER_TOP, BORDER_LFT, BORDER_BOT, BORDER_RHT);
 		this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 		this.setOpaque(false);
 		
 		Font font = context.theme.text.deriveFont(FONT_SIZE);
-		Dimension labelSize= new Dimension(100, 25);
+		Dimension labelSize= new Dimension(115, 25);
 		
 		titlePanel = new JPanel();
 		titlePanel.setOpaque(true);
@@ -59,11 +60,22 @@ public class UIWidget extends JPanel {
 		add(titlePanel);
 	}
 
+	/**
+	 * Updates the padding insets for the widget, overriding the default.
+	 * @param top
+	 * @param left
+	 * @param bottom
+	 * @param right
+	 */
 	public void setInsets (int top, int left, int bottom, int right) {
 		insets = new EmptyBorder(top, left, bottom, right);
 		this.setBorder(insets);
 	}	
 	
+	/**
+	 * Updates the widget title, overriding the default.
+	 * @param title - The string to update the title to.
+	 */
 	public void updateTitle(String title) {
 		titleLabel.setText(title);
 	}

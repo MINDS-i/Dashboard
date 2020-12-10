@@ -20,8 +20,11 @@ import javax.swing.*;
  */
 public class WidgetPanel extends NinePatchPanel {
 	//Constants
-	protected static final int BDR_SIZE_TB = 20;
-    protected static final int BDR_SIZE_LR = 10;
+    protected static final int BORDER_TOP = 18;
+    protected static final int BORDER_BOT = 18;
+    protected static final int BORDER_LFT = 12;
+    protected static final int BORDER_RHT = 12;
+    
 	
 	protected Context context;
 	protected LinkedList<UIWidget> widgets;
@@ -38,8 +41,8 @@ public class WidgetPanel extends NinePatchPanel {
 		setOpaque(false);
 		LayoutManager layout = new BoxLayout(this, BoxLayout.PAGE_AXIS);
 		setLayout(layout);
-		setBorder(BorderFactory.createEmptyBorder(BDR_SIZE_TB, BDR_SIZE_LR,
-        		BDR_SIZE_TB, BDR_SIZE_LR));
+		setBorder(BorderFactory.createEmptyBorder(BORDER_TOP, BORDER_LFT,
+        		BORDER_BOT, BORDER_RHT));
 	}
 	
 	/**
