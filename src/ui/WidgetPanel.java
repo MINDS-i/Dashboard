@@ -1,6 +1,5 @@
 package com.ui;
 
-
 import java.util.*;
 
 import com.Context;
@@ -25,7 +24,6 @@ public class WidgetPanel extends NinePatchPanel {
     protected static final int BORDER_LFT = 12;
     protected static final int BORDER_RHT = 12;
     
-	
 	protected Context context;
 	protected LinkedList<UIWidget> widgets;
     

@@ -12,6 +12,7 @@ import com.telemetry.*;
 import com.ui.*;
 import com.ui.ArtificialHorizon.DataAxis;
 import com.ui.ninePatch.*;
+import com.ui.PingWidget;
 import java.awt.*;
 import java.awt.Dimension;
 import java.awt.event.*;
@@ -51,6 +52,7 @@ public class Dashboard implements Runnable {
     //UI Widgets
     private TelemetryDataWidget dataWidget;
     public StateWidget stateWidget;
+    public PingWidget pingWidget;
     
     //Logging
     private final Logger seriallog = Logger.getLogger("d.serial");
@@ -211,7 +213,8 @@ public class Dashboard implements Runnable {
     	
     	//Telemetry Data Widget
     	try {
-    		widgetPanel.addWidget(createTelemetryWidget());
+    		dataWidget = createTelemetryWidget();
+    		widgetPanel.addWidget(dataWidget);
     	}
     	catch(Exception e) {
             iolog.severe("Failed to load telemetry widget line spec " + e);
@@ -219,7 +222,8 @@ public class Dashboard implements Runnable {
     	}
     	
     	//State Widget
-        widgetPanel.addWidget(new StateWidget(context));   
+    	stateWidget = new StateWidget(context);
+    	widgetPanel.addWidget(stateWidget);
         outerPanel.add(widgetPanel);
         
         //Round Widgets

@@ -101,20 +101,41 @@ public class SerialParser implements SerialPortEventListener {
             else return -1;
         }
         public void handle(byte[] msg) {
-            int subtype = Serial.getSubtype(msg[0]);
+        	int subtype = Serial.getSubtype(msg[0]);
             int index   = msg[1];
-            int tmpdata = (	((msg[2]&0xff)<<24)|
-                            ((msg[3]&0xff)<<16)|
-                            ((msg[4]&0xff)<< 8)|
-                            ((msg[5]&0xff)    ) );
-            float data  = Float.intBitsToFloat(tmpdata);
+            
+            int tempdata;
+            float data;
+            
             switch(subtype) {
                 case Serial.TELEMETRY_DATA:
+                	tempdata = ( ((msg[2]&0xff)<<24)|
+                				 ((msg[3]&0xff)<<16)|
+                				 ((msg[4]&0xff)<< 8)|
+                				 ((msg[5]&0xff)) );
+                	data  = Float.intBitsToFloat(tempdata);
                     context.setTelemetry(index, data);
                     break;
                 case Serial.SETTING_DATA:
+                	tempdata = ( ((msg[2]&0xff)<<24)|
+            					 ((msg[3]&0xff)<<16)|
+            					 ((msg[4]&0xff)<< 8)|
+            					 ((msg[5]&0xff)) );
+                	data  = Float.intBitsToFloat(tempdata);
                     context.setSettingQuiet(index, data);
                     break;
+                case Serial.SENSOR_DATA:
+                	byte[] sensorData = new byte[2];
+                	int sensorVal = 0;
+                	
+                	//[0]MSB [1]LSB
+                	sensorData[0] =  (byte) (msg[2] & 0xff);
+                	sensorData[1] =  (byte) (msg[3] & 0xff);
+                	for( byte val : sensorData) {
+                		sensorVal = (sensorVal << 8) | val;
+                	}
+                	context.dash.pingWidget.update(index, sensorVal);
+                	break;
             }
         }
     }

@@ -129,7 +129,6 @@ public class TelemetryDataWidget extends UIWidget {
         panel = new JPanel();
         panel.setBorder(insets);
         panel.setPreferredSize(new Dimension(115, (25 * items.size())));
-//        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
         panel.setOpaque(false);
 
         Font font = ctx.theme.text.deriveFont(fontSize);
@@ -149,7 +148,6 @@ public class TelemetryDataWidget extends UIWidget {
         }
 
         this.setOpaque(false);
-//        this.setBackground(Color.black);
         this.add(panel);
 	}
 	

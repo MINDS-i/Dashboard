@@ -15,6 +15,10 @@ public class Serial {
     //data type
     public static final int TELEMETRY_DATA = 0x0;
     public static final int SETTING_DATA   = 0x1;
+    public static final int SENSOR_DATA	   = 0x2;
+    
+    //Sensor Types
+    public static final int OBJDETECT_SONIC= 0x0;
     
     //word type
     public static final int CONFIRMATION   = 0x0;

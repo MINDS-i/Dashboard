@@ -254,6 +254,7 @@ public class Context {
     public void setSettingQuiet(int index, float value) {
         settingList.updateSettingVal(index, value);
     }
+    
     public void setTelemetry(int id, float value) {
         telemetry.updateTelemetry(id, (double)value);
     }

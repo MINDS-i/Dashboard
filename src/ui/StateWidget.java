@@ -53,8 +53,6 @@ public class StateWidget extends UIWidget {
 		Font font = context.theme.text.deriveFont(FONT_SIZE);
 		Dimension labelSize = new Dimension(100, 20);
 		
-//		this.setBorder(BorderFactory.createLineBorder(Color.black));
-		
 		//Configure state labels
 		apmLabel 	= new JLabel("Apm:--");
 		apmLabel.setFont(font);
