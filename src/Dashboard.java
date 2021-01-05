@@ -224,6 +224,12 @@ public class Dashboard implements Runnable {
     	//State Widget
     	stateWidget = new StateWidget(context);
     	widgetPanel.addWidget(stateWidget);
+        
+        
+        //Ping Widget
+        pingWidget = new PingWidget(context);
+        widgetPanel.add(pingWidget);
+        
         outerPanel.add(widgetPanel);
         
         //Round Widgets

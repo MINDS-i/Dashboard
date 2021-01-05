@@ -27,6 +27,14 @@ public class PingWidget extends UIWidget {
 	//Sensor Values
 	protected int[] curSensorVals;
 	
+	//Sensor Image Panel
+	protected JPanel sensorOuterPanel;
+	protected JPanel sensorPanelA;
+	protected JPanel sensorPanelB;
+	protected JPanel sensorPanelC;
+	protected JPanel sensorPanelD;
+	protected JPanel sensorPanelE;
+	
 	/**
 	 * Class Constructor
 	 * @param ctx - The application context
@@ -46,6 +54,60 @@ public class PingWidget extends UIWidget {
 			temp.add(ctx.theme.pingGreen);
 			sensors.put(i, temp);
 		}
+		
+		sensorOuterPanel = new JPanel();
+		sensorOuterPanel.setLayout(new GridBagLayout());
+		
+		GridBagConstraints constraints = new GridBagConstraints();
+		constraints.insets = new Insets(2, 2, 2, 2);
+		
+		sensorPanelA = new JPanel();
+		sensorPanelA.setLayout(new BoxLayout(sensorPanelA, BoxLayout.Y_AXIS));		
+		sensorPanelA.add(new JLabel(new ImageIcon(sensors.get(0).get(0))));
+		sensorPanelA.add(new JLabel(new ImageIcon(sensors.get(0).get(1))));
+		sensorPanelA.add(new JLabel(new ImageIcon(sensors.get(0).get(2))));
+		constraints.gridx = 0;
+		constraints.gridy = 0;
+		sensorOuterPanel.add(sensorPanelA, constraints);
+		
+		sensorPanelB = new JPanel();
+		sensorPanelB.setLayout(new BoxLayout(sensorPanelB, BoxLayout.Y_AXIS));		
+		sensorPanelB.add(new JLabel(new ImageIcon(sensors.get(1).get(0))));
+		sensorPanelB.add(new JLabel(new ImageIcon(sensors.get(1).get(1))));
+		sensorPanelB.add(new JLabel(new ImageIcon(sensors.get(1).get(2))));
+		constraints.gridx = 1;
+		constraints.gridy = 0;
+		sensorOuterPanel.add(sensorPanelB, constraints);
+		
+		sensorPanelC = new JPanel();
+		sensorPanelC.setLayout(new BoxLayout(sensorPanelC, BoxLayout.Y_AXIS));		
+		sensorPanelC.add(new JLabel(new ImageIcon(sensors.get(2).get(0))));
+		sensorPanelC.add(new JLabel(new ImageIcon(sensors.get(2).get(1))));
+		sensorPanelC.add(new JLabel(new ImageIcon(sensors.get(2).get(2))));
+		constraints.gridx = 2;
+		constraints.gridy = 0;
+		sensorOuterPanel.add(sensorPanelC, constraints);
+		
+		sensorPanelD = new JPanel();
+		sensorPanelD.setLayout(new BoxLayout(sensorPanelD, BoxLayout.Y_AXIS));		
+		sensorPanelD.add(new JLabel(new ImageIcon(sensors.get(3).get(0))));
+		sensorPanelD.add(new JLabel(new ImageIcon(sensors.get(3).get(1))));
+		sensorPanelD.add(new JLabel(new ImageIcon(sensors.get(3).get(2))));
+		constraints.gridx = 3;
+		constraints.gridy = 0;
+		sensorOuterPanel.add(sensorPanelD, constraints);
+		
+		sensorPanelE = new JPanel();
+		sensorPanelE.setLayout(new BoxLayout(sensorPanelE, BoxLayout.Y_AXIS));		
+		sensorPanelE.add(new JLabel(new ImageIcon(sensors.get(4).get(0))));
+		sensorPanelE.add(new JLabel(new ImageIcon(sensors.get(4).get(1))));
+		sensorPanelE.add(new JLabel(new ImageIcon(sensors.get(4).get(2))));
+		constraints.gridx = 4;
+		constraints.gridy = 0;
+		sensorOuterPanel.add(sensorPanelE, constraints);
+
+		
+		this.add(sensorOuterPanel);
 	}
 	
 	/**
@@ -71,7 +133,27 @@ public class PingWidget extends UIWidget {
 	 */
 	protected void updateSensorBar(int index) {
 		
-		//
+		//method A
+		//hide all
+		//if < warn /2 and greater than 0
+			//show green
+		
+		//if >= warn level
+			//show yellow
+		
+		//if >= block level
+			//show red
+		
+		
+		//method B
+		//if less than warn level / 2 hide green
+		//else show green
+		
+		//if >= warn level show yellow
+		//else hide yellow
+		
+		//if >= block, show red
+		//else hide red
 		
 	}
 	
