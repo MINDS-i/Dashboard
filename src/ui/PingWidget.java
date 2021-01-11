@@ -17,24 +17,18 @@ public class PingWidget extends UIWidget {
 	
 	//Constants
 	protected static final int NUM_SENSORS 	  = 5;
-	protected static final int[] WARN_LEVELS  = {1000, 1600, 3000, 1600, 1000};
-	protected static final int[] BLOCK_LEVELS = {1500, 2400, 4500, 2400, 1500};
+	protected static final int[] WARN_LEVELS  = {1500, 2400, 4500, 2400, 1500};
+	protected static final int[] BLOCK_LEVELS = {1000, 1600, 3000, 1600, 1000};
 	
-	//Ping Sensor Indicators
-	protected Hashtable<Integer, ArrayList<JLabel>> sensors;
-	
+	//Ping Sensor Meters
+	protected HashMap<Integer, ArrayList<JPanel>> sensorMeters;
 	
 	//Sensor Values
 	protected int[] curSensorVals;
 	
 	//Sensor Image Panel
 	protected JPanel sensorOuterPanel;
-	protected JPanel sensorPanelA;
-	protected JPanel sensorPanelB;
-	protected JPanel sensorPanelC;
-	protected JPanel sensorPanelD;
-	protected JPanel sensorPanelE;
-	
+
 	/**
 	 * Class Constructor
 	 * Generates the initial layout for the widget, loading graphics and placing
@@ -44,83 +38,81 @@ public class PingWidget extends UIWidget {
 	public PingWidget(Context ctx) {
 		super(ctx, "U-Sound Ping");
 		
-		ArrayList<JLabel> temp;
-		Component widthSpacer = Box.createHorizontalStrut(20);
-		
-		sensors = new Hashtable<Integer, ArrayList<JLabel>>();
 		curSensorVals = new int[5];
-
-		for(int i = 0; i < NUM_SENSORS; i++) {
-			temp = new ArrayList<JLabel>();
-			temp.add(new JLabel(new ImageIcon(ctx.theme.pingRed)));
-			temp.add(new JLabel(new ImageIcon(ctx.theme.pingYellow)));
-			temp.add(new JLabel(new ImageIcon(ctx.theme.pingGreen)));
-			sensors.put(i, temp);
-		}
 		
 		sensorOuterPanel = new JPanel();
+		sensorOuterPanel.setMinimumSize(new Dimension(100, 60));
 		sensorOuterPanel.setLayout(new GridBagLayout());
 		
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.insets = new Insets(2, 0, 2, 0);
 		constraints.anchor = GridBagConstraints.CENTER;
-		
-		
-		sensorPanelA = new JPanel();
-		sensorPanelA.setLayout(new BoxLayout(sensorPanelA, BoxLayout.Y_AXIS));
-		sensorPanelA.add(widthSpacer);
-		sensorPanelA.add(sensors.get(0).get(0));
-		sensorPanelA.add(sensors.get(0).get(1));
-		sensorPanelA.add(sensors.get(0).get(2));
+
+		sensorMeters = new HashMap<Integer, ArrayList<JPanel>>();		
+		for(int i = 0; i < NUM_SENSORS; i++) {
+			sensorMeters.put(i, buildMeterSet());
+		}
+
+		//Zero out meters on init
 		constraints.gridx = 0;
 		constraints.gridy = 0;
-		sensorOuterPanel.add(sensorPanelA, constraints);
-
-		sensorPanelB = new JPanel();
-		sensorPanelB.setLayout(new BoxLayout(sensorPanelB, BoxLayout.Y_AXIS));
-		sensorPanelB.add(widthSpacer);
-		sensorPanelB.add(sensors.get(1).get(0));
-		sensorPanelB.add(sensors.get(1).get(1));
-		sensorPanelB.add(sensors.get(1).get(2));
+		sensorOuterPanel.add(sensorMeters.get(0).get(0), constraints);
 		constraints.gridx = 1;
-		constraints.gridy = 0;
-		sensorOuterPanel.add(sensorPanelB, constraints);
-		
-		sensorPanelC = new JPanel();
-		sensorPanelC.setLayout(new BoxLayout(sensorPanelC, BoxLayout.Y_AXIS));
-		sensorPanelC.add(widthSpacer);
-		sensorPanelC.add(sensors.get(2).get(0));
-		sensorPanelC.add(sensors.get(2).get(1));
-		sensorPanelC.add(sensors.get(2).get(2));
+		sensorOuterPanel.add(sensorMeters.get(1).get(0), constraints);
 		constraints.gridx = 2;
-		constraints.gridy = 0;
-		sensorOuterPanel.add(sensorPanelC, constraints);
-
-		sensorPanelD = new JPanel();
-		sensorPanelD.setLayout(new BoxLayout(sensorPanelD, BoxLayout.Y_AXIS));
-		sensorPanelD.add(widthSpacer);
-		sensorPanelD.add(sensors.get(3).get(0));
-		sensorPanelD.add(sensors.get(3).get(1));
-		sensorPanelD.add(sensors.get(3).get(2));
+		sensorOuterPanel.add(sensorMeters.get(2).get(0), constraints);
 		constraints.gridx = 3;
-		constraints.gridy = 0;
-		sensorOuterPanel.add(sensorPanelD, constraints);
-
-		sensorPanelE = new JPanel();
-		sensorPanelE.setLayout(new BoxLayout(sensorPanelE, BoxLayout.Y_AXIS));
-		sensorPanelE.add(widthSpacer);
-		sensorPanelE.add(sensors.get(4).get(0));
-		sensorPanelE.add(sensors.get(4).get(1));
-		sensorPanelE.add(sensors.get(4).get(2));
+		sensorOuterPanel.add(sensorMeters.get(3).get(0), constraints);
 		constraints.gridx = 4;
-		constraints.gridy = 0;
-		sensorOuterPanel.add(sensorPanelE, constraints);
+		sensorOuterPanel.add(sensorMeters.get(4).get(0), constraints);
 
 		this.add(sensorOuterPanel);
+	}
+	
+	/**
+	 * Constructs a complete set of meter graphics to be used for a 
+	 * ping sensor.
+	 * @return - The JPanel meter set
+	 */
+	public ArrayList<JPanel> buildMeterSet() {
+		ArrayList<JPanel> meterSet;
+		JPanel panel;
 		
+		meterSet = new ArrayList<JPanel>();
 		
-		//Test show/hide
-//		updateSensorBar(3);
+		//Level: None
+		panel = new JPanel();
+		panel.add(new JLabel(new ImageIcon(context.theme.pingSpacer)));
+		panel.add(new JLabel(new ImageIcon(context.theme.pingSpacer)));
+		panel.add(new JLabel(new ImageIcon(context.theme.pingSpacer)));
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		meterSet.add(panel);
+		
+		//Level: Low
+		panel = new JPanel();
+		panel.add(new JLabel(new ImageIcon(context.theme.pingSpacer)));
+		panel.add(new JLabel(new ImageIcon(context.theme.pingSpacer)));
+		panel.add(new JLabel(new ImageIcon(context.theme.pingGreen)));
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		meterSet.add(panel);
+		
+		//Level: Medium
+		panel = new JPanel();
+		panel.add(new JLabel(new ImageIcon(context.theme.pingSpacer)));
+		panel.add(new JLabel(new ImageIcon(context.theme.pingYellow)));
+		panel.add(new JLabel(new ImageIcon(context.theme.pingGreen)));
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		meterSet.add(panel);
+		
+		//Level: High
+		panel = new JPanel();
+		panel.add(new JLabel(new ImageIcon(context.theme.pingRed)));
+		panel.add(new JLabel(new ImageIcon(context.theme.pingYellow)));
+		panel.add(new JLabel(new ImageIcon(context.theme.pingGreen)));
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		meterSet.add(panel);
+		
+		return meterSet;
 	}
 	
 	/**
@@ -132,52 +124,102 @@ public class PingWidget extends UIWidget {
 
 		//Return on out of bounds
 		if(index > (NUM_SENSORS - 1) || index < 0) {
+			System.err.println("Sensor index out of bounds");
 			return;
 		}
 
+//		System.err.println("Sensor Data - [Index: " + index + ", Data: " + data + "]");
+		
 		curSensorVals[index] = data;
-		updateSensorBar(index);
+		updateMeters();
 	}
 	
 	/**
-	 * Updates the visual display for a sensor based on the current
-	 * value.
-	 * @param index - The index of the sensor
+	 * Updates the visual display for all sensor meters based on the 
+	 * currently detected values as they compare against pre calibrated
+	 * warning levels.
+	 * @param index = The index of the sensor to be updated
 	 */
-	protected void updateSensorBar(int index) {
-	
-		if(index >= NUM_SENSORS) {
-			System.err.println("Error - Invalid PingSensor range access attempt.");
-			return;
+	protected void updateMeters() {
+		GridBagConstraints constraints = new GridBagConstraints();
+		
+		sensorOuterPanel.removeAll();
+		
+		constraints.gridy = 0;
+		constraints.gridx = 0;
+		  //Warning High
+		if(curSensorVals[0] <= 1500) {
+			sensorOuterPanel.add(sensorMeters.get(0).get(3), constraints);			
+		} //Warning Medium
+		else if (curSensorVals[0] <= 3000) { 
+			sensorOuterPanel.add(sensorMeters.get(0).get(2), constraints);
+		} //Warning Low
+		else if (curSensorVals[0] <= 4500) {
+			sensorOuterPanel.add(sensorMeters.get(0).get(1), constraints);
+		} //Warning None
+		else {
+			sensorOuterPanel.add(sensorMeters.get(0).get(0), constraints);
 		}
-		
-		ArrayList<JLabel> temp = sensors.get(index);
-		for (JLabel meter : temp) {
-			meter.setVisible(false);
+
+		constraints.gridx = 1;
+		  //Warning High
+		if(curSensorVals[1] <= 2400) {
+			sensorOuterPanel.add(sensorMeters.get(1).get(3), constraints);			
+		} //Warning Medium
+		else if (curSensorVals[1] <= 4800) { 
+			sensorOuterPanel.add(sensorMeters.get(1).get(2), constraints);
+		} //Warning Low
+		else if (curSensorVals[1] <= 9600) {
+			sensorOuterPanel.add(sensorMeters.get(1).get(1), constraints);
+		} //Warning None
+		else {
+			sensorOuterPanel.add(sensorMeters.get(1).get(0), constraints);
 		}
-		
-		//method A
-		//hide all
-		//if < warn /2 and greater than 0
-			//show green
-		
-		//if >= warn level
-			//show yellow
-		
-		//if >= block level
-			//show red
-		
-		
-		//method B
-		//if less than warn level / 2 hide green
-		//else show green
-		
-		//if >= warn level show yellow
-		//else hide yellow
-		
-		//if >= block, show red
-		//else hide red
-		
+
+		constraints.gridx = 2;
+		  //Warning High
+		if(curSensorVals[2] <= 4500) {
+			sensorOuterPanel.add(sensorMeters.get(2).get(3), constraints);			
+		} //Warning Medium
+		else if (curSensorVals[2] <= 9000) { 
+			sensorOuterPanel.add(sensorMeters.get(2).get(2), constraints);
+		} //Warning Low
+		else if (curSensorVals[2] <= 18000) {
+			sensorOuterPanel.add(sensorMeters.get(2).get(1), constraints);
+		} //Warning None
+		else {
+			sensorOuterPanel.add(sensorMeters.get(2).get(0), constraints);
+		}
+
+		constraints.gridx = 3;
+		  //Warning High
+		if(curSensorVals[3] <= 2400) {
+			sensorOuterPanel.add(sensorMeters.get(3).get(3), constraints);			
+		} //Warning Medium
+		else if (curSensorVals[3] <= 4800) { 
+			sensorOuterPanel.add(sensorMeters.get(3).get(2), constraints);
+		} //Warning Low
+		else if (curSensorVals[3] <= 9600) {
+			sensorOuterPanel.add(sensorMeters.get(3).get(1), constraints);
+		} //Warning None
+		else {
+			sensorOuterPanel.add(sensorMeters.get(3).get(0), constraints);
+		}
+
+		constraints.gridx = 4;
+		  //Warning High
+		if(curSensorVals[4] <= 1500) {
+			sensorOuterPanel.add(sensorMeters.get(4).get(3), constraints);			
+		} //Warning Medium
+		else if (curSensorVals[4] <= 3000) { 
+			sensorOuterPanel.add(sensorMeters.get(4).get(2), constraints);
+		} //Warning Low
+		else if (curSensorVals[4] <= 4500) {
+			sensorOuterPanel.add(sensorMeters.get(4).get(1), constraints);
+		} //Warning None
+		else {
+			sensorOuterPanel.add(sensorMeters.get(4).get(0), constraints);
+		}
 	}
 	
 	/**

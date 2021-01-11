@@ -94,7 +94,9 @@ public class Message {
         return new DataMessage(Serial.SETTING_DATA, index, data);
     }
     
-    //TODO - CP - Return new DataMessage here for Sensor Data
+    public static Message sensor(byte index, float data) {
+    	return new DataMessage(Serial.SENSOR_DATA, index, data);
+    }
     
     public static Message errorString(String err) {
         return new StringMessage(Serial.ERROR_STRING, err);

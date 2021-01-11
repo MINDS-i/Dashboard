@@ -33,6 +33,7 @@ public class Theme {
     public BufferedImage pingRed;
     public BufferedImage pingYellow;
     public BufferedImage pingGreen;
+    public BufferedImage pingSpacer;
     public Font number;
     public Font text;
     public Font alertFont;
@@ -66,6 +67,7 @@ public class Theme {
             pingRed			 = ImageIO.read(new File(img+ctx.getResource("ping_red")));
             pingYellow		 = ImageIO.read(new File(img+ctx.getResource("ping_yellow")));
             pingGreen		 = ImageIO.read(new File(img+ctx.getResource("ping_green")));
+            pingSpacer		 = ImageIO.read(new File(img+ctx.getResource("ping_spacer")));
             buttonPatch      = NinePatch.loadFrom(Paths.get(np+ctx.getResource("button")));
             buttonHover      = NinePatch.loadFrom(Paths.get(np+ctx.getResource("button_hovered")));
             buttonPress      = NinePatch.loadFrom(Paths.get(np+ctx.getResource("button_pressed")));

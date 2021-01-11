@@ -160,7 +160,7 @@ public class StateWidget extends UIWidget {
 		String fmt;
 		String fmtStr = "Apm:%s";
 		
-		System.err.println("StateWidget - Updating APM State");
+//		System.err.println("StateWidget - Updating APM State");
 		switch(substate) {
 			case Serial.APM_STATE_INIT:
 				fmt = String.format(fmtStr, "Init");

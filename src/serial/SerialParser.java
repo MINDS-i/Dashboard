@@ -125,16 +125,27 @@ public class SerialParser implements SerialPortEventListener {
                     context.setSettingQuiet(index, data);
                     break;
                 case Serial.SENSOR_DATA:
-                	byte[] sensorData = new byte[2];
-                	int sensorVal = 0;
+                	int sensorVal 	  = 0;
+                	int sensorSubtype = msg[1];
+                	int sensorIndex   = msg[2];
+                	int[] sensorData = new int[2];
                 	
-                	//[0]MSB [1]LSB
-                	sensorData[0] =  (byte) (msg[2] & 0xff);
-                	sensorData[1] =  (byte) (msg[3] & 0xff);
-                	for( byte val : sensorData) {
-                		sensorVal = (sensorVal << 8) | val;
+                	switch(sensorSubtype) {
+                		case Serial.OBJDETECT_SONIC:
+                			sensorIndex = msg[2];
+                        	//[0]MSB [1]LSB
+                        	sensorData[0] =  (msg[3] & 0xff);
+                        	sensorData[1] =  (msg[4] & 0xff);
+                        	for(int val : sensorData) {
+                        		sensorVal = (sensorVal << 8) | val;
+                        	}
+                        	
+                        	context.dash.pingWidget.update(sensorIndex, sensorVal);
+                        	break;
+                        default:
+                        	System.err.println("Unrecognized Sensor Subtype");
+                        	break;
                 	}
-                	context.dash.pingWidget.update(index, sensorVal);
                 	break;
             }
         }
