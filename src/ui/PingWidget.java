@@ -32,7 +32,7 @@ public class PingWidget extends UIWidget {
 	/**
 	 * Class Constructor
 	 * Generates the initial layout for the widget, loading graphics and placing
-	 * them within a defined JPanel layout
+	 * them within a defined GridBagLayout.
 	 * @param ctx - The application context
 	 */
 	public PingWidget(Context ctx) {
@@ -72,7 +72,7 @@ public class PingWidget extends UIWidget {
 	/**
 	 * Constructs a complete set of meter graphics to be used for a 
 	 * ping sensor.
-	 * @return - The JPanel meter set
+	 * @return - The JPanel containing the meter set
 	 */
 	public ArrayList<JPanel> buildMeterSet() {
 		ArrayList<JPanel> meterSet;
@@ -116,7 +116,8 @@ public class PingWidget extends UIWidget {
 	}
 	
 	/**
-	 * Updates the tracked value and visual display for the indexed sensor.
+	 * Updates a tracked sensor value and calls for a new visual meter display for 
+	 * all sensors.
 	 * @param index - The sensor number
 	 * @param data - The current value from this sensor.
 	 */
@@ -135,8 +136,8 @@ public class PingWidget extends UIWidget {
 	}
 	
 	/**
-	 * Updates the visual display for all sensor meters based on the 
-	 * currently detected values as they compare against pre calibrated
+	 * Updates the visual meter display for all sensor meters based on the 
+	 * currently detected values as they compare against pre-calibrated
 	 * warning levels.
 	 * @param index = The index of the sensor to be updated
 	 */
@@ -145,6 +146,7 @@ public class PingWidget extends UIWidget {
 		
 		sensorOuterPanel.removeAll();
 		
+		//Meter One
 		constraints.gridy = 0;
 		constraints.gridx = 0;
 		  //Warning High
@@ -161,6 +163,7 @@ public class PingWidget extends UIWidget {
 			sensorOuterPanel.add(sensorMeters.get(0).get(0), constraints);
 		}
 
+		//Meter Two
 		constraints.gridx = 1;
 		  //Warning High
 		if(curSensorVals[1] <= 2400) {
@@ -176,6 +179,7 @@ public class PingWidget extends UIWidget {
 			sensorOuterPanel.add(sensorMeters.get(1).get(0), constraints);
 		}
 
+		//Meter Three
 		constraints.gridx = 2;
 		  //Warning High
 		if(curSensorVals[2] <= 4500) {
@@ -191,6 +195,7 @@ public class PingWidget extends UIWidget {
 			sensorOuterPanel.add(sensorMeters.get(2).get(0), constraints);
 		}
 
+		//Meter Four
 		constraints.gridx = 3;
 		  //Warning High
 		if(curSensorVals[3] <= 2400) {
@@ -206,6 +211,7 @@ public class PingWidget extends UIWidget {
 			sensorOuterPanel.add(sensorMeters.get(3).get(0), constraints);
 		}
 
+		//Meter Five
 		constraints.gridx = 4;
 		  //Warning High
 		if(curSensorVals[4] <= 1500) {
@@ -223,7 +229,7 @@ public class PingWidget extends UIWidget {
 	}
 	
 	/**
-	 * Gets the current value for a sensor.
+	 * Gets the current value for a sensor by index.
 	 * @param index - The index of the sensor
 	 * @return - the current value stored for that sensor
 	 */
@@ -232,7 +238,7 @@ public class PingWidget extends UIWidget {
 	}
 	
 	/**
-	 * Gets the number of sensors traked by this widget.
+	 * Gets the number of sensors tracked by this widget.
 	 * @return - the number of sensors
 	 */
 	public int getNumSensors() {
