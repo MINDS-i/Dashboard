@@ -2,6 +2,8 @@ package com.ui;
 
 import java.util.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
 
@@ -16,15 +18,19 @@ import com.Context;
 public class PingWidget extends UIWidget {
 	
 	//Constants
-	protected static final int NUM_SENSORS 	  = 5;
-	protected static final int[] WARN_LEVELS  = {1500, 2400, 4500, 2400, 1500};
-	protected static final int[] BLOCK_LEVELS = {1000, 1600, 3000, 1600, 1000};
+	protected static final int 	 NUM_SENSORS 	  	= 5;
+	protected static final int 	 UPDATE_DELAY_MS 	= 500;
+	protected static final int[] WARN_LEVELS  		= {1500, 2400, 4500, 2400, 1500};
+	protected static final int[] BLOCK_LEVELS 		= {1000, 1600, 3000, 1600, 1000};
 	
 	//Ping Sensor Meters
 	protected HashMap<Integer, ArrayList<JPanel>> sensorMeters;
 	
 	//Sensor Values
 	protected int[] curSensorVals;
+	
+	//Meter Update Frequency Timer
+	protected javax.swing.Timer meterUpdateTimer;
 	
 	//Sensor Image Panel
 	protected JPanel sensorOuterPanel;
@@ -67,6 +73,9 @@ public class PingWidget extends UIWidget {
 		sensorOuterPanel.add(sensorMeters.get(4).get(0), constraints);
 
 		this.add(sensorOuterPanel);
+		
+		meterUpdateTimer = new javax.swing.Timer(UPDATE_DELAY_MS, meterUpdateAction);
+		meterUpdateTimer.start();
 	}
 	
 	/**
@@ -132,8 +141,18 @@ public class PingWidget extends UIWidget {
 //		System.err.println("Sensor Data - [Index: " + index + ", Data: " + data + "]");
 		
 		curSensorVals[index] = data;
-		updateMeters();
 	}
+	
+	/**
+	 * Timer event responsible for controlling the rate at which the sensor
+	 * meters update. see constant value UPDATE_DELAY_MS for the currently
+	 * configured timer delay.
+	 */
+	ActionListener meterUpdateAction = new ActionListener() {
+		public void actionPerformed(ActionEvent event) {
+			updateMeters();
+		}
+	};
 	
 	/**
 	 * Updates the visual meter display for all sensor meters based on the 
@@ -143,7 +162,7 @@ public class PingWidget extends UIWidget {
 	 */
 	protected void updateMeters() {
 		GridBagConstraints constraints = new GridBagConstraints();
-		
+
 		sensorOuterPanel.removeAll();
 		
 		//Meter One
