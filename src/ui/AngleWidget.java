@@ -43,7 +43,10 @@ public class AngleWidget extends JPanel implements TelemetryListener {
         overlay = foregroundImage;
         this.setPreferredSize(new Dimension(background.getWidth(),
                                             background.getHeight()) );
+        this.setMaximumSize(new Dimension(background.getWidth(),
+                                            background.getHeight()));
         setOpaque(false);
+        
     }
 
     @Override

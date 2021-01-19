@@ -16,7 +16,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * Adapted from source originally written by Brett Menzies
+ * Adapted from source originally written by Brett Menzies (See deprecated TelemetryWidget class)
  * @author Chris Park @ Infinetix Corp.
  * Date: 11-25-2020
  * Description: Widget child class used for displaying Telemetry data.

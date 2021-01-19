@@ -210,6 +210,7 @@ public class Dashboard implements Runnable {
     	outerPanel.setOpaque(false);
     	outerPanel.setLayout(new BoxLayout(outerPanel, BoxLayout.PAGE_AXIS));
     	widgetPanel = new WidgetPanel(context);
+    	widgetPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
     	
     	//Telemetry Data Widget
     	try {
