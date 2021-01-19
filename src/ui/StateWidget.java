@@ -27,7 +27,7 @@ public class StateWidget extends UIWidget {
 	
 	//State readouts
 	private JPanel apmPanel;
-	private JLabel apmLabel;	
+	private JLabel apmLabel;
 	private JPanel drivePanel;
 	private JLabel driveLabel;
 	private JPanel autoPanel;

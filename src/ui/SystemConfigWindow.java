@@ -48,7 +48,7 @@ public class SystemConfigWindow {
         versionPane.setAlignmentX(Component.CENTER_ALIGNMENT);
         container.add(versionPane);
 
-        // Add copy right notices
+        // Add copyright notices
         JTextPane copyRights = new JTextPane();
         Font tmp = copyRights.getFont();
         copyRights.setFont( tmp.deriveFont(9f) );
@@ -63,6 +63,7 @@ public class SystemConfigWindow {
 
         frame.add(container);
         frame.pack();
+        frame.setResizable(false);
         frame.setVisible(true);
     }
     

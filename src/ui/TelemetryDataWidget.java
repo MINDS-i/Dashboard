@@ -89,6 +89,7 @@ public class TelemetryDataWidget extends UIWidget {
          */
         public Line(Context ctx, String format) {
             formatStr = format;
+            setPreferredSize(new Dimension(100, 20));
             update(0.0);
         }
         
@@ -107,7 +108,6 @@ public class TelemetryDataWidget extends UIWidget {
         @Override 
         public void repaint() {
             super.repaint();
-            //Repaint the parent to ensure no change in layer order
             TelemetryDataWidget.this.repaint(getX(), getY(), 
             		getWidth(), getHeight());
         }
@@ -213,7 +213,6 @@ public class TelemetryDataWidget extends UIWidget {
         catch (Exception e) {
             throw new ParseException("Failed to parse XML from the stream"+ e, 0);
         }
-
         return new TelemetryDataWidget(ctx, width, fontSize, textColor, items);
 	}
 	

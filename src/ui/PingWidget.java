@@ -42,7 +42,7 @@ public class PingWidget extends UIWidget {
 	 * @param ctx - The application context
 	 */
 	public PingWidget(Context ctx) {
-		super(ctx, "U-Sound Ping");
+		super(ctx, "Utrasound");
 		
 		curSensorVals = new int[5];
 		

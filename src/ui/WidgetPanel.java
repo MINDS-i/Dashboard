@@ -19,10 +19,11 @@ import javax.swing.*;
  */
 public class WidgetPanel extends NinePatchPanel {
 	//Constants
-    protected static final int BORDER_TOP = 18;
-    protected static final int BORDER_BOT = 18;
-    protected static final int BORDER_LFT = 12;
-    protected static final int BORDER_RHT = 12;
+    protected static final int 		BORDER_TOP 	= 18;
+    protected static final int 		BORDER_BOT 	= 18;
+    protected static final int 		BORDER_LFT 	= 13;
+    protected static final int 		BORDER_RHT 	= 13;
+    protected static final Color 	BG_COLOR	= Color.decode("0xEEEEEE");
     
 	protected Context context;
 	protected LinkedList<UIWidget> widgets;

@@ -16,11 +16,13 @@ import java.awt.*;
  */
 public class UIWidget extends JPanel {
 	//Constants
-	protected static final float 	FONT_SIZE 	= 14.0f;
-	protected static final int 		BORDER_TOP = 0;
-	protected static final int 		BORDER_BOT = 0;
-	protected static final int 		BORDER_LFT = 0;
-	protected static final int 		BORDER_RHT = 0;
+	protected static final float 	FONT_SIZE 		= 14.0f;
+	protected static final int 		BORDER_TOP 		= 0;
+	protected static final int 		BORDER_BOT 		= 0;
+	protected static final int 		BORDER_LFT 		= 0;
+	protected static final int 		BORDER_RHT 		= 0;
+	protected static final int 		LABEL_HEIGHT	= 25;
+	protected static final int		LABEL_WIDTH 	= 115;
 	
 	//Standard Variables
 	protected Context context;
@@ -44,7 +46,7 @@ public class UIWidget extends JPanel {
 		this.setOpaque(false);
 		
 		Font font = context.theme.text.deriveFont(FONT_SIZE);
-		Dimension labelSize= new Dimension(115, 25);
+		Dimension labelSize= new Dimension(LABEL_WIDTH, LABEL_HEIGHT);
 		
 		titlePanel = new JPanel();
 		titlePanel.setOpaque(true);
