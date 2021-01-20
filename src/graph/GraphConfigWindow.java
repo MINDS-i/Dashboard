@@ -26,6 +26,7 @@ class GraphConfigWindow {
         container.add(buildCloseupPanel());
 
         frame.add(container);
+        frame.setResizable(false);
         frame.pack();
     }
 
