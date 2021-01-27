@@ -17,18 +17,19 @@ import com.Context;
  * indication related to a vehicle sensor or other data processing part over
  * serial communication.
  */
-public class StatusBarWidget extends UIWidget {
+public class StatusBarWidget extends JPanel {
 	
 	//Constants
 	protected static final int MIN_BAR_WIDTH	= 100;
 	protected static final int BAR_HEIGHT 		= 25;
 	
+	protected String barType;
 	protected JLabel statusLabel;
 	
 	//Class Constructor
-	public StatusBarWidget(Context ctx, String barType) {
-		super(ctx, barType + "StatusBar");
+	public StatusBarWidget(Context ctx, String type) {
 		
+		barType = type;
 		statusLabel.setText("Undefined");
 		statusLabel.setBackground(Color.white);
 		
