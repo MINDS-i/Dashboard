@@ -23,13 +23,30 @@ public class StatusBarWidget extends JPanel {
 	protected static final int MIN_BAR_WIDTH	= 100;
 	protected static final int BAR_HEIGHT 		= 25;
 	
-	protected String barType;
+	//Bar Display Label
 	protected JLabel statusLabel;
+	
+	/**
+	 * Pre-define status type enums used to more concisely track
+	 * status bar parameters by type and allow for easier updating.
+	 */
+	public enum StatusType {
+		NORMAL		("Normal", 	Color.white), 
+		PROCESSING	("Process", Color.blue), 
+		CAUTION		("Caution", Color.yellow),
+		ERROR		("Error", 	Color.red);
+		
+		private final String text;
+		private final Color color;
+		
+		StatusType(String text, Color color) {
+			this.text = text;
+			this.color = color;
+		}
+	};
 	
 	//Class Constructor
 	public StatusBarWidget(Context ctx, String type) {
-		
-		barType = type;
 		statusLabel.setText("Undefined");
 		statusLabel.setBackground(Color.white);
 		
@@ -37,27 +54,8 @@ public class StatusBarWidget extends JPanel {
 		statusLabel.setPreferredSize(new Dimension(MIN_BAR_WIDTH, BAR_HEIGHT));
 	}
 	
-	/**
-	 * Updates the status bar text display to the given string parameter.
-	 * @param text - The text to update the label to.
-	 */
-	public void setLabel(String text) {
-		statusLabel.setText(text);
-	}
-	
-	/**
-	 * Updates the status bar background color to the given Color parameter
-	 * @param color - The color to set the background do
-	 */
-	public void setColor(Color color) {
-		statusLabel.setBackground(color);
-	}
-	
-	/**
-	 * Updates the preferred size of the status bar
-	 * @param size - the Dimensional size (Width, Height) to set the bar to.
-	 */
-	public void setSize(Dimension size) {
-		statusLabel.setPreferredSize(size);
+	public void update(StatusType type) {
+		statusLabel.setText(type.text);
+		statusLabel.setBackground(type.color);
 	}
 }
