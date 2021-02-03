@@ -35,6 +35,8 @@ public class StateWidget extends UIWidget {
 	private JPanel flagPanel;
 	private JLabel flagLabel;
 	
+	private StatusBarWidget statusBar;
+	
 	/**
 	 * Class constructor
 	 * @param ctx - The application context
@@ -50,6 +52,10 @@ public class StateWidget extends UIWidget {
 	 * dimensional spacing, and border insets.
 	 */
 	private void initPanel() {
+		
+		statusBar = new StatusBarWidget(context);
+		this.add(statusBar);
+		
 		Font font = context.theme.text.deriveFont(FONT_SIZE);
 		Dimension labelSize = new Dimension(100, 20);
 		
@@ -124,6 +130,7 @@ public class StateWidget extends UIWidget {
 		for(JPanel panel : statePanels) {
 			this.add(panel);
 		}
+		
 	}
 	
 	/**
@@ -167,7 +174,6 @@ public class StateWidget extends UIWidget {
 				finalWidth = Math.min(fmt.length(), LINE_WIDTH);
 				break;
 			case Serial.APM_STATE_SELF_TEST:
-				
 				fmt = String.format(fmtStr, "Self Test");
 				finalWidth = Math.min(fmt.length(), LINE_WIDTH);
 				break;
@@ -230,6 +236,17 @@ public class StateWidget extends UIWidget {
 			case Serial.AUTO_STATE_AVOID:
 				fmt = String.format(fmtStr, "Avoid");
 				finalWidth = Math.min(fmt.length(), LINE_WIDTH);
+				
+				//TODO - CP - Currently the auto state flips between full and...
+				//avoid very quickly when a obstacle is detected by USound sensors.
+				//Need to talk with Ben about the best approach to smooth this out
+				//so the bar updates meaningfully and gives some time to be read.
+				//As is now it flip flops rapidly. Not sure if I should do this on
+				//the UI layer or not but I suspect so.
+				if(statusBar.getState() != StatusBarWidget.StatusType.CAUTION) {
+					statusBar.update(StatusBarWidget.StatusType.CAUTION);
+				}
+				
 				break;
 			case Serial.AUTO_STATE_STALLED:
 				fmt = String.format(fmtStr, "Stalled");
@@ -258,18 +275,22 @@ public class StateWidget extends UIWidget {
 		if(caution && approach) {
 			fmt = String.format(fmtStr, "App. & Caut.");
 			finalWidth = Math.min(fmt.length(), LINE_WIDTH);
+			statusBar.update(StatusBarWidget.StatusType.CAUTION);
 		}
 		else if(approach) {
 			fmt = String.format(fmtStr, "Approach");
 			finalWidth = Math.min(fmt.length(), LINE_WIDTH);
+			statusBar.update(StatusBarWidget.StatusType.PROCESSING);
 		}
 		else if(caution) {
 			fmt = String.format(fmtStr, "Caution");
-			finalWidth = Math.min(fmt.length(), LINE_WIDTH); 
+			finalWidth = Math.min(fmt.length(), LINE_WIDTH);
+			statusBar.update(StatusBarWidget.StatusType.CAUTION);
 		}
 		else {
 			fmt = String.format(fmtStr, "None");
 			finalWidth = Math.min(fmt.length(), LINE_WIDTH);
+			statusBar.update(StatusBarWidget.StatusType.NORMAL);
 		}
 		flagLabel.setText(fmt.substring(0, finalWidth));
 	}
