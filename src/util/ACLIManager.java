@@ -1,6 +1,9 @@
 package com.util;
 
 import java.util.*;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+import java.io.*;
 
 /**
  * @author Chris Park @ Infinetix Corp
@@ -11,10 +14,10 @@ import java.util.*;
 public class ACLIManager {
 	private static ACLIManager aclimInstance = null;
 	
-	private static final String CMD_EXEC  = "cmd /c";
-	private static final String ACLI_EXEC = "arduino-cli";
-	private static final String ACLI_PATH = "";
-	
+	private static final String CMD_EXEC  		= "cmd /c";
+	private static final String ACLI_EXEC 		= "arduino-cli";
+	private static final String ACLI_PATH 		= "";
+	private static final String BOARD_LIST_FILE = "boardlist.txt";
 	private ProcessBuilder processBuilder;
 	private List<String> params;
 	
@@ -26,11 +29,11 @@ public class ACLIManager {
 		//Installs required core for APM
 		INSTALL_AVR_CORE 	(Arrays.asList("core", "install", "arduino:avr")),
 		//Generates a list of attached Arduino Boards
-		GENERATE_BOARD_LIST (Arrays.asList("board", "list")),
+		GENERATE_BOARD_LIST (Arrays.asList("board", "list", ">", BOARD_LIST_FILE)),
 		//Parses port for an APM board and generates a config
-		ATTACH_APM_BOARD 	(Arrays.asList("board", "attach", "serial://")),
+		ATTACH_APM_BOARD 	(Arrays.asList("board", "attach")),
 		//Compiles and uploads a sketch using generated config
-		UPLOAD_SKETCH		(Arrays.asList("compile", "upload"));
+		UPLOAD_SKETCH		(Arrays.asList("compile", "--upload"));
 		
 		public final List<String> params;
 		
@@ -64,30 +67,80 @@ public class ACLIManager {
 	 * @param command
 	 */
 	public void execute(ACLICommand command) {
+		File boardList;
+		
 		params = new ArrayList<String>();
 		params.addAll(0, Arrays.asList(CMD_EXEC, ACLI_EXEC, ACLI_PATH));
 		params.addAll(command.params);
 		
-		processBuilder = new ProcessBuilder();
-		processBuilder.command(params);
-		
 		switch(command) {
 			case INSTALL_AVR_CORE:
-				//No stored information required
+				//Go straight to exectuion
 				break;
 			case GENERATE_BOARD_LIST:
-				//No stored information required
+				//Go straight to execution
 				break;
 			case ATTACH_APM_BOARD:
 				//Checks for board list
-				//Parses port for board
-				//Generates Config
+				boardList = new File(BOARD_LIST_FILE);
+				if(!boardList.exists()) {
+					//TODO - CP - Report this error to the UI level (Message popup)
+					System.err.println(
+							"ACLI Manager file error: Board list not found.");
+					return;
+				}
+				
+				Pattern pattern = Pattern.compile(
+						"^COM\\d+\\s\\w{0,6}\\s\\w{0,4}\\s\\(?\\w{0,5}\\)?\\sArduino");
+				Matcher matcher;
+				boolean matchFound = false;
+				
+				try {
+					FileReader fileReader = new FileReader(BOARD_LIST_FILE);
+					BufferedReader bufferedReader = new BufferedReader(fileReader);
+					String temp;
+					
+					while((temp = bufferedReader.readLine()) != null) {
+						matcher = pattern.matcher(temp);
+						
+						//If a match was found
+						matchFound = matcher.find();
+						if(matchFound) {
+							String[] substrings = temp.split(" ");
+							params.add("serial://" + substrings[0]);
+							break;
+						}
+					}	
+					bufferedReader.close();
+
+					//If no match was found
+					if(!matchFound) {
+						System.err.println(
+								"ACLI Manager file error: Failed to find port.");
+						return;
+					}
+				}
+				catch(Exception e) {
+					System.err.println("ACLI Manager file error: " + e);
+				}
 				break;
 			case UPLOAD_SKETCH:
 				//Checks for config
 				//Compiles Sketch
 				//Uploads sketch
 				break;
+			default:
 		}
+		
+		processBuilder = new ProcessBuilder();
+		processBuilder.command(params);
+		
+		try {
+			processBuilder.start();
+		}
+		catch (Exception e) {
+			System.err.println("ACLI Manager exec error: " + e);
+		}
+		
 	}
 }
