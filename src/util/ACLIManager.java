@@ -14,10 +14,11 @@ import java.io.*;
 public class ACLIManager {
 	private static ACLIManager aclimInstance = null;
 	
-	private static final String CMD_EXEC  		= "cmd /c";
-	private static final String ACLI_EXEC 		= "arduino-cli";
-	private static final String ACLI_PATH 		= "";
-	private static final String BOARD_LIST_FILE = "boardlist.txt";
+	private static final String CMD_EXEC  			= "cmd /c";
+	private static final String ACLI_EXEC 			= "arduino-cli";
+	private static final String ACLI_PATH 			= "";
+	private static final String BOARD_LIST_FILE 	= "boardlist.txt";
+	private static final String SKETCH_CONFIG_FILE 	= "sketch.json";
 	private ProcessBuilder processBuilder;
 	private List<String> params;
 	
@@ -67,7 +68,7 @@ public class ACLIManager {
 	 * @param command
 	 */
 	public void execute(ACLICommand command) {
-		File boardList;
+		File file;
 		
 		params = new ArrayList<String>();
 		params.addAll(0, Arrays.asList(CMD_EXEC, ACLI_EXEC, ACLI_PATH));
@@ -82,8 +83,8 @@ public class ACLIManager {
 				break;
 			case ATTACH_APM_BOARD:
 				//Checks for board list
-				boardList = new File(BOARD_LIST_FILE);
-				if(!boardList.exists()) {
+				file = new File(BOARD_LIST_FILE);
+				if(!file.exists()) {
 					//TODO - CP - Report this error to the UI level (Message popup)
 					System.err.println(
 							"ACLI Manager file error: Board list not found.");
@@ -126,8 +127,13 @@ public class ACLIManager {
 				break;
 			case UPLOAD_SKETCH:
 				//Checks for config
-				//Compiles Sketch
-				//Uploads sketch
+				file = new File(SKETCH_CONFIG_FILE);
+				if(!file.exists()) {
+					//TODO - CP - Report this error to the UI level (Message popup)
+					System.err.println(
+							"ACLI Manager file error: board config file not found.");
+					return;
+				}
 				break;
 			default:
 		}
