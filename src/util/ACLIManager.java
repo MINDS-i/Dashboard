@@ -19,6 +19,7 @@ public class ACLIManager {
 	private static final String ACLI_PATH 			= "";
 	private static final String BOARD_LIST_FILE 	= "boardlist.txt";
 	private static final String SKETCH_CONFIG_FILE 	= "sketch.json";
+	
 	private ProcessBuilder processBuilder;
 	private List<String> params;
 	private String port;
@@ -36,8 +37,9 @@ public class ACLIManager {
 		GENERATE_BOARD_LIST (Arrays.asList("board", "list", ">", BOARD_LIST_FILE)),
 		//Parses the port and core of the APM as it appears in the board list file
 		PARSE_BOARD_INFO	(Arrays.asList(BOARD_LIST_FILE)),
-
+		//Compiles and prepares a sketch for upload
 		COMPILE_SKETCH		(Arrays.asList("compile")),
+		//Uploads a sketch to the APM
 		UPLOAD_SKETCH		(Arrays.asList("upload"));
 		
 		public final List<String> params;
@@ -53,7 +55,7 @@ public class ACLIManager {
 	private ACLIManager() {
 		port = "";
 		core = "";
-		errorString = "No error";
+		errorString = "No error.";
 	}
 	
 	/**
@@ -73,7 +75,7 @@ public class ACLIManager {
 	 * the Java ProcessBuilder class.
 	 * @param command - The action/command to execute
 	 */
-	public void execute(ACLICommand command) {
+	public boolean execute(ACLICommand command) {
 		params = new ArrayList<String>();
 		params.addAll(0, Arrays.asList(CMD_EXEC, ACLI_EXEC, ACLI_PATH));
 		params.addAll(command.params);
@@ -90,9 +92,10 @@ public class ACLIManager {
 					params.add(port);
 				}
 				else {
-					System.err.println("ACLI Manager board attach error: "
+					errorString = "Could not obtain port and core information.";
+					System.err.println("ACLI Manager parse error: "
 							+ "parsing operation unsuccessful");
-					return;
+					return false;
 				}
 				break;
 			default:
@@ -102,12 +105,30 @@ public class ACLIManager {
 		processBuilder.command(params);
 		
 		try {
-			processBuilder.start();
+			Process process = processBuilder.start();
+			if(process.waitFor() == 0) {
+				errorString = "No error.";
+			}
 		}
 		catch (Exception e) {
+			switch(command) {
+				case INSTALL_AVR_CORE:
+					errorString = "Unable to install avr core.";
+					break;
+				case GENERATE_BOARD_LIST:
+					errorString = "Unable to generate board list.";
+					break;
+				case PARSE_BOARD_INFO:
+					errorString = "Unable to parse board info.";
+					break;
+				default:
+					errorString = "Unknown error";
+			}
 			System.err.println("ACLI Manager exec error: " + e);
+			return false;
 		}
 		
+		return true;
 	}
 	
 	/**
@@ -117,7 +138,7 @@ public class ACLIManager {
 	 * @param command - The action/command to execute
 	 * @param sketchPath - The user selected path to the sketch being used.
 	 */
-	public void execute(ACLICommand command, String sketchPath) {
+	public boolean execute(ACLICommand command, String sketchPath) {
 		params = new ArrayList<String>();
 		params.addAll(0, Arrays.asList(CMD_EXEC, ACLI_EXEC, ACLI_PATH));
 		params.addAll(command.params);
@@ -125,20 +146,23 @@ public class ACLIManager {
 		switch(command) {
 			case COMPILE_SKETCH:
 				if(core.isEmpty() || port.isEmpty()) {
-					//TODO - CP - Log error here
-					return;
+					errorString = "Necessary board information (port or core) missing. "
+							+ "Unable to compile.";
+					return false;
 				}
-				//Check that port and core are not empty
-				//arduino-cli compile -b <core:name> -p <Port name> <Path/To/Sketch> 
-				
+				params.add("-b " + core);
+				params.add("-p " + port);
+				params.add(sketchPath);
 				break;
 			case UPLOAD_SKETCH:
 				if(port.isEmpty()) {
-					//TODO - CP - Log error here
-					return;
+					errorString = "port information missing. "
+							+ "Unable to upload sketch.";
+					return false;
 				}
 				
-				//arduino-cli upload -p <port name> <Path/To/Sketch>
+				params.add("-p " + port);
+				params.add(sketchPath);
 				break;
 			default:
 		}
@@ -147,11 +171,27 @@ public class ACLIManager {
 		processBuilder.command(params);
 		
 		try {
-			processBuilder.start();
+			Process process = processBuilder.start();
+			if(process.waitFor() == 0) {
+				errorString = "No error.";
+			}
 		}
 		catch (Exception e) {
+			switch(command) {
+			case COMPILE_SKETCH:
+				errorString = "Unable to compile sketch.";
+				break;
+			case UPLOAD_SKETCH:
+				errorString = "Unable to upload sketch.";
+				break;
+			default:
+				errorString = "Unknown error";
+			}
 			System.err.println("ACLI Manager exec error: " + e);
+			return false;
 		}
+		
+		return true;
 	}
 	
 	/**
@@ -211,6 +251,10 @@ public class ACLIManager {
 		return true;
 	}
 	
+	/**
+	 * Gets the most recent error string resulting from command executions.
+	 * @return - The currently set error string or "No error" if there isn't one.
+	 */
 	public String getErrorStr() {
 		return errorString;
 	}

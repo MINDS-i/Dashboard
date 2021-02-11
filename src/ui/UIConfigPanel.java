@@ -3,6 +3,7 @@ package com.ui;
 import com.Context;
 import com.map.*;
 
+import java.io.*;
 import java.awt.Insets;
 import java.awt.Dimension;
 import java.awt.Component;
@@ -12,7 +13,10 @@ import java.awt.event.ActionEvent;
 import java.awt.geom.Point2D;
 import java.text.Format;
 import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.util.ACLIManager;
 
 /**
  * 
@@ -34,6 +38,7 @@ public class UIConfigPanel extends JPanel {
 	private JPanel 		buttonPanel;
 	private JButton		toggleButton;
 	private JButton		driverButton;
+	private JButton		sketchUploadButton;
 	private JPanel 		homePanel;
 	private JPanel		lngPanel;
 	private JLabel 		lngLabel;
@@ -74,6 +79,13 @@ public class UIConfigPanel extends JPanel {
 			constraints.gridy = 1;
 			this.add(driverButton, constraints);	
 		}
+		
+		sketchUploadButton = new JButton(uploadSketchAction);
+		sketchUploadButton.setPreferredSize(
+				new Dimension(DEF_BUTTON_WIDTH, DEF_BUTTON_HEIGHT));
+		constraints.gridx = 0;
+		constraints.gridy = 2;
+		this.add(sketchUploadButton, constraints);
 		
 		Point2D homeCoords = context.getHomeProp();
 		
@@ -141,6 +153,92 @@ public class UIConfigPanel extends JPanel {
                 ex.printStackTrace();
             }
         }
+    };
+    
+    /**
+     * Action used to open a FileChooser dialog, and
+     * select and upload an Arduino sketch to the APM.
+     */
+    private Action uploadSketchAction = new AbstractAction() {
+    	{
+    		String text = "Upload arduino sketch";
+    		putValue(Action.NAME, text);
+    	}
+    	public void actionPerformed(ActionEvent e) {
+    		File selectedFile = null;
+    		JFileChooser fileChooser = new JFileChooser();
+    		FileFilter filter = new FileNameExtensionFilter(
+    				"Arduino Sketch (*.ino)", "ino");
+    		
+    		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+    		fileChooser.removeChoosableFileFilter(fileChooser.getFileFilter());
+    		fileChooser.addChoosableFileFilter(filter);
+    		
+    		int retVal = fileChooser.showOpenDialog(UIConfigPanel.this);
+    		if(retVal == JFileChooser.APPROVE_OPTION) {
+    			selectedFile = fileChooser.getSelectedFile();
+    		}
+    		
+    		if (selectedFile == null) {
+    			System.err.println(
+    					"UIConfigPanel - Upload error: No file was selected.");
+    			return;
+    		}
+    		
+    		boolean result = false;
+    		
+			//Install avr core used by APM    		
+    		result = ACLIManager.getInstance().execute(
+    				ACLIManager.ACLICommand.INSTALL_AVR_CORE);
+    		if (result == false) {
+    			JOptionPane.showMessageDialog(UIConfigPanel.this, 
+    					ACLIManager.getInstance().getErrorStr(),
+    					"Error", JOptionPane.ERROR_MESSAGE);
+    			return;
+    		}
+    		
+			//Build list of available/connected boards
+    		result = ACLIManager.getInstance().execute(
+					ACLIManager.ACLICommand.GENERATE_BOARD_LIST);
+    		if (result == false) {
+    			JOptionPane.showMessageDialog(UIConfigPanel.this, 
+    					ACLIManager.getInstance().getErrorStr(),
+    					"Error", JOptionPane.ERROR_MESSAGE);
+    			return;
+    		}
+    		
+			//Parse core and port info
+    		result = ACLIManager.getInstance().execute(
+					ACLIManager.ACLICommand.PARSE_BOARD_INFO);
+    		if (result == false) {
+    			JOptionPane.showMessageDialog(UIConfigPanel.this, 
+    					ACLIManager.getInstance().getErrorStr(),
+    					"Error", JOptionPane.ERROR_MESSAGE);
+    			return;
+    		}
+    		
+			//Compile selected sketch
+    		result = ACLIManager.getInstance().execute(
+					ACLIManager.ACLICommand.COMPILE_SKETCH, 
+					selectedFile.getAbsolutePath());
+    		if (result == false) {
+    			JOptionPane.showMessageDialog(UIConfigPanel.this, 
+    					ACLIManager.getInstance().getErrorStr(),
+    					"Error", JOptionPane.ERROR_MESSAGE);
+    			return;
+    		}
+    		
+			//Upload selected sketch
+    		result = ACLIManager.getInstance().execute(
+					ACLIManager.ACLICommand.UPLOAD_SKETCH,
+					selectedFile.getAbsolutePath());
+    		if (result == false) {
+    			JOptionPane.showMessageDialog(UIConfigPanel.this, 
+    					ACLIManager.getInstance().getErrorStr(),
+    					"Error", JOptionPane.ERROR_MESSAGE);
+    			return;
+    		}
+    	}
     };
     
     /**
