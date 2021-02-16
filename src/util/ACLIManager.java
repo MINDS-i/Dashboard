@@ -14,7 +14,8 @@ import java.io.*;
 public class ACLIManager {
 	private static ACLIManager aclimInstance = null;
 	
-	private static final String CMD_EXEC  			= "cmd /c";
+	private static final String CMD_EXEC  			= "cmd.exe";
+	private static final String TERM_FLAG			= "/c";
 	private static final String ACLI_EXEC 			= "arduino-cli";
 	private static final String ACLI_PATH 			= "";
 	private static final String BOARD_LIST_FILE 	= "boardlist.txt";
@@ -77,7 +78,7 @@ public class ACLIManager {
 	 */
 	public boolean execute(ACLICommand command) {
 		params = new ArrayList<String>();
-		params.addAll(0, Arrays.asList(CMD_EXEC, ACLI_EXEC, ACLI_PATH));
+		params.addAll(0, Arrays.asList(CMD_EXEC, TERM_FLAG, ACLI_EXEC, ACLI_PATH));
 		params.addAll(command.params);
 		
 		switch(command) {
@@ -140,7 +141,7 @@ public class ACLIManager {
 	 */
 	public boolean execute(ACLICommand command, String sketchPath) {
 		params = new ArrayList<String>();
-		params.addAll(0, Arrays.asList(CMD_EXEC, ACLI_EXEC, ACLI_PATH));
+		params.addAll(0, Arrays.asList(CMD_EXEC, TERM_FLAG, ACLI_EXEC, ACLI_PATH));
 		params.addAll(command.params);
 		
 		switch(command) {

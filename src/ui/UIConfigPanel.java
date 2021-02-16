@@ -169,7 +169,7 @@ public class UIConfigPanel extends JPanel {
     		JFileChooser fileChooser = new JFileChooser();
     		FileFilter filter = new FileNameExtensionFilter(
     				"Arduino Sketch (*.ino)", "ino");
-    		
+    		    		
     		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
     		fileChooser.removeChoosableFileFilter(fileChooser.getFileFilter());
     		fileChooser.addChoosableFileFilter(filter);
@@ -196,6 +196,8 @@ public class UIConfigPanel extends JPanel {
     					"Error", JOptionPane.ERROR_MESSAGE);
     			return;
     		}
+//    		System.err.println("Successful Core Install");
+    		
     		
 			//Build list of available/connected boards
     		result = ACLIManager.getInstance().execute(
@@ -206,6 +208,7 @@ public class UIConfigPanel extends JPanel {
     					"Error", JOptionPane.ERROR_MESSAGE);
     			return;
     		}
+//    		System.err.println("Successful Board List Generation");
     		
 			//Parse core and port info
     		result = ACLIManager.getInstance().execute(
@@ -216,28 +219,35 @@ public class UIConfigPanel extends JPanel {
     					"Error", JOptionPane.ERROR_MESSAGE);
     			return;
     		}
+//    		System.err.println("Successful Board List Parsing");
     		
 			//Compile selected sketch
     		result = ACLIManager.getInstance().execute(
 					ACLIManager.ACLICommand.COMPILE_SKETCH, 
 					selectedFile.getAbsolutePath());
     		if (result == false) {
-    			JOptionPane.showMessageDialog(UIConfigPanel.this, 
+    			JOptionPane.showMessageDialog(UIConfigPanel.this,
     					ACLIManager.getInstance().getErrorStr(),
     					"Error", JOptionPane.ERROR_MESSAGE);
     			return;
     		}
+//    		System.err.println("Successful Sketch Compile");
     		
 			//Upload selected sketch
     		result = ACLIManager.getInstance().execute(
 					ACLIManager.ACLICommand.UPLOAD_SKETCH,
 					selectedFile.getAbsolutePath());
     		if (result == false) {
-    			JOptionPane.showMessageDialog(UIConfigPanel.this, 
+    			JOptionPane.showMessageDialog(UIConfigPanel.this,
     					ACLIManager.getInstance().getErrorStr(),
     					"Error", JOptionPane.ERROR_MESSAGE);
     			return;
     		}
+//    		System.err.println("Successful Sketch Upload");
+    		
+    		JOptionPane.showMessageDialog(UIConfigPanel.this, 
+    				"Sketch uploaded successfully.",
+    				"Info", JOptionPane.INFORMATION_MESSAGE);
     	}
     };
     

@@ -36,9 +36,7 @@ public class Context {
     private ResourceBundle resources;
     private Properties persist;
 
-    private static final File persistanceFile =
-            new File(System.getProperty("user.home") + "\\AppData\\Local\\MINDS-i Dashboard\\persist.properties");
-    
+    private final File persistenceFile;
     private final String instanceLogName;
     private final Logger ioerr = Logger.getLogger("d.io");
 
@@ -52,13 +50,24 @@ public class Context {
         instanceLogName = sdf.format(cal.getTime());
         
         persist = new Properties();
+        
+        //Find out what OS type we are running under
+        String osname = System.getProperty("os.name");
+        if(osname.toLowerCase().contains("windows")) {
+        	persistenceFile = new File(System.getProperty("user.home") 
+        			+ "\\AppData\\Local\\MINDS-i Dashboard\\persist.properties");
+        }
+        else { //Assume Linux and default to relative directory structure
+        	persistenceFile = new File("./resources/persist/persist.properties");
+        }
+        
         try {
-            if(!persistanceFile.exists()) {
-                persistanceFile.getParentFile().mkdirs();
-                persistanceFile.createNewFile();
+            if(!persistenceFile.exists()) {
+                persistenceFile.getParentFile().mkdirs();
+                persistenceFile.createNewFile();
             }
             
-            InputStream is =new FileInputStream(persistanceFile);
+            InputStream is = new FileInputStream(persistenceFile);
             persist.load(is);
             is.close();
         } 
@@ -181,7 +190,7 @@ public class Context {
     }
     
     private void saveProps() {
-        try(FileOutputStream file = new FileOutputStream(persistanceFile)) {
+        try(FileOutputStream file = new FileOutputStream(persistenceFile)) {
             persist.store(file, "");
         } catch (Exception e) {
             ioerr.severe("Can't save persist props "+e);

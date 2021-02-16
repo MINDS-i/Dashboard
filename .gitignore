@@ -24,3 +24,4 @@ resources/tile_servers.properties
 .project
 .classpath
 .settings/org.eclipse.wst.sse.core.prefs
+boardlist.txt
