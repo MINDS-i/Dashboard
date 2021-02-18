@@ -9,7 +9,7 @@ import java.io.*;
  * @author Chris Park @ Infinetix Corp
  * Date: 2-3-2021
  * Description: Singleton class used to configure the arduino-cli and upload
- * APM sketches from the dashboard.
+ * APM sketches from the dashboard using cmd call subprocesses.
  */
 public class ACLIManager {
 	private static ACLIManager aclimInstance = null;

@@ -42,9 +42,9 @@ public class PingWidget extends UIWidget {
 	 * @param ctx - The application context
 	 */
 	public PingWidget(Context ctx) {
-		super(ctx, "Utrasound");
+		super(ctx, "Ultrasound");
 		
-		curSensorVals = new int[5];
+		curSensorVals = new int[] {0, 0, 0, 0, 0};
 		
 		sensorOuterPanel = new JPanel();
 		sensorOuterPanel.setMinimumSize(new Dimension(100, 60));
@@ -138,8 +138,6 @@ public class PingWidget extends UIWidget {
 			return;
 		}
 
-//		System.err.println("Sensor Data - [Index: " + index + ", Data: " + data + "]");
-		
 		curSensorVals[index] = data;
 	}
 	
