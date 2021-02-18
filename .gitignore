@@ -25,3 +25,4 @@ resources/tile_servers.properties
 .classpath
 .settings/org.eclipse.wst.sse.core.prefs
 boardlist.txt
+arduino-cli.exe
