@@ -250,7 +250,6 @@ public class Dashboard implements Runnable {
                     context, Serial.ROLL, context.theme.roverFront));
         }
 
-        //TODO - CP - Relocate this watermark to a corner position
         //Watermark Image
         BufferedImage watermark = context.theme.logoWatermark;
         JLabel watermarkLabel = new JLabel(new ImageIcon(watermark));

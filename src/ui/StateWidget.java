@@ -236,13 +236,7 @@ public class StateWidget extends UIWidget {
 			case Serial.AUTO_STATE_AVOID:
 				fmt = String.format(fmtStr, "Avoid");
 				finalWidth = Math.min(fmt.length(), LINE_WIDTH);
-				
-				//TODO - CP - Currently the auto state flips between full and...
-				//avoid very quickly when a obstacle is detected by USound sensors.
-				//Need to talk with Ben about the best approach to smooth this out
-				//so the bar updates meaningfully and gives some time to be read.
-				//As is now it flip flops rapidly. Not sure if I should do this on
-				//the UI layer or not but I suspect so.
+
 				if(statusBar.getState() != StatusBarWidget.StatusType.CAUTION) {
 					statusBar.update(StatusBarWidget.StatusType.CAUTION);
 				}

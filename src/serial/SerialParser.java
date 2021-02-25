@@ -196,7 +196,7 @@ public class SerialParser implements SerialPortEventListener {
                     }
                     break;
                 
-                case Serial.STATE_WORD: //Subtype
+                case Serial.STATE_WORD:
                 	context.dash.stateWidget.update(a,b);
                 	break;
             }

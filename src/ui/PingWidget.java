@@ -20,7 +20,7 @@ public class PingWidget extends UIWidget {
 	//Constants
 	protected static final int 	 NUM_SENSORS 	  	= 5;
 	protected static final int 	 UPDATE_DELAY_MS 	= 500;
-	protected static final int[] WARN_LEVELS  		= {1500, 2400, 4500, 2400, 1500};
+	protected static final int[] WARN_LEVELS  		= {2000, 3200, 6000, 3200, 2000};
 	protected static final int[] BLOCK_LEVELS 		= {1000, 1600, 3000, 1600, 1000};
 	
 	//Ping Sensor Meters
@@ -167,82 +167,67 @@ public class PingWidget extends UIWidget {
 		constraints.gridy = 0;
 		constraints.gridx = 0;
 		  //Warning High
-		if(curSensorVals[0] <= 1500) {
+		if(curSensorVals[0] <= BLOCK_LEVELS[0]) {
 			sensorOuterPanel.add(sensorMeters.get(0).get(3), constraints);			
 		} //Warning Medium
-		else if (curSensorVals[0] <= 3000) { 
+		else if (curSensorVals[0] <= WARN_LEVELS[0]) { 
 			sensorOuterPanel.add(sensorMeters.get(0).get(2), constraints);
 		} //Warning Low
-		else if (curSensorVals[0] <= 4500) {
-			sensorOuterPanel.add(sensorMeters.get(0).get(1), constraints);
-		} //Warning None
 		else {
-			sensorOuterPanel.add(sensorMeters.get(0).get(0), constraints);
+			sensorOuterPanel.add(sensorMeters.get(0).get(1), constraints);
 		}
 
 		//Meter Two
 		constraints.gridx = 1;
 		  //Warning High
-		if(curSensorVals[1] <= 2400) {
+		if(curSensorVals[1] <= BLOCK_LEVELS[1]) {
 			sensorOuterPanel.add(sensorMeters.get(1).get(3), constraints);			
 		} //Warning Medium
-		else if (curSensorVals[1] <= 4800) { 
+		else if (curSensorVals[1] <= WARN_LEVELS[1]) { 
 			sensorOuterPanel.add(sensorMeters.get(1).get(2), constraints);
 		} //Warning Low
-		else if (curSensorVals[1] <= 9600) {
-			sensorOuterPanel.add(sensorMeters.get(1).get(1), constraints);
-		} //Warning None
 		else {
-			sensorOuterPanel.add(sensorMeters.get(1).get(0), constraints);
+			sensorOuterPanel.add(sensorMeters.get(1).get(1), constraints);
 		}
 
 		//Meter Three
 		constraints.gridx = 2;
 		  //Warning High
-		if(curSensorVals[2] <= 4500) {
+		if(curSensorVals[2] <= BLOCK_LEVELS[2]) {
 			sensorOuterPanel.add(sensorMeters.get(2).get(3), constraints);			
 		} //Warning Medium
-		else if (curSensorVals[2] <= 9000) { 
+		else if (curSensorVals[2] <= WARN_LEVELS[2]) { 
 			sensorOuterPanel.add(sensorMeters.get(2).get(2), constraints);
 		} //Warning Low
-		else if (curSensorVals[2] <= 18000) {
-			sensorOuterPanel.add(sensorMeters.get(2).get(1), constraints);
-		} //Warning None
 		else {
-			sensorOuterPanel.add(sensorMeters.get(2).get(0), constraints);
+			sensorOuterPanel.add(sensorMeters.get(2).get(1), constraints);
 		}
 
 		//Meter Four
 		constraints.gridx = 3;
 		  //Warning High
-		if(curSensorVals[3] <= 2400) {
+		if(curSensorVals[3] <= BLOCK_LEVELS[3]) {
 			sensorOuterPanel.add(sensorMeters.get(3).get(3), constraints);			
 		} //Warning Medium
-		else if (curSensorVals[3] <= 4800) { 
+		else if (curSensorVals[3] <= WARN_LEVELS[3]) { 
 			sensorOuterPanel.add(sensorMeters.get(3).get(2), constraints);
 		} //Warning Low
-		else if (curSensorVals[3] <= 9600) {
-			sensorOuterPanel.add(sensorMeters.get(3).get(1), constraints);
-		} //Warning None
 		else {
-			sensorOuterPanel.add(sensorMeters.get(3).get(0), constraints);
+			sensorOuterPanel.add(sensorMeters.get(3).get(1), constraints);
 		}
 
 		//Meter Five
 		constraints.gridx = 4;
 		  //Warning High
-		if(curSensorVals[4] <= 1500) {
+		if(curSensorVals[4] <= BLOCK_LEVELS[4]) {
 			sensorOuterPanel.add(sensorMeters.get(4).get(3), constraints);			
 		} //Warning Medium
-		else if (curSensorVals[4] <= 3000) { 
+		else if (curSensorVals[4] <= WARN_LEVELS[4]) { 
 			sensorOuterPanel.add(sensorMeters.get(4).get(2), constraints);
 		} //Warning Low
-		else if (curSensorVals[4] <= 4500) {
+		else {
 			sensorOuterPanel.add(sensorMeters.get(4).get(1), constraints);
 		} //Warning None
-		else {
-			sensorOuterPanel.add(sensorMeters.get(4).get(0), constraints);
-		}
 	}
 	
 	/**

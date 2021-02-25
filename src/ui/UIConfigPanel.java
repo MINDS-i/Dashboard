@@ -196,7 +196,7 @@ public class UIConfigPanel extends JPanel {
     					"Error", JOptionPane.ERROR_MESSAGE);
     			return;
     		}
-//    		System.err.println("Successful Core Install");
+    		System.err.println("Successful Core Install");
     		
     		
 			//Build list of available/connected boards
@@ -208,7 +208,7 @@ public class UIConfigPanel extends JPanel {
     					"Error", JOptionPane.ERROR_MESSAGE);
     			return;
     		}
-//    		System.err.println("Successful Board List Generation");
+    		System.err.println("Successful Board List Generation");
     		
 			//Parse core and port info
     		result = ACLIManager.getInstance().execute(
@@ -219,7 +219,7 @@ public class UIConfigPanel extends JPanel {
     					"Error", JOptionPane.ERROR_MESSAGE);
     			return;
     		}
-//    		System.err.println("Successful Board List Parsing");
+    		System.err.println("Successful Board List Parsing");
     		
 			//Compile selected sketch
     		result = ACLIManager.getInstance().execute(
@@ -231,7 +231,7 @@ public class UIConfigPanel extends JPanel {
     					"Error", JOptionPane.ERROR_MESSAGE);
     			return;
     		}
-//    		System.err.println("Successful Sketch Compile");
+    		System.err.println("Successful Sketch Compile");
     		
 			//Upload selected sketch
     		result = ACLIManager.getInstance().execute(
@@ -243,7 +243,7 @@ public class UIConfigPanel extends JPanel {
     					"Error", JOptionPane.ERROR_MESSAGE);
     			return;
     		}
-//    		System.err.println("Successful Sketch Upload");
+    		System.err.println("Successful Sketch Upload");
     		
     		JOptionPane.showMessageDialog(UIConfigPanel.this, 
     				"Sketch uploaded successfully.",
