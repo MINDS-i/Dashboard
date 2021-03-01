@@ -32,6 +32,9 @@ public class DataWindow implements ActionListener {
     private static final Dimension descriptionMin = new Dimension(300, 80);
     private static final Dimension descriptionPref= new Dimension(300, 200);
 
+    private JFrame frame;
+    private JPanel mainPanel;
+    
     private JTable telTable, setTable;
     private ColumnTableModel setModel;
     private ColumnTableModel telModel;
@@ -40,17 +43,12 @@ public class DataWindow implements ActionListener {
     private JPanel 		  	 logPanel;
     private JTextField	  	 logInput;
     private JTextComponent	 descriptionBox;
-
-    private JFrame frame;
     
     public DataWindow(Context cxt) {
         context = cxt;
         frame = new JFrame("Telemetry");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setSize(WINDOW_X,WINDOW_Y);
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-
         frame.addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
             public void windowClosing(java.awt.event.WindowEvent windowEvent) {
@@ -58,6 +56,9 @@ public class DataWindow implements ActionListener {
                 onClose();
             }
         });
+        
+        mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
 
         final SettingList settingList = context.settingList;
 
@@ -126,6 +127,7 @@ public class DataWindow implements ActionListener {
                 ;
             }
         });
+        
         settings.add( new TableColumn<String>() {
             public String getName() {
                 return "Setting";
@@ -147,7 +149,8 @@ public class DataWindow implements ActionListener {
                 Float newVal = Float.valueOf((String)val);
                 if(settingList.get(row).outsideOfBounds(newVal)) {
                     JFrame mf = new JFrame("Warning");
-                    JOptionPane.showMessageDialog(mf, "Caution: new value is outside of logical bounds");
+                    JOptionPane.showMessageDialog(
+                    		mf, "Caution: new value is outside of logical bounds");
                 }
                 settingList.pushSetting(row,newVal);
             }
@@ -203,13 +206,13 @@ public class DataWindow implements ActionListener {
         descriptionBox = dBox;
 
         constructLogPane();
-        panel.add(logPanel);
-        panel.add(telScroll);
-        panel.add(setScroll);
-        panel.add(descriptionBox);
-        panel.add(Box.createVerticalGlue());
+        mainPanel.add(logPanel);
+        mainPanel.add(telScroll);
+        mainPanel.add(setScroll);
+        mainPanel.add(descriptionBox);
+        mainPanel.add(Box.createVerticalGlue());
 
-        frame.add(panel);
+        frame.add(mainPanel);
         frame.pack();
         frame.setVisible(true);
         startUpdateTimer();
