@@ -170,6 +170,9 @@ public class DataWindow implements ActionListener {
         setTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         setTable.setFillsViewportHeight(true);
 
+        //setTable.setDefaultRenderer(Class type, new Renderer);
+        //setTable.setDefaultEditor(Class type, new Editor);
+        
         telScroll.setMaximumSize(  telemBoxMax);
         telScroll.setPreferredSize(telemBoxPref);
         telScroll.setMinimumSize(  telemBoxPref);
@@ -217,9 +220,11 @@ public class DataWindow implements ActionListener {
         frame.setVisible(true);
         startUpdateTimer();
     }
+    
     private void onClose() {
         if(update != null) update.cancel();
     }
+    
     private void constructLogPane() {
         logPanel = new JPanel();
         logPanel.setLayout(new FlowLayout());
@@ -249,6 +254,7 @@ public class DataWindow implements ActionListener {
         }
         if(descriptionBox != null) descriptionBox.setText(detail.toString());
     }
+    
     private void startUpdateTimer() {
         update = new java.util.Timer();
         update.scheduleAtFixedRate(new TimerTask() {
@@ -264,15 +270,19 @@ public class DataWindow implements ActionListener {
             }
         }, PERIOD, PERIOD);
     }
+    
     public void actionPerformed(ActionEvent evt) {
         if(logInput == null) return;
-        String inputText = logInput.getText();
+        
         int input;
+        String inputText = logInput.getText();
+        
         try {
             input = Integer.parseInt(inputText);
             logInput.setText(Integer.toString(input));
             context.telemLog.setPeriod(input);
-        } catch (NumberFormatException e) {
+        } 
+        catch (NumberFormatException e) {
             logInput.setText(Integer.toString(context.telemLog.getPeriod()));
         }
     }
