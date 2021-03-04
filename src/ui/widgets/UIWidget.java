@@ -1,4 +1,4 @@
-package com.ui;
+package com.ui.widgets;
 
 import com.Context;
 
