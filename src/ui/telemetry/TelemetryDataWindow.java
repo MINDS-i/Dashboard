@@ -2,7 +2,10 @@ package com.ui.telemetry;
 
 import com.Context;
 import com.remote.*;
+import com.serial.*;
 import com.table.TableFactory;
+
+import java.util.TimerTask;
 
 import javax.swing.*;
 import javax.swing.text.*;
@@ -10,6 +13,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.border.Border;
 import javax.swing.BorderFactory;
+import javax.swing.table.AbstractTableModel;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -25,9 +29,10 @@ import java.awt.event.WindowEvent;
 public class TelemetryDataWindow implements ActionListener {
 	
 	//Constants
-	private static final int UPDATE_PERIOD_MS = 200;
-	private static final int WINDOW_X = 300;
-	private static final int WINDOW_Y = 560;
+	private static final int UPDATE_PERIOD_MS 	= 200;
+	private static final int WINDOW_WIDTH 		= 300;
+	private static final int WINDOW_HEIGHT 		= 560;
+	private static final int LOG_FIELD_WIDTH 	= 8;
 
     private static final Dimension TELEM_DIM_PREF    = new Dimension(300, 140);
     private static final Dimension TELEM_DIM_MIN	 = new Dimension(300, 140);
@@ -44,6 +49,9 @@ public class TelemetryDataWindow implements ActionListener {
 	//UI Elements
 	private JFrame FRM_Window;
 	private JPanel PNL_Main;
+	private JPanel PNL_Log;
+	private JLabel LBL_Log;
+	private JTextField TXF_Log;
 	private JTextPane TXP_Description;
 	private JTextComponent TXC_DescriptionBox;
 	private JTable TBL_Telemetry;
@@ -53,6 +61,7 @@ public class TelemetryDataWindow implements ActionListener {
 	
 	//Standard Vars
 	private Context context;
+	private java.util.Timer updateTimer;
 		
 	/**
 	 * Class constructor resposnible for intializing and creating required 
@@ -66,7 +75,7 @@ public class TelemetryDataWindow implements ActionListener {
 		//Set up window JFrame
 		FRM_Window = new JFrame("Telemetry");
 		FRM_Window.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		FRM_Window.setSize(WINDOW_X, WINDOW_Y);
+		FRM_Window.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 		FRM_Window.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent event) {
@@ -85,10 +94,15 @@ public class TelemetryDataWindow implements ActionListener {
 		TXC_DescriptionBox = TXP_Description;
 		
 		//Set up Telemetry Table and ScrollPane
-		 ///
-		 ///
-		 ///
-		 ///
+		TBL_Telemetry = TableFactory.createTable(TableFactory.TableType.Telemetry,
+				context);
+		
+		SCL_Telemetry = new JScrollPane(TBL_Telemetry);
+		SCL_Telemetry.setMinimumSize(TELEM_DIM_MIN);
+		SCL_Telemetry.setMaximumSize(TELEM_DIM_MAX);
+		SCL_Telemetry.setPreferredSize(TELEM_DIM_PREF);
+		SCL_Telemetry.setBorder(TABLE_BORDERS);
+		
 		
 		//Set up Settings Table and ScrollPane
 		TBL_Settings = TableFactory.createTable(TableFactory.TableType.Settings,
@@ -104,15 +118,37 @@ public class TelemetryDataWindow implements ActionListener {
 		SCL_Settings.setMaximumSize(SETTINGS_DIM_MAX);
 		SCL_Settings.setPreferredSize(SETTINGS_DIM_PREF);
 		SCL_Settings.setBorder(TABLE_BORDERS);
+
+		//Build Log Panel
+		PNL_Log = new JPanel();
+		PNL_Log.setLayout(new FlowLayout());
+		LBL_Log = new JLabel("Set logging period (ms)");
+		TXF_Log = new JTextField();
+		TXF_Log.addActionListener(this);
+		TXF_Log.setText(Integer.toString(context.telemLog.getPeriod()));
+		TXF_Log.setColumns(LOG_FIELD_WIDTH);
+		PNL_Log.add(LBL_Log);
+		PNL_Log.add(TXF_Log);
 		
 		
 		//Set up Main JPanel
-			//Make sure all configuration for table elements is completed
 		PNL_Main = new JPanel();
 		PNL_Main.setLayout(new BoxLayout(PNL_Main, BoxLayout.PAGE_AXIS));
 		
+		//Add everything to main panel
+		PNL_Main.add(PNL_Log);
+		PNL_Main.add(SCL_Telemetry);
+		PNL_Main.add(SCL_Settings);
+		PNL_Main.add(TXP_Description);
+		PNL_Main.add(Box.createVerticalGlue());
 		
 		//Add Finished Panel to Frame
+		FRM_Window.add(PNL_Main);
+		FRM_Window.pack();
+		FRM_Window.setVisible(true);
+		
+		//Kick off the table updates
+		startTableUpdateTimer();
 	}
 	
 	/**
@@ -140,9 +176,24 @@ public class TelemetryDataWindow implements ActionListener {
         } 
     }
 	
-	//TODO - CP - Finish Implementation here	
+	/**
+	 * Updates the logging period in response to user driven
+	 * change.
+	 * @param event - The log period field update event
+	 */
 	public void actionPerformed(ActionEvent event) {
+		if(TXF_Log == null) {
+			return;
+		}
 		
+		try {
+			int input = Integer.parseInt(TXF_Log.getText());
+			TXF_Log.setText(Integer.toString(input));
+			context.telemLog.setPeriod(input);
+		}
+		catch(NumberFormatException e) {
+			TXF_Log.setText(Integer.toString(context.telemLog.getPeriod()));
+		}
 	}
 	
 	/**
@@ -153,9 +204,15 @@ public class TelemetryDataWindow implements ActionListener {
 		FRM_Window.toFront();
 	}
 	
-	//TODO - CP - Finish Implementation here
+	/**
+	 * Performs window closing operations such as
+	 * stoping the update timer if it is running when
+	 * the window is closed.
+	 */
 	public void onClose() {
-		
+		if(updateTimer != null) {
+			updateTimer.cancel();
+		}
 	}
 	
 	/**
@@ -165,5 +222,36 @@ public class TelemetryDataWindow implements ActionListener {
 	 */
 	public boolean getVisible() {
 		return FRM_Window.isVisible();
+	}
+	
+	/**
+	 * Initializes a periodic table update timer using the UPDATE_PERIOD_MS
+	 * variable. When the timer fires the table models will attempt to
+	 * update the current values.
+	 */
+	private void startTableUpdateTimer() {
+		updateTimer = new java.util.Timer();
+		updateTimer.scheduleAtFixedRate(new TimerTask() {
+			public void run() {
+				if(TBL_Telemetry.getModel() == null
+				|| TBL_Settings.getModel() == null) {
+					return;
+				}
+				
+				if(context.connected) {
+					AbstractTableModel telemetryModel = 
+							(AbstractTableModel) TBL_Telemetry.getModel();
+					AbstractTableModel settingsModel = 
+							(AbstractTableModel) TBL_Settings.getModel();
+					telemetryModel.fireTableRowsUpdated(
+							0, Serial.MAX_TELEMETRY);
+					settingsModel.fireTableRowsUpdated(
+							0, Serial.MAX_TELEMETRY);
+					
+					TBL_Telemetry.invalidate();
+					TBL_Settings.invalidate();
+				}
+			}
+		}, UPDATE_PERIOD_MS, UPDATE_PERIOD_MS);
 	}
 }

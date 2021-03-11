@@ -201,8 +201,6 @@ public class DataWindow implements ActionListener {
                 setDetail(setTable.getSelectedRow());
             }
         });
-
-        /////////
         
         JTextPane dBox = new JTextPane();
         dBox.setBorder(BorderFactory.createLineBorder(Color.gray));
@@ -212,7 +210,7 @@ public class DataWindow implements ActionListener {
         //dBox.setBorder(tableBorders);
         dBox.setOpaque(false);
         descriptionBox = dBox;
-
+        
         constructLogPane();
         mainPanel.add(logPanel);
         mainPanel.add(telScroll);
