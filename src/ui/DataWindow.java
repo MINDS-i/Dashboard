@@ -187,11 +187,14 @@ public class DataWindow implements ActionListener {
         setScroll.setBorder(tableBorders);
         telScroll.setBorder(tableBorders);
 
-        javax.swing.table.TableColumn col;
-        col = telTable.getColumn(telem.get(1).getName());
-        col.setPreferredWidth(1);
-        col = setTable.getColumn(settings.get(1).getName());
-        col.setPreferredWidth(1);
+        //TODO - CP - How is this variable ever used? This is the only place it appears...
+        //This is fully qualified because it creates a naming collision with the custom
+        //TableColumn interface in the code base... Bad.
+//        javax.swing.table.TableColumn col;
+//        col = telTable.getColumn(telem.get(1).getName());
+//        col.setPreferredWidth(1);
+//        col = setTable.getColumn(settings.get(1).getName());
+//        col.setPreferredWidth(1);
 
         setTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent event) {
@@ -199,6 +202,8 @@ public class DataWindow implements ActionListener {
             }
         });
 
+        /////////
+        
         JTextPane dBox = new JTextPane();
         dBox.setBorder(BorderFactory.createLineBorder(Color.gray));
         dBox.setContentType("text/html");
