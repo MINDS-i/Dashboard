@@ -18,8 +18,8 @@ public class TelemetryDataFieldPanel extends JPanel {
 
 	//Visual Components
 	protected JPanel 		panel;
-	protected JLabel 		telemName;
-	protected JTextField 	telemValField;
+//	protected JLabel 		telemName;
+//	protected JTextField 	telemValField;
 	protected FloatJSlider 	telemValSlider;
 
 	protected Setting		setting;
@@ -28,14 +28,6 @@ public class TelemetryDataFieldPanel extends JPanel {
 	
 	public TelemetryDataFieldPanel(Setting setting) {
 		this.setting = setting;
-		
-		//Create label
-		telemName = new JLabel(setting.getDescription());
-		
-		//Create/Set value in text field
-		telemValField = new JTextField(5);
-		telemValField.setEditable(false);
-		telemValField.setText(Float.toString(setting.getDefault()));
 
 		//Creat slider and map values to it.
 		//Parse out the decimal places for JSlider mapping (Jslider uses ints for range).
@@ -53,13 +45,14 @@ public class TelemetryDataFieldPanel extends JPanel {
 				min, max, (int) Math.floor(setting.getDefault()), conversionVal);
 		telemValSlider.setOpaque(false);
 		telemValSlider.setFocusable(false);
+		
 		telemValSlider.getModel().addChangeListener(new ChangeListener() {
 			@Override public void stateChanged(ChangeEvent event) {
 				BoundedRangeModel model = (BoundedRangeModel) event.getSource();
 				float updateVal = ((float) model.getValue() / (float) conversionVal);
 
 				//Update text field value
-				telemValField.setText(Objects.toString(updateVal));
+//				telemValField.setText(Objects.toString(updateVal));
 			}
 		});
 	}

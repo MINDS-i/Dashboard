@@ -4,6 +4,8 @@ import java.util.*;
 
 import com.Context;
 import com.ui.ninePatch.NinePatchPanel;
+import com.ui.widgets.*;
+
 
 import java.awt.*;
 import javax.swing.*;

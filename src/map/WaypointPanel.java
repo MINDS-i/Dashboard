@@ -10,7 +10,7 @@ import com.graph.Graph;
 import com.map.coordinateListener;
 import com.map.Dot;
 import com.serial.*;
-import com.ui.DataWindow;
+import com.ui.telemetry.TelemetryDataWindow;
 import com.ui.LogViewer;
 import com.ui.ninePatch.NinePatchPanel;
 import com.ui.SystemConfigWindow;
@@ -38,6 +38,7 @@ class WaypointPanel extends NinePatchPanel {
     private MapPanel map;
     private WaypointList waypoints;
     private javax.swing.Timer zoomTimer;
+    private TelemetryDataWindow telemetryDataWindow;
     TelemField latitude;
     TelemField longitude;
     TelemField altitude;
@@ -636,7 +637,6 @@ class WaypointPanel extends NinePatchPanel {
         }
     };
     
-    private DataWindow dataWindow;
     private Action openDataPanel = new AbstractAction() {
         {
             String text = "Telemetry";
@@ -644,12 +644,13 @@ class WaypointPanel extends NinePatchPanel {
         }
         public void actionPerformed(ActionEvent e) {
         	
-        	if(dataWindow != null && dataWindow.getVisible() == true) {
-        		dataWindow.toFront();
+        	if(telemetryDataWindow != null 
+    		&& telemetryDataWindow.getVisible() == true) {
+        		telemetryDataWindow.toFront();
         		return;
         	}
         	
-        	dataWindow = new DataWindow(context);
+        	telemetryDataWindow = new TelemetryDataWindow(context);
         }
     };
     

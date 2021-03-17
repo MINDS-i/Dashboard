@@ -9,7 +9,15 @@ import javax.swing.*;
  * custom JSlider class is intended for handling float values.
  */
 public class FloatJSlider extends JSlider{
-	private final int scale;
+	private int scale;
+	
+	/**
+	 * Default Constructor
+	 */
+	public FloatJSlider() {
+		super(0, 100, 50);
+		this.scale = 1;
+	}
 	
 	/**
 	 * Class constructor
@@ -29,5 +37,26 @@ public class FloatJSlider extends JSlider{
 	 */
 	public float getScaledValue() {
 		return ((float)super.getValue() / this.scale);
+	}
+	
+	/**
+	 * Sets the scale that determines decimal conversion when retrieving slider
+	 * values.
+	 * @return
+	 */
+	public int getScale() {
+		return scale;
+	}
+	
+	/**
+	 * Sets the current decimal scale for this slider.
+	 * @param value
+	 */
+	public void setScale(int value) {
+		scale = value;
+	}
+	
+	public void updateValue() {
+		//Update the slider value from an external source here.
 	}
 }

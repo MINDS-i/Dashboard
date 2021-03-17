@@ -8,29 +8,33 @@ public class Serial {
     public static final int WORD_TYPE      = 0x2;
     public static final int STRING_TYPE    = 0x3;
     
-    //waypoint type
+    //Waypoint type
     public static final int ADD_WAYPOINT   = 0x0;
     public static final int ALTER_WAYPOINT = 0x1;
     
-    //data type
+    //Data type
     public static final int TELEMETRY_DATA = 0x0;
     public static final int SETTING_DATA   = 0x1;
     public static final int SENSOR_DATA	   = 0x2;
+    public static final int INFO_DATA	   = 0x3;
     
     //Sensor Types
     public static final int OBJDETECT_SONIC= 0x0;
     
-    //word type
+    //Info Types
+    public static final int APM_VERSION	   = 0x0;
+    
+    //Word type
     public static final int CONFIRMATION   = 0x0;
     public static final int SYNC_WORD      = 0x1;
     public static final int COMMAND_WORD   = 0x2;
     public static final int STATE_WORD	   = 0x3;
     
-    //string type
+    //String type
     public static final int ERROR_STRING   = 0x0;
     public static final int STATE_STRING   = 0x1;
     
-    //commands
+    //Commands
     public static final byte ESTOP_CMD	  = 0x0;
     public static final byte TARGET_CMD	  = 0x1;
     public static final byte LOOPING_CMD  = 0x2;
@@ -39,7 +43,7 @@ public class Serial {
     public static final byte STOP_CMD 	  = 0x5;
     public static final byte START_CMD	  = 0x6;
     
-    //state types
+    //State types
     public static final byte APM_STATE	  = 0x0;
     public static final byte DRIVE_STATE  = 0x1;
     public static final byte AUTO_STATE	  = 0x2;
@@ -50,26 +54,26 @@ public class Serial {
     public static final byte APM_STATE_SELF_TEST 	= 0x2;
     public static final byte APM_STATE_DRIVE 		= 0x3;
     
-    //drive state sub values
+    //Drive state sub values
     public static final byte DRIVE_STATE_STOP 		= 0x1;
     public static final byte DRIVE_STATE_AUTO 		= 0x2;
     public static final byte DRIVE_STATE_RADIO 		= 0x3;
     
-    //auto state sub values
+    //Auto state sub values
     public static final byte AUTO_STATE_FULL 		= 0x1;
     public static final byte AUTO_STATE_AVOID		= 0x2;
     public static final byte AUTO_STATE_STALLED 	= 0x3;
     
-    //auto flags sub values
+    //Auto flags sub values
     public static final byte AUTO_STATE_FLAGS_NONE		= 0B00;
     public static final byte AUTO_STATE_FLAGS_CAUTION 	= 0B01;
     public static final byte AUTO_STATE_FLAGS_APPROACH 	= 0B10;
     
-    //sync
+    //Sync
     public static final byte SYNC_REQUEST = 0x00;
     public static final byte SYNC_RESPOND = 0x01;
     
-    //telemetry IDs
+    //Telemetry IDs
     public static final int LATITUDE      = 0;
     public static final int LONGITUDE     = 1;
     public static final int HEADING       = 2;

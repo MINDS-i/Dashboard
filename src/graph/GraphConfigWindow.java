@@ -1,7 +1,7 @@
 package com.graph;
 
 import com.table.ColumnTableModel;
-import com.table.TableColumn;
+import com.table.TelemetryColumn;
 
 import javax.swing.*;
 import java.awt.*;
@@ -84,8 +84,8 @@ class GraphConfigWindow {
     private JComponent buildSourceTable() {
         List<Graph.DataConfig> sources = subject.getSources();
 
-        ArrayList<TableColumn<?>> cols = new ArrayList<TableColumn<?>>();
-        cols.add( new TableColumn<String>() {
+        ArrayList<TelemetryColumn<?>> cols = new ArrayList<TelemetryColumn<?>>();
+        cols.add( new TelemetryColumn<String>() {
             public String getName() {
                 return "#";
             }
@@ -105,7 +105,7 @@ class GraphConfigWindow {
                 ;
             }
         });
-        cols.add( new TableColumn<Boolean>() {
+        cols.add( new TelemetryColumn<Boolean>() {
             public String getName() {
                 return "Graph?";
             }

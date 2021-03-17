@@ -12,7 +12,10 @@ import com.telemetry.*;
 import com.ui.*;
 import com.ui.ArtificialHorizon.DataAxis;
 import com.ui.ninePatch.*;
-import com.ui.PingWidget;
+import com.ui.widgets.PingWidget;
+import com.ui.telemetry.TelemetryDataWindow;
+import com.ui.widgets.*;
+
 import java.awt.*;
 import java.awt.Dimension;
 import java.awt.event.*;

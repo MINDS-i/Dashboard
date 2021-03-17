@@ -9,9 +9,9 @@ import javax.swing.event.*;
 import javax.swing.table.*;
 
 public class ColumnTableModel extends AbstractTableModel {
-    private List<TableColumn<?>> columns;
+    private List<TelemetryColumn<?>> columns;
    
-    public ColumnTableModel(List<TableColumn<?>> cList) {
+    public ColumnTableModel(List<TelemetryColumn<?>> cList) {
         columns = cList;
     }
     
@@ -24,7 +24,7 @@ public class ColumnTableModel extends AbstractTableModel {
         
         Iterator itr = columns.iterator();
         while(itr.hasNext()) {
-            TableColumn col = (TableColumn) itr.next();
+        	TelemetryColumn col = (TelemetryColumn) itr.next();
             rowCount = Math.min(col.getRowCount(), rowCount);
         }
         return rowCount;
@@ -50,7 +50,7 @@ public class ColumnTableModel extends AbstractTableModel {
         setValueAtHelper(columns.get(col), value, row);
         fireTableCellUpdated(row, col);
     }
-    private <T> void setValueAtHelper(TableColumn<T> tc, Object obj, int row){
+    private <T> void setValueAtHelper(TelemetryColumn<T> tc, Object obj, int row) {
         T val = tc.getDataClass().cast(obj);
         tc.setValueAt(val, row);
     }

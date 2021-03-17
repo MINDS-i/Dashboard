@@ -4,6 +4,7 @@ import com.Context;
 import com.remote.*;
 import com.table.*;
 import com.ui.telemetry.*;
+import com.ui.FloatJSlider;
 
 import java.io.*;
 import java.util.*;
@@ -46,11 +47,11 @@ public class TableFactory {
 		JTable table;
 		ColumnTableModel model;
 		SettingList settingList = context.settingList;
-		ArrayList<TableColumn<?>> columns = new ArrayList<TableColumn<?>>();
+		ArrayList<TelemetryColumn<?>> columns = new ArrayList<TelemetryColumn<?>>();
         
-		columns.add( new TableColumn<String>() {
+		columns.add(new TelemetryColumn<String>() {
             public String getName() {
-                return "name";
+                return "Name";
             }
             
             public String getValueAt(int row) {
@@ -76,7 +77,7 @@ public class TableFactory {
             }
         });
         
-        columns.add( new TableColumn<String>() {
+        columns.add(new TelemetryColumn<String>() {
             public String getName() {
                 return "Setting";
             }
@@ -94,6 +95,7 @@ public class TableFactory {
                 return String.class;
             }
             
+        	//TODO - CP - Once sliders are functional, remove editing for this cell?
             public boolean isRowEditable(int row) {
                 return true;
             }
@@ -109,6 +111,40 @@ public class TableFactory {
             }
         });
 
+        columns.add(new TelemetryColumn<Integer>() {
+        	public String getName() {
+        		return "Configuration";
+        	}
+        	
+        	public Integer getValueAt(int row) {
+        		float val = settingList.get(row).getVal();
+        		
+        		String str = String.valueOf(settingList.get(row).getDefault());
+        		String[] parsed = str.split(".");
+        		
+        		int sigFigs = (parsed.length > 2) ? parsed[1].length() : 0;
+        		int conversionVal = (sigFigs < 0) ? (int) Math.pow(10, sigFigs) : 1;
+
+        		return (int) (val * conversionVal);
+        	}
+        	
+        	public int getRowCount() {
+        		return settingList.size();
+        	}
+        	
+        	public Class<Integer> getDataClass() {
+        		return Integer.class;
+        	}
+        		
+        	public boolean isRowEditable(int row) {
+        		return true;
+        	}
+        	
+        	public void setValueAt(Integer val, int row) {
+        		
+        	}
+        });
+        
 		model = new ColumnTableModel(columns);
 		table = new JTable(model);
 		
@@ -128,8 +164,8 @@ public class TableFactory {
 		JTable table;
 		ColumnTableModel model;
 		
-		ArrayList<TableColumn<?>> columns = new ArrayList<TableColumn<?>>();
-        columns.add( new TableColumn<String>() {
+		ArrayList<TelemetryColumn<?>> columns = new ArrayList<TelemetryColumn<?>>();
+        columns.add( new TelemetryColumn<String>() {
             public String getName() {
                 return "name";
             }
@@ -154,7 +190,7 @@ public class TableFactory {
             }
         });
 
-        columns.add( new TableColumn<String>() {
+        columns.add( new TelemetryColumn<String>() {
             public String getName() {
                 return "Value";
             }
@@ -179,7 +215,7 @@ public class TableFactory {
                 ;
             }
         });
-		
+        
         model = new ColumnTableModel(columns);
         table = new JTable(model);
         

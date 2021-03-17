@@ -3,7 +3,7 @@ import com.Dashboard;
 import com.serial.*;
 import com.Context;
 import com.remote.*;
-import com.table.TableColumn;
+import com.table.TelemetryColumn;
 import com.table.ColumnTableModel;
 
 import java.awt.*;
@@ -62,8 +62,8 @@ public class DataWindow implements ActionListener {
 
         final SettingList settingList = context.settingList;
 
-        ArrayList<TableColumn<?>> telem = new ArrayList<TableColumn<?>>();
-        telem.add( new TableColumn<String>() {
+        ArrayList<TelemetryColumn<?>> telem = new ArrayList<TelemetryColumn<?>>();
+        telem.add( new TelemetryColumn<String>() {
             public String getName() {
                 return "name";
             }
@@ -83,7 +83,7 @@ public class DataWindow implements ActionListener {
             }
         });
 
-        telem.add( new TableColumn<String>() {
+        telem.add( new TelemetryColumn<String>() {
             public String getName() {
                 return "Value";
             }
@@ -104,8 +104,8 @@ public class DataWindow implements ActionListener {
             }
         });
 
-        ArrayList<TableColumn<?>> settings = new ArrayList<TableColumn<?>>();
-        settings.add( new TableColumn<String>() {
+        ArrayList<TelemetryColumn<?>> settings = new ArrayList<TelemetryColumn<?>>();
+        settings.add( new TelemetryColumn<String>() {
             public String getName() {
                 return "name";
             }
@@ -128,7 +128,7 @@ public class DataWindow implements ActionListener {
             }
         });
         
-        settings.add( new TableColumn<String>() {
+        settings.add( new TelemetryColumn<String>() {
             public String getName() {
                 return "Setting";
             }

@@ -65,8 +65,8 @@ public class TelemetryDataWindow implements ActionListener {
 		
 	/**
 	 * Class constructor resposnible for intializing and creating required 
-	 * telemetry/settings tables using the factory and setting up all UI component
-	 * visual layout.
+	 * telemetry/settings tables using the TableFactory class and setting 
+	 * up all UI component visual layout.
 	 * @param context - the application context
 	 */
 	public TelemetryDataWindow(Context context) {
@@ -130,19 +130,18 @@ public class TelemetryDataWindow implements ActionListener {
 		PNL_Log.add(LBL_Log);
 		PNL_Log.add(TXF_Log);
 		
-		
-		//Set up Main JPanel
+		//Set up main JPanel
 		PNL_Main = new JPanel();
 		PNL_Main.setLayout(new BoxLayout(PNL_Main, BoxLayout.PAGE_AXIS));
 		
-		//Add everything to main panel
+		//Add everything to main JPanel
 		PNL_Main.add(PNL_Log);
 		PNL_Main.add(SCL_Telemetry);
 		PNL_Main.add(SCL_Settings);
 		PNL_Main.add(TXP_Description);
 		PNL_Main.add(Box.createVerticalGlue());
 		
-		//Add Finished Panel to Frame
+		//Add finished panel setup to main JFrame
 		FRM_Window.add(PNL_Main);
 		FRM_Window.pack();
 		FRM_Window.setVisible(true);

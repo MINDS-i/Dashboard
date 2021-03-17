@@ -1,7 +1,7 @@
 package com.ui.widgets;
 
 import com.Context;
-import com.ui.UIWidget;
+import com.ui.widgets.UIWidget;
 
 import com.telemetry.TelemetryListener;
 
