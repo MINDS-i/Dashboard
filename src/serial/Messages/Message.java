@@ -137,4 +137,8 @@ public class Message {
     public static Message startDriving() {
     	return new WordMessage(Serial.COMMAND_WORD, Serial.START_CMD, (byte)0);
     }
+    
+    public static Message requestAPMVersion() {
+    	return new DataMessage(Serial.INFO_DATA, (byte)Serial.APM_VERSION, (byte)0);
+    }
 }

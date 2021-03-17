@@ -36,6 +36,8 @@ class DataMessage extends Message {
                 return "Settings Change";
             case Serial.SENSOR_DATA:
             	return "Sensor Message";
+            case Serial.INFO_DATA:
+            	return "Info Message";
         }
         return "Data Message";
     }

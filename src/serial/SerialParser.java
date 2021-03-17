@@ -116,6 +116,7 @@ public class SerialParser implements SerialPortEventListener {
                 	data  = Float.intBitsToFloat(tempdata);
                     context.setTelemetry(index, data);
                     break;
+                    
                 case Serial.SETTING_DATA:
                 	tempdata = ( ((msg[2]&0xff)<<24)|
             					 ((msg[3]&0xff)<<16)|
@@ -124,6 +125,7 @@ public class SerialParser implements SerialPortEventListener {
                 	data  = Float.intBitsToFloat(tempdata);
                     context.setSettingQuiet(index, data);
                     break;
+                    
                 case Serial.SENSOR_DATA:
                 	int sensorVal 	  = 0;
                 	int sensorSubtype = msg[1];
@@ -142,10 +144,30 @@ public class SerialParser implements SerialPortEventListener {
                         	
                         	context.dash.pingWidget.update(sensorIndex, sensorVal);
                         	break;
+                        	
                         default:
                         	System.err.println("Unrecognized Sensor Subtype");
                         	break;
                 	}
+                	break;
+                case Serial.INFO_DATA:
+                	int infoSubtype  = msg[1];
+                	
+                	switch(infoSubtype) {
+                		case Serial.APM_VERSION:
+                			int versionMajor = msg[2];
+                        	int versionMinor = msg[3];
+                        	int versionRev 	 = msg[4];
+                        	
+                        	context.setAPMVersion(String.format("%d.%d.%d",
+                        			versionMajor, versionMinor, versionRev));
+                			break;
+                			
+                		default:
+                			System.err.println("Unrecognized Info Subtype");
+                			break;
+                	}
+                	
                 	break;
             }
         }

@@ -10,9 +10,9 @@ import static org.mockito.Mockito.*;
 import org.mockito.InOrder;
 
 public class ColumnTableModel_test {
-    List<TableColumn<?>> mockTable(int cols) {
+    List<TelemetryColumn<?>> mockTable(int cols) {
         List list = new ArrayList();
-        for(int i=0; i<cols; i++) list.add(mock(TableColumn.class));
+        for(int i=0; i<cols; i++) list.add(mock(TelemetryColumn.class));
         return list;
     }
 
@@ -24,7 +24,7 @@ public class ColumnTableModel_test {
     }
     @Test
     public void testGetRowCount() {
-        List<TableColumn<?>> table = mockTable(3);
+        List<TelemetryColumn<?>> table = mockTable(3);
         ColumnTableModel ctm = new ColumnTableModel(table);
 
         when(table.get(0).getRowCount()).thenReturn(999);
@@ -35,7 +35,7 @@ public class ColumnTableModel_test {
     }
     @Test
     public void testGetColumnName() {
-        List<TableColumn<?>> table = mockTable(3);
+        List<TelemetryColumn<?>> table = mockTable(3);
         ColumnTableModel ctm = new ColumnTableModel(table);
 
         when(table.get(0).getName()).thenReturn("Bob");
@@ -44,7 +44,7 @@ public class ColumnTableModel_test {
     }
     @Test
     public void testGetValue() {
-        List<TableColumn<?>> table = mockTable(3);
+        List<TelemetryColumn<?>> table = mockTable(3);
         ColumnTableModel ctm = new ColumnTableModel(table);
 
         when(table.get(2).getValueAt(3)).thenReturn((Object)"Value");
@@ -53,17 +53,17 @@ public class ColumnTableModel_test {
     }
     @Test
     public void testGetColumnClass() {
-        List<TableColumn<?>> table = mockTable(3);
+        List<TelemetryColumn<?>> table = mockTable(3);
         ColumnTableModel ctm = new ColumnTableModel(table);
 
-        when( ((TableColumn<String>)table.get(0)).getDataClass() )
+        when( ((TelemetryColumn<String>)table.get(0)).getDataClass() )
             .thenReturn(String.class);
 
         assertEquals(String.class, ctm.getColumnClass(0));
     }
     @Test
     public void testIsCellEditable() {
-        List<TableColumn<?>> table = mockTable(3);
+        List<TelemetryColumn<?>> table = mockTable(3);
         ColumnTableModel ctm = new ColumnTableModel(table);
 
         when(table.get(1).isRowEditable(0)).thenReturn(true);
@@ -72,14 +72,14 @@ public class ColumnTableModel_test {
     }
     @Test
     public void testSetValue() {
-        List<TableColumn<?>> table = mockTable(3);
+        List<TelemetryColumn<?>> table = mockTable(3);
         ColumnTableModel ctm = new ColumnTableModel(table);
 
-        when( ((TableColumn<String>)table.get(1)).getDataClass() )
+        when( ((TelemetryColumn<String>)table.get(1)).getDataClass() )
             .thenReturn(String.class);
         when(table.get(1).isRowEditable(0)).thenReturn(true);
         ctm.setValueAt("Value", 0, 1);
 
-        verify((TableColumn<String>)table.get(1)).setValueAt("Value", 0);
+        verify((TelemetryColumn<String>)table.get(1)).setValueAt("Value", 0);
     }
 }

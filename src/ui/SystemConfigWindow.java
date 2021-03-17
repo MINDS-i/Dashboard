@@ -41,9 +41,11 @@ public class SystemConfigWindow {
 
         // Add version numbers
         String versionString = String.format(
-            "MINDS-i Dashboard | Version %s | %s",
+            "MINDS-i Dashboard | Dashboard Version %s | APM Version %s | %s",
             context.getResource("version_id"),
+            context.getAPMVersion(),
             context.getResource("release_date"));
+        
         JLabel versionPane = new JLabel(versionString);
         versionPane.setAlignmentX(Component.CENTER_ALIGNMENT);
         container.add(versionPane);

@@ -35,11 +35,13 @@ public class Context {
     private SerialPort port;
     private ResourceBundle resources;
     private Properties persist;
-
+    private String APMVersion;
+    
     private final File persistenceFile;
     private final String instanceLogName;
     private final Logger ioerr = Logger.getLogger("d.io");
 
+    
     public Context(Dashboard dashboard) {
         dash        = dashboard;
         port        = null;
@@ -284,5 +286,27 @@ public class Context {
     }
     public void onConnection() {
         sender.sendWaypointList();
+    }
+    
+    /**
+     * Sets the current APM board version string.
+     * @param version
+     */
+    public void setAPMVersion(String version) {
+    	APMVersion = version;
+    }
+    
+    /**
+     * Gets the current AMP board version string if available,
+     * otherwise returns a placeholder.
+     * @return - String
+     */
+    public String getAPMVersion() {
+		if(APMVersion == null || APMVersion.isEmpty()) {
+    		APMVersion = "x.x.x";
+    	}
+    	
+    	sender.sendMessage(Message.requestAPMVersion());
+		return APMVersion;
     }
 }
