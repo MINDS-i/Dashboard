@@ -34,14 +34,20 @@ public class TelemetryDataWindow implements ActionListener {
 	private static final int WINDOW_HEIGHT 		= 560;
 	private static final int LOG_FIELD_WIDTH 	= 8;
 
-    private static final Dimension TELEM_DIM_PREF    = new Dimension(300, 140);
-    private static final Dimension TELEM_DIM_MIN	 = new Dimension(300, 140);
+    private static final Dimension TELEM_DIM_PREF    = new Dimension(500, 140);
+    private static final Dimension TELEM_DIM_MIN	 = new Dimension(500, 140);
     private static final Dimension TELEM_DIM_MAX     = new Dimension(Integer.MAX_VALUE, 140);
+    
     private static final Dimension SETTINGS_DIM_PREF = new Dimension(300, 300);
     private static final Dimension SETTINGS_DIM_MIN	 = new Dimension(300, 300);
     private static final Dimension SETTINGS_DIM_MAX  = new Dimension(Integer.MAX_VALUE, 300);
-    private static final Dimension DESC_DIM_MIN 	 = new Dimension(300, 80);
-    private static final Dimension DESC_DIM_PREF	 = new Dimension(300, 200);
+    
+    private static final Dimension SLIDERS_DIM_PREF  = new Dimension(200, 300);
+    private static final Dimension SLIDERS_DIM_MIN	 = new Dimension(200, 300);
+    private static final Dimension SLIDERS_DIM_MAX   = new Dimension(Integer.MAX_VALUE, 300);
+        
+    private static final Dimension DESC_DIM_MIN 	 = new Dimension(500, 80);
+    private static final Dimension DESC_DIM_PREF	 = new Dimension(500, 200);
 	private static final Border    TABLE_BORDERS	 = BorderFactory.createCompoundBorder(
 													   	BorderFactory.createEmptyBorder(5, 5, 5, 5),
 													   	BorderFactory.createLineBorder(Color.BLACK));
@@ -49,6 +55,10 @@ public class TelemetryDataWindow implements ActionListener {
 	//UI Elements
 	private JFrame FRM_Window;
 	private JPanel PNL_Main;
+	
+	//New - To Vet
+	private JPanel PNL_Settings;
+	
 	private JPanel PNL_Log;
 	private JLabel LBL_Log;
 	private JTextField TXF_Log;
@@ -56,8 +66,15 @@ public class TelemetryDataWindow implements ActionListener {
 	private JTextComponent TXC_DescriptionBox;
 	private JTable TBL_Telemetry;
 	private JTable TBL_Settings;
+	
+	//New - To Vet
+	private JTable TBL_SettingsSliders;
+	
 	private JScrollPane SCL_Telemetry;
 	private JScrollPane SCL_Settings;
+	
+	//New - To Vet
+	private JScrollPane SCL_SettingsSliders;
 	
 	//Standard Vars
 	private Context context;
@@ -103,7 +120,6 @@ public class TelemetryDataWindow implements ActionListener {
 		SCL_Telemetry.setPreferredSize(TELEM_DIM_PREF);
 		SCL_Telemetry.setBorder(TABLE_BORDERS);
 		
-		
 		//Set up Settings Table and ScrollPane
 		TBL_Settings = TableFactory.createTable(TableFactory.TableType.Settings,
 				context);
@@ -112,12 +128,28 @@ public class TelemetryDataWindow implements ActionListener {
             	setSelectedDetails(TBL_Settings.getSelectedRow());
             }
         });
-
+        
 		SCL_Settings = new JScrollPane(TBL_Settings);
 		SCL_Settings.setMinimumSize(SETTINGS_DIM_MIN);
 		SCL_Settings.setMaximumSize(SETTINGS_DIM_MAX);
 		SCL_Settings.setPreferredSize(SETTINGS_DIM_PREF);
 		SCL_Settings.setBorder(TABLE_BORDERS);
+
+        //Set up SettingSlider Table and ScrollPane
+		TBL_SettingsSliders = TableFactory.createTable(TableFactory.TableType.Sliders,
+				context);
+		
+		SCL_SettingsSliders = new JScrollPane(TBL_SettingsSliders);
+		SCL_SettingsSliders.setMinimumSize(SLIDERS_DIM_MIN);
+		SCL_SettingsSliders.setMaximumSize(SLIDERS_DIM_MAX);
+		SCL_SettingsSliders.setPreferredSize(SLIDERS_DIM_PREF);
+		SCL_SettingsSliders.setBorder(TABLE_BORDERS);
+
+        //Pack both settings tables in flow layout settings panel
+        PNL_Settings = new JPanel();
+        PNL_Settings.setLayout(new FlowLayout());
+        PNL_Settings.add(SCL_Settings);
+        PNL_Settings.add(SCL_SettingsSliders);
 
 		//Build Log Panel
 		PNL_Log = new JPanel();
@@ -137,7 +169,7 @@ public class TelemetryDataWindow implements ActionListener {
 		//Add everything to main JPanel
 		PNL_Main.add(PNL_Log);
 		PNL_Main.add(SCL_Telemetry);
-		PNL_Main.add(SCL_Settings);
+		PNL_Main.add(PNL_Settings);
 		PNL_Main.add(TXP_Description);
 		PNL_Main.add(Box.createVerticalGlue());
 		
@@ -146,7 +178,7 @@ public class TelemetryDataWindow implements ActionListener {
 		FRM_Window.pack();
 		FRM_Window.setVisible(true);
 		
-		//Kick off the table updates
+		//Kick off table updates
 		startTableUpdateTimer();
 	}
 	
@@ -249,6 +281,7 @@ public class TelemetryDataWindow implements ActionListener {
 					
 					TBL_Telemetry.invalidate();
 					TBL_Settings.invalidate();
+					//TODO - CP - Does Slider table need to be invalidated here as well?
 				}
 			}
 		}, UPDATE_PERIOD_MS, UPDATE_PERIOD_MS);

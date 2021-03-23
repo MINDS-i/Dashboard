@@ -22,7 +22,7 @@ public class TableFactory {
 	//Constructor is private here to prevent object instantiation.
 	private TableFactory() {} 
 	
-	public enum TableType {Telemetry, Settings}
+	public enum TableType {Telemetry, Settings, Sliders}
 	
 	public static JTable createTable(TableType type, Context context) {
 		switch(type) {
@@ -30,6 +30,8 @@ public class TableFactory {
 				return buildTelemetryTable(context);
 			case Settings:
 				return buildSettingsTable(context);
+			case Sliders:
+				return buildSettingsSliderTable(context);
 			default:
 				System.err.println("TableFactory Error - Unknown table type");
 		}
@@ -110,50 +112,35 @@ public class TableFactory {
                 settingList.pushSetting(row,newVal);
             }
         });
-
-        columns.add(new TelemetryColumn<Integer>() {
-        	public String getName() {
-        		return "Configuration";
-        	}
-        	
-        	public Integer getValueAt(int row) {
-        		float val = settingList.get(row).getVal();
-        		
-        		String str = String.valueOf(settingList.get(row).getDefault());
-        		String[] parsed = str.split(".");
-        		
-        		int sigFigs = (parsed.length > 2) ? parsed[1].length() : 0;
-        		int conversionVal = (sigFigs < 0) ? (int) Math.pow(10, sigFigs) : 1;
-
-        		return (int) (val * conversionVal);
-        	}
-        	
-        	public int getRowCount() {
-        		return settingList.size();
-        	}
-        	
-        	public Class<Integer> getDataClass() {
-        		return Integer.class;
-        	}
-        		
-        	public boolean isRowEditable(int row) {
-        		return true;
-        	}
-        	
-        	public void setValueAt(Integer val, int row) {
-        		
-        	}
-        });
         
 		model = new ColumnTableModel(columns);
 		table = new JTable(model);
-		
+
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 		table.setFillsViewportHeight(true);
 		
 		return table;
 	}
 
+	private static JTable buildSettingsSliderTable(Context context) {
+		
+		JTable table;
+		SettingSliderModel model;
+		
+		
+		model = new SettingSliderModel(context.settingList.size());
+		
+		table = new JTable(model);
+		
+		table.setDefaultRenderer(SettingPercentage.class, new SliderRenderer());
+		//TODO - CP - Add SliderEditor set here.
+		
+		table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		table.setFillsViewportHeight(true);
+		
+		return table;
+	}
+	
 	/**
 	 * Creates a telemtry data table with column layout specified by 
 	 * the applied table model and sizing settings.
