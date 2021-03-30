@@ -3,13 +3,17 @@ package com.table;
 import com.Context;
 import com.remote.*;
 import com.table.*;
-import com.ui.telemetry.*;
 import com.ui.FloatJSlider;
+import com.ui.telemetry.SliderRenderer;
+import com.ui.telemetry.SliderEditor;
+import com.ui.telemetry.SettingPercentage;
 
 import java.io.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.table.*;
+//import javax.swing.event.TableModelListener;
+//import javax.swing.event.TableModelEvent;
 
 /**
  * @author Chris Park @ Infinetix Corp
@@ -122,6 +126,12 @@ public class TableFactory {
 		return table;
 	}
 
+	/**
+	 * Creates a custom table that renders slider controls for use in
+	 * controlling vehicle telemetry settings values.
+	 * @param context - The application context;
+	 * @return - A configured slider table.
+	 */
 	private static JTable buildSettingsSliderTable(Context context) {
 		
 		JTable table;
@@ -130,10 +140,28 @@ public class TableFactory {
 		
 		model = new SettingSliderModel(context.settingList.size());
 		
+//		model.addTableModelListener(new TableModelListener() {
+//			public void tableChanged(TableModelEvent event) {
+//				System.err.println("Model listener fired a change event.");
+//				
+//				TableModel model = (TableModel) event.getSource();
+//				
+//				int row = event.getFirstRow();
+//				int column = event.getColumn();
+//				
+//				Object data = model.getValueAt(row, column);
+//				
+//				if(data instanceof SettingPercentage) {
+//					System.err.println("Detected as setting percentage");
+//				}
+//			}
+//		});
+		
 		table = new JTable(model);
 		
-		table.setDefaultRenderer(SettingPercentage.class, new SliderRenderer());
-		//TODO - CP - Add SliderEditor set here.
+		table.setDefaultRenderer(SettingPercentage.class, new SliderRenderer(context));
+		table.setDefaultEditor(SettingPercentage.class, new SliderEditor(context, table));
+		
 		
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 		table.setFillsViewportHeight(true);

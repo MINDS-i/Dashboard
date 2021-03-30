@@ -1,6 +1,7 @@
 package com.table;
 
 import com.ui.telemetry.SettingPercentage;
+
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -13,6 +14,7 @@ public class SettingSliderModel extends AbstractTableModel {
 	
 	String headers[] = {"Configure"};
 	Object data[][];
+
 	
 	/**
 	 * Class Constructor
@@ -20,12 +22,13 @@ public class SettingSliderModel extends AbstractTableModel {
 	 */
 	public SettingSliderModel(int size) {
 		//Init the data structure based on the size of the
-		//telemetry settings list.
+		//telemetry settings list.		
 		data = new Object[size][1];
 		
 		for(int i = 0; i < size; i++) {
 			data[i][0] = new SettingPercentage();
 		}
+		
 	}
 	
 	/**
@@ -52,7 +55,7 @@ public class SettingSliderModel extends AbstractTableModel {
 	 * @return - Class
 	 */
 	@Override
-	public Class getColumnClass(int column) {
+	public Class<?> getColumnClass(int column) {
 		return SettingPercentage.class;
 	}
 	
@@ -97,6 +100,9 @@ public class SettingSliderModel extends AbstractTableModel {
 	 */
 	@Override
 	public void setValueAt(Object value, int row, int column) {
+//		System.err.println("SliderSettingModel - Setting value to model for row: " + row);
 		((SettingPercentage) data[row][column]).setPercentage(value);
+		
+		fireTableCellUpdated(row, column);
 	}
 }
