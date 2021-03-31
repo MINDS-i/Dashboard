@@ -48,6 +48,7 @@ public class Serial {
     public static final byte DRIVE_STATE  = 0x1;
     public static final byte AUTO_STATE	  = 0x2;
     public static final byte AUTO_FLAGS	  = 0x3;
+    public static final byte GPS_STATE	  = 0x4;
     
     //APM state sub values
     public static final byte APM_STATE_INIT 		= 0x1;
