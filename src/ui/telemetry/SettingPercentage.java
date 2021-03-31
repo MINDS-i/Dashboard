@@ -39,9 +39,7 @@ public class SettingPercentage {
 	 * @param value - The new percentage value
 	 */
 	public void setPercentage(Object value) {
-//		System.err.println("Setting Percentage - Attempting to determine value for set");
 		if(value instanceof SettingPercentage) {
-//			System.err.println("Setting Percentage - Value identified as setting percentage class");
 			setPercentage(((SettingPercentage) value).getPercentage());
 		}
 		else if (value instanceof String) {

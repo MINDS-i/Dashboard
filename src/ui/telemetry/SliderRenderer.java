@@ -21,12 +21,22 @@ public class SliderRenderer extends JSlider implements TableCellRenderer {
 		this.context = context;
 	}
 	
+	/**
+	 * Handles the standard functionality of the renderer. Determining how
+	 * values and positions are visually represented.
+	 * @param table - The table this renderer is attached to
+	 * @param value - The cell value manipulated by the renderer.
+	 * @param isSelected - Whether or not the active cell is selected
+	 * @param hasFocus - Whether or not the selected cell has focus.
+	 * @param row - The row location of the cell in the table
+	 * @param column - The column location of the cell in the table.
+	 * @return - Component
+	 */
 	@Override
 	public Component getTableCellRendererComponent(JTable table, Object value,
 			boolean isSelected, boolean hasFocus, int row, int column) {
 
 		if(value instanceof SettingPercentage) {
-//			System.err.println("SliderRenderer - In renderer component");
 			setValue(((SettingPercentage) value).getPercentage());
 		}
 		else {

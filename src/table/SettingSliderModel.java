@@ -100,9 +100,7 @@ public class SettingSliderModel extends AbstractTableModel {
 	 */
 	@Override
 	public void setValueAt(Object value, int row, int column) {
-//		System.err.println("SliderSettingModel - Setting value to model for row: " + row);
 		((SettingPercentage) data[row][column]).setPercentage(value);
-		
 		fireTableCellUpdated(row, column);
 	}
 }
