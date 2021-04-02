@@ -101,7 +101,7 @@ public class TableFactory {
             
         	//TODO - CP - Once sliders are functional, remove editing for this cell?
             public boolean isRowEditable(int row) {
-                return true;
+                return false;
             }
             
             public void setValueAt(String val, int row) {

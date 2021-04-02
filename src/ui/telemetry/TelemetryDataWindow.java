@@ -281,7 +281,6 @@ public class TelemetryDataWindow implements ActionListener {
 					
 					TBL_Telemetry.invalidate();
 					TBL_Settings.invalidate();
-					//TODO - CP - Does Slider table need to be invalidated here as well?
 				}
 			}
 		}, UPDATE_PERIOD_MS, UPDATE_PERIOD_MS);

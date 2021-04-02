@@ -24,3 +24,4 @@ resources/tile_servers.properties
 .settings/org.eclipse.wst.sse.core.prefs
 boardlist.txt
 arduino-cli.exe
+resources/groundSettings_edited.xml
