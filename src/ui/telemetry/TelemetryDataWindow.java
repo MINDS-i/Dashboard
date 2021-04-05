@@ -15,10 +15,18 @@ import javax.swing.border.Border;
 import javax.swing.BorderFactory;
 import javax.swing.table.AbstractTableModel;
 
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+
+
+import java.awt.event.MouseListener;
+import java.awt.event.MouseWheelListener;
+import java.awt.event.MouseEvent;
 
 /**
  * @author Chris Park @ Infinetix Corp
@@ -133,8 +141,18 @@ public class TelemetryDataWindow implements ActionListener {
 		SCL_Settings.setMinimumSize(SETTINGS_DIM_MIN);
 		SCL_Settings.setMaximumSize(SETTINGS_DIM_MAX);
 		SCL_Settings.setPreferredSize(SETTINGS_DIM_PREF);
-		SCL_Settings.setBorder(TABLE_BORDERS);
+		SCL_Settings.setBorder(TABLE_BORDERS);		
+		SCL_Settings.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
 
+		SCL_Settings.getViewport().addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent event) {
+				int scrollPosition = 
+						SCL_Settings.getVerticalScrollBar().getValue();
+				SCL_SettingsSliders.getVerticalScrollBar().setValue(scrollPosition);
+			}
+		});
+		
         //Set up SettingSlider Table and ScrollPane
 		TBL_SettingsSliders = TableFactory.createTable(TableFactory.TableType.Sliders,
 				context);
@@ -144,6 +162,15 @@ public class TelemetryDataWindow implements ActionListener {
 		SCL_SettingsSliders.setMaximumSize(SLIDERS_DIM_MAX);
 		SCL_SettingsSliders.setPreferredSize(SLIDERS_DIM_PREF);
 		SCL_SettingsSliders.setBorder(TABLE_BORDERS);
+
+		SCL_SettingsSliders.getViewport().addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent event) {
+				int scrollPosition = 
+						SCL_SettingsSliders.getVerticalScrollBar().getValue();
+				SCL_Settings.getVerticalScrollBar().setValue(scrollPosition);
+			}
+		});
 
         //Pack both settings tables in flow layout settings panel
         PNL_Settings = new JPanel();
