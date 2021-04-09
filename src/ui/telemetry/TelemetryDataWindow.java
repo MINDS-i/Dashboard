@@ -74,14 +74,10 @@ public class TelemetryDataWindow implements ActionListener {
 	private JTextComponent TXC_DescriptionBox;
 	private JTable TBL_Telemetry;
 	private JTable TBL_Settings;
-	
-	//New - To Vet
 	private JTable TBL_SettingsSliders;
 	
 	private JScrollPane SCL_Telemetry;
 	private JScrollPane SCL_Settings;
-	
-	//New - To Vet
 	private JScrollPane SCL_SettingsSliders;
 	
 	//Standard Vars
@@ -104,7 +100,6 @@ public class TelemetryDataWindow implements ActionListener {
 		FRM_Window.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent event) {
-				System.out.println("Data window closed");
 				onClose();
 			}
 		});
@@ -144,6 +139,7 @@ public class TelemetryDataWindow implements ActionListener {
 		SCL_Settings.setBorder(TABLE_BORDERS);		
 		SCL_Settings.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
 
+		//Tie scrolling movement to slider table
 		SCL_Settings.getViewport().addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent event) {
@@ -163,6 +159,7 @@ public class TelemetryDataWindow implements ActionListener {
 		SCL_SettingsSliders.setPreferredSize(SLIDERS_DIM_PREF);
 		SCL_SettingsSliders.setBorder(TABLE_BORDERS);
 
+		//Tie scrolling movement to settings table
 		SCL_SettingsSliders.getViewport().addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent event) {
@@ -204,6 +201,9 @@ public class TelemetryDataWindow implements ActionListener {
 		FRM_Window.add(PNL_Main);
 		FRM_Window.pack();
 		FRM_Window.setVisible(true);
+		
+		//Initialize slider values to match current telemetry data
+		initSliderPercentages();
 		
 		//Kick off table updates
 		startTableUpdateTimer();
@@ -312,4 +312,30 @@ public class TelemetryDataWindow implements ActionListener {
 			}
 		}, UPDATE_PERIOD_MS, UPDATE_PERIOD_MS);
 	}
+	
+	
+	/**
+	 * Initializes the slider values for current telemetry values when the
+	 * window is opened.
+	 */
+	public void initSliderPercentages() {
+		Setting setting;
+		float min; 
+		float max;
+		float current;
+		int percentage;
+		
+		for(int i = 0; i < context.settingList.size(); i++) {
+			setting = context.settingList.get(i);
+			min 	= setting.getMin();
+			max 	= setting.getMax();
+			current = setting.getVal();
+			
+			percentage = (int) Math.round(((current - min) * 100) / (max - min));
+			percentage = (int) Math.floor(percentage);
+			
+			TBL_SettingsSliders.getModel().setValueAt(percentage, i, 0);
+		}
+	}
+	
 }

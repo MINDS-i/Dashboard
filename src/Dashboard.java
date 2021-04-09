@@ -38,8 +38,6 @@ import jssc.SerialPort;
 import jssc.SerialPortException;
 import jssc.SerialPortList;
 
-//import com.ui.WidgetPanel;
-
 public class Dashboard implements Runnable {
     //Standard References
 	private Context context;

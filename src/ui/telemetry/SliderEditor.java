@@ -67,7 +67,7 @@ public class SliderEditor extends JSlider implements TableCellEditor {
 				//Edge Case and Update Window: The last value generated on mouse
 				//up is a duplicate of the previous change event. Update the setting
 				//value here.
-				if(previousChangeValue == getValue()) {					
+				if(previousChangeValue == getValue()) {
 					setting = context.settingList.get(row);
 					
 					float min 		= setting.getMin();

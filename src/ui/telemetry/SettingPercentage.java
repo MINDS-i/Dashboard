@@ -46,8 +46,7 @@ public class SettingPercentage {
 			setPercentage(Integer.parseInt((String) value));
 		}
 		else {
-			System.err.println(
-					"SettingPercentage - Unrecognized value type set attempt");
+			setPercentage((int)value);
 		}
 	}
 	
