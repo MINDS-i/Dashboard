@@ -302,11 +302,22 @@ public class Context {
      * @return - String
      */
     public String getAPMVersion() {
-		if(APMVersion == null || APMVersion.isEmpty()) {
+    	sender.sendMessage(Message.requestAPMVersion());
+    	
+    	try {
+    		Thread.sleep(250);	
+    	}
+    	catch(InterruptedException ex) {
+    		Thread.currentThread().interrupt();
+    		System.err.println("Context - Wait for version interrupted with exception: " 
+    		+ ex.toString());
+    	}
+    	
+    	
+    	if(APMVersion == null || APMVersion.isEmpty()) {
     		APMVersion = "x.x.x";
     	}
     	
-    	sender.sendMessage(Message.requestAPMVersion());
 		return APMVersion;
     }
 }
