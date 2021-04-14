@@ -59,6 +59,7 @@ public class WaypointPanel extends NinePatchPanel {
     public JButton zoomInButton;
     public JButton zoomOutButton;
     public JButton zoomFullButton;
+
     //Waypoint Options
     public JButton clearWaypoints;
     public JButton newButton;
