@@ -54,6 +54,7 @@ public class Dashboard implements Runnable {
     private TelemetryDataWidget dataWidget;
     public StateWidget stateWidget;
     public PingWidget pingWidget;
+    public MapPanel mapPanel;
     
     //Logging
     private final Logger seriallog = Logger.getLogger("d.serial");
@@ -146,7 +147,7 @@ public class Dashboard implements Runnable {
         
         JPanel messageBox = createAlertBox();
 
-        MapPanel mapPanel = new MapPanel(context,
+        mapPanel = new MapPanel(context,
         								 new Point((int)context.getHomeProp().getY(),
         										   (int)context.getHomeProp().getX()),
         								 4, // default zoom level

@@ -40,7 +40,7 @@ public class MapPanel extends JPanel implements CoordinateTransform {
     private BorderLayout  border = new BorderLayout();
     private DragListener  mouseListener = new DragListener();
     private LayerManager  mll = new LayerManager();
-    private WaypointPanel waypointPanel;
+    public WaypointPanel waypointPanel;
     private RoverPath     roverPath;
 
     private final Logger iolog = Logger.getLogger("d.io");

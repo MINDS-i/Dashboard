@@ -29,11 +29,13 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.xml.stream.XMLStreamException;
 
-class WaypointPanel extends NinePatchPanel {
-    protected static final int MOVE_STEP = 32;
+public class WaypointPanel extends NinePatchPanel {
+    //Constants
+	protected static final int MOVE_STEP = 32;
     protected static final int BDR_SIZE_TB = 20;
     protected static final int BDR_SIZE_LR = 15;
     protected static final String NO_WAYPOINT_MSG = "N / A";
+    
     private Context context;
     private MapPanel map;
     private WaypointList waypoints;
@@ -43,7 +45,31 @@ class WaypointPanel extends NinePatchPanel {
     TelemField longitude;
     TelemField altitude;
     JLabel waypointIndexDisplay;
-
+    
+    //Panel Buttons
+    public JButton tileButton;
+    public JButton dataPanel;
+    public JButton graphButton;
+    public JButton reTarget;
+    public JButton looping; 
+    public JButton config;
+    public JButton logPanelButton;
+    
+    //Map Zoom Options
+    public JButton zoomInButton;
+    public JButton zoomOutButton;
+    public JButton zoomFullButton;
+    //Waypoint Options
+    public JButton clearWaypoints;
+    public JButton newButton;
+    public JButton enterButton; 
+    public JButton undoButton;
+    public JButton redoButton;
+    public JButton saveButton;
+    public JButton loadButton;
+    public JButton missionButton;
+    
+    
     private class TelemField extends JTextField{
         float lastSetValue = Float.NaN;
         @Override
@@ -163,30 +189,30 @@ class WaypointPanel extends NinePatchPanel {
         final Dimension buttonSize = new Dimension(140, 25);
 
         //Make all buttons
-        JButton tileButton 	= theme.makeButton(nextTileServer);
-        JButton dataPanel 	= theme.makeButton(openDataPanel);
-        JButton graphButton = theme.makeButton(buildGraph);
-        JButton reTarget 	= theme.makeButton(reTargetRover);
-        JButton looping 	= theme.makeButton(toggleLooping);
-        JButton config      = theme.makeButton(openConfigWindow);
-        JButton logPanelButton = theme.makeButton(logPanelAction);
+        tileButton 		= theme.makeButton(nextTileServer);
+        dataPanel 		= theme.makeButton(openDataPanel);
+        graphButton 	= theme.makeButton(buildGraph);
+        reTarget 		= theme.makeButton(reTargetRover);
+        looping 		= theme.makeButton(toggleLooping);
+        config      	= theme.makeButton(openConfigWindow);
+        logPanelButton 	= theme.makeButton(logPanelAction);
         
         //Map Zoom Options
-        JButton zoomInButton = theme.makeButton(zoomInAction);
-        		zoomInButton.addMouseListener(zoomInMouseAdapter);
-        JButton zoomOutButton = theme.makeButton(zoomOutAction);
-        		zoomOutButton.addMouseListener(zoomOutMouseAdapter);
-        JButton zoomFullButton = theme.makeButton(zoomFullAction);
+        zoomInButton 	= theme.makeButton(zoomInAction);
+        zoomInButton.addMouseListener(zoomInMouseAdapter);
+        zoomOutButton 	= theme.makeButton(zoomOutAction);
+        zoomOutButton.addMouseListener(zoomOutMouseAdapter);
+        zoomFullButton 	= theme.makeButton(zoomFullAction);
 
         //Waypoint Options
-        JButton clearWaypoints = theme.makeButton(clearWaypointsAction);
-        JButton newButton = theme.makeButton(newWaypoint);
-        JButton enterButton = theme.makeButton(interpretLocationAction);
-        JButton undoButton = theme.makeButton(undoCommandAction);
-        JButton redoButton = theme.makeButton(redoCommandAction);
-        JButton saveButton = theme.makeButton(saveWaypoints);
-        JButton loadButton = theme.makeButton(loadWaypoints);
-        JButton missionButton = theme.makeButton(toggleMovement);
+        clearWaypoints 	= theme.makeButton(clearWaypointsAction);
+        newButton 		= theme.makeButton(newWaypoint);
+        enterButton 	= theme.makeButton(interpretLocationAction);
+        undoButton 		= theme.makeButton(undoCommandAction);
+        redoButton 		= theme.makeButton(redoCommandAction);
+        saveButton 		= theme.makeButton(saveWaypoints);
+        loadButton 		= theme.makeButton(loadWaypoints);
+        missionButton 	= theme.makeButton(toggleMovement);
         
         JComponent[] format = new JComponent[] {
             tileButton, dataPanel, graphButton,
@@ -500,6 +526,10 @@ class WaypointPanel extends NinePatchPanel {
     		}
     	}
     };
+    
+    public boolean getIsMoving() {
+    	return isUnitMoving;
+    }
     
     private Action previousWaypoint = new AbstractAction() {
         {

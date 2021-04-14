@@ -25,7 +25,7 @@ public class StateWidget extends UIWidget {
 	
 	private JFrame infoFrame;
 	
-	//State readouts
+	//State Readouts Labels
 	private JPanel apmPanel;
 	private JLabel apmLabel;
 	private JPanel drivePanel;
@@ -39,6 +39,9 @@ public class StateWidget extends UIWidget {
 	private JLabel gpsLabel;
 	
 	private StatusBarWidget statusBar;
+	
+	//State Tracking Variables
+	protected byte lastDriveState = 0xF;
 	
 	/**
 	 * Class constructor
@@ -217,11 +220,18 @@ public class StateWidget extends UIWidget {
 		String fmt;
 		String fmtStr = "Drv:%s";
 		
-//		System.err.println("StateWidget - Updating Drive State");
+//		System.err.println("StateWidget - Updating Drive State");		
 		switch(substate) {
 			case Serial.DRIVE_STATE_STOP:
 				fmt = String.format(fmtStr, "Stopped");
 				finalWidth = Math.min(fmt.length(), LINE_WIDTH);
+
+				//If the mission finished, update the Start/Stop Mission button.
+				if(context.dash.mapPanel.waypointPanel.getIsMoving()
+				&& lastDriveState != Serial.DRIVE_STATE_STOP) {
+					context.dash.mapPanel.waypointPanel.missionButton.doClick();	
+				}
+				
 				break;
 			case Serial.DRIVE_STATE_AUTO:
 				fmt = String.format(fmtStr, "Auto");
@@ -236,6 +246,7 @@ public class StateWidget extends UIWidget {
 				finalWidth = Math.min(fmt.length(), LINE_WIDTH);
 		}
 		driveLabel.setText(fmt.substring(0, finalWidth));
+		lastDriveState = substate;
 	}
 	
 	/**
