@@ -2,6 +2,8 @@ package com.ui.widgets;
 
 import com.Context;
 
+import java.util.logging.Logger;
+
 import javax.swing.*;
 import javax.swing.border.*;
 
@@ -23,7 +25,7 @@ public class UIWidget extends JPanel {
 	protected static final int 		BORDER_RHT 		= 0;
 	protected static final int 		LABEL_HEIGHT	= 25;
 	protected static final int		LABEL_WIDTH 	= 115;
-	
+		
 	//Standard Variables
 	protected Context context;
 	protected Border insets;
@@ -32,6 +34,8 @@ public class UIWidget extends JPanel {
 	protected JPanel titlePanel;
 	protected JLabel titleLabel;
 	
+	//Logging support
+	protected final Logger serialLog = Logger.getLogger("d.serial");
 	
 	/**
 	 * Class constructor

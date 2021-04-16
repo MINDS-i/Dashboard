@@ -320,10 +320,13 @@ public class StateWidget extends UIWidget {
 		flagLabel.setText(fmt.substring(0, finalWidth));
 	}
 	
+	boolean previousGPSState;
 	private void setGPSState(byte substate) {
 		int finalWidth;
 		String fmt;
 		String fmtStr = "GPS:%s";
+		
+		
 		
 		boolean GPSSignalGood = (substate == 0x00) ? true : false;
 		
@@ -337,6 +340,13 @@ public class StateWidget extends UIWidget {
 			finalWidth = Math.min(fmt.length(), LINE_WIDTH);
 		}
 		gpsLabel.setText(fmt.substring(0, finalWidth));
+		
+		if(previousGPSState != GPSSignalGood) {
+			serialLog.warning(
+					"GPS Signal is: " + (GPSSignalGood ? "Good" : "Bad"));
+		}
+		
+		previousGPSState = GPSSignalGood;
 	}
 	
 	/**
