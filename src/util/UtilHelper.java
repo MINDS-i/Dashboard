@@ -2,6 +2,7 @@ package com.util;
 
 import java.util.*;
 
+import com.map.Dot;
 
 /**
  * @author Chris Park @ Infinetix Corp
@@ -12,7 +13,7 @@ import java.util.*;
 public class UtilHelper {
 	private static UtilHelper utilHelperInstance = null;
 	
-	private static final double EARTH_RADIUS = 6371.00;
+	private static final double EARTH_RADIUS_KM = 6371.00;
 	private static final double FEET_PER_KM = 3280.84;
 	
 	/**
@@ -32,6 +33,18 @@ public class UtilHelper {
 		}
 		
 		return utilHelperInstance;
+	}
+	
+	
+	/**
+	 * Computes the distance in km between to points on the surface of a sphere.
+	 * @param pointA - First Waypoint (Dot)
+	 * @param pointB - Second Waypoint (Dot)
+	 * @return - Distance between coordinates in km
+	 */
+	public double haversine(Dot pointA, Dot pointB) {
+		return haversine(pointA.getLatitude(), pointA.getLongitude(),
+				pointB.getLatitude(), pointB.getLongitude());
 	}
 	
 	/**
@@ -58,7 +71,7 @@ public class UtilHelper {
 				    Math.cos(lat1) * 
 				    Math.cos(lat2)));
 		double c = (2 * Math.asin(Math.sqrt(a)));
-		return EARTH_RADIUS * c;
+		return EARTH_RADIUS_KM * c;
 	}
 	
 	/**

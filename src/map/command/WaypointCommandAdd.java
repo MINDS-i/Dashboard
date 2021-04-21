@@ -1,8 +1,13 @@
 package com.map.command;
 
+import javax.swing.*;
+
 import com.map.WaypointList;
 import com.map.command.WaypointCommand.CommandType;
 import com.map.Dot;
+import com.util.UtilHelper;
+
+
 
 /**
  * @author Chris Park @ Infinetix Corp.
@@ -11,7 +16,10 @@ import com.map.Dot;
  * active sessions list.
  */
 public class WaypointCommandAdd extends WaypointCommand {
-	
+	private static final double MIN_DISTANCE_FT = 45.00;
+	private static final String WARN_STRING = "For optimal results, a minimum" 
+			+ " distance of " + MIN_DISTANCE_FT + " feet between waypoints" 
+			+ " is recommended.";
 	/**
 	 * Constructor
 	 * @param waypoints - List of current navigational waypoints.
@@ -39,7 +47,9 @@ public class WaypointCommandAdd extends WaypointCommand {
 			waypoints.setTarget(index);
 		}
 		
-		waypoints.setSelected(index);	
+		waypoints.setSelected(index);			
+		warnMinimumDistance(index);
+
 		return true;
 	}
 	
@@ -61,5 +71,30 @@ public class WaypointCommandAdd extends WaypointCommand {
 	@Override
 	public boolean redo() {
 		return execute();
+	}
+	
+	/**
+	 * Check if the distance between the waypoint at index and the previous
+	 * waypoint (if there is one) are greater than a minimum recommended distance
+	 * (MIN_DIST_FT). If they are not, then provide a dialog box informing the user
+	 * that they should increase the distance for best performance.
+	 * @param index - the index of the most recent waypoint.
+	 */
+	public void warnMinimumDistance(int index) {
+		Dot waypointA;
+		Dot waypointB;
+		double distance;
+		
+		if(index > 0 ) {
+			waypointA = waypoints.get(index - 1).dot();
+			waypointB = waypoints.get(index).dot();
+			
+			distance = UtilHelper.getInstance().haversine(waypointA, waypointB);
+			distance = UtilHelper.getInstance().kmToFeet(distance);
+			
+			if(distance < MIN_DISTANCE_FT) {
+				JOptionPane.showMessageDialog(null, WARN_STRING);
+			}
+		}
 	}
 }
