@@ -22,6 +22,8 @@ import java.awt.*;
  * Description: Widget child class used for displaying Telemetry data.
  */
 public class TelemetryDataWidget extends UIWidget {
+	protected static final double BATTERY_LOW_THRESHOLD = 6.0;
+	
 	protected JPanel panel;
 	
 	private int lineWidth;
@@ -101,10 +103,17 @@ public class TelemetryDataWidget extends UIWidget {
             
 
             //TODO - CP - Parse the Vcc string here and change text on low voltage (< 6.0v)
-//            if(format.contains("Vcc")) {
-//            	System.out.println("Data: " + format);	
-//            }
+            if(format.contains("Vcc")) {
+            	if(data <= BATTERY_LOW_THRESHOLD) {
+            		this.setForeground(Color.red);
+            	}
+            	else {
+            		this.setForeground(Color.decode("0xEA8300"));
+            	}
+            }
 
+            
+            
             int finalWidth = Math.min(format.length(), lineWidth);
             setText(format.substring(0, finalWidth));
         }
