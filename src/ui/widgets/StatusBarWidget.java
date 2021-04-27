@@ -37,7 +37,7 @@ public class StatusBarWidget extends JPanel {
 	 */
 	public enum StatusType {
 		NORMAL		("Normal",	 	Color.black, Color.white), 
-		PROCESSING	("Processing",  Color.black, Color.blue), 
+		PROCESSING	("Processing",  Color.white, Color.blue), 
 		CAUTION		("Caution", 	Color.black, Color.yellow),
 		ERROR		("Error", 		Color.black, Color.red);
 		

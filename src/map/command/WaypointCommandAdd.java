@@ -1,13 +1,13 @@
 package com.map.command;
 
+import java.util.logging.Logger;
+
 import javax.swing.*;
 
 import com.map.WaypointList;
 import com.map.command.WaypointCommand.CommandType;
 import com.map.Dot;
 import com.util.UtilHelper;
-
-
 
 /**
  * @author Chris Park @ Infinetix Corp.
@@ -20,6 +20,9 @@ public class WaypointCommandAdd extends WaypointCommand {
 	private static final String WARN_STRING = "For optimal results, a minimum" 
 			+ " distance of " + MIN_DISTANCE_FT + " feet between waypoints" 
 			+ " is recommended.";
+	
+	private final Logger serialLog = Logger.getLogger("d.serial");
+	
 	/**
 	 * Constructor
 	 * @param waypoints - List of current navigational waypoints.
@@ -93,7 +96,12 @@ public class WaypointCommandAdd extends WaypointCommand {
 			distance = UtilHelper.getInstance().kmToFeet(distance);
 			
 			if(distance < MIN_DISTANCE_FT) {
+				serialLog.finer("Waypoint placement of "  
+								+ distance 
+								+ "feet is less than recommended minimum of " 
+								+ MIN_DISTANCE_FT + "feet.");
 				JOptionPane.showMessageDialog(null, WARN_STRING);
+				
 			}
 		}
 	}
