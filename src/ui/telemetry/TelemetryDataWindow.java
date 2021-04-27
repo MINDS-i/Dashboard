@@ -137,7 +137,7 @@ public class TelemetryDataWindow implements ActionListener {
 		SCL_Settings.setMaximumSize(SETTINGS_DIM_MAX);
 		SCL_Settings.setPreferredSize(SETTINGS_DIM_PREF);
 		SCL_Settings.setBorder(TABLE_BORDERS);		
-		SCL_Settings.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+//		SCL_Settings.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
 
 		//Tie scrolling movement to slider table
 		SCL_Settings.getViewport().addChangeListener(new ChangeListener() {
