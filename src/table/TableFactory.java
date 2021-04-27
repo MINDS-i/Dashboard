@@ -3,7 +3,6 @@ package com.table;
 import com.Context;
 import com.remote.*;
 import com.table.*;
-import com.ui.FloatJSlider;
 import com.ui.telemetry.SliderRenderer;
 import com.ui.telemetry.SliderEditor;
 import com.ui.telemetry.SettingPercentage;
@@ -99,7 +98,6 @@ public class TableFactory {
                 return String.class;
             }
             
-        	//TODO - CP - Once sliders are functional, remove editing for this cell?
             public boolean isRowEditable(int row) {
                 return false;
             }

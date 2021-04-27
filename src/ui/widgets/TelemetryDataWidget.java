@@ -98,6 +98,13 @@ public class TelemetryDataWidget extends UIWidget {
          */
         public void update(double data) {
             String format = String.format(formatStr, data);
+            
+
+            //TODO - CP - Parse the Vcc string here and change text on low voltage (< 6.0v)
+//            if(format.contains("Vcc")) {
+//            	System.out.println("Data: " + format);	
+//            }
+
             int finalWidth = Math.min(format.length(), lineWidth);
             setText(format.substring(0, finalWidth));
         }
