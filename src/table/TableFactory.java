@@ -99,17 +99,28 @@ public class TableFactory {
             }
             
             public boolean isRowEditable(int row) {
-                return false;
+                return true;
             }
             
             public void setValueAt(String val, int row) {
+            	
                 Float newVal = Float.valueOf((String)val);
+                
                 if(settingList.get(row).outsideOfBounds(newVal)) {
                     JFrame mf = new JFrame("Warning");
                     JOptionPane.showMessageDialog(
-                    		mf, "Caution: new value is outside of logical bounds");
+                    		mf, "Caution: new value is outside of allowable range. " +
+                    "The min or max of that range will be used.");
+                    
+                    //Ensure we are only setting values at maximum or minimum
+                    //if they have been exceeded.
+                    newVal = ((newVal > settingList.get(row).getMax()) 
+                    		? settingList.get(row).getMax() 
+                    		: settingList.get(row).getMin());
                 }
                 settingList.pushSetting(row,newVal);
+                
+                //TODO - CP - Update the slider position based on the set value.
             }
         });
         

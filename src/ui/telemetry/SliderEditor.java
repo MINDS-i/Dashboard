@@ -75,6 +75,7 @@ public class SliderEditor extends JSlider implements TableCellEditor {
 					float range 	= (max - min);
 					float settingValue = ((getValue() * range) / 100) + min;
 					
+					System.out.println("Pushing new setting value: " + settingValue);
 					//Set final updated value
 					context.settingList.pushSetting(row, settingValue);
 					
