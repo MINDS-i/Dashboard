@@ -11,6 +11,8 @@ import javax.swing.*;
 import javax.swing.text.*;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.event.TableModelEvent;
 import javax.swing.border.Border;
 import javax.swing.BorderFactory;
 import javax.swing.table.AbstractTableModel;
@@ -63,10 +65,7 @@ public class TelemetryDataWindow implements ActionListener {
 	//UI Elements
 	private JFrame FRM_Window;
 	private JPanel PNL_Main;
-	
-	//New - To Vet
 	private JPanel PNL_Settings;
-	
 	private JPanel PNL_Log;
 	private JLabel LBL_Log;
 	private JTextField TXF_Log;
@@ -132,12 +131,19 @@ public class TelemetryDataWindow implements ActionListener {
             }
         });
         
-		SCL_Settings = new JScrollPane(TBL_Settings);
+        //Set up slider visual updates when a value is entered manually.
+		TBL_Settings.getModel().addTableModelListener(new TableModelListener() {
+			@Override
+			public void tableChanged(TableModelEvent event) {
+				updateSliderPercentages();
+			}
+		});
+
+        SCL_Settings = new JScrollPane(TBL_Settings);
 		SCL_Settings.setMinimumSize(SETTINGS_DIM_MIN);
 		SCL_Settings.setMaximumSize(SETTINGS_DIM_MAX);
 		SCL_Settings.setPreferredSize(SETTINGS_DIM_PREF);
 		SCL_Settings.setBorder(TABLE_BORDERS);		
-//		SCL_Settings.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
 
 		//Tie scrolling movement to slider table
 		SCL_Settings.getViewport().addChangeListener(new ChangeListener() {
@@ -152,6 +158,15 @@ public class TelemetryDataWindow implements ActionListener {
         //Set up SettingSlider Table and ScrollPane
 		TBL_SettingsSliders = TableFactory.createTable(TableFactory.TableType.Sliders,
 				context);
+		
+		//Release table cell editing on mouse up so that sliders update correctly
+        TBL_SettingsSliders.addMouseListener(new MouseAdapter() {
+        	@Override
+        	public void mouseReleased(MouseEvent e) {
+        		TBL_SettingsSliders.getCellEditor().stopCellEditing();
+        	}
+        });
+		
 		
 		SCL_SettingsSliders = new JScrollPane(TBL_SettingsSliders);
 		SCL_SettingsSliders.setMinimumSize(SLIDERS_DIM_MIN);
@@ -202,8 +217,8 @@ public class TelemetryDataWindow implements ActionListener {
 		FRM_Window.pack();
 		FRM_Window.setVisible(true);
 		
-		//Initialize slider values to match current telemetry data
-		initSliderPercentages();
+		//Initialize/update slider values to match current telemetry data
+		updateSliderPercentages();
 		
 		//Kick off table updates
 		startTableUpdateTimer();
@@ -301,6 +316,7 @@ public class TelemetryDataWindow implements ActionListener {
 							(AbstractTableModel) TBL_Telemetry.getModel();
 					AbstractTableModel settingsModel = 
 							(AbstractTableModel) TBL_Settings.getModel();
+					
 					telemetryModel.fireTableRowsUpdated(
 							0, Serial.MAX_TELEMETRY);
 					settingsModel.fireTableRowsUpdated(
@@ -318,7 +334,7 @@ public class TelemetryDataWindow implements ActionListener {
 	 * Initializes the slider values for current telemetry values when the
 	 * window is opened.
 	 */
-	public void initSliderPercentages() {
+	public void updateSliderPercentages() {
 		Setting setting;
 		float min; 
 		float max;
@@ -337,5 +353,4 @@ public class TelemetryDataWindow implements ActionListener {
 			TBL_SettingsSliders.getModel().setValueAt(percentage, i, 0);
 		}
 	}
-	
 }

@@ -20,11 +20,18 @@ import javax.swing.table.*;
  */
 public class TableFactory {
 	
+	//Table type to return from the factory.
+	public enum TableType {Telemetry, Settings, Sliders}
+	
 	//Constructor is private here to prevent object instantiation.
 	private TableFactory() {} 
 	
-	public enum TableType {Telemetry, Settings, Sliders}
-	
+	/**
+	 * Create a table based on the Enum TableType provided.
+	 * @param type - The TableType of the table to create
+	 * @param context - The application context
+	 * @return JTable - The generated table
+	 */
 	public static JTable createTable(TableType type, Context context) {
 		switch(type) {
 			case Telemetry:
@@ -118,9 +125,7 @@ public class TableFactory {
                     		? settingList.get(row).getMax() 
                     		: settingList.get(row).getMin());
                 }
-                settingList.pushSetting(row,newVal);
-                
-                //TODO - CP - Update the slider position based on the set value.
+                settingList.pushSetting(row, newVal);
             }
         });
         

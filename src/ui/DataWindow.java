@@ -1,3 +1,8 @@
+/**
+ * DEPRICATED 4-21, Replaced by TelemetryDataWindow, with Table creation moved to
+ * separate class (TableFactory)
+ */
+
 package com.ui;
 import com.Dashboard;
 import com.serial.*;
@@ -186,15 +191,6 @@ public class DataWindow implements ActionListener {
                                   BorderFactory.createLineBorder(Color.BLACK) );
         setScroll.setBorder(tableBorders);
         telScroll.setBorder(tableBorders);
-
-        //TODO - CP - How is this variable ever used? This is the only place it appears...
-        //This is fully qualified because it creates a naming collision with the custom
-        //TableColumn interface in the code base... Bad.
-//        javax.swing.table.TableColumn col;
-//        col = telTable.getColumn(telem.get(1).getName());
-//        col.setPreferredWidth(1);
-//        col = setTable.getColumn(settings.get(1).getName());
-//        col.setPreferredWidth(1);
 
         setTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent event) {
