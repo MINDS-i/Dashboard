@@ -25,3 +25,5 @@ resources/tile_servers.properties
 boardlist.txt
 arduino-cli.exe
 resources/groundSettings_edited.xml
+resources/groundSettings_Old.xml
+resources/groundSettings.xml
