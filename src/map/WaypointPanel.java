@@ -36,11 +36,14 @@ public class WaypointPanel extends NinePatchPanel {
     protected static final int BDR_SIZE_LR = 15;
     protected static final String NO_WAYPOINT_MSG = "N / A";
     
+    
     private Context context;
     private MapPanel map;
     private WaypointList waypoints;
     private javax.swing.Timer zoomTimer;
     private TelemetryDataWindow telemetryDataWindow;
+    
+    //Text Fields
     TelemField latitude;
     TelemField longitude;
     TelemField altitude;
@@ -71,7 +74,7 @@ public class WaypointPanel extends NinePatchPanel {
     public JButton missionButton;
     
     
-    private class TelemField extends JTextField{
+    private class TelemField extends JTextField {
         float lastSetValue = Float.NaN;
         @Override
         public void setText(String newString){
@@ -95,14 +98,18 @@ public class WaypointPanel extends NinePatchPanel {
         super(cxt.theme.panelPatch);
         map = mapPanel;
         context = cxt;
+        
         makeActions();
+        
         waypoints = context.getWaypointList();
         setOpaque(false);
         LayoutManager layout = new BoxLayout(this, BoxLayout.PAGE_AXIS);
         setLayout(layout);
         setBorder(BorderFactory.createEmptyBorder(BDR_SIZE_TB, BDR_SIZE_LR,
         		BDR_SIZE_TB, BDR_SIZE_LR));
+        
         buildPanel();
+        
         addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent me) {
                 //do nothing here to prevent clicks from falling through
@@ -172,16 +179,18 @@ public class WaypointPanel extends NinePatchPanel {
         latitude.setForeground(Color.BLACK);
         longitude.setForeground(Color.BLACK);
         altitude.setForeground(Color.BLACK);
+        
         if(selectedWaypoint < 0){
             latitude.setEditable(false);
             longitude.setEditable(false);
             altitude.setEditable(false);
         } else {
-            latitude.setEditable(true);
-            longitude.setEditable(true);
-            altitude.setEditable(true);
+        	if(!isUnitMoving) {
+	            latitude.setEditable(true);
+	            longitude.setEditable(true);
+	            altitude.setEditable(true);
+        	}
         }
-
     }
 
     private void buildPanel() {
@@ -259,6 +268,7 @@ public class WaypointPanel extends NinePatchPanel {
         editorBoxes.add(new EditBoxSpec(latitude , "Lat: "));
         editorBoxes.add(new EditBoxSpec(longitude, "Lng: "));
         editorBoxes.add(new EditBoxSpec(altitude , context.getResource("waypointExtra")+" "));
+        
         ArrayList<JPanel> editorPanels = new ArrayList<JPanel>();
         for(EditBoxSpec box : editorBoxes) {
             //construct panel
@@ -366,6 +376,54 @@ public class WaypointPanel extends NinePatchPanel {
                 CommandManager.getInstance().process(command);
             }
         } catch (NumberFormatException e) {}
+    }
+    
+    /**
+     * Disables all WaypointPanel buttons and mouse events related
+     * to the manipulation of waypoints.
+     */
+    private void lockWaypoints() {
+    	//Buttons
+    	newButton.setEnabled(false);
+    	enterButton.setEnabled(false);
+    	undoButton.setEnabled(false);
+    	redoButton.setEnabled(false);
+    	saveButton.setEnabled(false);
+    	loadButton.setEnabled(false);
+    	reTarget.setEnabled(false);
+    	looping.setEnabled(false);
+    	
+    	//Manual Fields
+    	latitude.setEditable(false);
+    	longitude.setEditable(false);
+    	altitude.setEditable(false);
+    	
+    	//Mouse events
+    	map.enablePathModifications(false);
+    }
+    
+    /**
+     * Enables all WaypointPanel buttons and mouse events related
+     * to the manipulation of waypoints.
+     */
+    private void unlockWaypoints() {
+    	//Buttons
+    	newButton.setEnabled(true);
+    	enterButton.setEnabled(true);
+    	undoButton.setEnabled(true);
+    	redoButton.setEnabled(true);
+    	saveButton.setEnabled(true);
+    	loadButton.setEnabled(true);
+    	reTarget.setEnabled(true);
+    	looping.setEnabled(true);
+    	
+    	//Manual Fields
+    	latitude.setEditable(true);
+    	longitude.setEditable(true);
+    	altitude.setEditable(true);
+    	
+    	//Mouse events
+    	map.enablePathModifications(true);
     }
     
     private Action logPanelAction = new AbstractAction() {
@@ -516,11 +574,13 @@ public class WaypointPanel extends NinePatchPanel {
     	
     	public void actionPerformed(ActionEvent e) {
     		if(isUnitMoving) {
+    			unlockWaypoints();
     			context.sender.changeMovement(false);
     			putValue(Action.NAME, "Start Mission");
     			isUnitMoving = false;
     		}
     		else {
+    			lockWaypoints();
     			context.sender.changeMovement(true);
     			putValue(Action.NAME, "Stop Mission");
     			isUnitMoving = true;

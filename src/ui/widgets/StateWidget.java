@@ -326,8 +326,6 @@ public class StateWidget extends UIWidget {
 		String fmt;
 		String fmtStr = "GPS:%s";
 		
-		
-		
 		boolean GPSSignalGood = (substate == 0x00) ? true : false;
 		
 		if(GPSSignalGood) {

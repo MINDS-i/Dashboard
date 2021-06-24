@@ -285,6 +285,10 @@ public class MapPanel extends JPanel implements CoordinateTransform {
         return sources;
     }
 
+    /**
+     * Name: Class - DragListener
+     * Desc: Handles mouse movement events (Click and Drag, Zoom by scrollwheel) for the map.
+     */
     private class DragListener implements Layer, MouseWheelListener {
         private Point downCoords = null;
         private Point2D downPosition = null;
