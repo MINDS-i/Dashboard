@@ -219,9 +219,9 @@ public class SerialConnectPanel extends JPanel {
                 		SerialPort.STOPBITS_1,
                 		SerialPort.PARITY_NONE);
                 
-                serialPort.setFlowControlMode(
-                		SerialPort.FLOWCONTROL_RTSCTS_IN |
-                		SerialPort.FLOWCONTROL_RTSCTS_OUT);
+//                serialPort.setFlowControlMode(
+//                		SerialPort.FLOWCONTROL_RTSCTS_IN |
+//                		SerialPort.FLOWCONTROL_RTSCTS_OUT);
             } 
             catch(SerialPortException ex) {
                 System.err.println(ex.getMessage());

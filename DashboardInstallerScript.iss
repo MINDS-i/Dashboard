@@ -16,7 +16,7 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={pf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
-OutputDir=C:\Archives\WorkingDirectory\MINDS-i\Dashboard Installer
+OutputDir=C:\Archives\Working Directory\MINDS-i\Dashboard Installer
 OutputBaseFilename=DashboardSetup
 Compression=lzma
 SolidCompression=yes
@@ -28,10 +28,10 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}";
 
 [Files]
-Source: "C:\Archives\WorkingDirectory\MINDS-i\Dashboard Release\Dashboard.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Archives\WorkingDirectory\MINDS-i\Dashboard Release\DashBoard.jar"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Archives\WorkingDirectory\MINDS-i\Dashboard Release\RadioDiversv2.12.06WHQL_Centified.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Archives\WorkingDirectory\MINDS-i\Dashboard Release\resources\*"; DestDir: "{app}\resources"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\Archives\Working Directory\MINDS-i\Dashboard Release\Dashboard.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Archives\Working Directory\MINDS-i\Dashboard Release\DashBoard.jar"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Archives\Working Directory\MINDS-i\Dashboard Release\RadioDiversv2.12.06WHQL_Centified.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Archives\Working Directory\MINDS-i\Dashboard Release\resources\*"; DestDir: "{app}\resources"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
