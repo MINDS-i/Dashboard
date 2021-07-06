@@ -10,7 +10,7 @@ import com.Context;
 /**
  * @author Chris Park @ Infinetix Corp.
  * Date: 1-26-21
- * Description: Dashboard Widget child class used to display contextual vehicle 
+ * Description: Dashboard Widget class used to display contextual vehicle 
  * information in an easy to interpret visual format. Example use cases would be
  * displaying a units current decision state, or perhaps a visual warning level
  * indication related to a vehicle sensor or other data processing part over
@@ -32,7 +32,7 @@ public class StatusBarWidget extends JPanel {
 	protected StatusType currentType;
 	
 	/**
-	 * Pre-define status type enums used to more concisely track
+	 * Pre-defined status type enums used to more concisely track
 	 * status bar parameters by type and allow for easier updating.
 	 */
 	public enum StatusType {

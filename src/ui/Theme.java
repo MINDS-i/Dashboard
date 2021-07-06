@@ -34,6 +34,10 @@ public class Theme {
     public BufferedImage pingYellow;
     public BufferedImage pingGreen;
     public BufferedImage pingSpacer;
+    public BufferedImage verticalMeterRed;
+    public BufferedImage verticalMeterYellow;
+    public BufferedImage verticalMeterGreen;
+    public BufferedImage verticalMeterSpacer;
     public Font number;
     public Font text;
     public Font alertFont;
@@ -68,6 +72,10 @@ public class Theme {
             pingYellow		 = ImageIO.read(new File(img+ctx.getResource("ping_yellow")));
             pingGreen		 = ImageIO.read(new File(img+ctx.getResource("ping_green")));
             pingSpacer		 = ImageIO.read(new File(img+ctx.getResource("ping_spacer")));
+            verticalMeterRed = ImageIO.read(new File(img+ctx.getResource("gps_red")));
+            verticalMeterYellow = ImageIO.read(new File(img+ctx.getResource("gps_yellow")));
+            verticalMeterGreen = ImageIO.read(new File(img+ctx.getResource("gps_green")));
+            verticalMeterSpacer = ImageIO.read(new File(img+ctx.getResource("gps_spacer")));
             buttonPatch      = NinePatch.loadFrom(Paths.get(np+ctx.getResource("button")));
             buttonHover      = NinePatch.loadFrom(Paths.get(np+ctx.getResource("button_hovered")));
             buttonPress      = NinePatch.loadFrom(Paths.get(np+ctx.getResource("button_pressed")));
