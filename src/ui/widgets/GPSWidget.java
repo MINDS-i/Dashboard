@@ -3,6 +3,7 @@ package com.ui.widgets;
 import com.Context;
 import com.serial.Serial;
 import com.telemetry.TelemetryListener;
+import com.util.UtilHelper;
 
 import java.util.*;
 
@@ -23,7 +24,14 @@ import java.awt.image.BufferedImage;
  */
 public class GPSWidget extends UIWidget {
 	//Constants
-	protected final static int UPDATE_DELAY_MS = 5000;
+	protected final static int UPDATE_DELAY_MS 		= 5000;
+	protected final static int AVERAGE_WINDOW_SIZE 	= 10;
+	
+	protected final static int MIN_SATS_FOR_LOCK 	= 4;
+	
+	protected final static double HDOP_MAX_EXCELLENT= 1.0;
+	protected final static double HDOP_MAX_GOOD		= 2.0;
+	protected final static double HDOP_MAX_FAIR		= 5.0;
 	
 	//Meter Outer Panel
 	protected JPanel meterOuterPanel;
@@ -35,48 +43,36 @@ public class GPSWidget extends UIWidget {
 	protected javax.swing.Timer meterUpdateTimer;
 	
 	//Satellite Value/State
-	protected int satelliteValue;
-	protected SatelliteStrength currentSatelliteStrength;
+	protected int satIdx;
+	protected int satAvgVal;
+	protected double[] satAvgArray;
 
 	//HDOP Value/State
-	protected double hdopValue;
-	protected HDOPStrength currentHDOPStrength;
+	protected int hdopIdx;
+	protected double hdopAvgVal;
+	protected double[] hdopAvgArray;
+	
+	protected GPSStrength currGPSStrength;
 	
 	/**
 	 * Pre-defined strength enum used to track the GPS
-	 * signal strength derived from HDOP. Used as a rough
-	 * metric in conjunction with SatelliteStrength to make
-	 * a better determination of signal strength.
+	 * signal strength derived from HDOP and Satellite Data. 
 	 */
-	protected enum HDOPStrength {
-		EXCELLENT 	(1),
-		GOOD		(2),
-		POOR		(3),
-		UNKOWN		(-1);
+	protected enum GPSStrength {
+		UNKOWN		(0),
+		POOR		(1),
+		FAIR		(2),
+		GOOD		(3),
+		EXCELLENT 	(4);
 		
 		private final int strength;
 		
-		HDOPStrength(int strength) {
+		GPSStrength(int strength) {
 			this.strength = strength;
 		}
-	};
-	
-	/**
-	 * Pre-defined satellite strength enum based on the
-	 * number of available satellites. Used as a rough 
-	 * metric in conjunction with HDOPStrength to make
-	 * a better determination of signal strength.
-	 */
-	protected enum SatelliteStrength {
-		EXCELLENT	(15),
-		GOOD		(10),
-		POOR		(5),
-		UNKOWN		(-1);
 		
-		private final int numSats;
-		
-		SatelliteStrength(int numSats) {
-			this.numSats = numSats;
+		public int getValue() {
+			return this.strength;
 		}
 	};
 	
@@ -87,24 +83,57 @@ public class GPSWidget extends UIWidget {
 	public GPSWidget(Context ctx) {
 		super(ctx, "GPS");
 
-		//Init member variables
-		satelliteValue 	= -1;
-		hdopValue 		= -1.0;
-		updateSatelliteStrength(SatelliteStrength.UNKOWN);
-		updateHDOPStrength(HDOPStrength.UNKOWN);
+		//Init Satellite and HDOP averaging member vars
+		satIdx 		 = 0;
+		satAvgVal 	 = -1;
+		satAvgArray	 = new double[AVERAGE_WINDOW_SIZE];
+		
+		hdopIdx 	 = 0;
+		hdopAvgVal 	 = -1.0;
+		hdopAvgArray = new double[AVERAGE_WINDOW_SIZE];
+		
+		for(int i = 0; i < AVERAGE_WINDOW_SIZE; i++) {
+			satAvgArray[i]  = 0.0;
+			hdopAvgArray[i] = 0.0;
+		}
+
+		//Init current GPS strength state;
+		currGPSStrength = GPSStrength.UNKOWN;
 		
 		//Setup telemetry update listeners
 		ctx.telemetry.registerListener(Serial.GPSNUMSAT, new TelemetryListener() {
-			//The number of satellites here is an integer sent as floating
-			//point, so we account for rounding error
+			/**
+			 * Updates and computes a rolling average of the number of satellites.
+			 * Satellite data is represented as an integer, so rounding error 
+			 * is accounted for in the final calculation.
+			 * @param data - The most recent number of satellites
+			 */
 			public void update(double data) {
-				satelliteValue = (int)(data + 0.5);
+				if(satIdx == AVERAGE_WINDOW_SIZE) {
+					satIdx = 0;
+				}
+
+				satAvgArray[satIdx] = data;
+				satAvgVal = (int)(UtilHelper.getInstance().average(
+						satAvgArray, AVERAGE_WINDOW_SIZE) + 0.5);
+				satIdx++;
 			}
 		});
 		
 		ctx.telemetry.registerListener(Serial.GPSHDOP, new TelemetryListener() {
-			public void update(double data) {
-				hdopValue = data;
+			/**
+			 * Updates and computes a rolling average of HDOP values.
+			 * @param data - The most recent HDOP value
+			 */
+			public void update(double data) {				
+				if(hdopIdx == AVERAGE_WINDOW_SIZE) {
+					hdopIdx = 0;
+				}
+				
+				hdopAvgArray[hdopIdx] = data;
+				hdopAvgVal = UtilHelper.getInstance().average(
+						hdopAvgArray, AVERAGE_WINDOW_SIZE);
+				hdopIdx++;
 			}
 		});
 		
@@ -121,7 +150,7 @@ public class GPSWidget extends UIWidget {
 		
 		constraints.gridx = 0;
 		constraints.gridy = 0;
-		meterOuterPanel.add(gpsMeters.get(0), constraints);
+		meterOuterPanel.add(gpsMeters.get(GPSStrength.UNKOWN.getValue()), constraints);
 		
 		this.add(meterOuterPanel);
 		
@@ -141,7 +170,7 @@ public class GPSWidget extends UIWidget {
 		
 		meterSet = new ArrayList<JPanel>();
 		
-		//No Signal
+		//No Signal (Unknown)
 		panel = new JPanel();
 		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterSpacer)));
 		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterSpacer)));
@@ -163,9 +192,26 @@ public class GPSWidget extends UIWidget {
 		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterRed)));
 		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterRed)));
 		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterRed)));
+		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterSpacer)));
+		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterSpacer)));
+		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterSpacer)));
+		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterSpacer)));
+		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterSpacer)));
+		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterSpacer)));
+		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterSpacer)));
+		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterSpacer)));
+		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterSpacer)));
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		meterSet.add(panel);
+		
+		//Fair Signal
+		panel = new JPanel();
 		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterRed)));
-		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterSpacer)));
-		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterSpacer)));
+		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterRed)));
+		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterRed)));
+		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterYellow)));
+		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterYellow)));
+		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterYellow)));
 		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterSpacer)));
 		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterSpacer)));
 		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterSpacer)));
@@ -180,12 +226,12 @@ public class GPSWidget extends UIWidget {
 		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterRed)));
 		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterRed)));
 		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterRed)));
-		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterRed)));
 		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterYellow)));
 		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterYellow)));
 		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterYellow)));
-		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterYellow)));
-		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterSpacer)));
+		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterGreen)));
+		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterGreen)));
+		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterGreen)));
 		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterSpacer)));
 		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterSpacer)));
 		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterSpacer)));
@@ -197,11 +243,11 @@ public class GPSWidget extends UIWidget {
 		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterRed)));
 		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterRed)));
 		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterRed)));
-		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterRed)));
 		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterYellow)));
 		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterYellow)));
 		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterYellow)));
-		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterYellow)));
+		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterGreen)));
+		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterGreen)));
 		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterGreen)));
 		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterGreen)));
 		panel.add(new JLabel(new ImageIcon(context.theme.verticalMeterGreen)));
@@ -219,9 +265,53 @@ public class GPSWidget extends UIWidget {
 	 */
 	ActionListener meterUpdateAction = new ActionListener() {
 		public void actionPerformed(ActionEvent event) {
-			updateMeter();
+			determineSignalStrength();
 		}
 	};
+	
+	/**
+	 * Determines the current GPS signal strength based on the number 
+	 * of satellites visible and HDOP values. 
+	 * 
+	 * The Algorithm: At least 4 GPS satellites are needed to get a reliable
+	 * location fix on a position. If the number of satellites does not at least
+	 * equal this (MIN_SATS_FOR_LOCK) then the signal is considered poor and HDOP
+	 * values are not considered. If the minimum satellite requirement is met then
+	 * HDOP values are evaluated to determine the strength of the signal. (See
+	 * HDOP_MAX_[X] constants for range details)
+	 * 
+	 *  Once this is calculation is performed, the visual meter 
+	 * representation is updated. 
+	 */
+	protected void determineSignalStrength() {
+		
+		//Determine the current GPS signal strength
+		if(satAvgVal < MIN_SATS_FOR_LOCK) {
+			currGPSStrength = GPSStrength.POOR;
+		}
+		else {
+			if(hdopAvgVal < HDOP_MAX_EXCELLENT) {
+				currGPSStrength = GPSStrength.EXCELLENT;
+			}
+			else if ((hdopAvgVal >= HDOP_MAX_EXCELLENT) 
+				  && (hdopAvgVal <= HDOP_MAX_GOOD)) {
+				currGPSStrength = GPSStrength.GOOD;
+			}
+			else if ((hdopAvgVal > HDOP_MAX_GOOD) 
+				  && (hdopAvgVal <= HDOP_MAX_FAIR )) {
+				currGPSStrength = GPSStrength.FAIR;
+			}
+			else if (hdopAvgVal > HDOP_MAX_FAIR) {
+				currGPSStrength = GPSStrength.POOR;
+			}
+			else {
+				currGPSStrength = GPSStrength.UNKOWN;
+			}
+		}
+		
+		//Update the visual meters accordingly
+		updateMeter();
+	}
 	
 	/**
 	 * Updates the graphical representation of GPS signal strength for the
@@ -230,27 +320,11 @@ public class GPSWidget extends UIWidget {
 	protected void updateMeter() {
 		GridBagConstraints constraints = new GridBagConstraints();
 		
+		constraints.gridy = 0;
+		constraints.gridx = 0;
+		
 		meterOuterPanel.removeAll();
+		meterOuterPanel.add(gpsMeters.get(currGPSStrength.getValue()), constraints);
 		
-		//TODO - CP - Add strength determination algorithm here.
-		
-		//check levels to determine signal strength (enums)
-		//add corresponding meter set to outer panel.
-	}
-	
-	/**
-	 * Updates the current satellite strength tracked by the widget.
-	 * @param strength - The strength based on number of available satellites.
-	 */
-	public void updateSatelliteStrength(SatelliteStrength strength) {
-		currentSatelliteStrength = strength;
-	}
-	
-	/**
-	 * Updates the current HDOP strength tracked by the widget.
-	 * @param strength - The strength based on HDOP value.
-	 */
-	public void updateHDOPStrength(HDOPStrength strength) {
-		currentHDOPStrength = strength;
 	}
 }

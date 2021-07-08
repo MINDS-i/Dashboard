@@ -54,6 +54,7 @@ public class Dashboard implements Runnable {
     private TelemetryDataWidget dataWidget;
     public StateWidget stateWidget;
     public PingWidget pingWidget;
+    public GPSWidget gpsWidget;
     public MapPanel mapPanel;
     
     //Logging
@@ -233,7 +234,13 @@ public class Dashboard implements Runnable {
         pingWidget = new PingWidget(context);
         widgetPanel.add(pingWidget);
         
+        
+        //GPS Widget
+        gpsWidget = new GPSWidget(context);
+        widgetPanel.add(gpsWidget);
+        
         outerPanel.add(widgetPanel);
+        
         
         //Round Widgets
         outerPanel.add(AngleWidget.createDial(
