@@ -224,7 +224,7 @@ class RoverPath implements Layer {
     private void drawPoints(Graphics g) {
         Point tmp;
 
-        for(int i = waypoints.extendedIndexStart(); i < waypoints.size(); i++) {
+        for(int i = waypoints.getExtendedIndexStart(); i < waypoints.size(); i++) {
             tmp = toPoint(drawnLocation(i));
             ExtendedWaypoint w = waypoints.get(i);
             BufferedImage img = context.theme.waypointImage;
@@ -262,7 +262,7 @@ class RoverPath implements Layer {
     }
 
     public int isOverDot(Point2D click, BufferedImage image) {
-        for(int i = waypoints.extendedIndexStart(); i < waypoints.size(); i++) {
+        for(int i = waypoints.getExtendedIndexStart(); i < waypoints.size(); i++) {
             Dot d = waypoints.get(i).dot();
             Point2D loc = mapTransform.screenPosition(d.getLocation());
             if(Math.abs(click.getX()-loc.getX()-1) > image.getWidth() / 2.0) continue;
