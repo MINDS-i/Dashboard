@@ -24,11 +24,10 @@ import java.awt.image.BufferedImage;
  */
 public class GPSWidget extends UIWidget {
 	//Constants
-	protected final static int UPDATE_DELAY_MS 		= 5000;
+	protected final static int UPDATE_DELAY_MS 		= 1000;
 	protected final static int AVERAGE_WINDOW_SIZE 	= 10;
 	
-	protected final static int MIN_SATS_FOR_LOCK 	= 4;
-	
+	protected final static int    MIN_SATS_FOR_LOCK = 4;
 	protected final static double HDOP_MAX_EXCELLENT= 1.0;
 	protected final static double HDOP_MAX_GOOD		= 2.0;
 	protected final static double HDOP_MAX_FAIR		= 5.0;
