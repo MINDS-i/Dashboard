@@ -13,7 +13,7 @@ import java.awt.*;
  * 
  * @author Chris Park @ Infinetix Corp.
  * Date: 11-20-2020
- * Descriptions: Base class from which a UI widget derives its
+ * Description: Base class from which a UI widget derives its
  * general functionality.
  */
 public class UIWidget extends JPanel {

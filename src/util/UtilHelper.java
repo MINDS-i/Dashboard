@@ -35,9 +35,24 @@ public class UtilHelper {
 		return utilHelperInstance;
 	}
 	
+	/**
+	 * Computes the avarage of the provided array values.
+	 * @param array - The array to average
+	 * @param length - The length of the array
+	 * @return - the average of the array values.
+	 */
+	public double average(double[] array, int length) {
+		double sumOfData = 0;
+		
+		for(int i = 0; i < length; i++) {
+			sumOfData += array[i];
+		}
+		
+		return (sumOfData / length);
+	}
 	
 	/**
-	 * Computes the distance in km between to points on the surface of a sphere.
+	 * Computes the distance in km between two points on the surface of a sphere.
 	 * @param pointA - First Waypoint (Dot)
 	 * @param pointB - Second Waypoint (Dot)
 	 * @return - Distance between coordinates in km
@@ -48,7 +63,7 @@ public class UtilHelper {
 	}
 	
 	/**
-	 * Computes the distance in km between to points on the surface of a sphere.
+	 * Computes the distance in km between two points on the surface of a sphere.
 	 * @param lat1 - First latitude coordinate
 	 * @param lon1 - First longitude coordinate
 	 * @param lat2 - Second latitude coordinate

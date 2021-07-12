@@ -93,6 +93,8 @@ public class Serial {
     public static final int HOMELONGITUDE = 15;
     public static final int HOMEALTITUDE  = 16;
     public static final int DELTAALTITUDE = 17;
+    public static final int GPSNUMSAT 	  = 18;
+    public static final int GPSHDOP 	  = 19;
 
     public static final int	MAX_WAYPOINTS		= 64;
     public static final int	MAX_SETTINGS		= 64;
