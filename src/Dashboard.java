@@ -337,7 +337,7 @@ public class Dashboard implements Runnable {
             launchOptions.load(optFile);
             openglProperty =
                 launchOptions.getProperty("opengl", openglProperty);
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

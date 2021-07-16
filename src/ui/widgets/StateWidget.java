@@ -35,9 +35,6 @@ public class StateWidget extends UIWidget {
 	private JPanel flagPanel;
 	private JLabel flagLabel;
 	
-	private JPanel gpsPanel;
-	private JLabel gpsLabel;
-	
 	private StatusBarWidget statusBar;
 	
 	//State Tracking Variables
@@ -89,15 +86,9 @@ public class StateWidget extends UIWidget {
 		flagLabel.setForeground(DEF_FONT_COLOR);
 		flagLabel.setBackground(DEF_BACK_COLOR_B);
 		flagLabel.setOpaque(true);
-		
-		gpsLabel	= new JLabel("GPS:--");
-		gpsLabel.setFont(font);
-		gpsLabel.setForeground(DEF_FONT_COLOR);
-		gpsLabel.setBackground(DEF_BACK_COLOR_A);
-		gpsLabel.setOpaque(true);
-		
+
 		JComponent[] labelList = new JComponent[] {
-			apmLabel, driveLabel, autoLabel, flagLabel, gpsLabel	
+			apmLabel, driveLabel, autoLabel, flagLabel //, gpsLabel	
 		};
 		
 		for(JComponent jc : labelList) {
@@ -138,19 +129,10 @@ public class StateWidget extends UIWidget {
 		flagPanel.add(flagLabel);
 		statePanels.add(flagPanel);
 		
-		gpsPanel = new JPanel();
-		gpsPanel.setBorder(insets);
-		gpsPanel.setLayout(new BoxLayout(gpsPanel, BoxLayout.LINE_AXIS));
-		gpsPanel.setPreferredSize(labelSize);
-		gpsPanel.setOpaque(true);
-		gpsPanel.add(gpsLabel);
-		statePanels.add(gpsPanel);
-		
 		//Add panels to widget
 		for(JPanel panel : statePanels) {
 			this.add(panel);
 		}
-		
 	}
 	
 	/**
@@ -174,7 +156,10 @@ public class StateWidget extends UIWidget {
 				setFlagState(substate);
 				break;
 			case Serial.GPS_STATE:
-				setGPSState(substate);
+				//(CP - Depricated as of 7-15-21, May be utilized for
+				//other functionality at another time so this case is left
+				//in place for now. If this turns out to not be the case,
+				//then this should be removed.
 				break;
 			default:
 				System.err.println("Error - Unrecognized State");
@@ -318,33 +303,6 @@ public class StateWidget extends UIWidget {
 			statusBar.update(StatusBarWidget.StatusType.NORMAL);
 		}
 		flagLabel.setText(fmt.substring(0, finalWidth));
-	}
-	
-	boolean previousGPSState;
-	private void setGPSState(byte substate) {
-		int finalWidth;
-		String fmt;
-		String fmtStr = "GPS:%s";
-		
-		boolean GPSSignalGood = (substate == 0x00) ? true : false;
-		
-		if(GPSSignalGood) {
-			fmt = String.format(fmtStr, "Good");
-			finalWidth = Math.min(fmt.length(), LINE_WIDTH);
-			
-		}
-		else {
-			fmt = String.format(fmtStr, "Bad");
-			finalWidth = Math.min(fmt.length(), LINE_WIDTH);
-		}
-		gpsLabel.setText(fmt.substring(0, finalWidth));
-		
-		if(previousGPSState != GPSSignalGood) {
-			serialLog.warning(
-					"GPS Signal is: " + (GPSSignalGood ? "Good" : "Bad"));
-		}
-		
-		previousGPSState = GPSSignalGood;
 	}
 	
 	/**

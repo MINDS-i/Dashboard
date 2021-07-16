@@ -20,7 +20,6 @@ public class UtilHelper {
 	 * Constructor (Private, accessed by getInstance
 	 */
 	private UtilHelper() {
-		
 	}
 	
 	/**

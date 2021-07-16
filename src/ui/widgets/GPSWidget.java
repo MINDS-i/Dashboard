@@ -50,7 +50,7 @@ public class GPSWidget extends UIWidget {
 	protected int hdopIdx;
 	protected double hdopAvgVal;
 	protected double[] hdopAvgArray;
-	
+	protected boolean wasBelowMinSats;
 	protected GPSStrength currGPSStrength;
 	
 	/**
@@ -95,7 +95,9 @@ public class GPSWidget extends UIWidget {
 			satAvgArray[i]  = 0.0;
 			hdopAvgArray[i] = 0.0;
 		}
-
+		
+		wasBelowMinSats = false;
+		
 		//Init current GPS strength state;
 		currGPSStrength = GPSStrength.UNKOWN;
 		
@@ -272,24 +274,37 @@ public class GPSWidget extends UIWidget {
 	 * Determines the current GPS signal strength based on the number 
 	 * of satellites visible and HDOP values. 
 	 * 
-	 * The Algorithm: At least 4 GPS satellites are needed to get a reliable
-	 * location fix on a position. If the number of satellites does not at least
-	 * equal this (MIN_SATS_FOR_LOCK) then the signal is considered poor and HDOP
-	 * values are not considered. If the minimum satellite requirement is met then
-	 * HDOP values are evaluated to determine the strength of the signal. (See
-	 * HDOP_MAX_[X] constants for range details)
+	 * The Algorithm: At least MIN_SATS_FOR_LOCK GPS satellites are needed to get 
+	 * a reliable location fix on a position. If the number of satellites does 
+	 * not at least equal this, then the signal is considered poor and HDOP 
+	 * values are not considered. If the minimum satellite requirement is met 
+	 * then HDOP values are evaluated to determine the strength of the signal. 
+	 * (See HDOP_MAX_[X] constants at the head of the class for range details)
 	 * 
-	 *  Once this is calculation is performed, the visual meter 
-	 * representation is updated. 
+	 * Once this calculation is performed, the visual meter representation 
+	 * is updated. 
 	 */
 	protected void determineSignalStrength() {
+		boolean roverIsMoving = context.dash.mapPanel.waypointPanel.getIsMoving();
 		
-		//Determine the current GPS signal strength
+		//Check for minimum # satellites to lock in GPS signal.
 		if(satAvgVal < MIN_SATS_FOR_LOCK) {
 			currGPSStrength = GPSStrength.POOR;
-//			serialLog.warning("GPS: No good Sat lock!");
+			
+			//If there is an initial bad sat lock or the minimum sats
+			//cannot be met from a previously good HDOP state, send a warning. 
+			if(!wasBelowMinSats && roverIsMoving) {
+				serialLog.warning("GPS: Unable to obtain satellite lock.");
+				wasBelowMinSats = true;
+			}
 		}
 		else {
+			//If a good satellite lock was just obtained, notify the user.
+			if(wasBelowMinSats) {
+				serialLog.warning("GPS: Minimum satellite lock obtained.");
+				wasBelowMinSats = false;
+			}
+			
 			if(hdopAvgVal < HDOP_MAX_EXCELLENT) {
 				currGPSStrength = GPSStrength.EXCELLENT;
 			}
@@ -303,7 +318,7 @@ public class GPSWidget extends UIWidget {
 			}
 			else if (hdopAvgVal > HDOP_MAX_FAIR) {
 				currGPSStrength = GPSStrength.POOR;
-				serialLog.warning("GPS: HDOP lock Poor");
+				serialLog.warning("GPS: HDOP satellite lock is poor.");
 			}
 			else {
 				currGPSStrength = GPSStrength.UNKOWN;
