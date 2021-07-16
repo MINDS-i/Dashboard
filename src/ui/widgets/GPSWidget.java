@@ -287,6 +287,7 @@ public class GPSWidget extends UIWidget {
 		//Determine the current GPS signal strength
 		if(satAvgVal < MIN_SATS_FOR_LOCK) {
 			currGPSStrength = GPSStrength.POOR;
+//			serialLog.warning("GPS: No good Sat lock!");
 		}
 		else {
 			if(hdopAvgVal < HDOP_MAX_EXCELLENT) {
@@ -302,6 +303,7 @@ public class GPSWidget extends UIWidget {
 			}
 			else if (hdopAvgVal > HDOP_MAX_FAIR) {
 				currGPSStrength = GPSStrength.POOR;
+				serialLog.warning("GPS: HDOP lock Poor");
 			}
 			else {
 				currGPSStrength = GPSStrength.UNKOWN;
