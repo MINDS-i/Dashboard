@@ -76,7 +76,7 @@ public class GPSWidget extends UIWidget {
 	};
 	
 	/**
-	 * Class constructor
+	 * Class Constructor
 	 * @param ctx - The application context
 	 */
 	public GPSWidget(Context ctx) {

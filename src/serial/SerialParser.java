@@ -134,7 +134,6 @@ public class SerialParser implements SerialPortEventListener {
                 	
                 	switch(sensorSubtype) {
                 		case Serial.OBJDETECT_SONIC:
-//                			sensorIndex = msg[2];
                         	//[0]MSB [1]LSB
                         	sensorData[0] =  (msg[3] & 0xff);
                         	sensorData[1] =  (msg[4] & 0xff);
@@ -146,12 +145,11 @@ public class SerialParser implements SerialPortEventListener {
                         	break;
                         
                 		case Serial.OBJDETECT_BUMPER:
-//                			sensorIndex = msg[2];
                 			//0 = Off, 1 = On
                 			sensorVal = sensorData[0];
                 			
-                			//TODO - CP - Update a bumper widget here.
-                			//Send: Index (left/right), State (on/off)
+                			//TODO - CP - VERIFY this.
+//                			context.dash.bumperWidget.update(sensorIndex, sensorVal);
                 			break;
                 			
                         default:

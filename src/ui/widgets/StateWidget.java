@@ -35,7 +35,7 @@ public class StateWidget extends UIWidget {
 	private JPanel flagPanel;
 	private JLabel flagLabel;
 	
-	private StatusBarWidget statusBar;
+	protected StatusBarWidget statusBar;
 	
 	//State Tracking Variables
 	protected byte lastDriveState = 0xF;
@@ -304,6 +304,9 @@ public class StateWidget extends UIWidget {
 		}
 		flagLabel.setText(fmt.substring(0, finalWidth));
 	}
+	
+	//TODO - CP - Add Set Wiggle Flag state or incorporate into existing
+					//flag structure.
 	
 	/**
 	 * Generates an information panel on click describing any warnings, errors,
