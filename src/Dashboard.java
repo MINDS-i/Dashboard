@@ -55,6 +55,7 @@ public class Dashboard implements Runnable {
     public StateWidget stateWidget;
     public PingWidget pingWidget;
     public GPSWidget gpsWidget;
+    public BumperWidget bumperWidget;
     public MapPanel mapPanel;
     
     //Logging
@@ -238,6 +239,10 @@ public class Dashboard implements Runnable {
         //GPS Widget
         gpsWidget = new GPSWidget(context);
         widgetPanel.add(gpsWidget);
+        
+        //Bumper Widget
+        bumperWidget = new BumperWidget(context);
+        widgetPanel.add(bumperWidget);
         
         outerPanel.add(widgetPanel);
         

@@ -26,6 +26,7 @@ public class BumperWidget extends UIWidget {
 	
 	//Visual Components
 	protected JPanel outerPanel;
+	protected JPanel lowerPanel;
 	protected JPanel leftPanel;
 	protected JLabel leftLabel;
 	protected JPanel rightPanel;
@@ -65,7 +66,6 @@ public class BumperWidget extends UIWidget {
 	public BumperWidget(Context ctx) {
 		super(ctx, "Bumper");
 		
-		
 		Font font = context.theme.text.deriveFont(FONT_SIZE);
 		Dimension labelSize = new Dimension(50, 20);
 		
@@ -73,37 +73,48 @@ public class BumperWidget extends UIWidget {
 		bumperStateLeft 	= BumperStatus.CLEAR;
 		bumperStateRight 	= BumperStatus.CLEAR;
 		
+		//Set up outer panel
+		outerPanel = new JPanel();
+		outerPanel.setLayout(new BoxLayout(outerPanel, BoxLayout.Y_AXIS));
+		
+		//Set up lower panel (Houses Left/Right Displays)
+		lowerPanel = new JPanel();
+		lowerPanel.setLayout(new BoxLayout(lowerPanel, BoxLayout.X_AXIS));
+		
 		//Set up Status Bar
 		statusBar = new StatusBarWidget(context);
 		statusBar.update(StatusBarWidget.StatusType.CLEAR);
 		outerPanel.add(statusBar);
 		
 		//Set up left button label/panel
-		leftLabel 	= new JLabel("Left");
+		leftLabel 	= new JLabel("Left", SwingConstants.CENTER);
 		leftLabel.setBackground(DEF_INACTIVE_COLOR);
 		leftLabel.setOpaque(true);
 		leftLabel.setMaximumSize(labelSize);
 		
 		leftPanel = new JPanel();
 		leftPanel.setBorder(insets);
-		leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.LINE_AXIS));
+		leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.X_AXIS));
+		leftPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 		leftPanel.setPreferredSize(labelSize);
 		leftPanel.add(leftLabel);
-		outerPanel.add(leftPanel);
+		lowerPanel.add(leftPanel);
 	
 		//Set up right button label/panel
-		rightLabel 	= new JLabel("Right");
+		rightLabel 	= new JLabel("Right", SwingConstants.CENTER);
 		rightLabel.setBackground(DEF_INACTIVE_COLOR);
 		rightLabel.setOpaque(true);
 		rightLabel.setMaximumSize(labelSize);
 	
 		rightPanel = new JPanel();
 		rightPanel.setBorder(insets);
-		rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.LINE_AXIS));
+		rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.X_AXIS));
+		rightPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 		rightPanel.setPreferredSize(labelSize);
 		rightPanel.add(rightLabel);
-		outerPanel.add(rightPanel);
+		lowerPanel.add(rightPanel);
 		
+		outerPanel.add(lowerPanel);
 		this.add(outerPanel);
 	}
 	
