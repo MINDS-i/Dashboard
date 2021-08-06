@@ -177,7 +177,7 @@ public class BumperWidget extends UIWidget {
 				rightLabel.setBackground(DEF_ACTIVE_COLOR);
 				break;
 			default:
-				//TODO - CP - Log as unknown state? or use color to represent this?
+				serialLog.warning("BUMPER: Unknown left bumper STATE received on color update.");
 		}
 		
 		//Update Right Bumper
@@ -189,7 +189,7 @@ public class BumperWidget extends UIWidget {
 				rightLabel.setBackground(DEF_ACTIVE_COLOR);
 				break;
 			default:
-				//TODO - CP - Log as unknown state? or use color to represent this?
+				serialLog.warning("BUMPER: Unknown right bumper STATE received on color update.");
 		}
 	}
 	
