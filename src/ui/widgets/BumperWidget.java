@@ -125,8 +125,7 @@ public class BumperWidget extends UIWidget {
 	 * @param bumper - The bumper to be updated
 	 * @param state - the received state of the bumper
 	 */
-	public void update(byte bumper, byte state) {
-		
+	public void update(int bumper, int state) {
 		switch(bumper) {
 			case LEFT_BUMPER:
 				setBumperState(bumperStateLeft, state);
@@ -148,13 +147,13 @@ public class BumperWidget extends UIWidget {
 	 * @param target - Bumper to update
 	 * @param state - State to set that bumper to.
 	 */
-	protected void setBumperState(BumperStatus target, byte state) {
+	protected void setBumperState(BumperStatus target, int state) {
 		
 		switch(state) {
-			case 0x00:
+			case 0:
 				target = BumperStatus.CLEAR;
 				break;
-			case 0x01:
+			case 1:
 				target = BumperStatus.ACTIVATED;
 				break;
 			default:

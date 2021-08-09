@@ -132,24 +132,21 @@ public class SerialParser implements SerialPortEventListener {
                 	int sensorIndex   = msg[2];
                 	int[] sensorData = new int[2];
                 	
+                	sensorData[0] =  (msg[3] & 0xff);
+                	sensorData[1] =  (msg[4] & 0xff);
+                	for(int val : sensorData) {
+                		sensorVal = (sensorVal << 8) | val;
+                	}
+                	
                 	switch(sensorSubtype) {
                 		case Serial.OBJDETECT_SONIC:
-                        	//[0]MSB [1]LSB
-                        	sensorData[0] =  (msg[3] & 0xff);
-                        	sensorData[1] =  (msg[4] & 0xff);
-                        	for(int val : sensorData) {
-                        		sensorVal = (sensorVal << 8) | val;
-                        	}
-                        	
+                        	//SensorData: [0]MSB [1]LSB
                         	context.dash.pingWidget.update(sensorIndex, sensorVal);
                         	break;
                         
                 		case Serial.OBJDETECT_BUMPER:
-                			//0 = Off, 1 = On
-                			sensorVal = sensorData[0];
-                			
-                			//TODO - CP - VERIFY this.
-//                			context.dash.bumperWidget.update(sensorIndex, sensorVal);
+                			//SensorData: 0 = Off, 1 = On
+                			context.dash.bumperWidget.update(sensorIndex, sensorVal);
                 			break;
                 			
                         default:
