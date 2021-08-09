@@ -57,6 +57,7 @@ public class BumperWidget extends UIWidget {
 		public int getValue() {
 			return this.state;
 		}
+		
 	};
 		
 	/**
@@ -126,12 +127,28 @@ public class BumperWidget extends UIWidget {
 	 * @param state - the received state of the bumper
 	 */
 	public void update(int bumper, int state) {
+		BumperStatus newState;
+		
+		//Determine incoming state
+		switch(state) {
+			case 0:
+				newState = BumperStatus.CLEAR;
+				break;
+			case 1:
+				newState = BumperStatus.ACTIVATED;
+				break;
+			default:
+				newState = BumperStatus.UNKOWN;
+				serialLog.warning("BUMPER: Unrecognized bumper state, cannot update.");
+		}
+		
+		//Update target bumper
 		switch(bumper) {
 			case LEFT_BUMPER:
-				setBumperState(bumperStateLeft, state);
+				bumperStateLeft = newState;
 				break;
 			case RIGHT_BUMPER:
-				setBumperState(bumperStateRight, state);
+				bumperStateRight = newState;
 				break;
 			default:
 				serialLog.warning("BUMPER: Unkown bumper INDEX received on state update.");
@@ -140,25 +157,6 @@ public class BumperWidget extends UIWidget {
 		//Update Colors & Label
 		updateBumperColors();
 		updateStatusLabel();
-	}
-
-	/**
-	 * Sets the On/Off bumper state of the target bumper.
-	 * @param target - Bumper to update
-	 * @param state - State to set that bumper to.
-	 */
-	protected void setBumperState(BumperStatus target, int state) {
-		
-		switch(state) {
-			case 0:
-				target = BumperStatus.CLEAR;
-				break;
-			case 1:
-				target = BumperStatus.ACTIVATED;
-				break;
-			default:
-				serialLog.warning("BUMPER: Unkown bumper STATE received on state update.");
-		}
 	}
 	
 	/**
@@ -173,7 +171,7 @@ public class BumperWidget extends UIWidget {
 				leftLabel.setBackground(DEF_INACTIVE_COLOR);
 				break;
 			case ACTIVATED:
-				rightLabel.setBackground(DEF_ACTIVE_COLOR);
+				leftLabel.setBackground(DEF_ACTIVE_COLOR);
 				break;
 			default:
 				serialLog.warning("BUMPER: Unknown left bumper STATE received on color update.");
