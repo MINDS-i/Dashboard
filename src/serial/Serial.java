@@ -40,13 +40,15 @@ public class Serial {
     public static final int STATE_STRING   	 = 0x1;
     
     //Commands
-    public static final byte ESTOP_CMD	  	 = 0x0;
-    public static final byte TARGET_CMD	  	 = 0x1;
-    public static final byte LOOPING_CMD  	 = 0x2;
-    public static final byte CLEAR_CMD    	 = 0x3;
-    public static final byte DELETE_CMD   	 = 0x4;
-    public static final byte STOP_CMD 	  	 = 0x5;
-    public static final byte START_CMD	  	 = 0x6;
+    public static final byte ESTOP_CMD	  	 	= 0x0;
+    public static final byte TARGET_CMD	  	 	= 0x1;
+    public static final byte LOOPING_CMD  	 	= 0x2;
+    public static final byte CLEAR_CMD    	 	= 0x3;
+    public static final byte DELETE_CMD   	 	= 0x4;
+    public static final byte STOP_CMD 	  	 	= 0x5;
+    public static final byte START_CMD	  	 	= 0x6;
+    public static final byte ENABLE_BUMPER_CMD 	= 0x7;
+    public static final byte DISABLE_BUMPER_CMD = 0x8;
     
     //State types
     public static final byte APM_STATE	  	 = 0x0;
