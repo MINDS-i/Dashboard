@@ -31,7 +31,6 @@ public class BumperWidget extends UIWidget {
 	protected JLabel leftLabel;
 	protected JPanel rightPanel;
 	protected JLabel rightLabel;
-	protected StatusBarWidget statusBar;
 	
 	//State Tracking Variables
 	protected BumperStatus bumperStateLeft;
@@ -81,11 +80,6 @@ public class BumperWidget extends UIWidget {
 		//Set up lower panel (Houses Left/Right Displays)
 		lowerPanel = new JPanel();
 		lowerPanel.setLayout(new BoxLayout(lowerPanel, BoxLayout.X_AXIS));
-		
-		//Set up Status Bar
-		statusBar = new StatusBarWidget(context);
-		statusBar.update(StatusBarWidget.StatusType.CLEAR);
-		outerPanel.add(statusBar);
 		
 		//Set up left button label/panel
 		leftLabel 	= new JLabel("Left", SwingConstants.CENTER);
@@ -156,7 +150,6 @@ public class BumperWidget extends UIWidget {
 		
 		//Update Colors & Label
 		updateBumperColors();
-		updateStatusLabel();
 	}
 	
 	/**
@@ -189,21 +182,4 @@ public class BumperWidget extends UIWidget {
 				serialLog.warning("BUMPER: Unknown right bumper STATE received on color update.");
 		}
 	}
-	
-	/**
-	 * Updates the status label message with respect to
-	 * the currently held bumper button states.
-	 */
-	protected void updateStatusLabel() {
-		//If either bumper has been triggered, update the label to reflect this.
-		if((bumperStateLeft == BumperStatus.ACTIVATED)
-		||(bumperStateRight == BumperStatus.ACTIVATED)) {
-			statusBar.update(StatusBarWidget.StatusType.ACTIVATED);
-			return;
-		}
-		
-		//Otherwise assume the bumper is clear
-		statusBar.update(StatusBarWidget.StatusType.CLEAR);
-	}
-	
 }
