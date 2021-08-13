@@ -182,4 +182,29 @@ public class BumperWidget extends UIWidget {
 				serialLog.warning("BUMPER: Unknown right bumper STATE received on color update.");
 		}
 	}
+	
+	/**
+	 * Sets the working state of the widget to either enabled or disabled.
+	 * @param shouldEnabled - Whether or not to enable/disable the widget. 
+	 */
+	public void setEnabled(boolean shouldEnable) {
+		if(shouldEnable) {
+			leftPanel.setEnabled(true);
+			leftLabel.setEnabled(true);
+			rightPanel.setEnabled(true);
+			rightLabel.setEnabled(true);
+			lowerPanel.setEnabled(true);
+			outerPanel.setEnabled(true);
+			outerPanel.setVisible(true);
+		}
+		else {
+			leftPanel.setEnabled(false);
+			leftLabel.setEnabled(false);
+			rightPanel.setEnabled(false);
+			rightLabel.setEnabled(false);
+			lowerPanel.setEnabled(false);
+			outerPanel.setEnabled(false);
+			outerPanel.setVisible(false);
+		}
+	}
 }

@@ -158,24 +158,19 @@ public class UIConfigPanel extends JPanel {
 			putValue(Action.NAME, text);
 		}
 		
-		//NOTE - CP - Message should be ack'd by rover yes? Need to update this.
 		public void actionPerformed(ActionEvent e) {
 			
 			//Bumper enable/disable toggle
 			if(bumperIsEnabled && !bumperCheckBox.isSelected()) {
 				bumperIsEnabled = false;
 				context.sender.toggleBumper(bumperIsEnabled);
-				
-				//TODO - Gray out/disable widget
-				
+				context.dash.bumperWidget.setEnabled(bumperIsEnabled);
 			}
 			else if(!bumperIsEnabled && bumperCheckBox.isSelected()) {
 				bumperIsEnabled = true;
 				context.sender.toggleBumper(bumperIsEnabled);
-				
-				//TODO - Enable widget
+				context.dash.bumperWidget.setEnabled(bumperIsEnabled);
 			}
-			
 		} 
 	};
 	

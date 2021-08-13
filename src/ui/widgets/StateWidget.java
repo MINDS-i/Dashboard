@@ -311,9 +311,6 @@ public class StateWidget extends UIWidget {
 		flagLabel.setText(fmt.substring(0, finalWidth));
 	}
 	
-	//TODO - CP - Add Set Wiggle Flag state or incorporate into existing
-					//flag structure.
-	
 	/**
 	 * Generates an information panel on click describing any warnings, errors,
 	 * and details of the current state.
