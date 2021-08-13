@@ -73,9 +73,10 @@ public class Serial {
     public static final byte AUTO_STATE_STALLED 	= 0x3;
     
     //Auto flags sub values
-    public static final byte AUTO_STATE_FLAGS_NONE		= 0B00;
-    public static final byte AUTO_STATE_FLAGS_CAUTION 	= 0B01;
-    public static final byte AUTO_STATE_FLAGS_APPROACH 	= 0B10;
+    public static final byte AUTO_STATE_FLAGS_NONE		 = 0B00;
+    public static final byte AUTO_STATE_FLAGS_CAUTION 	 = 0B01;
+    public static final byte AUTO_STATE_FLAGS_APPROACH 	 = 0B10;
+    public static final byte AUTO_STATE_FLAGS_TURNAROUND = 0B100;
     
     //Sync
     public static final byte SYNC_REQUEST = 0x00;

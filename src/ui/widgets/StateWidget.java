@@ -278,8 +278,9 @@ public class StateWidget extends UIWidget {
 		String fmt;
 		String fmtStr = "Flg:%s";
 		
-		boolean caution  = ((substate & Serial.AUTO_STATE_FLAGS_CAUTION)  > 0 ) ? true : false;
-		boolean approach = ((substate & Serial.AUTO_STATE_FLAGS_APPROACH) > 0 ) ? true : false;
+		boolean caution  = ((substate & Serial.AUTO_STATE_FLAGS_CAUTION)    > 0) ? true : false;
+		boolean approach = ((substate & Serial.AUTO_STATE_FLAGS_APPROACH)   > 0) ? true : false;
+		boolean turn	 = ((substate & Serial.AUTO_STATE_FLAGS_TURNAROUND) > 0) ? true : false;
 		
 //		System.out.println("StateWidget - Updating Flag State");
 		if(caution && approach) {
@@ -296,6 +297,11 @@ public class StateWidget extends UIWidget {
 			fmt = String.format(fmtStr, "Caution");
 			finalWidth = Math.min(fmt.length(), LINE_WIDTH);
 			statusBar.update(StatusBarWidget.StatusType.CAUTION);
+		}
+		else if(turn) {
+			fmt = String.format(fmtStr, "Turn");
+			finalWidth = Math.min(fmt.length(), LINE_WIDTH);
+			statusBar.update(StatusBarWidget.StatusType.TURNAROUND);
 		}
 		else {
 			fmt = String.format(fmtStr, "None");

@@ -41,6 +41,7 @@ public class StatusBarWidget extends JPanel {
 		NORMAL		("Normal",	 	Color.black, Color.white), 
 		PROCESSING	("Processing",  Color.white, Color.blue), 
 		CAUTION		("Caution", 	Color.black, Color.yellow),
+		TURNAROUND	("Turn",		Color.white, Color.blue),
 		ERROR		("Error", 		Color.black, Color.red),
 		UNKNOWN		("Unknown", 	Color.black, Color.white),
 		
