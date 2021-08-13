@@ -36,10 +36,19 @@ public class StatusBarWidget extends JPanel {
 	 * status bar parameters by type and allow for easier updating.
 	 */
 	public enum StatusType {
+		
+		//General State Tracking
 		NORMAL		("Normal",	 	Color.black, Color.white), 
 		PROCESSING	("Processing",  Color.white, Color.blue), 
 		CAUTION		("Caution", 	Color.black, Color.yellow),
-		ERROR		("Error", 		Color.black, Color.red);
+		TURNAROUND	("Turn",		Color.white, Color.blue),
+		ERROR		("Error", 		Color.black, Color.red),
+		UNKNOWN		("Unknown", 	Color.black, Color.white),
+		
+		//Bumper Specific State Tracking
+		DEFER		("Defer to US", Color.black, Color.yellow),
+		ACTIVATED	("Activated",	Color.black, Color.yellow),
+		CLEAR		("Clear", 		Color.black, Color.white);
 		
 		private final String text;
 		private final Color fgColor;
@@ -52,7 +61,10 @@ public class StatusBarWidget extends JPanel {
 		}
 	};
 	
-	//Class Constructor
+	/**
+	 * Class Constructor
+	 * @param ctx - The application context
+	 */
 	public StatusBarWidget(Context ctx) {
 		context = ctx;
 		

@@ -3,52 +3,59 @@ package com.serial;
 import jssc.SerialPort;
 
 public class Serial {
-    public static final int WAYPOINT_TYPE  = 0x0;
-    public static final int DATA_TYPE      = 0x1;
-    public static final int WORD_TYPE      = 0x2;
-    public static final int STRING_TYPE    = 0x3;
+    public static final int WAYPOINT_TYPE  	 = 0x0;
+    public static final int DATA_TYPE      	 = 0x1;
+    public static final int WORD_TYPE      	 = 0x2;
+    public static final int STRING_TYPE    	 = 0x3;
     
     //Waypoint type
-    public static final int ADD_WAYPOINT   = 0x0;
-    public static final int ALTER_WAYPOINT = 0x1;
+    public static final int ADD_WAYPOINT   	 = 0x0;
+    public static final int ALTER_WAYPOINT 	 = 0x1;
     
     //Data type
-    public static final int TELEMETRY_DATA = 0x0;
-    public static final int SETTING_DATA   = 0x1;
-    public static final int SENSOR_DATA	   = 0x2;
-    public static final int INFO_DATA	   = 0x3;
+    public static final int TELEMETRY_DATA 	 = 0x0;
+    public static final int SETTING_DATA   	 = 0x1;
+    public static final int SENSOR_DATA	   	 = 0x2;
+    public static final int INFO_DATA	   	 = 0x3;
     
     //Sensor Types
-    public static final int OBJDETECT_SONIC= 0x0;
+    public static final int OBJDETECT_SONIC	 = 0x0;
+    public static final int OBJDETECT_BUMPER = 0x1;
+    
+    //Bumper Sub Types
+    public static final int BUMPER_BUTTON_LEFT  = 0x0;
+    public static final int BUMPER_BUTTON_RIGHT = 0x1;
     
     //Info Types
-    public static final int APM_VERSION	   = 0x0;
+    public static final int APM_VERSION	   	 = 0x0;
     
     //Word type
-    public static final int CONFIRMATION   = 0x0;
-    public static final int SYNC_WORD      = 0x1;
-    public static final int COMMAND_WORD   = 0x2;
-    public static final int STATE_WORD	   = 0x3;
+    public static final int CONFIRMATION   	 = 0x0;
+    public static final int SYNC_WORD      	 = 0x1;
+    public static final int COMMAND_WORD   	 = 0x2;
+    public static final int STATE_WORD	   	 = 0x3;
     
     //String type
-    public static final int ERROR_STRING   = 0x0;
-    public static final int STATE_STRING   = 0x1;
+    public static final int ERROR_STRING   	 = 0x0;
+    public static final int STATE_STRING   	 = 0x1;
     
     //Commands
-    public static final byte ESTOP_CMD	  = 0x0;
-    public static final byte TARGET_CMD	  = 0x1;
-    public static final byte LOOPING_CMD  = 0x2;
-    public static final byte CLEAR_CMD    = 0x3;
-    public static final byte DELETE_CMD   = 0x4;
-    public static final byte STOP_CMD 	  = 0x5;
-    public static final byte START_CMD	  = 0x6;
+    public static final byte ESTOP_CMD	  	 	= 0x0;
+    public static final byte TARGET_CMD	  	 	= 0x1;
+    public static final byte LOOPING_CMD  	 	= 0x2;
+    public static final byte CLEAR_CMD    	 	= 0x3;
+    public static final byte DELETE_CMD   	 	= 0x4;
+    public static final byte STOP_CMD 	  	 	= 0x5;
+    public static final byte START_CMD	  	 	= 0x6;
+    public static final byte ENABLE_BUMPER_CMD 	= 0x7;
+    public static final byte DISABLE_BUMPER_CMD = 0x8;
     
     //State types
-    public static final byte APM_STATE	  = 0x0;
-    public static final byte DRIVE_STATE  = 0x1;
-    public static final byte AUTO_STATE	  = 0x2;
-    public static final byte AUTO_FLAGS	  = 0x3;
-    public static final byte GPS_STATE	  = 0x4;
+    public static final byte APM_STATE	  	 = 0x0;
+    public static final byte DRIVE_STATE  	 = 0x1;
+    public static final byte AUTO_STATE	  	 = 0x2;
+    public static final byte AUTO_FLAGS	  	 = 0x3;
+    public static final byte GPS_STATE	  	 = 0x4;
     
     //APM state sub values
     public static final byte APM_STATE_INIT 		= 0x1;
@@ -66,9 +73,10 @@ public class Serial {
     public static final byte AUTO_STATE_STALLED 	= 0x3;
     
     //Auto flags sub values
-    public static final byte AUTO_STATE_FLAGS_NONE		= 0B00;
-    public static final byte AUTO_STATE_FLAGS_CAUTION 	= 0B01;
-    public static final byte AUTO_STATE_FLAGS_APPROACH 	= 0B10;
+    public static final byte AUTO_STATE_FLAGS_NONE		 = 0B00;
+    public static final byte AUTO_STATE_FLAGS_CAUTION 	 = 0B01;
+    public static final byte AUTO_STATE_FLAGS_APPROACH 	 = 0B10;
+    public static final byte AUTO_STATE_FLAGS_TURNAROUND = 0B100;
     
     //Sync
     public static final byte SYNC_REQUEST = 0x00;
