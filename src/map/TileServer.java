@@ -10,13 +10,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.imageio.*;
 
 /**
- * MapSource implementation for web-mecator maps loaded from external
+ * MapSource implementation for web-mercator maps loaded from external
  *  tile servers
  */
 
 class TileServer implements MapSource {
     //label tiles on screen for debugging
-    private static final boolean TILE_LABEL = false;
+    private static final boolean TILE_LABEL = true;
     //Number of pixels a tile takes up
     private static final int TILE_SIZE = 256;
     //Minimum index any tile can have on Z
@@ -321,6 +321,7 @@ class TileServer implements MapSource {
             return dir * (int) Math.signum(xydiff + Z_PRIORITY * zdiff);
         }
     }
+    
     /**
      * TileTag contains refereces to x,y,z coordinates, defining equals
      * and hash code appropriately, and generating url's for standard

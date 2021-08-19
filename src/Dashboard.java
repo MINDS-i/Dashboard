@@ -43,9 +43,10 @@ public class Dashboard implements Runnable {
 	private Context context;
     
 	//Static Values
-    private static final int START_WIDTH  = 1200; //default window width
-    private static final int START_HEIGHT = 900; //default window height
+    private static final int DEF_WINDOW_WIDTH  = 1200;
+    private static final int DEF_WINDOW_HEIGHT = 900;
     private static final int ROUND_WIDGET_SIZE = 105;
+    private static final int DEFAULT_ZOOM_LEVEL = 4;
 
     //UI Widget Frame
     WidgetPanel widgetPanel;
@@ -152,14 +153,14 @@ public class Dashboard implements Runnable {
         mapPanel = new MapPanel(context,
         								 new Point((int)context.getHomeProp().getY(),
         										   (int)context.getHomeProp().getX()),
-        								 4, // default zoom level
+        								 DEFAULT_ZOOM_LEVEL,
         								 serialPanel,
         								 createRightPanel(),
         								 messageBox);
         
         f.add(mapPanel);
         f.pack();
-        f.setSize(START_WIDTH, START_HEIGHT);
+        f.setSize(DEF_WINDOW_WIDTH, DEF_WINDOW_HEIGHT);
         f.setVisible(true);
     }
 
