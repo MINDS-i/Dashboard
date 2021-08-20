@@ -43,9 +43,9 @@ public class Dashboard implements Runnable {
 	private Context context;
     
 	//Static Values
-    private static final int DEF_WINDOW_WIDTH  = 1200;
-    private static final int DEF_WINDOW_HEIGHT = 900;
-    private static final int ROUND_WIDGET_SIZE = 105;
+    private static final int DEF_WINDOW_WIDTH  	= 1200;
+    private static final int DEF_WINDOW_HEIGHT 	= 900;
+    private static final int ROUND_WIDGET_SIZE 	= 105;
     private static final int DEFAULT_ZOOM_LEVEL = 4;
 
     //UI Widget Frame
