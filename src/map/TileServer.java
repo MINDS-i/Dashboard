@@ -21,16 +21,13 @@ class TileServer implements MapSource {
     //Number of pixels a tile takes up
     private static final int TILE_SIZE = 256;
     
+    //QUESTION (CP) - Why min 2? (Two's Compliment leading zeros, checks out)
     //Minimum index any tile can have on Z
-    //QUESTION (CP) - Why min 2?
     private static final int MIN_Z = 2;
     
-    //QUESTION (CP) - Why max 18?
+    //QUESTION (CP) - Why max 18? (Two's Compliment of max zoom here ends up being 22. This doesn't line up...)
     //Maximum index any tile can have on Z
-    private static final int MAX_Z = 18;
-    
-    //Maximum index any tile can have on X (CP - Not used anywhere?)
-//    private static final int MAX_X = (1 << MAX_Z) / TILE_SIZE;
+    private static final int MAX_Z = 18; 
     
     //Maximum index any tile can have on Y (Used in TileTag Hashcode calculation only)
     private static final int MAX_Y = (1 << MAX_Z) / TILE_SIZE;
@@ -57,25 +54,24 @@ class TileServer implements MapSource {
     private static final float ZOOM_CROSSOVER = 1.30f;
 
     //Dummy image to render when a tile that has not loaded is requested
-    private static final Image dummyTile = new BufferedImage(TILE_SIZE,TILE_SIZE,
+    private static final Image dummyTile = new BufferedImage(TILE_SIZE, TILE_SIZE,
                                                              BufferedImage.TYPE_INT_ARGB);
 
-    //CP - List of listeners that should be triggered to repaint when a change 
-    //to the map tiles occurs...Should be a satellite and elevation map for our
-    //purposes.
+    //List of listeners triggered to repaint when a change to the map tiles occurs
     private java.util.List<Component> repaintListeners = new LinkedList<Component>();
+
     
     //Key value pairings for currently cached map tile data. Contains the following:
-    	//TileTag - XYZ and URL (Standard Web Mercator Protocol)
-    	//Image - Corresponding Image to go along with tile tag information
+    // 		TileTag - XYZ and URL (Standard Web Mercator Protocol)
+    // 		Image - that coincides with the tile tag information
     private Map<TileTag, Image> cache = 
     		new ConcurrentHashMap<TileTag, Image>(CACHE_SIZE + 1, 1.0f);
     
-    //CP - Main URL of the tile server to be used (Root here because each TileTag has an 
-    //additional URL piece that gets concatenated on to access it from the server.
+    //Main URL of the tile server to be used. specific tile addresses are 
+    //concatenated to this
     private final String rootURL;
     
-    // Keep track of the map position on the last draw to trigger new tile loads
+    // Keeps track of the map position on the last draw to trigger new tile loads
     private TileTag centerTag = new TileTag(0,0,0);
 
     /**
@@ -171,15 +167,27 @@ class TileServer implements MapSource {
         TileTag newCenterTag = new TileTag(rowB + (wit / 2), colB + (hit / 2), zoom);
         if(!newCenterTag.equals(centerTag)) {
             centerTag = newCenterTag;
-            launchTileLoader(centerTag, (width / TILE_SIZE) + 1, (height / TILE_SIZE) + 1);
+            launchTileLoader((width / TILE_SIZE) + 1, (height / TILE_SIZE) + 1);
         }
     }
 
+    /**
+     * Determines if the given zoom level is within the acceptable range
+     * determined by MIN_Z/MAX_Z.
+     * @param zoomLevel - The new new zoom level the verify
+     * @return - whether or not the zoom level is within range.
+     */
     public boolean isValidZoom(int zoomLevel) {
         int zoom = 31 - Integer.numberOfLeadingZeros(zoomLevel / TILE_SIZE);
         return (zoom >= MIN_Z && zoom < MAX_Z);
     }
 
+    /**
+     * Retrieves a tile image from the cache. If no tile is available,
+     * a standard dummy tile is returned.
+     * @param target - the Images corresponding TileTag to index in the cache
+     * @return - The cached tile image or a dummy tile.
+     */
     Image pollImage(TileTag target) {
         Image tile = cache.get(target);
         if(tile != null) return tile;
@@ -187,17 +195,28 @@ class TileServer implements MapSource {
         return dummyTile;
     }
 
+    
+    
+    /**
+     * Instantiates and starts a new TileLoader thread. If one
+     * is already running it is interrupted.
+     * @param width - The width in map tiles of the map
+     * @param height - The Height in tiles of the map.
+     */
     private Thread tileLoader = null;
-    private void launchTileLoader(TileTag center, int width, int height) {
-        if(tileLoader != null) {
+    private void launchTileLoader(int width, int height) {
+        
+    	if(tileLoader != null) {
             tileLoader.interrupt();
         }
+        
         tileLoader = new TileLoader(centerTag, width, height);
         tileLoader.start();
     }
 
     /**
      * Remove the CLEAN_NUM furthest tiles from the cache to make space
+     * for new incoming tiles.
      */
     private void cleanTiles() {
         TileTag[] loaded = cache.keySet().toArray(new TileTag[] {});
@@ -206,8 +225,11 @@ class TileServer implements MapSource {
             cache.remove(loaded[i]);
         }
     }
+    
     /**
-     * Add given tile as image to the cache
+     * Adds the TileTag and corresponding image to the cache
+     * @param tag
+     * @param tile
      */
     private synchronized void addTile(TileTag tag, Image tile) {
         if(cache.size() >= CACHE_SIZE) {
@@ -215,18 +237,23 @@ class TileServer implements MapSource {
         }
         cache.put(tag, tile);
     }
+    
     /**
-     * Add listener to be repainted if the viewed map ever changes
+     * Add listener to be repainted if the viewed map ever changes 
+     * @param c - The target component to be repaint on triggering.
      */
     public void addRepaintListener(Component c) {
         repaintListeners.add(c);
     }
+    
     /**
      * Remove listener to be repainted if the viewed map ever changes
+     * @param c - the target component to be removed from the listener list
      */
     public void removeRepaintListener(Component c) {
         repaintListeners.remove(c);
     }
+    
     /**
      * Notify listeners that the current map view may have changed
      */
@@ -235,26 +262,38 @@ class TileServer implements MapSource {
             c.repaint();
         }
     }
+    
     /**
-     * Tile loader thread
-     * This will load all the tiles around ref given width and height, as well
-     * as all the tiles one level below that, in the order specified by the
-     * TileDistCmp comparator
+     * Class: TileLoader
+     * Tile loader thread .This will load all the tiles around ref given width 
+     * and height, as well as all the tiles one level below that, in the order 
+     * specified by the TileDistCmp comparator
      */
     private class TileLoader extends Thread {
+    	
         final TileTag ref;
         final int width;
         final int height;
+        
         boolean stop = false;
         int numToLoad;
+        
         AtomicInteger loadIndex = new AtomicInteger(0);
         AtomicInteger finishedHelpers = new AtomicInteger(0);
         java.util.List<TileTag> toLoad = new ArrayList<TileTag>(CACHE_SIZE);
+        
+        /**
+         * Class Constructor
+         * @param ref - the map center reference point.
+         * @param width - Width in tiles of the map
+         * @param height - Height in tiles of the map
+         */
         TileLoader(TileTag ref, int width, int height) {
             this.ref = ref;
             this.width = width;
             this.height = height;
         }
+        
         public void run() {
             try {
                 //enqueue all the tiles on this zoom level by view+margin

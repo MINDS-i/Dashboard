@@ -107,9 +107,10 @@ public class MapPanel extends JPanel implements CoordinateTransform {
     public void enablePathModifications(boolean value){
         roverPath.setWaypointsEnabled(value);
     }
+    
     //Code for CoordinateTransform interface
     /**
-     * Transforms a (lonitude,latitude) point to absolute (x,y) pixels
+     * Transforms a (longitude, latitude) point to absolute (x, y) pixels.
      * Will return an instance of the same class as the argument p
      */
     public Point2D toPixels(Point2D p) {
@@ -117,15 +118,13 @@ public class MapPanel extends JPanel implements CoordinateTransform {
         double scale = zoom;
         double lon   = p.getX();
         double lat   = Math.toRadians(p.getY());
-        double x = (lon+180.0)/360.0 * scale;
-        double y = ((1 -
-                     Math.log(
-                         Math.tan(lat) + 1 / Math.cos(lat)
-                     ) / Math.PI
-                    )/2) * scale;
+        double x = ((lon + 180.0) / 360.0) * scale;
+        double y = ((1 - Math.log(Math.tan(lat) + 1 / Math.cos(lat)) / Math.PI) / 2) * scale;
+        
         f.setLocation(x,y);
         return f;
     }
+    
     /**
      * Transforms absolute (x,y) pixels to (lonitude,latitude)
      * Will return an instance of the same class as the argument p
@@ -146,6 +145,7 @@ public class MapPanel extends JPanel implements CoordinateTransform {
         f.setLocation(lon,lat);
         return f;
     }
+    
     /**
      * Transforms absolute (lon,lat) to the pixel position in the current screen
      */
@@ -157,14 +157,15 @@ public class MapPanel extends JPanel implements CoordinateTransform {
                       click.getY() - center.getY() + getHeight()/2.0 );
         return f;
     }
+    
     /**
      * Transforms pixel position relative current screen to absolute (lon,lat)
      */
     public Point2D mapPosition(Point2D p) {
         Point2D f = (Point2D) p.clone();
         Point2D center = getMapPosPixels();
-        f.setLocation(p.getX() + center.getX() -  getWidth()/2.0,
-                      p.getY() + center.getY() - getHeight()/2.0);
+        f.setLocation(p.getX() + center.getX() - (getWidth() / 2.0),
+                      p.getY() + center.getY() - (getHeight() / 2.0));
         return toCoordinates(f);
     }
     //End Code for CoordinateTransform interface
@@ -189,12 +190,14 @@ public class MapPanel extends JPanel implements CoordinateTransform {
         return zoom;
     }
     
-    /**
-     * Returns true if the new zoom is valid and the view has been changed
-     */
     public boolean setZoom(int zoom) {
         boolean valid = currentTileServer.isValidZoom(zoom);
         if(valid) this.zoom = zoom;
+        
+        //CP - DEBUG
+        System.err.println("New zoom level: " + this.zoom + " Valid?: " 
+        + (valid ? "Yes" : "No"));
+        
         return valid;
     }
 
