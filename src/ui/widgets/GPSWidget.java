@@ -260,9 +260,9 @@ public class GPSWidget extends UIWidget {
 	}
 	
 	/**
-	 * Periodic update responsible for updating the GPS widget visual meter.
-	 * This is fired by a predetermined timer value. See
-	 * UPDATE_DELAY_MS for interrupt period.
+	 * Periodic function responsible for updating the GPS widget visual meter.
+	 * This is fired by a predetermined timer value. See UPDATE_DELAY_MS for 
+	 * the interrupt period.
 	 */
 	ActionListener meterUpdateAction = new ActionListener() {
 		public void actionPerformed(ActionEvent event) {
@@ -277,7 +277,7 @@ public class GPSWidget extends UIWidget {
 	 * The Algorithm: At least MIN_SATS_FOR_LOCK GPS satellites are needed to get 
 	 * a reliable location fix on a position. If the number of satellites does 
 	 * not at least equal this, then the signal is considered poor and HDOP 
-	 * values are not considered. If the minimum satellite requirement is met 
+	 * values are not evaluated. If the minimum satellite requirement is met 
 	 * then HDOP values are evaluated to determine the strength of the signal. 
 	 * (See HDOP_MAX_[X] constants at the head of the class for range details)
 	 * 

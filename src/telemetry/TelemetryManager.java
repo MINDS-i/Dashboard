@@ -10,13 +10,19 @@ import java.text.DecimalFormat;
 import java.util.regex.*;
 
 public class TelemetryManager {
+	
     private final List<Double> telemetry = new ArrayList<Double>();
     private final Map<Integer,List<TelemetryListener>> listenerMap =
         new HashMap<Integer,List<TelemetryListener>>();
     private final List<DataSource> streams = new ArrayList<DataSource>();
+    
     private ResourceBundle labels = null;
     private int telemetryIndex = 0;
 
+    /**
+     * Class Constructor
+     * @param context - the application context
+     */
     public TelemetryManager(Context context) {
         String labelResPath = context.getResource("telemetryLabels");
         labels = context.loadResourceBundle(labelResPath);
@@ -31,8 +37,16 @@ public class TelemetryManager {
         }
     }
     
+    /**
+     * Default Class COnstructor
+     */
     public TelemetryManager() {}
     
+    /**
+     * Retrieves the name of the telemetry resource at the given index.
+     * @param index - Index of label found in telemetryLabels_en_US.properties 
+     * @return - The label String
+     */
     public String getTelemetryName(int index) {
         String resourceLabel = "t"+index;
         

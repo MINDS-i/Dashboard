@@ -16,7 +16,8 @@ import javax.swing.table.*;
  * @author Chris Park @ Infinetix Corp
  * Date: 3-4-21
  * Description: Factory class used to encapsulate the creation of
- * tables used for displaying telemetry and configurable vehicle settings.
+ * tables used for displaying telemetry data and configurable 
+ * vehicle settings.
  */
 public class TableFactory {
 	

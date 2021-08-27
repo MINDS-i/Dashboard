@@ -194,10 +194,6 @@ public class MapPanel extends JPanel implements CoordinateTransform {
         boolean valid = currentTileServer.isValidZoom(zoom);
         if(valid) this.zoom = zoom;
         
-        //CP - DEBUG
-        System.err.println("New zoom level: " + this.zoom + " Valid?: " 
-        + (valid ? "Yes" : "No"));
-        
         return valid;
     }
 
