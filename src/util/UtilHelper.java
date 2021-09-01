@@ -41,7 +41,7 @@ public class UtilHelper {
 	 * @return - the average of the array values.
 	 */
 	public double average(double[] array, int length) {
-		double sumOfData = 0;
+		double sumOfData = 0.0;
 		
 		for(int i = 0; i < length; i++) {
 			sumOfData += array[i];
