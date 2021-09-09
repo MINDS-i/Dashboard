@@ -21,8 +21,8 @@ public class BumperWidget extends UIWidget {
 	protected final static int RIGHT_BUMPER 	= 1;
 	
 	//Color Defaults
-	protected static final Color DEF_INACTIVE_COLOR = Color.decode("0x2CBC00");
-	protected static final Color DEF_ACTIVE_COLOR 	= Color.decode("0xD70514");
+	protected static final Color DEF_ACTIVE_COLOR 	= Color.decode("0x2CBC00");
+	protected static final Color DEF_INACTIVE_COLOR = Color.decode("0xD70514");
 	
 	//Visual Components
 	protected JPanel outerPanel;

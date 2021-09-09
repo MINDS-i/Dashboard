@@ -17,7 +17,8 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * Adapted from source originally written by Brett Menzies (See deprecated TelemetryWidget class)
+ * Adapted from source originally written by Brett Menzies (See deprecated 
+ * TelemetryWidget class)
  * @author Chris Park @ Infinetix Corp.
  * Date: 11-25-2020
  * Description: Widget child class used for displaying Telemetry data.
@@ -194,11 +195,14 @@ public class TelemetryDataWidget extends UIWidget {
 	 * Initializes the voltage averaing array to a zero value
 	 * and resets the count.
 	 */
+	int DEBUG_RESET_COUNT = 0;
 	protected void initVoltAveraging() {
 		for(int i = 0; i < VOLT_AVERAGING_SIZE; i++) {
 			voltArray[i] = 0.0;
 		}
 		voltArrayCount = 0;
+		
+		DEBUG_RESET_COUNT++;
 	}
 	
 	/**
@@ -231,11 +235,10 @@ public class TelemetryDataWidget extends UIWidget {
 			//Stop the ground vehicle.
 			if((context.dash.mapPanel != null)
 			&& (context.dash.mapPanel.waypointPanel.getIsMoving())) {
-				serialLog.warning("Battery low. Stopping");
-				serialLog.warning("to prevent unpredictable");
-				serialLog.warning("vehicle behavior.");	
+				serialLog.warning("Battery too low. Stopping");
 				
 				context.sender.changeMovement(false);
+				System.err.println("Reset Count: " + DEBUG_RESET_COUNT);
 			}
 		}
 	}
