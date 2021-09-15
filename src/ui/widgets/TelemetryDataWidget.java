@@ -15,6 +15,8 @@ import java.text.ParseException;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 /**
  * Adapted from source originally written by Brett Menzies (See deprecated 
@@ -25,17 +27,11 @@ import java.awt.*;
  */
 public class TelemetryDataWidget extends UIWidget {
 	protected static final double BATTERY_LOW_WARNING_THRESHOLD = 6.5;
-	protected static final double BATTERY_LOW_CUTOFF_THRESHOLD = 6.0;
-	protected static final int VOLT_AVERAGING_SIZE = 20;
 	
 	protected JPanel panel;
-	
+//	protected TelemetryMonitor telemetryMonitor;
 	private int lineWidth;
-	private double[] voltArray;
-	private int voltArrayCount;
-	
 	private Collection<Line> lines = new ArrayList<Line>();
-	
 	
 	/**
 	 * @author Chris Park @ Infinetix Corp.
@@ -116,14 +112,7 @@ public class TelemetryDataWidget extends UIWidget {
             	}
             	else {
             		this.setForeground(Color.decode("0xEA8300"));
-            	}
-            	
-        		voltArray[voltArrayCount] = data;
-        		voltArrayCount++;
-        		
-        		if(voltArrayCount == VOLT_AVERAGING_SIZE) {
-        			evaluateVoltage();
-        		}
+            	}		
             }
 
             int finalWidth = Math.min(format.length(), lineWidth);
@@ -132,7 +121,7 @@ public class TelemetryDataWidget extends UIWidget {
         
         /**
          * Repaints the parent widget to avoid a change in order layering
-         */
+         */	
         @Override 
         public void repaint() {
             super.repaint();
@@ -145,7 +134,7 @@ public class TelemetryDataWidget extends UIWidget {
 	 * Class Constructor
 	 * @param ctx - The application context
 	 * @param lineWidth - Maximum Line width for a line of text
-	 * @param fontSize  - Font size of a line of 
+	 * @param fontSize  - Font size of a line of text
 	 * @param textColor - Color of the displayed text
 	 * @param items - Collection of LineItems to be displayed
 	 */
@@ -153,10 +142,7 @@ public class TelemetryDataWidget extends UIWidget {
 			Color textColor, Collection<LineItem> items) {
 		super(ctx, "Telemetry");
 		this.lineWidth = lineWidth;
-		
-		voltArray = new double[VOLT_AVERAGING_SIZE];
-		initVoltAveraging();
-		
+
         panel = new JPanel();
         panel.setBorder(insets);
         panel.setPreferredSize(new Dimension(115, (25 * items.size())));
@@ -188,58 +174,6 @@ public class TelemetryDataWidget extends UIWidget {
 	public void reset() {
 		for(Line l : lines) {
 			l.update(0.0);
-		}
-	}
-
-	/**
-	 * Initializes the voltage averaing array to a zero value
-	 * and resets the count.
-	 */
-	int DEBUG_RESET_COUNT = 0;
-	protected void initVoltAveraging() {
-		for(int i = 0; i < VOLT_AVERAGING_SIZE; i++) {
-			voltArray[i] = 0.0;
-		}
-		voltArrayCount = 0;
-		
-		DEBUG_RESET_COUNT++;
-	}
-	
-	/**
-	 * Checks the average voltage value across a range of VOLT_AVERAGE_SIZE. 
-	 * If the average is below the BATTERY_LOW_CUTOFF_THRESHOLD, and the unit 
-	 * is a ground vehicle, a warning is issued and the unit is stopped to 
-	 * prevent abnormal running behavior.
-	 * 
-	 * NOTE FOR FUTURE IMPROVEMENT: Initialization calls to Line.update() 
-	 * with a value of 0.0 will skew the average. This should be fine for
-	 * a sufficiently large VOLT_AVERAGE_SIZE, but needs to be accounted
-	 * for at some point. 
-	 */
-	protected void evaluateVoltage() {
-		double average;
-		
-		average = UtilHelper.getInstance().average(
-				voltArray, VOLT_AVERAGING_SIZE);
-		
-		//Reset averaging for the next pass
-		initVoltAveraging();
-		
-		if(average <= BATTERY_LOW_CUTOFF_THRESHOLD) {
-			//If this is not a ground vehicle, return. We don't want to crash.
-			if(context.getCurrentLocale() != "ground") {
-				return;
-			}
-			
-			//Otherwise given that we're initialized and running,
-			//Stop the ground vehicle.
-			if((context.dash.mapPanel != null)
-			&& (context.dash.mapPanel.waypointPanel.getIsMoving())) {
-				serialLog.warning("Battery too low. Stopping");
-				
-				context.sender.changeMovement(false);
-				System.err.println("Reset Count: " + DEBUG_RESET_COUNT);
-			}
 		}
 	}
 	
