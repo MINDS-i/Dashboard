@@ -5,6 +5,9 @@ import com.ui.widgets.UIWidget;
 import com.util.UtilHelper;
 
 import com.telemetry.TelemetryListener;
+import com.telemetry.TelemetryMonitor;
+import com.telemetry.TelemetryMonitor.TelemetryDataType;
+import com.telemetry.IMonitorListener;
 
 import java.io.Reader;
 import java.io.FileReader;
@@ -26,10 +29,12 @@ import java.awt.event.ActionEvent;
  * Description: Widget child class used for displaying Telemetry data.
  */
 public class TelemetryDataWidget extends UIWidget {
+	//Constants
 	protected static final double BATTERY_LOW_WARNING_THRESHOLD = 6.5;
 	
+	//Vars
 	protected JPanel panel;
-//	protected TelemetryMonitor telemetryMonitor;
+	protected TelemetryMonitor telemetryMonitor;
 	private int lineWidth;
 	private Collection<Line> lines = new ArrayList<Line>();
 	
@@ -85,8 +90,9 @@ public class TelemetryDataWidget extends UIWidget {
 	 * Date: 11-25-2020
 	 * Description: Nested internal class used to display telemetry data.
 	 */
-	private class Line extends JLabel implements TelemetryListener {
+	private class Line extends JLabel implements TelemetryListener, IMonitorListener {
         private String formatStr;
+        private double currData;
         
         /**
          * Class Constructor
@@ -97,13 +103,17 @@ public class TelemetryDataWidget extends UIWidget {
             formatStr = format;
             setPreferredSize(new Dimension(100, 20));
             update(0.0);
+            
+            telemetryMonitor.register(this);
+            telemetryMonitor.start();
         }
         
         /**
          * Updates the value and text formatting for this line
          * @param data - the value to update the line text to.
          */
-        public void update(double data) {        	
+        public void update(double data) { 
+        	currData = data;
         	String format = String.format(formatStr, data);
             
             if(format.contains("Vcc")) {        		
@@ -117,6 +127,20 @@ public class TelemetryDataWidget extends UIWidget {
 
             int finalWidth = Math.min(format.length(), lineWidth);
             setText(format.substring(0, finalWidth));
+        }
+        
+        /**
+         * Sends the last received data value to the telemetry manager along
+         * with an identifier so that it can process the data appropriately.
+         * @param monitor - The reference to the telemetry monitor this object
+         * is registered/subscribed to.
+         */
+        @Override
+        public void updateMonitor(TelemetryMonitor monitor) {
+        	if(formatStr.contains("Vcc")) {
+        		monitor.storeData(currData, TelemetryDataType.VOLTAGE);
+        	}
+        	
         }
         
         /**
@@ -141,6 +165,8 @@ public class TelemetryDataWidget extends UIWidget {
 	public TelemetryDataWidget(Context ctx, int lineWidth, float fontSize,
 			Color textColor, Collection<LineItem> items) {
 		super(ctx, "Telemetry");
+		
+		telemetryMonitor = new TelemetryMonitor(ctx);
 		this.lineWidth = lineWidth;
 
         panel = new JPanel();

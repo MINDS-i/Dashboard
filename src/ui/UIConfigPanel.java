@@ -135,11 +135,11 @@ public class UIConfigPanel extends JPanel {
 		
 		//Bumper toggle checkbox
 		bumperCheckBox = new JCheckBox("Enable Bumper");
-		bumperCheckBox.setSelected(true);
+		bumperCheckBox.setSelected(false);
 		constraints.gridx = 3;
 		constraints.gridy = 1;
 		this.add(bumperCheckBox, constraints);
-		this.bumperIsEnabled = true;
+		toggleBumper(false);
 		
 		//Settings apply button (for Checkboxes/Radio Buttons)
 		applySettingsButton = new JButton(setSettingsAction);
@@ -162,17 +162,19 @@ public class UIConfigPanel extends JPanel {
 			
 			//Bumper enable/disable toggle
 			if(bumperIsEnabled && !bumperCheckBox.isSelected()) {
-				bumperIsEnabled = false;
-				context.sender.toggleBumper(bumperIsEnabled);
-				context.dash.bumperWidget.setEnabled(bumperIsEnabled);
+				toggleBumper(false);
 			}
 			else if(!bumperIsEnabled && bumperCheckBox.isSelected()) {
-				bumperIsEnabled = true;
-				context.sender.toggleBumper(bumperIsEnabled);
-				context.dash.bumperWidget.setEnabled(bumperIsEnabled);
+				toggleBumper(true);
 			}
 		} 
 	};
+	
+	private void toggleBumper(boolean isEnabled) {
+		bumperIsEnabled = isEnabled;
+		context.sender.toggleBumper(bumperIsEnabled);
+		context.dash.bumperWidget.setEnabled(bumperIsEnabled);
+	}
 	
 	/**
 	 * Action used to toggle the user interface between Air and Ground mode.

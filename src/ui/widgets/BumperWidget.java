@@ -111,6 +111,9 @@ public class BumperWidget extends UIWidget {
 		
 		outerPanel.add(lowerPanel);
 		this.add(outerPanel);
+		
+		//Default to off state
+		setEnabled(false);
 	}
 	
 	/**

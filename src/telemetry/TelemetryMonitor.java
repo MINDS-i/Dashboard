@@ -67,14 +67,27 @@ public class TelemetryMonitor {
 	 * Stops the timers for this monitor.
 	 */
 	public void stop() {
-		updateTimer.stop();
+		if(updateTimer.isRunning()) {
+			updateTimer.stop();	
+		}
 	}
 	
 	/**
 	 * Starts the timers for this monitor.
 	 */
 	public void start() {
-		updateTimer.start();
+		if(!updateTimer.isRunning()) {
+			
+			System.err.println("DEBUG - TelMon - Starting Timer");
+			updateTimer.start();	
+		}
+	}
+	
+	/*
+	 * Returns whether the update timer is currently running.
+	 */
+	public boolean isRunning() {
+		return updateTimer.isRunning();
 	}
 	
 	/**
@@ -109,6 +122,12 @@ public class TelemetryMonitor {
 	 * services and send in new values.
 	 */
 	public void signalUpdate() {
+		
+		//If the rover is stopped, do not update.
+		if(!context.dash.mapPanel.waypointPanel.getIsMoving()) {
+			return;
+		}
+		
 		for(IMonitorListener l : listeners) {
 			l.updateMonitor(this);
 		}
@@ -124,6 +143,9 @@ public class TelemetryMonitor {
 	public void storeData(double data, TelemetryDataType type) {
 		switch(type) {
 		case VOLTAGE:
+			
+//			System.err.println("DEBUG - TelMon - Receiving voltage Data: " + data);
+			
 			vccMonitor.add(data);
 			break;
 		default:
@@ -164,7 +186,6 @@ public class TelemetryMonitor {
 			sampleArray = new double[VCC_AVERAGING_SIZE];
 			isBelowThreshold = false;
 			elapsedMS = 0;
-			
 		}
 		
 		/**
@@ -208,6 +229,9 @@ public class TelemetryMonitor {
 			
 			//Voltage monitor reset
 			if(average > BATTERY_LOW_CUTOFF_THRESHOLD) {
+				
+				System.err.println("DEBUG - VCCMon - Evaluation State: Reset");
+				
 				isBelowThreshold = false;
 				elapsedMS = 0;
 				return;
@@ -215,11 +239,17 @@ public class TelemetryMonitor {
 			
 			//LOW_VCC_SETTLING_TIME_MS time starts from here.
 			if(average <= BATTERY_LOW_CUTOFF_THRESHOLD) {
+				
+				System.err.println("DEBUG - VCCMon - Evaluation State: Cutoff Tick");
+				
 				isBelowThreshold = true;
 			}
 			
 			//if voltage has remained low over settling time. stop the unit.
 			if(elapsedMS == LOW_VCC_SETTLING_TIME_MS) {
+				
+				System.err.println("DEBUG - VCCMon - Evaluation State: Shutoff");
+				
 				if(isBelowThreshold 
 				&& (context.getCurrentLocale() == "ground")) {
 					
