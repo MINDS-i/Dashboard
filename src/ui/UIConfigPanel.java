@@ -139,7 +139,7 @@ public class UIConfigPanel extends JPanel {
 		constraints.gridx = 3;
 		constraints.gridy = 1;
 		this.add(bumperCheckBox, constraints);
-		toggleBumper(false);
+		toggleBumper(context.dash.bumperWidget.isEnabled());
 		
 		//Settings apply button (for Checkboxes/Radio Buttons)
 		applySettingsButton = new JButton(setSettingsAction);
@@ -172,6 +172,7 @@ public class UIConfigPanel extends JPanel {
 	
 	private void toggleBumper(boolean isEnabled) {
 		bumperIsEnabled = isEnabled;
+		bumperCheckBox.setSelected(bumperIsEnabled);
 		context.sender.toggleBumper(bumperIsEnabled);
 		context.dash.bumperWidget.setEnabled(bumperIsEnabled);
 	}

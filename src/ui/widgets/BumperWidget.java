@@ -36,6 +36,8 @@ public class BumperWidget extends UIWidget {
 	protected BumperStatus bumperStateLeft;
 	protected BumperStatus bumperStateRight;
 	
+	protected boolean isCurrEnabled;
+	
 	/**
 	 * Pre-defined state enums used to keep track of and
 	 * update the currently displayed status label based
@@ -209,5 +211,14 @@ public class BumperWidget extends UIWidget {
 			outerPanel.setEnabled(false);
 			outerPanel.setVisible(false);
 		}
+		
+		isCurrEnabled = shouldEnable;
+	}
+	
+	/**
+	 * Returns whether or not the bumpers are currently enabled.
+	 */
+	public boolean isEnabled() {
+		return isCurrEnabled;
 	}
 }

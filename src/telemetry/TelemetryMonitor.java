@@ -143,9 +143,6 @@ public class TelemetryMonitor {
 	public void storeData(double data, TelemetryDataType type) {
 		switch(type) {
 		case VOLTAGE:
-			
-//			System.err.println("DEBUG - TelMon - Receiving voltage Data: " + data);
-			
 			vccMonitor.add(data);
 			break;
 		default:
@@ -229,9 +226,6 @@ public class TelemetryMonitor {
 			
 			//Voltage monitor reset
 			if(average > BATTERY_LOW_CUTOFF_THRESHOLD) {
-				
-				System.err.println("DEBUG - VCCMon - Evaluation State: Reset");
-				
 				isBelowThreshold = false;
 				elapsedMS = 0;
 				return;
@@ -239,24 +233,19 @@ public class TelemetryMonitor {
 			
 			//LOW_VCC_SETTLING_TIME_MS time starts from here.
 			if(average <= BATTERY_LOW_CUTOFF_THRESHOLD) {
-				
-				System.err.println("DEBUG - VCCMon - Evaluation State: Cutoff Tick");
-				
 				isBelowThreshold = true;
 			}
 			
 			//if voltage has remained low over settling time. stop the unit.
 			if(elapsedMS == LOW_VCC_SETTLING_TIME_MS) {
 				
-				System.err.println("DEBUG - VCCMon - Evaluation State: Shutoff");
-				
 				if(isBelowThreshold 
 				&& (context.getCurrentLocale() == "ground")) {
 					
 					if((context.dash.mapPanel != null)
 					&& context.dash.mapPanel.waypointPanel.getIsMoving()) {
-						serialLog.warning("Battery voltage low. Stopping unit.");
-						context.sender.changeMovement(false);
+						serialLog.warning("VCC: Battery voltage low. Stopping unit.");
+						context.dash.mapPanel.waypointPanel.missionButton.doClick();
 					}
 					
 					elapsedMS = 0;
