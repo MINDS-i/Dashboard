@@ -150,7 +150,9 @@ public class SerialParser implements SerialPortEventListener {
                 			break;
                 			
                         default:
-                        	System.err.println("Unrecognized Sensor Subtype");
+                        	seriallog.severe(
+                        			"SerialParser - Sensor Data -" 
+                        		  + "Unrecognized Sensor Sbbtype");
                         	break;
                 	}
                 	break;
@@ -168,7 +170,9 @@ public class SerialParser implements SerialPortEventListener {
                 			break;
                 			
                 		default:
-                			System.err.println("Unrecognized Info Subtype");
+                			seriallog.severe(
+                					"SerialParser - Info Data - "  
+                				  + "Unrecognized Info Subtype");
                 			break;
                 	}
                 	

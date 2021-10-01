@@ -23,7 +23,6 @@ public class TelemetryMonitor {
 	
 	//Constants
 	protected static final int UPDATE_CYCLE_MS = 100;
-	protected static final int VCC_EVAL_CYCLE_MS = 1000;
 	protected final Logger serialLog = Logger.getLogger("d.serial");
 	
 	//Vars, Standard Refs
@@ -102,7 +101,7 @@ public class TelemetryMonitor {
 	
 	/**
 	 * Removes a lisener from the tracking list.
-	 * @param toUnregister
+	 * @param toUnregister - the listener to stop tracking
 	 */
 	public void unregister(IMonitorListener toUnregister) {
 		listeners.remove(toUnregister);
@@ -166,6 +165,7 @@ public class TelemetryMonitor {
 		protected static final int 	  VCC_AVERAGING_SIZE 			= 20;
 		protected static final int 	  MAX_SEC_BELOW_THRESHOLD 		= 20;
 		protected static final int 	  LOW_VCC_SETTLING_TIME_MS 		= 20000;
+		protected static final int 	  VCC_EVAL_CYCLE_MS 			= 1000;
 		
 		//Vars
 		protected int sampleIndex;

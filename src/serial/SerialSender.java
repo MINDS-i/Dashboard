@@ -164,11 +164,9 @@ public class SerialSender {
     	if(context.connected) {
     		if(shouldMove) {
     			msg = Message.startDriving();
-    			System.err.println("Sending start driving message.");
     		}
     		else {
     			msg = Message.stopDriving();
-    			System.err.println("Sending stop driving message.");
     		}
     		sendMessage(msg);
     	}
@@ -185,11 +183,9 @@ public class SerialSender {
     	if(context.connected) {
     		if(shouldEnable) {
     			msg = Message.enableBumper();
-    			System.err.println("Sending bumper enable message.");
     		}
     		else {
     			msg = Message.disableBumper();
-    			System.err.println("Sending bumper disable message.");
     		}
     		sendMessage(msg);
     	}
