@@ -9,7 +9,7 @@
 	 </setting><setting index="8" name="Ping Factor" min="1" max="20000" def="1400"> Factor to determine how strongly obstacles effect the rover's course &lt;br&gt; Larger numbers correspond to larger effects from obstacles
 	 </setting><setting index="9" name="Coast Time" min="2000" max="8000" def="2000"> Time in milliseconds to coast before reversing when an obstacle is encountered
 	 </setting><setting index="10" name="Min Rev Time" min="500" max="2000" def="1000"> Minimum time in seconds to reverse away from an obstacle
-	 </setting><setting index="11" name="Cruise P" min="0" max="10" def="0.05"> P term in cruise control PID loop
+	 </setting><setting index="11" name="Cruise P" min="0" max="1" def="0.05"> P term in cruise control PID loop
 	 </setting><setting index="12" name="Cruise I" min="0" max="10" def="0.1"> I term in cruise control PID loop
 	 </setting><setting index="13" name="Cruise D" min="0" max="10" def="0.0"> D term in cruise control PID loop
 	 </setting><setting index="14" name="Tire Diameter" min="0" max="12" def="5.85"> Tire Diameter in inches, used to calculate MPH
