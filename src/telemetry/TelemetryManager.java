@@ -81,7 +81,7 @@ public class TelemetryManager {
     }
     
     /**
-     * An index that can be used to see if a update has been made to any
+     * An index that can be used to see if an update has been made to any
      *   telemetry values since the last time it was observed
      */
     public int changeIndex() {

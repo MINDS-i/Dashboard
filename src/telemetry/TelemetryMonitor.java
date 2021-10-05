@@ -14,10 +14,9 @@ import com.telemetry.TelemetryListener;
 /**
  * @author Chris Park @ Infinetix Corp.
  * Date: 9-14-21
- * Description: Class responsible for monitoring and responding to
+ * Description: Class responsible for monitoring and handling
  * changes in various telemetry data types. This can sometimes include
- * issuing commands to the greater UI system in response to those changes.
- *
+ * issuing commands to in response to those changes.
  */
 public class TelemetryMonitor {
 	
@@ -29,7 +28,7 @@ public class TelemetryMonitor {
 	private Context context;
 	protected VCCMonitor vccMonitor;
 	
-	//Observer Update Timer
+	//Timers
 	protected javax.swing.Timer updateTimer;
 	protected javax.swing.Timer vccEvalTimer;
 	
@@ -37,7 +36,7 @@ public class TelemetryMonitor {
 	protected List<IMonitorListener> listeners;
 	
 	/**
-	 * Pre-defined strings for identify those telemetry
+	 * Pre-defined strings to identify those telemetry
 	 * value types that the monitor can service in some way.
 	 */
 	public enum TelemetryDataType {
@@ -52,7 +51,6 @@ public class TelemetryMonitor {
 	
 	/**
 	 * Class Constructor
-	 * 
 	 * @param ctx
 	 */
 	public TelemetryMonitor(Context ctx) {
@@ -76,8 +74,6 @@ public class TelemetryMonitor {
 	 */
 	public void start() {
 		if(!updateTimer.isRunning()) {
-			
-			System.err.println("DEBUG - TelMon - Starting Timer");
 			updateTimer.start();	
 		}
 	}
@@ -95,7 +91,6 @@ public class TelemetryMonitor {
 	 * @param toRegister - the listener to track
 	 */
 	public void register(IMonitorListener toRegister) {
-		
 		listeners.add(toRegister);
 	}
 	

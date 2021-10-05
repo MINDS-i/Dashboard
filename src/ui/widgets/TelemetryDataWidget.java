@@ -41,7 +41,7 @@ public class TelemetryDataWidget extends UIWidget {
 	/**
 	 * @author Chris Park @ Infinetix Corp.
 	 * Date: 11-25-2020
-	 * Description: Nested static internal class used to display telemetry data.
+	 * Description: Nested static class used to display telemetry data.
 	 */
 	public static class LineItem {
 		private String formatStr;
