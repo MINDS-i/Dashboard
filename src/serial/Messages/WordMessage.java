@@ -24,7 +24,11 @@ public class WordMessage extends Message {
     
     @Override
     public boolean needsConfirm() {
-        return true;
+        if(msgType == Serial.COMMAND_WORD) {
+        	return true;
+        }
+        
+        return false;
     }
     
     @Override

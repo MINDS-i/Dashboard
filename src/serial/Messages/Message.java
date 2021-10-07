@@ -14,32 +14,41 @@ public class Message {
     protected int    confirmSum;
     protected int    failCount;
     protected Date   sent;
+    
     protected Message() { //subclasses must call buildChecksums after making content
         failCount = 0;
     }
+    
     public Message(byte[] data) {
         failCount	= 0;
         content     = data.clone();
         buildChecksum();
     }
+    
     public void sendTime(Date date) {
         sent = (Date)date.clone();
     }
+    
     public boolean isConfirmedBy(int confirmation) {
         return ((confirmation&0xFFFF) == (confirmSum&0xFFFF));
     }
+    
     public boolean isPastExpiration(Date now) {
         return (now.getTime()-sent.getTime()) > Serial.MAX_CONFIRM_WAIT;
     }
+    
     public void addFailure() {
         failCount++;
     }
+    
     public int numberOfFailures() {
         return failCount;
     }
+    
     public int getConfirmSum() {
         return confirmSum;
     }
+    
     public void send(SerialPort port) throws SerialPortException {
         port.writeBytes(Serial.HEADER);
         port.writeBytes(content);
@@ -47,6 +56,7 @@ public class Message {
         port.writeBytes(Serial.FOOTER);
         sent = new Date();
     }
+    
     private byte[] concat(byte[] a, byte[] b) {
         byte[] c = new byte[a.length+b.length];
         for(int i=0; i< a.length; i++) {
@@ -57,14 +67,17 @@ public class Message {
         }
         return c;
     }
+    
     protected void buildChecksum() {
         checkPair  = Serial.fletcher16bytes(content);
         confirmSum = Serial.fletcher16( concat(content,checkPair) )&0xffff;
     }
+    
     //these should be overridden
     public boolean needsConfirm() {
         return false;
     }
+    
     @Override
     public String toString() {
         return "A message";
