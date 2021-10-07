@@ -24,7 +24,7 @@ public class WordMessage extends Message {
     
     @Override
     public boolean needsConfirm() {
-        return false;
+        return true;
     }
     
     @Override
@@ -56,6 +56,10 @@ public class WordMessage extends Message {
             	return "Stop Movement Command";
             case Serial.START_CMD:
             	return "Start Movement Command";
+            case Serial.ENABLE_BUMPER_CMD:
+            	return "Enable Bumper Command";
+            case Serial.DISABLE_BUMPER_CMD:
+            	return "Disable Bumper Command";
         }
         return "Command Message";
     }
