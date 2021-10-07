@@ -34,7 +34,7 @@ public class Message {
     }
     
     public boolean isPastExpiration(Date now) {
-        return (now.getTime()-sent.getTime()) > Serial.MAX_CONFIRM_WAIT;
+        return (now.getTime()-sent.getTime()) > Serial.MAX_CONFIRM_WAIT_MS;
     }
     
     public void addFailure() {
