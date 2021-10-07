@@ -1,25 +1,37 @@
+/** 
+ * NOTE: - CP - 10-2021: I don't see any references to this class in the 
+ * rest of the project...Waypoint list tracking uses the Dot.java class instead
+ * of this. This should be removed if no ties to the system can be found.
+ */
+
 package com.map;
 
 import static java.lang.Math.*;
 
 public class Waypoint{
+	
     /** Earth's radius in miles */
     private static final double EARTH_RAD = 3958.761;
+    
     /** Earth's circumference in miles */
-    private static final double EARTH_CIRC = EARTH_RAD*Math.PI*2.0;
+    private static final double EARTH_CIRC = EARTH_RAD * Math.PI * 2.0;
+    
     /** Convert degrees to radians */
-    private static double toRad(double degrees){
-        return degrees*Math.PI/180.0;
+    private static double toRad(double degrees) {
+        return degrees * (Math.PI / 180.0);
     }
+    
     /** Convert radians to degrees */
-    private static double toDeg(double radians){
-        return radians*180.0/Math.PI;
+    private static double toDeg(double radians) {
+        return radians * (180.0 / Math.PI);
     }
+    
     /**
      * The waypoint's latitude and longitude in decimal degrees
      * northern and eastern hemisphere are positive lat, long respectively
      */
     private final double latitude, longitude;
+    
     /**
      * Construct a new waypoint; arguments are in decimal degrees
      */
@@ -27,14 +39,17 @@ public class Waypoint{
         this.latitude = latitude;
         this.longitude = longitude;
     }
+    
     /** Return this Waypoint's latitude in decimal degrees */
     public double getLatitude(){
         return latitude;
     }
+    
     /** Return this Waypoint's longitude in decimal degrees */
     public double getLongitude(){
         return longitude;
     }
+    
     /**
      * Return the heading in degrees, north = 0, CW positive around UP from
      * this waypoint to target
@@ -49,6 +64,7 @@ public class Waypoint{
                    - sin(aRlat)*cos(bRlat)*cos(bRlng - aRlng);
         return toDeg( atan2(y,x) );
     }
+    
     /**
      * Return the distance in miles between this waypoint and the target
      */
@@ -62,6 +78,7 @@ public class Waypoint{
         double chord  = sinlat*sinlat + sinlng*sinlng*cos(aRlat)*cos(bRlat);
         return 2.0 * EARTH_RAD * atan2( sqrt(chord), sqrt(1.-chord) );
     }
+    
     /**
      * Return a waypoint that is `distance` miles away in the `heading`
      * direction from this waypoint's location.

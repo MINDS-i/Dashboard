@@ -178,7 +178,7 @@ class RoverPath implements Layer {
 
     private void paintDots(Graphics g) {
         drawLines(g);
-        drowRoverLine(g);
+        drawRoverLine(g);
         drawPoints(g);
     }
 
@@ -254,7 +254,7 @@ class RoverPath implements Layer {
         }
     }
 
-    private void drowRoverLine(Graphics g) {
+    private void drawRoverLine(Graphics g) {
         if(waypoints.getTarget() >= waypoints.size()) {
             return;
         }

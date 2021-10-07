@@ -216,7 +216,7 @@ public class WaypointPanel extends NinePatchPanel {
 
         //Waypoint Options
         clearWaypoints 	= theme.makeButton(clearWaypointsAction);
-        newButton 		= theme.makeButton(newWaypoint);
+        newButton 		= theme.makeButton(newWaypointAction);
         enterButton 	= theme.makeButton(interpretLocationAction);
         undoButton 		= theme.makeButton(undoCommandAction);
         redoButton 		= theme.makeButton(redoCommandAction);
@@ -700,13 +700,18 @@ public class WaypointPanel extends NinePatchPanel {
     	}
     };
     
-    private Action newWaypoint = new AbstractAction() {
+    private Action newWaypointAction = new AbstractAction() {
         {
             String text = "New";
             putValue(Action.NAME, text);
         }
         public void actionPerformed(ActionEvent e) {
             int selectedWaypoint = waypoints.getSelected();
+            
+            if(selectedWaypoint < 0) {
+            	//TODO - CP - No waypoints found, so place at a default 
+            	//location (perhaps current map view center position?)
+            }
             
             WaypointCommand command = new WaypointCommandAdd(
             		waypoints,
@@ -725,7 +730,7 @@ public class WaypointPanel extends NinePatchPanel {
         public void actionPerformed(ActionEvent e) {
         	WaypointCommand command = new WaypointCommandClear(waypoints, context);
         	CommandManager.getInstance().process(command);
-        }
+        } 	
     };
     
     private Action openDataPanel = new AbstractAction() {

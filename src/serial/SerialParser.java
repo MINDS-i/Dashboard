@@ -152,7 +152,7 @@ public class SerialParser implements SerialPortEventListener {
                         default:
                         	seriallog.severe(
                         			"SerialParser - Sensor Data -" 
-                        		  + "Unrecognized Sensor Sbbtype");
+                        		  + "Unrecognized Sensor Subtype");
                         	break;
                 	}
                 	break;
