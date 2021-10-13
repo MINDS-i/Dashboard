@@ -17,11 +17,11 @@
 	 </setting><setting index="16" name="Waypoint acheived radius in miles" min="0" max=".003" def=".0015"> Radius centered at waypoint where target is determined to be meet
 	 </setting><setting index="17" name="Approach radius" min="0" max=".0076" def=".0038"> Radius cneter at waypoint where the approach flag is set
 	 </setting><setting index="18" name="GryoSync" min="0" max="1" def="0"> Change to init gyro sync to north
-	 </setting><setting index="57" name="Steer Skew" min="-45" max="45" def="0"> 
-	 </setting><setting index="58" name="Avoid Ping value Edges" min="500" max="10000" def="1000"> 
-	 </setting><setting index="59" name="Avoid Ping value Middles" min="500" max="10000" def="1600"> 
-	 </setting><setting index="60" name="Avoid Ping value center" min="500" max="10000" def="3000"> 
-	 </setting><setting index="61" name="Warn Ping value Edges" min="500" max="10000" def="2000"> 
-	 </setting><setting index="62" name="Warn Ping value Middles" min="500" max="10000" def="3200"> 
-	 </setting><setting index="63" name="Warn Ping value center" min="500" max="10000" def="6000"> 
+	 </setting><setting index="20" name="Steer Skew" min="-45" max="45" def="0"> 
+	 </setting><setting index="21" name="Avoid Ping value Edges" min="500" max="10000" def="1000"> 
+	 </setting><setting index="22" name="Avoid Ping value Middles" min="500" max="10000" def="1600"> 
+	 </setting><setting index="23" name="Avoid Ping value center" min="500" max="10000" def="3000"> 
+	 </setting><setting index="24" name="Warn Ping value Edges" min="500" max="10000" def="2500"> 
+	 </setting><setting index="25" name="Warn Ping value Middles" min="500" max="10000" def="5000"> 
+	 </setting><setting index="26" name="Warn Ping value center" min="500" max="10000" def="8000"> 
 	 </setting></settingList>

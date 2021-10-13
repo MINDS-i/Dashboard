@@ -138,7 +138,7 @@ public class DataWindow implements ActionListener {
                 return "Setting";
             }
             public String getValueAt(int row) {
-                float val = settingList.get(row).getVal();
+                double val = settingList.get(row).getVal();
                 return " "+val;
             }
             public int getRowCount() {

@@ -262,18 +262,23 @@ public class Context {
     public void sendSetting(int index) {
         settingList.pushSetting(index);
     }
-    public void setSetting(int index, float value) {
+    public void setSetting(int index, double value) {
         settingList.pushSetting(index, value);
     }
-    public void setSettingQuiet(int index, float value) {
+    public void setSettingQuiet(int index, double value) {
         settingList.updateSettingVal(index, value);
     }
-    
+
     public void setTelemetry(int id, float value) {
         telemetry.updateTelemetry(id, (double)value);
     }
-    public float getTelemetry(int id) {
-        return (float) telemetry.getTelemetry(id);
+    
+    public void setTelemetry(int id, double value) {
+    	telemetry.updateTelemetry(id, value);
+    }
+
+    public double getTelemetry(int id) {
+        return telemetry.getTelemetry(id);
     }
 
     public String getTelemetryName(int id) {

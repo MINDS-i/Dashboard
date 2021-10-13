@@ -18,36 +18,42 @@ public class SettingList {
         context = cxt;
         loadSettingData();
     }
+    
     public int size() {
         return settingData.size();
     }
+    
     public Setting get(int id) {
         return settingData.get(id);
     }
-    public void pushSetting(int id, float val) {
+    
+    public void pushSetting(int id, double val) {
         if(id < 0 || id >= settingData.size()) return;
         updateSettingVal(id, val);
         pushSetting(id);
     }
+    
     public void pushSetting(int id) {
         Message msg = Message.setSetting((byte)id, settingData.get(id).getVal());
         context.sender.sendMessage(msg);
     }
-    public void updateSettingVal(int id, float val) {
+    
+    public void updateSettingVal(int id, double val) {
         if(id < 0 || id >= settingData.size()) return;
         settingData.get(id).setVal(val);
     }
-
-    private float getFloat(XMLStreamReader reader, String label) {
+    
+    private double getDouble(XMLStreamReader reader, String label) {
         String raw = reader.getAttributeValue(null,label);
         if(raw == null) return 0.0f;
         //strip whitespace
         raw = raw.replaceAll("\\s","");
         //parse
-        if(raw.equals("+inf"))       return Float.POSITIVE_INFINITY;
-        else if (raw.equals("-inf")) return Float.NEGATIVE_INFINITY;
-        else                         return Float.valueOf(raw);
+        if(raw.equals("+inf"))       return Double.POSITIVE_INFINITY;
+        else if (raw.equals("-inf")) return Double.NEGATIVE_INFINITY;
+        else                         return Double.valueOf(raw);
     }
+    
     private void loadSettingData() {
         settingData.clear();
         for(int i=0; i<Serial.MAX_SETTINGS; i++) {
@@ -74,9 +80,9 @@ public class SettingList {
                         }
                         tmp = settingData.get(index);
                         tmp.name = reader.getAttributeValue(null,"name");
-                        tmp.min  = getFloat(reader,"min");
-                        tmp.max  = getFloat(reader,"max");
-                        tmp.def  = getFloat(reader,"def");
+                        tmp.min  = getDouble(reader,"min");
+                        tmp.max  = getDouble(reader,"max");
+                        tmp.def  = getDouble(reader,"def");
                         break;
                     case XMLStreamConstants.CHARACTERS:
                         if(tmp != null)
