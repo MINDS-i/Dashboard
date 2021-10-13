@@ -116,7 +116,8 @@ public class SerialParser implements SerialPortEventListener {
                 	
                 	if(index >= MIXED_TELEMETRY_TYPE_INDEX_START) {
                 		
-                		precision_tempdata = (msg[2] | (msg[3] << 8));
+                		precision_tempdata = ( ((msg[2] & 0xff)<< 8)|
+                							   ((msg[3])) );
                 		
                     	tempdata = ( ((msg[4]&0xff)<<24)|
           				 		 	 ((msg[5]&0xff)<<16)|
