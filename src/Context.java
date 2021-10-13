@@ -272,6 +272,11 @@ public class Context {
     public void setTelemetry(int id, float value) {
         telemetry.updateTelemetry(id, (double)value);
     }
+    
+    public void setTelemetry(int id, double value) {
+    	telemetry.updateTelemetry(id, value);
+    }
+    
     public float getTelemetry(int id) {
         return (float) telemetry.getTelemetry(id);
     }

@@ -24,6 +24,8 @@ import java.awt.*;
 import java.nio.charset.StandardCharsets;
 
 public class SerialParser implements SerialPortEventListener {
+	private final static int MIXED_TELEMETRY_TYPE_INDEX_START = 64;
+	
     private Context context;
     private Decoder decoder;
     private StateMap descriptionMap;
@@ -104,17 +106,39 @@ public class SerialParser implements SerialPortEventListener {
         	int subtype = Serial.getSubtype(msg[0]);
             int index   = msg[1];
             
+            int precision_tempdata;
             int tempdata;
             float data;
+            double precision_data;
             
             switch(subtype) {
                 case Serial.TELEMETRY_DATA:
-                	tempdata = ( ((msg[2]&0xff)<<24)|
-                				 ((msg[3]&0xff)<<16)|
-                				 ((msg[4]&0xff)<< 8)|
-                				 ((msg[5]&0xff)) );
-                	data  = Float.intBitsToFloat(tempdata);
-                    context.setTelemetry(index, data);
+                	
+                	if(index > MIXED_TELEMETRY_TYPE_INDEX_START) {
+                		precision_tempdata = ((msg[2] & 0xff) << 32);
+                		
+                    	tempdata = ( ((msg[3]&0xff)<<24)|
+          				 		 	 ((msg[4]&0xff)<<16)|
+          				 		 	 ((msg[5]&0xff)<< 8)|
+          				 		 	 ((msg[6]&0xff)) );
+                    	
+                    	precision_data = 
+                    			((double)precision_tempdata + 
+                    					(double)Float.intBitsToFloat(tempdata));
+                    	
+                    	context.setTelemetry(index, precision_data);
+                	}
+                	else {
+                    	tempdata = ( ((msg[2]&0xff)<<24)|
+          				 		 	 ((msg[3]&0xff)<<16)|
+          				 		 	 ((msg[4]&0xff)<< 8)|
+          				 		 	 ((msg[5]&0xff)) );
+                    	
+                    	data  = Float.intBitsToFloat(tempdata);
+                    	
+                    	context.setTelemetry(index, data);
+                	}
+
                     break;
                     
                 case Serial.SETTING_DATA:
