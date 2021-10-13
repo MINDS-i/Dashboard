@@ -114,18 +114,18 @@ public class SerialParser implements SerialPortEventListener {
             switch(subtype) {
                 case Serial.TELEMETRY_DATA:
                 	
-                	if(index > MIXED_TELEMETRY_TYPE_INDEX_START) {
-                		precision_tempdata = ((msg[2] & 0xff) << 32);
+                	if(index >= MIXED_TELEMETRY_TYPE_INDEX_START) {
                 		
-                    	tempdata = ( ((msg[3]&0xff)<<24)|
-          				 		 	 ((msg[4]&0xff)<<16)|
-          				 		 	 ((msg[5]&0xff)<< 8)|
-          				 		 	 ((msg[6]&0xff)) );
+                		precision_tempdata = (msg[2] | (msg[3] << 8));
+                		
+                    	tempdata = ( ((msg[4]&0xff)<<24)|
+          				 		 	 ((msg[5]&0xff)<<16)|
+          				 		 	 ((msg[6]&0xff)<< 8)|
+          				 		 	 ((msg[7]&0xff)) );
                     	
                     	precision_data = 
-                    			((double)precision_tempdata + 
-                    					(double)Float.intBitsToFloat(tempdata));
-                    	
+                    			Double.longBitsToDouble(precision_tempdata)
+                    		  + Double.longBitsToDouble(tempdata);
                     	context.setTelemetry(index, precision_data);
                 	}
                 	else {
@@ -135,7 +135,6 @@ public class SerialParser implements SerialPortEventListener {
           				 		 	 ((msg[5]&0xff)) );
                     	
                     	data  = Float.intBitsToFloat(tempdata);
-                    	
                     	context.setTelemetry(index, data);
                 	}
 
