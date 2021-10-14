@@ -276,9 +276,9 @@ public class Context {
     public void setTelemetry(int id, double value) {
     	telemetry.updateTelemetry(id, value);
     }
-    
-    public float getTelemetry(int id) {
-        return (float) telemetry.getTelemetry(id);
+
+    public double getTelemetry(int id) {
+        return telemetry.getTelemetry(id);
     }
 
     public String getTelemetryName(int id) {

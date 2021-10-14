@@ -102,6 +102,7 @@ public class SerialParser implements SerialPortEventListener {
             if(Serial.getMsgType(data) == Serial.DATA_TYPE) return 255;
             else return -1;
         }
+        
         public void handle(byte[] msg) {
         	int subtype = Serial.getSubtype(msg[0]);
             int index   = msg[1];
