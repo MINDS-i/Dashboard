@@ -103,7 +103,7 @@ public class Message {
         return new DataMessage(Serial.TELEMETRY_DATA, index, data);
     }
     
-    public static Message setSetting(byte index, float data) {
+    public static Message setSetting(byte index, double data) {
         return new DataMessage(Serial.SETTING_DATA, index, data);
     }
     

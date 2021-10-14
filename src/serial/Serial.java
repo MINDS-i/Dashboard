@@ -111,7 +111,7 @@ public class Serial {
 
     //Constants
     public static final int	MAX_WAYPOINTS		= 64;
-    public static final int	MAX_SETTINGS		= 72;
+    public static final int	MAX_SETTINGS		= 64;
     public static final int	MAX_TELEMETRY		= 256;
     public static final int	BAUD				= SerialPort.BAUDRATE_57600;
     public static final int	U16_FIXED_POINT		= 256;

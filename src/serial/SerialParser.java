@@ -24,7 +24,7 @@ import java.awt.*;
 import java.nio.charset.StandardCharsets;
 
 public class SerialParser implements SerialPortEventListener {
-	private final static int MIXED_TELEMETRY_TYPE_INDEX_START = 64;
+	private final static int MIXED_SETTING_TYPE_INDEX_START = 64;
 	
     private Context context;
     private Decoder decoder;
@@ -115,7 +115,18 @@ public class SerialParser implements SerialPortEventListener {
             switch(subtype) {
                 case Serial.TELEMETRY_DATA:
                 	
-                	if(index >= MIXED_TELEMETRY_TYPE_INDEX_START) {
+                	tempdata = ( ((msg[2]&0xff)<<24)|
+      				 		 	 ((msg[3]&0xff)<<16)|
+      				 		 	 ((msg[4]&0xff)<< 8)|
+      				 		 	 ((msg[5]&0xff)) );
+                	
+                	data  = Float.intBitsToFloat(tempdata);
+                	context.setTelemetry(index, data);
+
+                    break;
+                    
+                case Serial.SETTING_DATA:
+                	if(index >= MIXED_SETTING_TYPE_INDEX_START) {
                 		
                 		precision_tempdata = ( ((msg[2] & 0xff)<< 8)|
                 							   ((msg[3])) );
@@ -128,27 +139,18 @@ public class SerialParser implements SerialPortEventListener {
                     	precision_data = 
                     			Double.longBitsToDouble(precision_tempdata)
                     		  + Double.longBitsToDouble(tempdata);
-                    	context.setTelemetry(index, precision_data);
+                    	context.setSettingQuiet(index, precision_data);
                 	}
                 	else {
                     	tempdata = ( ((msg[2]&0xff)<<24)|
-          				 		 	 ((msg[3]&0xff)<<16)|
-          				 		 	 ((msg[4]&0xff)<< 8)|
-          				 		 	 ((msg[5]&0xff)) );
+           					 		 ((msg[3]&0xff)<<16)|
+           					 		 ((msg[4]&0xff)<< 8)|
+           					 		 ((msg[5]&0xff)) );
                     	
                     	data  = Float.intBitsToFloat(tempdata);
-                    	context.setTelemetry(index, data);
+                    	context.setSettingQuiet(index, data);
                 	}
-
-                    break;
-                    
-                case Serial.SETTING_DATA:
-                	tempdata = ( ((msg[2]&0xff)<<24)|
-            					 ((msg[3]&0xff)<<16)|
-            					 ((msg[4]&0xff)<< 8)|
-            					 ((msg[5]&0xff)) );
-                	data  = Float.intBitsToFloat(tempdata);
-                    context.setSettingQuiet(index, data);
+                	
                     break;
                     
                 case Serial.SENSOR_DATA:
