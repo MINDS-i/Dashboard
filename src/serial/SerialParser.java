@@ -24,8 +24,6 @@ import java.awt.*;
 import java.nio.charset.StandardCharsets;
 
 public class SerialParser implements SerialPortEventListener {
-	private final static int MIXED_SETTING_TYPE_INDEX_START = 64;
-	
     private Context context;
     private Decoder decoder;
     private StateMap descriptionMap;
@@ -65,38 +63,6 @@ public class SerialParser implements SerialPortEventListener {
         }
     }
 
-/*    private class WaypointReader implements PacketReader {
-        public int claim(byte data) {
-            if(Serial.getMsgType(data) == Serial.WAYPOINT_TYPE) return 255;
-            else return -1;
-        }
-        public void handle(byte[] msg) {
-            int subtype = Serial.getSubtype(msg[0]);
-            int tmpLat = (	((msg[1]&0xff)<<24)|
-                            ((msg[2]&0xff)<<16)|
-                            ((msg[3]&0xff)<< 8)|
-                            ((msg[4]&0xff)    ) );
-            int tmpLon = (	((msg[5]&0xff)<<24)|
-                            ((msg[6]&0xff)<<16)|
-                            ((msg[7]&0xff)<< 8)|
-                            ((msg[8]&0xff)    ) );
-            int index = msg[11];
-            //msg 9, 10 are altitude
-            float latitude	= Float.intBitsToFloat(tmpLat);
-            float longitude	= Float.intBitsToFloat(tmpLon);
-            switch(subtype) {
-                case Serial.ADD_WAYPOINT:
-                    waypoints.add(new Dot(longitude, latitude, 0), index);
-                    break;
-                case Serial.ALTER_WAYPOINT:
-                    waypoints.set(index, new Dot(longitude, latitude, ));
-                    get(index).setLocation(
-                        new Point.Double(longitude, latitude));
-                    break;
-            }
-        }
-    }*/
-
     private class DataReader implements PacketReader {
         public int claim(byte data) {
             if(Serial.getMsgType(data) == Serial.DATA_TYPE) return 255;
@@ -107,50 +73,75 @@ public class SerialParser implements SerialPortEventListener {
         	int subtype = Serial.getSubtype(msg[0]);
             int index   = msg[1];
             
-            int precision_tempdata;
             int tempdata;
             float data;
             double precision_data;
             
+            //Precision Lat/Long Vars
+            short minutes;
+            int degrees;
+            float minuteFractions;
+            double minuteDegrees;
+            
             switch(subtype) {
                 case Serial.TELEMETRY_DATA:
                 	
-                	tempdata = ( ((msg[2]&0xff)<<24)|
-      				 		 	 ((msg[3]&0xff)<<16)|
-      				 		 	 ((msg[4]&0xff)<< 8)|
-      				 		 	 ((msg[5]&0xff)) );
-                	
-                	data  = Float.intBitsToFloat(tempdata);
-                	context.setTelemetry(index, data);
+                	switch(index) {
+            			case Serial.LATITUDE_PRECISION:
+            			case Serial.LONGITUDE_PRECISION:
+            				
+            				//Retrieve whole minutes value
+            				minutes = (short) ( ((msg[2]&0xff)<< 8)|
+            					   	    		((msg[3]&0xff)) );
+            				
+            				//Retrieve fractional minute value
+	            			tempdata = ( ((msg[4]&0xff)<<24)|
+	            						 ((msg[5]&0xff)<<16)|
+	            						 ((msg[6]&0xff)<< 8)|
+	            						 ((msg[7]&0xff)) );
+	            			
+	            			minuteFractions = Float.intBitsToFloat(tempdata);
+	            			
+	            			//Convert to whole minutes
+	            			degrees = (minutes / 60);
+	            			
+	            			//degrees can't be negative so 
+	            			//we enforce a positive value here
+	            			if (degrees < 0 ) {
+	            				degrees = (degrees * (-1));
+	            			}
+	            			
+	            			//Add remainder of whole and fractional minutes
+	            			minuteDegrees = (((minutes - (degrees * 60)) + 
+	            					minuteFractions) / 60.0f);
+	            			
+	            			//Ship it!
+	            			precision_data = (double)degrees + minuteDegrees;
+	            			context.setTelemetry(index, precision_data);
 
+	            			break;
+            		
+	            		default:
+	            			tempdata = ( ((msg[2]&0xff)<<24)|
+	       					 		 	 ((msg[3]&0xff)<<16)|
+	       					 		 	 ((msg[4]&0xff)<< 8)|
+	       					 		 	 ((msg[5]&0xff)) );
+	                	
+	            			data  = Float.intBitsToFloat(tempdata);
+	            			context.setTelemetry(index, data);
+	            			break;
+                	}
                     break;
                     
                 case Serial.SETTING_DATA:
-                	if(index >= MIXED_SETTING_TYPE_INDEX_START) {
-                		
-                		precision_tempdata = ( ((msg[2] & 0xff)<< 8)|
-                							   ((msg[3])) );
-                		
-                    	tempdata = ( ((msg[4]&0xff)<<24)|
-          				 		 	 ((msg[5]&0xff)<<16)|
-          				 		 	 ((msg[6]&0xff)<< 8)|
-          				 		 	 ((msg[7]&0xff)) );
-                    	
-                    	precision_data = 
-                    			Double.longBitsToDouble(precision_tempdata)
-                    		  + Double.longBitsToDouble(tempdata);
-                    	context.setSettingQuiet(index, precision_data);
-                	}
-                	else {
-                    	tempdata = ( ((msg[2]&0xff)<<24)|
-           					 		 ((msg[3]&0xff)<<16)|
-           					 		 ((msg[4]&0xff)<< 8)|
-           					 		 ((msg[5]&0xff)) );
-                    	
-                    	data  = Float.intBitsToFloat(tempdata);
-                    	context.setSettingQuiet(index, data);
-                	}
-                	
+
+        			tempdata = ( ((msg[2]&0xff)<<24)|
+   					 		 	 ((msg[3]&0xff)<<16)|
+   					 		 	 ((msg[4]&0xff)<< 8)|
+   					 		 	 ((msg[5]&0xff)) );
+            	
+        			data  = Float.intBitsToFloat(tempdata);
+        			context.setSettingQuiet(index, data);
                     break;
                     
                 case Serial.SENSOR_DATA:
@@ -183,6 +174,7 @@ public class SerialParser implements SerialPortEventListener {
                         	break;
                 	}
                 	break;
+                	
                 case Serial.INFO_DATA:
                 	int infoSubtype  = msg[1];
                 	
