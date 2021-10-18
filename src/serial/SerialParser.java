@@ -263,6 +263,7 @@ public class SerialParser implements SerialPortEventListener {
                 sm = null;
             }
         }
+        
         private String format(String data) {
             if(sm == null) return data;
             Optional<Description> details = sm.getFullDescription(data);
@@ -273,10 +274,12 @@ public class SerialParser implements SerialPortEventListener {
                                  d.getDescription(),
                                  d.getSourceFile());
         }
+        
         public int claim(byte data) {
             if(Serial.getMsgType(data) == Serial.STRING_TYPE) return 255;
             else return -1;
         }
+        
         public void handle(byte[] msg) {
             int subtype = Serial.getSubtype(msg[0]);
             byte[] buff = new byte[msg.length-1];
