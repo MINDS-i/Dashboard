@@ -6,19 +6,24 @@ import static com.map.WaypointList.*;
 import com.remote.SettingList;
 import com.serial.*;
 import com.serial.Messages.*;
+import com.serial.CommsMonitor;
 import com.ui.*;
 import com.telemetry.*;
 import com.xml;
 import com.graph.DataSource;
+
 import java.io.*;
 import java.nio.file.*;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.*;
+
+import java.awt.geom.Point2D;
+
 import jssc.SerialPort;
 import jssc.SerialPortException;
-import java.awt.geom.Point2D;
+
 
 public class Context {
     public boolean connected;
@@ -30,6 +35,7 @@ public class Context {
     public SettingList settingList;
     public TelemetryManager telemetry;
     public TelemetryLogger telemLog;
+    public CommsMonitor commsMonitor;
 
     private WaypointList waypoint;
     private SerialPort port;
@@ -163,6 +169,7 @@ public class Context {
             }
         });
     }
+    
     public void toggleLocale() {
         String current = (String) persist.get("subject");
         if(current.equals("air")) {
@@ -220,11 +227,13 @@ public class Context {
         port = newPort;
         sender.start();
         parser.updatePort();
+        commsMonitor.getInstance(this).startHeartbeatTimer();
         connected = true;
     }
     public void closePort() {
         sender.stop();
         port = null;
+        commsMonitor.getInstance(this).stopHeartbeatTimer();
         connected = false;
     }
     public SerialPort port() {

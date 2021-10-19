@@ -42,7 +42,7 @@ public class SerialParser implements SerialPortEventListener {
     public SerialParser(Context cxt, WaypointList waypoints) {
         context = cxt;
         this.waypoints = waypoints;
-        commsMonitor = new CommsMonitor(context);
+        commsMonitor = CommsMonitor.getInstance(context);
     }
 
     public void serialEvent(SerialPortEvent event) {

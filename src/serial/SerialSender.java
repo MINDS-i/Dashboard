@@ -195,4 +195,5 @@ public class SerialSender {
         Message msg = Message.syncMessage(Serial.SYNC_REQUEST);
         sendMessage(msg);
     }
+    
 }

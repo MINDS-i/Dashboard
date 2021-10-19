@@ -26,6 +26,7 @@ public class CommandManager {
 	/**
 	 * Returns an instance of this singleton class. This is
 	 * the intended form of retrieval and instantiation.
+	 * @return - The CommandManager instance
 	 */
 	public static CommandManager getInstance() {
 		if(cmInstance == null) {

@@ -1,7 +1,7 @@
 <settingList><setting index="0" name="Line Gravity" min="0.25" max="0.75" def="0.50"> Defines how strongly the rover should attempt to return to the original course between waypoints, verses the direct path from its current location to the target&lt;br&gt;
 	 </setting><setting index="1" name="Steer Throw" min="0" max="90" def="45"> The number of degrees that rover will turn its wheels when it needs to to turn its most extreme amount
 	 </setting><setting index="2" name="Steer Style" min="0" max="2" def="1"> Switches between arctangent of error steering (0) &lt;br&gt; square of error steering (1) &lt;br&gt; and proportional to error steering (2)
-	 </setting><setting index="3" name="Steer Scalar" min="0" def="1.5"> Multiplier that determines how aggressively to steer
+	 </setting><setting index="3" name="Steer Scalar" min="0" max="8" def="1.5"> Multiplier that determines how aggressively to steer
 	 </setting><setting index="4" name="Min Fwd Speed" min="1" max="3" def="1.5"> Minimum forward driving speed in MPH
 	 </setting><setting index="5" name="Max Fwd Speed" min="1.5" max="3" def="2.0"> Maximum forward driving speed in MPH
 	 </setting><setting index="6" name="Rev Str Throw" min="0" max="90" def="20"> How far to turn the wheels when backing away from an obstacle
@@ -9,7 +9,7 @@
 	 </setting><setting index="8" name="Ping Factor" min="1" max="20000" def="1400"> Factor to determine how strongly obstacles effect the rover's course &lt;br&gt; Larger numbers correspond to larger effects from obstacles
 	 </setting><setting index="9" name="Coast Time" min="2000" max="8000" def="2000"> Time in milliseconds to coast before reversing when an obstacle is encountered
 	 </setting><setting index="10" name="Min Rev Time" min="500" max="2000" def="1000"> Minimum time in seconds to reverse away from an obstacle
-	 </setting><setting index="11" name="Cruise P" min="0" max="10" def="0.05"> P term in cruise control PID loop
+	 </setting><setting index="11" name="Cruise P" min="0" max="1" def="0.05"> P term in cruise control PID loop
 	 </setting><setting index="12" name="Cruise I" min="0" max="10" def="0.1"> I term in cruise control PID loop
 	 </setting><setting index="13" name="Cruise D" min="0" max="10" def="0.0"> D term in cruise control PID loop
 	 </setting><setting index="14" name="Tire Diameter" min="0" max="12" def="5.85"> Tire Diameter in inches, used to calculate MPH
