@@ -28,6 +28,7 @@ public class Serial {
     
     //Info Types
     public static final int APM_VERSION	   	 = 0x0;
+    public static final int HEARTBEAT		 = 0x1;
     
     //Word type
     public static final int CONFIRMATION   	 = 0x0;
