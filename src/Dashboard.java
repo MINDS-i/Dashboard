@@ -137,15 +137,13 @@ public class Dashboard implements Runnable {
                 context.updatePort(port);
                 seriallog.info("Port opened");
                 context.sender.sendSync();
-                //TODO - CP - Or perhaps start heartbeat here?
-                context.commsMonitor.getInstance(context).startHeartbeatTimer();
+                context.commsMonitor.getInstance().startHeartbeatTimer();
             }
             public void disconnectRequest() {
                 context.closePort();
                 seriallog.info("Serial Port Closed");
                 resetData();
-                //TODO - CP - Stop heartbeat here?
-                context.commsMonitor.getInstance(context).stopHeartbeatTimer();
+                context.commsMonitor.getInstance().stopHeartbeatTimer();
             }
         };
         

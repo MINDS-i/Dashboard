@@ -42,7 +42,7 @@ public class SerialParser implements SerialPortEventListener {
     public SerialParser(Context cxt, WaypointList waypoints) {
         context = cxt;
         this.waypoints = waypoints;
-        commsMonitor = CommsMonitor.getInstance(context);
+        commsMonitor = CommsMonitor.getInstance();
     }
 
     public void serialEvent(SerialPortEvent event) {
@@ -178,9 +178,9 @@ public class SerialParser implements SerialPortEventListener {
                 			break;
                 		
                 		case Serial.HEARTBEAT:
-                			int response = msg[2];
+                			int pulse = msg[2];
                 			
-                			commsMonitor.receiveHeartbeatResponse(response);
+                			commsMonitor.receiveHeartbeatPulse(pulse);
                 			break;
                 			
                 		default:
