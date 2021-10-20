@@ -127,6 +127,7 @@ public class CommsMonitor {
 	public void stopHeartbeatTimer() {
 		System.err.println("Stopping heartbeat timer");
 		heartbeatPulseTimer.stop();
+		//TODO - CP - Reset timeout count here?
 	}
 	
 }

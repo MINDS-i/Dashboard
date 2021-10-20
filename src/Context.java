@@ -227,13 +227,15 @@ public class Context {
         port = newPort;
         sender.start();
         parser.updatePort();
-        commsMonitor.getInstance(this).startHeartbeatTimer();
+        //TODO - CP - Remove this call?
+//        commsMonitor.getInstance(this).startHeartbeatTimer();
         connected = true;
     }
     public void closePort() {
         sender.stop();
         port = null;
-        commsMonitor.getInstance(this).stopHeartbeatTimer();
+        //TODO - CP - Remove this call?
+//        commsMonitor.getInstance(this).stopHeartbeatTimer();
         connected = false;
     }
     public SerialPort port() {
@@ -296,6 +298,7 @@ public class Context {
     }
     public void onConnection() {
         sender.sendWaypointList();
+        //TODO - CP - Called after sync response, stop then start heartbeat here?
     }
     
     /**

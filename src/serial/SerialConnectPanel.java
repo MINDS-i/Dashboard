@@ -114,6 +114,7 @@ public class SerialConnectPanel extends JPanel {
             connectButton.setEnabled(true);
             connectButton.setText(BUTTON_CONNECTED);
             inProgress = false;
+            //TODO - CP - Start heartbeat timer here?
         }
     }
     
