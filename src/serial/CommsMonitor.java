@@ -78,7 +78,13 @@ public class CommsMonitor {
 	 * has exceeded the maximum, an error is logged.
 	 */
 	private void updateHeartbeatCheck() {
+		
+		if(awaitingInitialHeartbeat) {
+			return;
+		}
+		
 		if(heartbeatCheckCount == MAX_HEARTBEAT_CHECK_COUNT) {
+			
 			if(!heartbeatConnectionLost) {
 				serialLog.severe(
 						"CommsMonitor - No serial heartbeat response from unit. " 
