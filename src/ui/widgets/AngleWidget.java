@@ -15,7 +15,7 @@ import java.lang.Math;
 public class AngleWidget extends JPanel implements TelemetryListener {
 	
 	//Constants
-	private static final double ANGLE_OFFSET_LIMIT = 5.0;
+	private static final double ANGLE_OFFSET_LIMIT = 10.0;
 	
 	//Vars
     private double theta;
@@ -104,8 +104,28 @@ public class AngleWidget extends JPanel implements TelemetryListener {
     	//reading to smooth out data hiccups. Some kind of rolling average could
     	//work, but what happens if we get multiple wrong values in a row. how
     	//do we determine that the change is real...how many samples have to
-    	//remain in range before it is considered a normal change?
+    	//remain in range before it is considered a normal change? If we wait
+    	//too long to collect samples it will delay the widget update and look
+    	//bad
 
+    	//Known
+    		//Update rate is ~110ms
+    	
+    	//Need to know:
+    		//how many outliers in a row can we get/what is reasonable to account for?
+    		//How big should the average be? Don't want to take too long to update.
+    		//How do we account for different widget types or does it matter? 
+    		//	(there is no indication currently)
+    		//What offset should we consider an outlier? is this universal
+    		//	across widget types?
+    	
+    	if(Math.abs(prevAngle - angle) > ANGLE_OFFSET_LIMIT) {
+    		System.out.println(
+    				"AngleWidget - Maximum change between angles too great. Ignoring Outlier");
+    		prevAngle = angle;
+    		return;
+    	}
+    	
         theta = (angle * Math.PI) / 180;
         prevAngle = angle;
         repaint();
