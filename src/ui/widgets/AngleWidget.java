@@ -1,15 +1,29 @@
 package com.ui.widgets;
 
+import com.Context;
 import com.telemetry.TelemetryListener;
-import java.awt.*;
+
 import javax.imageio.*;
 import javax.swing.*;
+
+import java.awt.*;
 import java.awt.FontMetrics;
 import java.awt.image.BufferedImage;
 
-import com.Context;
+import java.lang.Math;
 
 public class AngleWidget extends JPanel implements TelemetryListener {
+	
+	//Constants
+	private static final double ANGLE_OFFSET_LIMIT = 5.0;
+	
+	//Vars
+    private double theta;
+    private double prevAngle;
+    private BufferedImage image;
+    private BufferedImage background;
+    private BufferedImage overlay;
+
     /**
      * Create a new AngleWidget instance that displays the values in a given
      * telemetry index interpreted as angles by applying them to an image in
@@ -18,37 +32,41 @@ public class AngleWidget extends JPanel implements TelemetryListener {
      * @param telemetryID Telemetry index with angles in degrees
      * @param indicator   The image to rotate according to the telemetry data
      */
-    public static AngleWidget createDial(
-      Context ctx,
-      int telemetryID,
-      BufferedImage indicator){
-        AngleWidget aw = new AngleWidget( indicator,
-                            ctx.theme.gaugeBackground,
-                            ctx.theme.gaugeGlare);
+    public static AngleWidget createDial(Context ctx, int telemetryID,
+    		BufferedImage indicator) {
+    	
+    	AngleWidget aw = new AngleWidget(
+    			indicator, ctx.theme.gaugeBackground, ctx.theme.gaugeGlare);
         ctx.telemetry.registerListener(telemetryID, aw);
         return aw;
     }
 
-    private double theta;
-    private BufferedImage image;
-    private BufferedImage background;
-    private BufferedImage overlay;
-
-    private AngleWidget(
-      BufferedImage tiltImage,
-      BufferedImage backgroundImage,
+    /**
+     * Prive class constructor. Instantiated from static createDial function
+     * call.
+     * @param tiltImage - The image effected by angle rotation
+     * @param backgroundImage - the background image of the dial widget
+     * @param foregroundImage - the foreground image of the dial widget
+     */
+    private AngleWidget(BufferedImage tiltImage, BufferedImage backgroundImage,
       BufferedImage foregroundImage) {
         image = tiltImage;
         background = backgroundImage;
         overlay = foregroundImage;
-        this.setPreferredSize(new Dimension(background.getWidth(),
-                                            background.getHeight()) );
-        this.setMaximumSize(new Dimension(background.getWidth(),
-                                            background.getHeight()));
-        setOpaque(false);
+        prevAngle = 0.0;
         
+        this.setPreferredSize(
+        		new Dimension(background.getWidth(), background.getHeight()));
+        this.setMaximumSize(
+        		new Dimension(background.getWidth(), background.getHeight()));
+        setOpaque(false);
     }
 
+    /**
+     * Paints the widget image at the current angle offset determined
+     * by incoming telemetry angle values.
+     * @param g - The graphics reference.
+     */
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -74,8 +92,22 @@ public class AngleWidget extends JPanel implements TelemetryListener {
         g2d.dispose();
     }
 
+    /**
+     * Updates the angle offset of the widgets main angle image. If the change
+     * in angle exceeds ANGLE_OFFSET_LIMIT then the change is considered to be
+     * an outlier and unlikely to be realistic. This change is then ignored,
+     * and no update occurs.
+     * @param angle
+     */
     public void update(double angle) {
-        theta = (angle*Math.PI)/180;
+    	//TODO - CP - Determine a method of smoothing out one or more outlier
+    	//reading to smooth out data hiccups. Some kind of rolling average could
+    	//work, but what happens if we get multiple wrong values in a row. how
+    	//do we determine that the change is real...how many samples have to
+    	//remain in range before it is considered a normal change?
+
+        theta = (angle * Math.PI) / 180;
+        prevAngle = angle;
         repaint();
     }
 }
