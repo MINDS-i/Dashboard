@@ -1,5 +1,4 @@
-<settingList><setting index="0" name="Line Gravity" min="0.25" max="5.00" def="1.00"> Defines how strongly the rover should attempt to return to the original course between waypoints, verses the direct path from its current location to the target&lt;br&gt;
-	 </setting><setting index="1" name="Steer Throw" min="0" max="90" def="45"> The number of degrees that rover will turn its wheels when it needs to to turn its most extreme amount
+<settingList><setting index="1" name="Steer Throw" min="0" max="90" def="45"> The number of degrees that rover will turn its wheels when it needs to to turn its most extreme amount
 	 </setting><setting index="2" name="Steer Style" min="0" max="2" def="1"> Switches between arctangent of error steering (0) &lt;br&gt; square of error steering (1) &lt;br&gt; and proportional to error steering (2)
 	 </setting><setting index="3" name="Steer Scalar" min="0" max="8" def="1.5"> Multiplier that determines how aggressively to steer
 	 </setting><setting index="4" name="Min Fwd Speed" min="1" max="3" def="1.5"> Minimum forward driving speed in MPH
