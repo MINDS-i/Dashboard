@@ -155,6 +155,10 @@ public class Message {
     	return new DataMessage(Serial.INFO_DATA, (byte)Serial.APM_VERSION, (byte)0);
     }
     
+    public static Message sendHeartbeatPulse() {
+    	return new DataMessage(Serial.INFO_DATA, (byte)Serial.HEARTBEAT, (byte)0);
+    }
+    
     public static Message enableBumper() {
     	return new WordMessage(Serial.COMMAND_WORD, Serial.ENABLE_BUMPER_CMD, (byte)0);
     }
