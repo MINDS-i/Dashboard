@@ -9,18 +9,24 @@ import com.map.WaypointList;
 import com.serial.*;
 import com.serial.Messages.*;
 import com.serial.Serial;
+import com.serial.CommsMonitor;
 import static com.map.WaypointList.*;
+
 import jssc.SerialPort;
 import jssc.SerialPortException;
 import jssc.SerialPortEventListener;
 import jssc.SerialPortEvent;
+
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.logging.Logger;
+
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.FileReader;
+
 import java.awt.*;
+
 import java.nio.charset.StandardCharsets;
 
 public class SerialParser implements SerialPortEventListener {
@@ -28,13 +34,15 @@ public class SerialParser implements SerialPortEventListener {
     private Decoder decoder;
     private StateMap descriptionMap;
     private WaypointList waypoints;
-
+    private CommsMonitor commsMonitor;
+    
     private final Logger seriallog = Logger.getLogger("d.serial");
     private final Logger robotlog = Logger.getLogger("d.robot");
 
     public SerialParser(Context cxt, WaypointList waypoints) {
         context = cxt;
         this.waypoints = waypoints;
+        commsMonitor = CommsMonitor.getInstance();
     }
 
     public void serialEvent(SerialPortEvent event) {
@@ -186,6 +194,12 @@ public class SerialParser implements SerialPortEventListener {
                         	
                         	context.setAPMVersion(String.format("%d.%d.%d",
                         			versionMajor, versionMinor, versionRev));
+                			break;
+                		
+                		case Serial.HEARTBEAT:
+                			int pulse = msg[2];
+                			
+                			commsMonitor.receiveHeartbeatPulse(pulse);
                 			break;
                 			
                 		default:
