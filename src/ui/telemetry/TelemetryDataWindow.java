@@ -371,13 +371,7 @@ public class TelemetryDataWindow implements ActionListener {
 		}
 		
 		public void actionPerformed(ActionEvent e) {
-			//TODO - CP - Restore telemetry defaults here
-			//Determine how best to approach restore
-				//A - Loop through all settings and set at default value
-				//	- Then call update sliders to make sure it all lines up
-				
-				//B - There may be a more streamlined way to do this
-				//	- Look into how settings are intialized for clues.
+			context.sender.resetSettings();
 		}
 	};
 }

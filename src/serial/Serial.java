@@ -50,8 +50,9 @@ public class Serial {
     public static final byte START_CMD	  	 	= 0x6;
     public static final byte DISABLE_BUMPER_CMD	= 0x7;
     public static final byte ENABLE_BUMPER_CMD  = 0x8;
+    public static final byte SETTINGS_RESET_CMD = 0x9;
     
-    //TODO - CP - Add restore to defaults command here
+    
     
     //State types
     public static final byte APM_STATE	  	 = 0x0;

@@ -166,4 +166,8 @@ public class Message {
     public static Message disableBumper() {
     	return new WordMessage(Serial.COMMAND_WORD, Serial.DISABLE_BUMPER_CMD, (byte)0);
     }
+    
+    public static Message resetSettings() {
+    	return new WordMessage(Serial.COMMAND_WORD, Serial.SETTINGS_RESET_CMD, (byte)0);	
+    }
 }
