@@ -70,10 +70,10 @@ public class SliderEditor extends JSlider implements TableCellEditor {
 				if(previousChangeValue == getValue()) {
 					setting = context.settingList.get(row);
 					
-					double min 		= setting.getMin();
-					double max 		= setting.getMax();
-					double range 	= (max - min);
-					double settingValue = ((getValue() * range) / 100) + min;
+					float min 		= setting.getMin();
+					float max 		= setting.getMax();
+					float range 	= (max - min);
+					float settingValue = ((getValue() * range) / 100) + min;
 					
 					//Set final updated value
 					context.settingList.pushSetting(row, settingValue);
