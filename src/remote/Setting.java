@@ -5,10 +5,10 @@ package com.remote;
 public class Setting {
     String name;
     String description;
-    double min;
-    double max;
-    double def;
-    double remoteVal;
+    float min;
+    float max;
+    float def;
+    float remoteVal;
     Setting() {
         this.name        = "";
         this.description = "";
@@ -16,17 +16,17 @@ public class Setting {
         this.max         = 0;
         this.def         = 0;
     }
-    Setting(String name, String description, double min, double max, double def) {
+    Setting(String name, String description, float min, float max, float def) {
         this.name        = name;
         this.description = description;
         this.min         = min;
         this.max         = max;
         this.def         = def;
     }
-    void setVal(double newVal) {
+    void setVal(float newVal) {
         remoteVal = newVal;
     }
-    public Boolean outsideOfBounds(double v) {
+    public Boolean outsideOfBounds(float v) {
         return (v < min) || (v > max);
     }
     public String getName() {
@@ -35,16 +35,16 @@ public class Setting {
     public String getDescription() {
         return description;
     }
-    public double getMin() {
+    public float getMin() {
         return min;
     }
-    public double getMax() {
+    public float getMax() {
         return max;
     }
-    public double getDefault() {
+    public float getDefault() {
         return def;
     }
-    public double getVal() {
+    public float getVal() {
         return remoteVal;
     }
 }

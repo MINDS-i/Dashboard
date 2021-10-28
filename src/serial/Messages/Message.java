@@ -99,15 +99,15 @@ public class Message {
         return new WordMessage(Serial.SYNC_WORD, resync, (byte)0);
     }
     
-    public static Message telemetry(byte index, double data) {
+    public static Message telemetry(byte index, float data) {
         return new DataMessage(Serial.TELEMETRY_DATA, index, data);
     }
     
-    public static Message setSetting(byte index, double data) {
+    public static Message setSetting(byte index, float data) {
         return new DataMessage(Serial.SETTING_DATA, index, data);
     }
     
-    public static Message sensor(byte index, double data) {
+    public static Message sensor(byte index, float data) {
     	return new DataMessage(Serial.SENSOR_DATA, index, data);
     }
     
