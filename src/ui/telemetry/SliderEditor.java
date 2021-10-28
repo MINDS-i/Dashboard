@@ -5,6 +5,7 @@ import com.remote.Setting;
 import com.remote.SettingList;
 
 import java.util.*;
+import java.lang.Math;
 
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
@@ -72,7 +73,7 @@ public class SliderEditor extends JSlider implements TableCellEditor {
 					
 					float min 		= setting.getMin();
 					float max 		= setting.getMax();
-					float range 	= (max - min);
+					float range 	= Math.abs(max - min);
 					float settingValue = ((getValue() * range) / 100) + min;
 					
 					//Set final updated value
