@@ -94,7 +94,7 @@ public class TableFactory {
             }
             
             public String getValueAt(int row) {
-                double val = settingList.get(row).getVal();
+                float val = settingList.get(row).getVal();
                 return " "+val;
             }
             
@@ -112,7 +112,7 @@ public class TableFactory {
             
             public void setValueAt(String val, int row) {
             	
-                double newVal = Double.valueOf((String)val);
+                Float newVal = Float.valueOf((String)val);
                 
                 if(settingList.get(row).outsideOfBounds(newVal)) {
                     JFrame mf = new JFrame("Warning");

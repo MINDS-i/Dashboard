@@ -343,9 +343,9 @@ public class TelemetryDataWindow implements ActionListener {
 	 */
 	public void updateSliderPercentages() {
 		Setting setting;
-		double min; 
-		double max;
-		double current;
+		float min; 
+		float max;
+		float current;
 		int percentage;
 		
 		for(int i = 0; i < context.settingList.size(); i++) {
