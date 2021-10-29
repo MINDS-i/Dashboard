@@ -5,11 +5,11 @@ import com.serial.Messages.*;
 
 class DataMessage extends Message {
     int msgType;
-    public DataMessage(int type, byte index, double data) {
+    public DataMessage(int type, byte index, float data) {
         super();
         msgType = type;
 
-        long idata   = Double.doubleToLongBits(data);
+        int idata   = Float.floatToIntBits(data);
 
         content     = new byte[6];
         content[0]  = Serial.buildMessageLabel(Serial.DATA_TYPE, type);

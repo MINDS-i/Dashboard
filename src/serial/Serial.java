@@ -83,7 +83,7 @@ public class Serial {
     public static final byte SYNC_REQUEST = 0x00;
     public static final byte SYNC_RESPOND = 0x01;
     
-    //Telemetry IDs (Float types)
+    //Telemetry IDs
     public static final int LATITUDE      = 0;
     public static final int LONGITUDE     = 1;
     public static final int HEADING       = 2;
@@ -104,15 +104,9 @@ public class Serial {
     public static final int DELTAALTITUDE = 17;
     public static final int GPSNUMSAT 	  = 18;
     public static final int GPSHDOP 	  = 19;
-    public static final int HEADING_LOCK  = 20;
-    
-    //Telemetry IDs (Mixed types)
-    public static final int LATITUDE_PRECISION 	= 64;
-    public static final int LONGITUDE_PRECISION = 65;
 
-    //Constants
     public static final int	MAX_WAYPOINTS		= 64;
-    public static final int	MAX_SETTINGS		= 72;
+    public static final int	MAX_SETTINGS		= 64;
     public static final int	MAX_TELEMETRY		= 256;
     public static final int	BAUD				= SerialPort.BAUDRATE_57600;
     public static final int	U16_FIXED_POINT		= 256;
