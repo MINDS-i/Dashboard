@@ -30,6 +30,8 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelListener;
 import java.awt.event.MouseEvent;
 
+import java.awt.event.ActionEvent;
+
 /**
  * @author Chris Park @ Infinetix Corp
  * Date: 3-3-21
@@ -66,9 +68,12 @@ public class TelemetryDataWindow implements ActionListener {
 	private JFrame FRM_Window;
 	private JPanel PNL_Main;
 	private JPanel PNL_Settings;
-	private JPanel PNL_Log;
+	private JPanel PNL_Top;
 	private JLabel LBL_Log;
 	private JTextField TXF_Log;
+	
+	private JButton BTN_RestoreDefaults;
+	
 	private JTextPane TXP_Description;
 	private JTextComponent TXC_DescriptionBox;
 	private JTable TBL_Telemetry;
@@ -191,22 +196,24 @@ public class TelemetryDataWindow implements ActionListener {
         PNL_Settings.add(SCL_SettingsSliders);
 
 		//Build Log Panel
-		PNL_Log = new JPanel();
-		PNL_Log.setLayout(new FlowLayout());
+		PNL_Top = new JPanel();
+		PNL_Top.setLayout(new FlowLayout());
 		LBL_Log = new JLabel("Set logging period (ms)");
 		TXF_Log = new JTextField();
 		TXF_Log.addActionListener(this);
 		TXF_Log.setText(Integer.toString(context.telemLog.getPeriod()));
 		TXF_Log.setColumns(LOG_FIELD_WIDTH);
-		PNL_Log.add(LBL_Log);
-		PNL_Log.add(TXF_Log);
+		BTN_RestoreDefaults = new JButton(restoreDefaultsAction);
+		PNL_Top.add(LBL_Log);
+		PNL_Top.add(TXF_Log);		
+		PNL_Top.add(BTN_RestoreDefaults);
 		
 		//Set up main JPanel
 		PNL_Main = new JPanel();
 		PNL_Main.setLayout(new BoxLayout(PNL_Main, BoxLayout.PAGE_AXIS));
 		
 		//Add everything to main JPanel
-		PNL_Main.add(PNL_Log);
+		PNL_Main.add(PNL_Top);
 		PNL_Main.add(SCL_Telemetry);
 		PNL_Main.add(PNL_Settings);
 		PNL_Main.add(TXP_Description);
@@ -353,4 +360,18 @@ public class TelemetryDataWindow implements ActionListener {
 			TBL_SettingsSliders.getModel().setValueAt(percentage, i, 0);
 		}
 	}
+	
+	/**
+	 * Action used to restore telemetry values to their default settings.
+	 */
+	private Action restoreDefaultsAction = new AbstractAction() {
+		{
+			String text = "Restore Defaults";
+			putValue(Action.NAME, text);
+		}
+		
+		public void actionPerformed(ActionEvent e) {
+			context.sender.resetSettings();
+		}
+	};
 }
