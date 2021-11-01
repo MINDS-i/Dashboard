@@ -52,8 +52,6 @@ public class Serial {
     public static final byte ENABLE_BUMPER_CMD  = 0x8;
     public static final byte SETTINGS_RESET_CMD = 0x9;
     
-    
-    
     //State types
     public static final byte APM_STATE	  	 = 0x0;
     public static final byte DRIVE_STATE  	 = 0x1;

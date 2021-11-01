@@ -196,6 +196,7 @@ public class SerialSender {
      * restored to their factory defaults.
      */
     public void resetSettings() {
+    	seriallog.warning("SerialSender - Requesting reset to default telemetry settings.");
     	sendMessage(Message.resetSettings());
     }
     
