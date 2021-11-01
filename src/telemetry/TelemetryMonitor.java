@@ -16,7 +16,7 @@ import com.telemetry.TelemetryListener;
  * Date: 9-14-21
  * Description: Class responsible for monitoring and handling
  * changes in various telemetry data types. This can sometimes include
- * issuing commands to in response to those changes.
+ * issuing commands in response to those changes.
  */
 public class TelemetryMonitor {
 	
