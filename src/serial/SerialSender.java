@@ -191,9 +191,17 @@ public class SerialSender {
     	}
     }
     
+    /**
+     * Sends a message to the unit request that all telemetry settings be
+     * restored to their factory defaults.
+     */
+    public void resetSettings() {
+    	seriallog.warning("SerialSender - Requesting reset to default telemetry settings.");
+    	sendMessage(Message.resetSettings());
+    }
+    
     public void sendSync() {
         Message msg = Message.syncMessage(Serial.SYNC_REQUEST);
         sendMessage(msg);
     }
-    
 }
