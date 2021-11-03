@@ -236,6 +236,7 @@ public class SerialParser implements SerialPortEventListener {
                         } 
                         else {
                             waypoints.setTarget(b, WaypointListener.Source.REMOTE);
+                            seriallog.warning("SerialParser - New target index from rover: " + b);
                         }
                     }
                     break;
