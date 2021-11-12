@@ -17,6 +17,7 @@ import javax.swing.*;
 
 
 class RoverPath implements Layer {
+	
     private static final Color ACTIVE_LINE_FILL = new Color(1.f, 1.f, 0.f, 1f);
     private static final Color PATH_LINE_FILL   = new Color(0f, 0f, 0f, 1f);
     private static final Color LINE_BORDER      = new Color(0.5f, 0.5f, 0.5f, 0.0f);
@@ -177,10 +178,17 @@ class RoverPath implements Layer {
 
     private void paintDots(Graphics g) {
         drawLines(g);
-        drowRoverLine(g);
+        drawRoverLine(g);
         drawPoints(g);
     }
 
+    /**
+     * Returns the screen coordinate (x, y) pixel position of
+     * the Lng/Lat point found at the specified index in the
+     * waypoint list. 
+     * @param index - The waypoint list index
+     * @return - Point2D containing the pixel coordinates on the map.
+     */
     private Point2D drawnLocation(int index){
         Dot d = null;
         
@@ -199,6 +207,7 @@ class RoverPath implements Layer {
     }
 
     private void drawLines(Graphics g) {
+    	
         if(waypoints.size() < 2) {
         	return;
         } 
@@ -224,7 +233,7 @@ class RoverPath implements Layer {
     private void drawPoints(Graphics g) {
         Point tmp;
 
-        for(int i = waypoints.extendedIndexStart(); i < waypoints.size(); i++) {
+        for(int i = waypoints.getExtendedIndexStart(); i < waypoints.size(); i++) {
             tmp = toPoint(drawnLocation(i));
             ExtendedWaypoint w = waypoints.get(i);
             BufferedImage img = context.theme.waypointImage;
@@ -245,7 +254,7 @@ class RoverPath implements Layer {
         }
     }
 
-    private void drowRoverLine(Graphics g) {
+    private void drawRoverLine(Graphics g) {
         if(waypoints.getTarget() >= waypoints.size()) {
             return;
         }
@@ -261,8 +270,10 @@ class RoverPath implements Layer {
         g.translate( img.getWidth() / 2, img.getHeight() / 2);
     }
 
+    
+    //Mouse Action Handler
     public int isOverDot(Point2D click, BufferedImage image) {
-        for(int i = waypoints.extendedIndexStart(); i < waypoints.size(); i++) {
+        for(int i = waypoints.getExtendedIndexStart(); i < waypoints.size(); i++) {
             Dot d = waypoints.get(i).dot();
             Point2D loc = mapTransform.screenPosition(d.getLocation());
             if(Math.abs(click.getX()-loc.getX()-1) > image.getWidth() / 2.0) continue;
@@ -273,6 +284,7 @@ class RoverPath implements Layer {
         return Integer.MAX_VALUE;
     }
 
+    //Mouse Action Handler
     public int isOverLine(Point p) {
         if(waypoints.size() <= 0) {
         	return Integer.MAX_VALUE;

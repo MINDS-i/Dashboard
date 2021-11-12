@@ -101,60 +101,138 @@ public class SerialParser implements SerialPortEventListener {
             else return -1;
         }
         public void handle(byte[] msg) {
-            int subtype = Serial.getSubtype(msg[0]);
+        	int subtype = Serial.getSubtype(msg[0]);
             int index   = msg[1];
-            int tmpdata = (	((msg[2]&0xff)<<24)|
-                            ((msg[3]&0xff)<<16)|
-                            ((msg[4]&0xff)<< 8)|
-                            ((msg[5]&0xff)    ) );
-            float data  = Float.intBitsToFloat(tmpdata);
+            
+            int tempdata;
+            float data;
+            
             switch(subtype) {
                 case Serial.TELEMETRY_DATA:
+                	tempdata = ( ((msg[2]&0xff)<<24)|
+                				 ((msg[3]&0xff)<<16)|
+                				 ((msg[4]&0xff)<< 8)|
+                				 ((msg[5]&0xff)) );
+                	data  = Float.intBitsToFloat(tempdata);
                     context.setTelemetry(index, data);
                     break;
+                    
                 case Serial.SETTING_DATA:
+                	tempdata = ( ((msg[2]&0xff)<<24)|
+            					 ((msg[3]&0xff)<<16)|
+            					 ((msg[4]&0xff)<< 8)|
+            					 ((msg[5]&0xff)) );
+                	data  = Float.intBitsToFloat(tempdata);
                     context.setSettingQuiet(index, data);
                     break;
+                    
+                case Serial.SENSOR_DATA:
+                	int sensorVal 	  = 0;
+                	int sensorSubtype = msg[1];
+                	int sensorIndex   = msg[2];
+                	int[] sensorData = new int[2];
+                	
+                	sensorData[0] =  (msg[3] & 0xff);
+                	sensorData[1] =  (msg[4] & 0xff);
+                	for(int val : sensorData) {
+                		sensorVal = (sensorVal << 8) | val;
+                	}
+                	
+                	switch(sensorSubtype) {
+                		case Serial.OBJDETECT_SONIC:
+                        	//SensorData: [0]MSB [1]LSB
+                        	context.dash.pingWidget.update(sensorIndex, sensorVal);
+                        	break;
+                        
+                		case Serial.OBJDETECT_BUMPER:
+                			//SensorData: 0 = Off, 1 = On
+                			context.dash.bumperWidget.update(sensorIndex, sensorVal);
+                			break;
+                			
+                        default:
+                        	seriallog.severe(
+                        			"SerialParser - Sensor Data -" 
+                        		  + "Unrecognized Sensor Subtype");
+                        	break;
+                	}
+                	break;
+                case Serial.INFO_DATA:
+                	int infoSubtype  = msg[1];
+                	
+                	switch(infoSubtype) {
+                		case Serial.APM_VERSION:
+                			int versionMajor = msg[2];
+                        	int versionMinor = msg[3];
+                        	int versionRev 	 = msg[4];
+                        	
+                        	context.setAPMVersion(String.format("%d.%d.%d",
+                        			versionMajor, versionMinor, versionRev));
+                			break;
+                			
+                		default:
+                			seriallog.severe(
+                					"SerialParser - Info Data - "  
+                				  + "Unrecognized Info Subtype");
+                			break;
+                	}
+                	
+                	break;
             }
         }
     }
+    
     private class WordReader implements PacketReader {
         public int claim(byte data) {
-            if(Serial.getMsgType(data) == Serial.WORD_TYPE) return 255;
-            else return -1;
+            if(Serial.getMsgType(data) == Serial.WORD_TYPE) {
+            	return 255;
+            }
+            else {
+            	return -1;
+            }
         }
+        
         public void handle(byte[] msg) {
             int subtype = Serial.getSubtype(msg[0]);
-            byte a = (byte)(msg[1]&0xff);
-            byte b = (byte)(msg[2]&0xff);
-            int join = ( ((int)(a<<8)&0xFF00) | ((int)(b&0xFF)) );
+            byte a = (byte)(msg[1] & 0xff);
+            byte b = (byte)(msg[2] & 0xff);
+            int join = ( ((int)(a<<8) & 0xFF00) | ((int)(b & 0xFF)) );
+            
             switch(subtype) {
                 case Serial.CONFIRMATION:
                     context.sender.notifyOfConfirm(join);
                     break;
+                    
                 case Serial.SYNC_WORD: {
                         if(a == Serial.SYNC_REQUEST) {
                             Message message = Message.syncMessage(Serial.SYNC_RESPOND);
                             context.sender.sendMessage(message);
                             context.onConnection();
-                        } else if (a == Serial.SYNC_RESPOND) { //resync seen
+                        } 
+                        else if (a == Serial.SYNC_RESPOND) { //resync seen
                             context.onConnection();
                         }
                     }
                     break;
+                    
                 case Serial.COMMAND_WORD:
                     if(a == Serial.TARGET_CMD) {
                         if(b < 0 || b >= waypoints.size()){
                             seriallog.severe("Rover transmitted inconsistent target; resyncing");
                             context.sender.sendWaypointList();
-                        } else {
+                        } 
+                        else {
                             waypoints.setTarget(b, WaypointListener.Source.REMOTE);
                         }
                     }
                     break;
+                
+                case Serial.STATE_WORD:
+                	context.dash.stateWidget.update(a,b);
+                	break;
             }
         }
     }
+    
     private class StringReader implements PacketReader {
         private StateMap sm;
         {

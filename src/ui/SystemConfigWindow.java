@@ -41,14 +41,16 @@ public class SystemConfigWindow {
 
         // Add version numbers
         String versionString = String.format(
-            "MINDS-i Dashboard | Version %s | %s",
+            "MINDS-i Dashboard | Dashboard Version %s | APM Version %s | %s",
             context.getResource("version_id"),
+            context.getAPMVersion(),
             context.getResource("release_date"));
+        
         JLabel versionPane = new JLabel(versionString);
         versionPane.setAlignmentX(Component.CENTER_ALIGNMENT);
         container.add(versionPane);
 
-        // Add copy right notices
+        // Add copyright notices
         JTextPane copyRights = new JTextPane();
         Font tmp = copyRights.getFont();
         copyRights.setFont( tmp.deriveFont(9f) );
@@ -63,6 +65,7 @@ public class SystemConfigWindow {
 
         frame.add(container);
         frame.pack();
+        frame.setResizable(false);
         frame.setVisible(true);
     }
     

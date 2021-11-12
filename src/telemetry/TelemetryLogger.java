@@ -9,7 +9,7 @@ import java.text.SimpleDateFormat;
 import java.text.DecimalFormat;
 
 public class TelemetryLogger{
-    private final static int DEFAULT_LOG_PERIOD = 250;
+    private final static int DEFAULT_LOG_PERIOD_MS = 250;
     static final DecimalFormat numberFormat = new DecimalFormat("#.########");
     private BufferedWriter logFile;
     private java.util.Timer logTimer;
@@ -27,7 +27,7 @@ public class TelemetryLogger{
         } catch (IOException ex) {
             System.err.println(ex);
         }
-        setPeriod(DEFAULT_LOG_PERIOD);
+        setPeriod(DEFAULT_LOG_PERIOD_MS);
         startTime = System.currentTimeMillis();
     }
 

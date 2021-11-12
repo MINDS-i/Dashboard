@@ -1,4 +1,4 @@
-package com.ui;
+package com.ui.widgets;
 
 import com.telemetry.TelemetryListener;
 import java.awt.*;
@@ -43,7 +43,10 @@ public class AngleWidget extends JPanel implements TelemetryListener {
         overlay = foregroundImage;
         this.setPreferredSize(new Dimension(background.getWidth(),
                                             background.getHeight()) );
+        this.setMaximumSize(new Dimension(background.getWidth(),
+                                            background.getHeight()));
         setOpaque(false);
+        
     }
 
     @Override

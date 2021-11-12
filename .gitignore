@@ -14,8 +14,6 @@ graph.jar
 Dashboard.zip
 test.png
 resources/stateMessageDb.xml
-resources/airSettings.xml
-resources/groundSettings.xml
 sourceExtraction/test/
 sourceExtraction/__pycache__/
 DashBoard.zip
@@ -25,7 +23,8 @@ resources/tile_servers.properties
 .classpath
 .settings/org.eclipse.wst.sse.core.prefs
 boardlist.txt
-resources/groundSettings_edited.xml
 arduino-cli.exe
+resources/groundSettings_edited.xml
 resources/groundSettings_Old.xml
+resources/groundSettings.xml
 resources/images/6x6-Top - Backup.png

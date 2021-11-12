@@ -35,13 +35,13 @@ public class Context {
     private SerialPort port;
     private ResourceBundle resources;
     private Properties persist;
-
-    private static final File persistanceFile =
-            new File(System.getProperty("user.home") + "\\AppData\\Local\\MINDS-i Dashboard\\persist.properties");
+    private String APMVersion;
     
+    private final File persistenceFile;
     private final String instanceLogName;
     private final Logger ioerr = Logger.getLogger("d.io");
 
+    
     public Context(Dashboard dashboard) {
         dash        = dashboard;
         port        = null;
@@ -52,13 +52,24 @@ public class Context {
         instanceLogName = sdf.format(cal.getTime());
         
         persist = new Properties();
+        
+        //Find out what OS type we are running under
+        String osname = System.getProperty("os.name");
+        if(osname.toLowerCase().contains("windows")) {
+        	persistenceFile = new File(System.getProperty("user.home") 
+        			+ "\\AppData\\Local\\MINDS-i Dashboard\\persist.properties");
+        }
+        else { //Assume Linux and default to relative directory structure
+        	persistenceFile = new File("./resources/persist/persist.properties");
+        }
+        
         try {
-            if(!persistanceFile.exists()) {
-                persistanceFile.getParentFile().mkdirs();
-                persistanceFile.createNewFile();
+            if(!persistenceFile.exists()) {
+                persistenceFile.getParentFile().mkdirs();
+                persistenceFile.createNewFile();
             }
             
-            InputStream is =new FileInputStream(persistanceFile);
+            InputStream is = new FileInputStream(persistenceFile);
             persist.load(is);
             is.close();
         } 
@@ -162,6 +173,10 @@ public class Context {
         saveProps();
     }
     
+    public String getCurrentLocale() {
+    	return (String) persist.get("subject");
+    }
+    
     public void setHomeProp(String lat, String lng) {
     	persist.setProperty("homeLat", lat);
     	persist.setProperty("homeLng", lng);
@@ -177,7 +192,7 @@ public class Context {
     }
     
     private void saveProps() {
-        try(FileOutputStream file = new FileOutputStream(persistanceFile)) {
+        try(FileOutputStream file = new FileOutputStream(persistenceFile)) {
             persist.store(file, "");
         } catch (Exception e) {
             ioerr.severe("Can't save persist props "+e);
@@ -253,12 +268,14 @@ public class Context {
     public void setSettingQuiet(int index, float value) {
         settingList.updateSettingVal(index, value);
     }
+    
     public void setTelemetry(int id, float value) {
         telemetry.updateTelemetry(id, (double)value);
     }
     public float getTelemetry(int id) {
         return (float) telemetry.getTelemetry(id);
     }
+
     public String getTelemetryName(int id) {
         return telemetry.getTelemetryName(id);
     }
@@ -270,5 +287,38 @@ public class Context {
     }
     public void onConnection() {
         sender.sendWaypointList();
+    }
+    
+    /**
+     * Sets the current APM board version string.
+     * @param version
+     */
+    public void setAPMVersion(String version) {
+    	APMVersion = version;
+    }
+    
+    /**
+     * Gets the current AMP board version string if available,
+     * otherwise returns a placeholder.
+     * @return - String
+     */
+    public String getAPMVersion() {
+    	sender.sendMessage(Message.requestAPMVersion());
+    	
+    	try {
+    		Thread.sleep(250);	
+    	}
+    	catch(InterruptedException ex) {
+    		Thread.currentThread().interrupt();
+    		System.err.println("Context - Wait for version interrupted with exception: " 
+    		+ ex.toString());
+    	}
+    	
+    	
+    	if(APMVersion == null || APMVersion.isEmpty()) {
+    		APMVersion = "x.x.x";
+    	}
+    	
+		return APMVersion;
     }
 }

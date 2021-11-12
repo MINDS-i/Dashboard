@@ -12,6 +12,10 @@ import com.telemetry.*;
 import com.ui.*;
 import com.ui.ArtificialHorizon.DataAxis;
 import com.ui.ninePatch.*;
+import com.ui.widgets.PingWidget;
+import com.ui.telemetry.TelemetryDataWindow;
+import com.ui.widgets.*;
+
 import java.awt.*;
 import java.awt.Dimension;
 import java.awt.event.*;
@@ -35,13 +39,27 @@ import jssc.SerialPortException;
 import jssc.SerialPortList;
 
 public class Dashboard implements Runnable {
-    private static final int START_WIDTH  = 1200; //default window width
-    private static final int START_HEIGHT = 900; //default window height
-    private static final int WIDGET_SIZE = 140;
-    private Context context;
+    //Standard References
+	private Context context;
+    
+	//Static Values
+    private static final int DEF_WINDOW_WIDTH  	= 1200;
+    private static final int DEF_WINDOW_HEIGHT 	= 900;
+    private static final int ROUND_WIDGET_SIZE 	= 105;
+    private static final int DEFAULT_ZOOM_LEVEL = 4;
 
-    private TelemetryWidget dataWidget;
-
+    //UI Widget Frame
+    WidgetPanel widgetPanel;
+    
+    //UI Widgets
+    private TelemetryDataWidget dataWidget;
+    public StateWidget stateWidget;
+    public PingWidget pingWidget;
+    public GPSWidget gpsWidget;
+    public BumperWidget bumperWidget;
+    public MapPanel mapPanel;
+    
+    //Logging
     private final Logger seriallog = Logger.getLogger("d.serial");
     private final Logger iolog = Logger.getLogger("d.io");
     private final Logger rootlog = Logger.getLogger("d");
@@ -126,22 +144,23 @@ public class Dashboard implements Runnable {
                 resetData();
             }
         };
+        
         SerialConnectPanel serialPanel = new SerialConnectPanel(connectActions);
         serialPanel.showBaudSelector(true);
         
         JPanel messageBox = createAlertBox();
 
-        MapPanel mapPanel = new MapPanel(context,
+        mapPanel = new MapPanel(context,
         								 new Point((int)context.getHomeProp().getY(),
         										   (int)context.getHomeProp().getX()),
-        								 4, // default zoom level
+        								 DEFAULT_ZOOM_LEVEL,
         								 serialPanel,
         								 createRightPanel(),
         								 messageBox);
         
         f.add(mapPanel);
         f.pack();
-        f.setSize(START_WIDTH, START_HEIGHT);
+        f.setSize(DEF_WINDOW_WIDTH, DEF_WINDOW_HEIGHT);
         f.setVisible(true);
     }
 
@@ -186,52 +205,120 @@ public class Dashboard implements Runnable {
         }
     }
 
+    /**
+     * Creates the right panel display for the dashboard. This display is populated
+     * with with preconfigured UIWidgets that plug in to a larger WidgetPanel.
+     * @return - The right panel
+     */
     private JPanel createRightPanel() {
-        try {
-            dataWidget = TelemetryWidget.fromXML(context, "telemetryWidetSpec");
-        } catch(Exception e) {
-            iolog.severe("Failed to load telemetry widget line spec "+e);
+    	JPanel outerPanel = new JPanel();
+    	outerPanel.setOpaque(false);
+    	outerPanel.setLayout(new BoxLayout(outerPanel, BoxLayout.PAGE_AXIS));
+    	widgetPanel = new WidgetPanel(context);
+    	widgetPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+    	
+    	//Telemetry Data Widget
+    	try {
+    		dataWidget = createTelemetryWidget();
+    		widgetPanel.addWidget(dataWidget);
+    	}
+    	catch(Exception e) {
+            iolog.severe("Failed to load telemetry widget line spec " + e);
             e.printStackTrace();
-        }
-
-        JPanel dashPanel = new JPanel();
-        dashPanel.setOpaque(false);
-        dashPanel.setLayout(new BoxLayout(dashPanel, BoxLayout.PAGE_AXIS));
-
-        dashPanel.add(dataWidget);
-        dashPanel.add(
-            AngleWidget.createDial(
+    	}
+    	
+    	//State Widget
+    	stateWidget = new StateWidget(context);
+    	widgetPanel.addWidget(stateWidget);
+        
+        
+        //Ping Widget
+        pingWidget = new PingWidget(context);
+        widgetPanel.add(pingWidget);
+        
+        
+        //GPS Widget
+        gpsWidget = new GPSWidget(context);
+        widgetPanel.add(gpsWidget);
+        
+        //Bumper Widget
+        bumperWidget = new BumperWidget(context);
+        widgetPanel.add(bumperWidget);
+        
+        outerPanel.add(widgetPanel);
+        
+        
+        //Round Widgets
+        outerPanel.add(AngleWidget.createDial(
                 context, Serial.HEADING, context.theme.roverTop));
+        
         if(context.getResource("widget_type", "Angles").equals("Horizon")){
-            // Initialize the horizon widget
-            JPanel horizon =
-                HorizonWidgets.makeHorizonWidget(context, WIDGET_SIZE, (ArtificialHorizon ah)->{
-                    registerHorizonListeners(ah, false);
-                });
-            // Add call back to pop out a new horizon window when clicked
-            horizon.addMouseListener(new MouseAdapter(){
-                @Override
-                public void mouseClicked(MouseEvent e){
-                    HorizonWidgets.makeHorizonWindow(context, (ArtificialHorizon ah)->{
-                        registerHorizonListeners(ah, true);
-                    }).setVisible(true);
-                }
-            });
-            // Add to the panel
-            dashPanel.add(horizon);
-            dashPanel.add(RadioWidget.create(context, WIDGET_SIZE));
-        } else {
-            dashPanel.add(
+            outerPanel.add(createHorizonWidget());
+            outerPanel.add(RadioWidget.create(context, ROUND_WIDGET_SIZE));
+        } 
+        else {
+        	outerPanel.add(
                 AngleWidget.createDial(
                     context, Serial.PITCH, context.theme.roverSide));
-            dashPanel.add(
+        	outerPanel.add(
                 AngleWidget.createDial(
                     context, Serial.ROLL, context.theme.roverFront));
         }
 
-        return dashPanel;
+        //Watermark Image
+        BufferedImage watermark = context.theme.logoWatermark;
+        JLabel watermarkLabel = new JLabel(new ImageIcon(watermark));
+        watermarkLabel.setOpaque(false);
+        JPanel logo = new JPanel();
+        logo.setOpaque(false);
+        logo.add(watermarkLabel);
+        outerPanel.add(logo);
+        
+        return outerPanel;
     }
 
+    
+    /**
+     * Creates and returns a TelementryDataWidget from xml. The type of
+     * telemetry in the widget is selected using the mode configuration
+     * found in the users persistent settings.
+     * @return - The telemetry data widget.
+     */
+    private TelemetryDataWidget createTelemetryWidget() throws Exception {
+    	if(context.getCurrentLocale() == "ground") {
+			return TelemetryDataWidget.fromXML(context, "telemetryWidgetGnd");
+		}
+		else {
+			return TelemetryDataWidget.fromXML(context, "telemetryWidgetAir");
+		}
+    } 
+    
+    /**
+     * Creates a horizon widget with mouse event listener to pop out
+     * a new horizon window when clicked.
+     * @return - The horizon widget.
+     */
+    private JPanel createHorizonWidget() {
+    	// Initialize the horizon widget
+        JPanel horizon =
+            HorizonWidgets.makeHorizonWidget(
+            		context,
+            		ROUND_WIDGET_SIZE, 
+            		(ArtificialHorizon ah)->{registerHorizonListeners(ah, false);
+            });
+        
+        horizon.addMouseListener(new MouseAdapter(){
+            @Override
+            public void mouseClicked(MouseEvent e){
+                HorizonWidgets.makeHorizonWindow(context, (ArtificialHorizon ah)->{
+                    registerHorizonListeners(ah, true);
+                }).setVisible(true);
+            }
+        });
+        
+        return horizon;
+    }
+    
     private void resetData() {
         dataWidget.reset();
     }
@@ -256,7 +343,7 @@ public class Dashboard implements Runnable {
             launchOptions.load(optFile);
             openglProperty =
                 launchOptions.getProperty("opengl", openglProperty);
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

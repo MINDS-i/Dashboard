@@ -1,4 +1,4 @@
-package com.ui;
+package com.ui.widgets;
 
 import com.telemetry.TelemetryListener;
 import com.ui.ninePatch.*;
@@ -16,18 +16,23 @@ import java.awt.FontMetrics;
 import javax.xml.stream.*;
 import java.text.ParseException;
 
+//TODO - CP - DEPRECATED - This class has been ported to the UIWidget Heirarchy, and is no longer
+//used. Once any necessary information that remains has been gleaned out it should
+//be removed. See the TelemetryDataWidget class instead.
 
 public class TelemetryWidget extends JPanel{
     // The top,left,bottom,right border widths of the nine patch image rendered
     // around the internal text
     private final static Border insets = new EmptyBorder(9,10,40,10);
     private final static Border padding = new EmptyBorder(0,4,0,4);
+    
     // Maximum number of chars wide to make the lines
     private final int lineWidth;
+    
     // Collection of line instances being rendered in the telemetry widget
     private final Collection<Line> lines = new ArrayList<Line>();
 
-    private final NinePatch np;
+//    private final NinePatch np;
 
     public static class LineItem {
         private String fmt;
@@ -43,6 +48,32 @@ public class TelemetryWidget extends JPanel{
         public Color getBgColor(){ return bgcolor; }
     }
 
+    private class Line extends JLabel implements TelemetryListener {
+        private String fmtStr;
+        
+        public Line(Context ctx, String fmtStr) {
+            this.fmtStr = fmtStr;
+            update(0.0);
+        }
+        
+        public void update(double data) {
+            String fmt = String.format(fmtStr, data);
+            int finalWidth = Math.min(fmt.length(), lineWidth);
+            setText(fmt.substring(0,finalWidth));
+        }
+        
+        @Override 
+        public void repaint() {
+            super.repaint();
+            // Since the parent component (lower in the component tree) could
+            //   render a transparent border on top of it's Lines
+            //   (higher in the view window), it must be repainted after
+            //   this component or the layers will change order depending on
+            //   who gets repainted
+            TelemetryWidget.this.repaint(getX(), getY(), getWidth(), getHeight());
+        }
+    }
+    
     /**
      * Create a TelemetryWidget.
      * Each line will be `lineWidth` characters
@@ -64,11 +95,15 @@ public class TelemetryWidget extends JPanel{
         String defaultFormat = "% f";
         Color textColor = ctx.theme.textColor;
         Collection<LineItem> items = new LinkedList<LineItem>();
-        try (Reader source = new FileReader(ctx.getResource(resourceKey))){
-            XMLStreamReader r = XMLInputFactory.newInstance().
-                                        createXMLStreamReader(source);
+        
+        try (Reader source = new FileReader(ctx.getResource(resourceKey))) {
+            XMLStreamReader r = 
+            		XMLInputFactory.newInstance().createXMLStreamReader(source);
+            
             while(r.hasNext()) {
+            	
                 switch(r.next()) {
+                
                     case XMLStreamConstants.START_ELEMENT:
                         if(r.getLocalName().equals("telemetryWidget")) {
                             width = Integer.valueOf(r.getAttributeValue(null, "width"));
@@ -79,7 +114,8 @@ public class TelemetryWidget extends JPanel{
                             if(color != null){
                                 textColor = Color.decode(color);
                             }
-                        } else if(r.getLocalName().equals("line")) {
+                        } 
+                        else if(r.getLocalName().equals("line")) {
                             String fmt = r.getAttributeValue(null,"fmt");
                             String idx = r.getAttributeValue(null,"telem");
 
@@ -89,11 +125,12 @@ public class TelemetryWidget extends JPanel{
                                         : Color.WHITE;
 
                             String format = (fmt == null)? defaultFormat : fmt;
-                            int index = (idx == null)? -1 : Integer.valueOf(idx);
+                            int index = (idx == null) ? -1 : Integer.valueOf(idx);
 
                             items.add(new LineItem(format,index, bg));
                         }
                         break;
+                        
                     default:
                         break;
                 }
@@ -114,15 +151,13 @@ public class TelemetryWidget extends JPanel{
         }
     }
 
-    private TelemetryWidget(
-      Context ctx,
-      int lineWidth,
-      float fontSize,
-      Color textColor,
-      Collection<LineItem> items){
+    //Private Constructor
+    private TelemetryWidget(Context ctx, int lineWidth, float fontSize, 
+    		Color textColor, Collection<LineItem> items) {
+    	
         this.lineWidth = lineWidth;
 
-        np = ctx.theme.screenPatch;
+//        np = ctx.theme.screenPatch;
         JPanel dataPanel = new JPanel();
         dataPanel.setBorder(insets);
         dataPanel.setLayout(new BoxLayout(dataPanel, BoxLayout.PAGE_AXIS));
@@ -137,7 +172,7 @@ public class TelemetryWidget extends JPanel{
             l.setBackground(i.getBgColor());
             l.setOpaque(true);
             l.setBorder(padding);
-            if(i.getTelemetryId() != -1){
+            if(i.getTelemetryId() != -1) {
                 ctx.telemetry.registerListener(i.getTelemetryId(), l);
             }
 
@@ -152,29 +187,6 @@ public class TelemetryWidget extends JPanel{
     @Override
     public void paint(Graphics g) {
         super.paint(g);
-        np.paintIn(g, getWidth(), getHeight());
+//        np.paintIn(g, getWidth(), getHeight());
     }
-
-    private class Line extends JLabel implements TelemetryListener {
-        private String fmtStr;
-        public Line(Context ctx, String fmtStr) {
-            this.fmtStr = fmtStr;
-            update(0.0);
-        }
-        public void update(double data) {
-            String fmt = String.format(fmtStr, data);
-            int finalWidth = Math.min(fmt.length(), lineWidth);
-            setText(fmt.substring(0,finalWidth));
-        }
-        @Override public void repaint(){
-            super.repaint();
-            // Since the parent component (lower in the component tree) could
-            //   render a transparent border on top of it's Lines
-            //   (higher in the view window), it must be repainted after
-            //   this component or the layers will change order depending on
-            //   who gets repainted
-            TelemetryWidget.this.repaint(getX(), getY(), getWidth(), getHeight());
-        }
-    }
-
 }
