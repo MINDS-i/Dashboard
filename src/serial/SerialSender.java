@@ -153,6 +153,44 @@ public class SerialSender {
         }
     }
 
+    /**
+     * Sends a message to a unit telling it whether it should start or stop
+     * moving.
+     * @param shouldMove - Whether movement should be started or stopped
+     */
+    public void changeMovement(boolean shouldMove) {
+    	Message msg;
+    	
+    	if(context.connected) {
+    		if(shouldMove) {
+    			msg = Message.startDriving();
+    		}
+    		else {
+    			msg = Message.stopDriving();
+    		}
+    		sendMessage(msg);
+    	}
+    }
+    
+    /**
+     * Sends a message to a unit telling it whether to enable or
+     * disable its push button bumper.
+     * @param shouldEnable - Whether the bumper should be enabled or disabled.
+     */
+    public void toggleBumper(boolean shouldEnable) {
+    	Message msg;
+    	
+    	if(context.connected) {
+    		if(shouldEnable) {
+    			msg = Message.enableBumper();
+    		}
+    		else {
+    			msg = Message.disableBumper();
+    		}
+    		sendMessage(msg);
+    	}
+    }
+    
     public void sendSync() {
         Message msg = Message.syncMessage(Serial.SYNC_REQUEST);
         sendMessage(msg);

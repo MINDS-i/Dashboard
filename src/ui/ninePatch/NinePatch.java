@@ -220,7 +220,9 @@ public class NinePatch {
         g2d.dispose();
     }
 
+    /*
     public static void main(String[] args) {
+    
         JFrame f = new JFrame("9-Patch Test");
 
         NinePatch test3 = new NinePatch();
@@ -290,4 +292,5 @@ public class NinePatch {
         }
 
     }
+    */
 }

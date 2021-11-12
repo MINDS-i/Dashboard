@@ -10,7 +10,7 @@ import com.graph.Graph;
 import com.map.coordinateListener;
 import com.map.Dot;
 import com.serial.*;
-import com.ui.DataWindow;
+import com.ui.telemetry.TelemetryDataWindow;
 import com.ui.LogViewer;
 import com.ui.ninePatch.NinePatchPanel;
 import com.ui.SystemConfigWindow;
@@ -29,20 +29,52 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.xml.stream.XMLStreamException;
 
-class WaypointPanel extends NinePatchPanel {
-    protected static final int MOVE_STEP = 32;
-    protected static final int BDR_SIZE = 25;
+public class WaypointPanel extends NinePatchPanel {
+    //Constants
+	protected static final int MOVE_STEP = 32;
+    protected static final int BDR_SIZE_TB = 20;
+    protected static final int BDR_SIZE_LR = 15;
     protected static final String NO_WAYPOINT_MSG = "N / A";
+    
+    
     private Context context;
     private MapPanel map;
     private WaypointList waypoints;
     private javax.swing.Timer zoomTimer;
+    private TelemetryDataWindow telemetryDataWindow;
+    
+    //Text Fields
     TelemField latitude;
     TelemField longitude;
     TelemField altitude;
     JLabel waypointIndexDisplay;
+    
+    //Panel Buttons
+    public JButton tileButton;
+    public JButton dataPanel;
+    public JButton graphButton;
+    public JButton reTarget;
+    public JButton looping; 
+    public JButton config;
+    public JButton logPanelButton;
+    
+    //Map Zoom Options
+    public JButton zoomInButton;
+    public JButton zoomOutButton;
+    public JButton zoomFullButton;
 
-    private class TelemField extends JTextField{
+    //Waypoint Options
+    public JButton clearWaypoints;
+    public JButton newButton;
+    public JButton enterButton; 
+    public JButton undoButton;
+    public JButton redoButton;
+    public JButton saveButton;
+    public JButton loadButton;
+    public JButton missionButton;
+    
+    
+    private class TelemField extends JTextField {
         float lastSetValue = Float.NaN;
         @Override
         public void setText(String newString){
@@ -66,13 +98,18 @@ class WaypointPanel extends NinePatchPanel {
         super(cxt.theme.panelPatch);
         map = mapPanel;
         context = cxt;
+        
         makeActions();
+        
         waypoints = context.getWaypointList();
         setOpaque(false);
         LayoutManager layout = new BoxLayout(this, BoxLayout.PAGE_AXIS);
         setLayout(layout);
-        setBorder(BorderFactory.createEmptyBorder(BDR_SIZE,BDR_SIZE,BDR_SIZE,BDR_SIZE));
+        setBorder(BorderFactory.createEmptyBorder(BDR_SIZE_TB, BDR_SIZE_LR,
+        		BDR_SIZE_TB, BDR_SIZE_LR));
+        
         buildPanel();
+        
         addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent me) {
                 //do nothing here to prevent clicks from falling through
@@ -142,16 +179,18 @@ class WaypointPanel extends NinePatchPanel {
         latitude.setForeground(Color.BLACK);
         longitude.setForeground(Color.BLACK);
         altitude.setForeground(Color.BLACK);
+        
         if(selectedWaypoint < 0){
             latitude.setEditable(false);
             longitude.setEditable(false);
             altitude.setEditable(false);
         } else {
-            latitude.setEditable(true);
-            longitude.setEditable(true);
-            altitude.setEditable(true);
+        	if(!isUnitMoving) {
+	            latitude.setEditable(true);
+	            longitude.setEditable(true);
+	            altitude.setEditable(true);
+        	}
         }
-
     }
 
     private void buildPanel() {
@@ -160,34 +199,37 @@ class WaypointPanel extends NinePatchPanel {
         final Dimension buttonSize = new Dimension(140, 25);
 
         //Make all buttons
-        JButton tileButton 	= theme.makeButton(nextTileServer);
-        JButton dataPanel 	= theme.makeButton(openDataPanel);
-        JButton graphButton = theme.makeButton(buildGraph);
-        JButton reTarget 	= theme.makeButton(reTargetRover);
-        JButton looping 	= theme.makeButton(toggleLooping);
-        JButton config      = theme.makeButton(openConfigWindow);
-        JButton logPanelButton = theme.makeButton(logPanelAction);
+        tileButton 		= theme.makeButton(nextTileServer);
+        dataPanel 		= theme.makeButton(openDataPanel);
+        graphButton 	= theme.makeButton(buildGraph);
+        reTarget 		= theme.makeButton(reTargetRover);
+        looping 		= theme.makeButton(toggleLooping);
+        config      	= theme.makeButton(openConfigWindow);
+        logPanelButton 	= theme.makeButton(logPanelAction);
         
         //Map Zoom Options
-        JButton zoomInButton = theme.makeButton(zoomInAction);
-        		zoomInButton.addMouseListener(zoomInMouseAdapter);
-        JButton zoomOutButton = theme.makeButton(zoomOutAction);
-        		zoomOutButton.addMouseListener(zoomOutMouseAdapter);
-        JButton zoomFullButton = theme.makeButton(zoomFullAction);
+        zoomInButton 	= theme.makeButton(zoomInAction);
+        zoomInButton.addMouseListener(zoomInMouseAdapter);
+        zoomOutButton 	= theme.makeButton(zoomOutAction);
+        zoomOutButton.addMouseListener(zoomOutMouseAdapter);
+        zoomFullButton 	= theme.makeButton(zoomFullAction);
 
         //Waypoint Options
-        JButton clearWaypoints = theme.makeButton(clearWaypointsAction);
-        JButton newButton = theme.makeButton(newWaypoint);
-        JButton enterButton = theme.makeButton(interpretLocationAction);
-        JButton undoButton = theme.makeButton(undoCommandAction);
-        JButton redoButton = theme.makeButton(redoCommandAction);
-        JButton saveButton = theme.makeButton(saveWaypoints);
-        JButton loadButton = theme.makeButton(loadWaypoints);
+        clearWaypoints 	= theme.makeButton(clearWaypointsAction);
+        newButton 		= theme.makeButton(newWaypointAction);
+        enterButton 	= theme.makeButton(interpretLocationAction);
+        undoButton 		= theme.makeButton(undoCommandAction);
+        redoButton 		= theme.makeButton(redoCommandAction);
+        saveButton 		= theme.makeButton(saveWaypoints);
+        loadButton 		= theme.makeButton(loadWaypoints);
+        missionButton 	= theme.makeButton(toggleMovement);
         
         JComponent[] format = new JComponent[] {
             tileButton, dataPanel, graphButton,
-            reTarget, looping, config, logPanelButton, clearWaypoints
+            reTarget, looping, config, logPanelButton,
+            clearWaypoints, missionButton
         };
+        
         for(JComponent jc : format) {
             jc.setAlignmentX(Component.CENTER_ALIGNMENT);
             jc.setMaximumSize(buttonSize);
@@ -226,6 +268,7 @@ class WaypointPanel extends NinePatchPanel {
         editorBoxes.add(new EditBoxSpec(latitude , "Lat: "));
         editorBoxes.add(new EditBoxSpec(longitude, "Lng: "));
         editorBoxes.add(new EditBoxSpec(altitude , context.getResource("waypointExtra")+" "));
+        
         ArrayList<JPanel> editorPanels = new ArrayList<JPanel>();
         for(EditBoxSpec box : editorBoxes) {
             //construct panel
@@ -248,7 +291,11 @@ class WaypointPanel extends NinePatchPanel {
             editorPanels.add(panel);
         }
 
-        JPanel waypointOptions = new JPanel(new GridLayout(3,2,5,5));
+        int COLS = 3;
+        int ROWS = 2;
+        int PADDING = 5;
+        JPanel waypointOptions = new JPanel(
+        		new GridLayout(COLS, ROWS, PADDING, PADDING));
         waypointOptions.setOpaque(false);
         waypointOptions.add(newButton);
         waypointOptions.add(enterButton);      
@@ -282,6 +329,8 @@ class WaypointPanel extends NinePatchPanel {
         add(reTarget);
         add(Box.createRigidArea(space));
         add(looping);
+        add(Box.createRigidArea(space));
+        add(missionButton);
     }
 
     private double fixedToDouble(int i) {
@@ -329,6 +378,54 @@ class WaypointPanel extends NinePatchPanel {
         } catch (NumberFormatException e) {}
     }
     
+    /**
+     * Disables all WaypointPanel buttons and mouse events related
+     * to the manipulation of waypoints.
+     */
+    private void lockWaypoints() {
+    	//Buttons
+    	newButton.setEnabled(false);
+    	enterButton.setEnabled(false);
+    	undoButton.setEnabled(false);
+    	redoButton.setEnabled(false);
+    	saveButton.setEnabled(false);
+    	loadButton.setEnabled(false);
+    	reTarget.setEnabled(false);
+    	looping.setEnabled(false);
+    	
+    	//Manual Fields
+    	latitude.setEditable(false);
+    	longitude.setEditable(false);
+    	altitude.setEditable(false);
+    	
+    	//Mouse events
+    	map.enablePathModifications(false);
+    }
+    
+    /**
+     * Enables all WaypointPanel buttons and mouse events related
+     * to the manipulation of waypoints.
+     */
+    private void unlockWaypoints() {
+    	//Buttons
+    	newButton.setEnabled(true);
+    	enterButton.setEnabled(true);
+    	undoButton.setEnabled(true);
+    	redoButton.setEnabled(true);
+    	saveButton.setEnabled(true);
+    	loadButton.setEnabled(true);
+    	reTarget.setEnabled(true);
+    	looping.setEnabled(true);
+    	
+    	//Manual Fields
+    	latitude.setEditable(true);
+    	longitude.setEditable(true);
+    	altitude.setEditable(true);
+    	
+    	//Mouse events
+    	map.enablePathModifications(true);
+    }
+    
     private Action logPanelAction = new AbstractAction() {
         LogViewer lv;
         Logger log;
@@ -355,6 +452,10 @@ class WaypointPanel extends NinePatchPanel {
     	}
     };
     
+    /**
+     * Starts a periodic timer while the mouse button is held which
+     * triggers repeated zoom in actions. The timer is stopped on release.
+     */
     private MouseAdapter zoomInMouseAdapter = new MouseAdapter() {
         	@Override
         	public void mousePressed(MouseEvent me) {
@@ -375,6 +476,9 @@ class WaypointPanel extends NinePatchPanel {
            }
     };
     
+    /**
+     * The zoom action performed when a zoomIn Timer is triggered
+     */
     private Action zoomInTimerAction = new AbstractAction() {
     	public void actionPerformed(ActionEvent e) {
     		map.zoomIn(new Point(map.getWidth() / 2, map.getHeight() / 2));
@@ -393,6 +497,10 @@ class WaypointPanel extends NinePatchPanel {
     	}
     };
 
+    /**
+     * Starts a periodic timer while the mouse button is held which
+     * triggers repeated zoom out actions. The timer is stopped on release.
+     */
     private MouseAdapter zoomOutMouseAdapter = new MouseAdapter() {
     	@Override
     	public void mousePressed(MouseEvent me) {
@@ -413,12 +521,18 @@ class WaypointPanel extends NinePatchPanel {
     	}	
     };
     
+    /**
+     * The zoom action performed when a zoomOut Timer is triggered
+     */
     private Action zoomOutTimerAction = new AbstractAction() {	
     	public void actionPerformed(ActionEvent e) {
     		map.zoomOut(new Point(map.getWidth() / 2, map.getHeight() / 2));
     	}
     };
     
+    /**
+     * Zooms the map to the closest level.
+     */
     private Action zoomFullAction = new AbstractAction() {
     	{
     		String text = "Full";
@@ -446,6 +560,37 @@ class WaypointPanel extends NinePatchPanel {
                      (waypoints.getLooped())? "Looping Off" : "Looping On");
         }
     };
+    
+    /**
+     * Action that starts or stops a unit for the currently active mission.
+     */
+    private boolean isUnitMoving = false;
+    private Action toggleMovement = new AbstractAction() {
+    	{
+    		String text = "Start Mission";
+    		putValue(Action.NAME, text);
+    		putValue(Action.SHORT_DESCRIPTION, "Start/Stop Mission");
+    	}
+    	
+    	public void actionPerformed(ActionEvent e) {
+    		if(isUnitMoving) {
+    			unlockWaypoints();
+    			context.sender.changeMovement(false);
+    			putValue(Action.NAME, "Start Mission");
+    			isUnitMoving = false;
+    		}
+    		else {
+    			lockWaypoints();
+    			context.sender.changeMovement(true);
+    			putValue(Action.NAME, "Stop Mission");
+    			isUnitMoving = true;
+    		}
+    	}
+    };
+    
+    public boolean getIsMoving() {
+    	return isUnitMoving;
+    }
     
     private Action previousWaypoint = new AbstractAction() {
         {
@@ -525,6 +670,10 @@ class WaypointPanel extends NinePatchPanel {
         }
     };
     
+    /**
+     * Action responsible for triggering an undo operation on the
+     * last command performed.
+     */
     private Action undoCommandAction = new AbstractAction() {
     	{
     		String text = "Undo";
@@ -536,6 +685,10 @@ class WaypointPanel extends NinePatchPanel {
     	}
     };
     
+    /**
+     * Action responsible for triggering a redo action on the
+     * last command undone.
+     */
     private Action redoCommandAction = new AbstractAction() {
     	{
     		String text = "Redo";
@@ -547,13 +700,18 @@ class WaypointPanel extends NinePatchPanel {
     	}
     };
     
-    private Action newWaypoint = new AbstractAction() {
+    private Action newWaypointAction = new AbstractAction() {
         {
             String text = "New";
             putValue(Action.NAME, text);
         }
         public void actionPerformed(ActionEvent e) {
             int selectedWaypoint = waypoints.getSelected();
+            
+            if(selectedWaypoint < 0) {
+            	//TODO - CP - No waypoints found, so place at a default 
+            	//location (perhaps current map view center position?)
+            }
             
             WaypointCommand command = new WaypointCommandAdd(
             		waypoints,
@@ -572,10 +730,9 @@ class WaypointPanel extends NinePatchPanel {
         public void actionPerformed(ActionEvent e) {
         	WaypointCommand command = new WaypointCommandClear(waypoints, context);
         	CommandManager.getInstance().process(command);
-        }
+        } 	
     };
     
-    private DataWindow dataWindow;
     private Action openDataPanel = new AbstractAction() {
         {
             String text = "Telemetry";
@@ -583,12 +740,13 @@ class WaypointPanel extends NinePatchPanel {
         }
         public void actionPerformed(ActionEvent e) {
         	
-        	if(dataWindow != null && dataWindow.getVisible() == true) {
-        		dataWindow.toFront();
+        	if(telemetryDataWindow != null 
+    		&& telemetryDataWindow.getVisible() == true) {
+        		telemetryDataWindow.toFront();
         		return;
         	}
         	
-        	dataWindow = new DataWindow(context);
+        	telemetryDataWindow = new TelemetryDataWindow(context);
         }
     };
     

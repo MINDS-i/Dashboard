@@ -1,9 +1,14 @@
+/**
+ * DEPRICATED 4-21, Replaced by TelemetryDataWindow, with Table creation moved to
+ * separate class (TableFactory)
+ */
+
 package com.ui;
 import com.Dashboard;
 import com.serial.*;
 import com.Context;
 import com.remote.*;
-import com.table.TableColumn;
+import com.table.TelemetryColumn;
 import com.table.ColumnTableModel;
 
 import java.awt.*;
@@ -32,6 +37,9 @@ public class DataWindow implements ActionListener {
     private static final Dimension descriptionMin = new Dimension(300, 80);
     private static final Dimension descriptionPref= new Dimension(300, 200);
 
+    private JFrame frame;
+    private JPanel mainPanel;
+    
     private JTable telTable, setTable;
     private ColumnTableModel setModel;
     private ColumnTableModel telModel;
@@ -40,17 +48,12 @@ public class DataWindow implements ActionListener {
     private JPanel 		  	 logPanel;
     private JTextField	  	 logInput;
     private JTextComponent	 descriptionBox;
-
-    private JFrame frame;
     
     public DataWindow(Context cxt) {
         context = cxt;
         frame = new JFrame("Telemetry");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setSize(WINDOW_X,WINDOW_Y);
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-
         frame.addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
             public void windowClosing(java.awt.event.WindowEvent windowEvent) {
@@ -58,11 +61,14 @@ public class DataWindow implements ActionListener {
                 onClose();
             }
         });
+        
+        mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
 
         final SettingList settingList = context.settingList;
 
-        ArrayList<TableColumn<?>> telem = new ArrayList<TableColumn<?>>();
-        telem.add( new TableColumn<String>() {
+        ArrayList<TelemetryColumn<?>> telem = new ArrayList<TelemetryColumn<?>>();
+        telem.add( new TelemetryColumn<String>() {
             public String getName() {
                 return "name";
             }
@@ -82,7 +88,7 @@ public class DataWindow implements ActionListener {
             }
         });
 
-        telem.add( new TableColumn<String>() {
+        telem.add( new TelemetryColumn<String>() {
             public String getName() {
                 return "Value";
             }
@@ -103,8 +109,8 @@ public class DataWindow implements ActionListener {
             }
         });
 
-        ArrayList<TableColumn<?>> settings = new ArrayList<TableColumn<?>>();
-        settings.add( new TableColumn<String>() {
+        ArrayList<TelemetryColumn<?>> settings = new ArrayList<TelemetryColumn<?>>();
+        settings.add( new TelemetryColumn<String>() {
             public String getName() {
                 return "name";
             }
@@ -126,7 +132,8 @@ public class DataWindow implements ActionListener {
                 ;
             }
         });
-        settings.add( new TableColumn<String>() {
+        
+        settings.add( new TelemetryColumn<String>() {
             public String getName() {
                 return "Setting";
             }
@@ -147,7 +154,8 @@ public class DataWindow implements ActionListener {
                 Float newVal = Float.valueOf((String)val);
                 if(settingList.get(row).outsideOfBounds(newVal)) {
                     JFrame mf = new JFrame("Warning");
-                    JOptionPane.showMessageDialog(mf, "Caution: new value is outside of logical bounds");
+                    JOptionPane.showMessageDialog(
+                    		mf, "Caution: new value is outside of logical bounds");
                 }
                 settingList.pushSetting(row,newVal);
             }
@@ -167,6 +175,9 @@ public class DataWindow implements ActionListener {
         setTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         setTable.setFillsViewportHeight(true);
 
+        //setTable.setDefaultRenderer(Class type, new Renderer);
+        //setTable.setDefaultEditor(Class type, new Editor);
+        
         telScroll.setMaximumSize(  telemBoxMax);
         telScroll.setPreferredSize(telemBoxPref);
         telScroll.setMinimumSize(  telemBoxPref);
@@ -181,18 +192,12 @@ public class DataWindow implements ActionListener {
         setScroll.setBorder(tableBorders);
         telScroll.setBorder(tableBorders);
 
-        javax.swing.table.TableColumn col;
-        col = telTable.getColumn(telem.get(1).getName());
-        col.setPreferredWidth(1);
-        col = setTable.getColumn(settings.get(1).getName());
-        col.setPreferredWidth(1);
-
         setTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent event) {
                 setDetail(setTable.getSelectedRow());
             }
         });
-
+        
         JTextPane dBox = new JTextPane();
         dBox.setBorder(BorderFactory.createLineBorder(Color.gray));
         dBox.setContentType("text/html");
@@ -201,22 +206,24 @@ public class DataWindow implements ActionListener {
         //dBox.setBorder(tableBorders);
         dBox.setOpaque(false);
         descriptionBox = dBox;
-
+        
         constructLogPane();
-        panel.add(logPanel);
-        panel.add(telScroll);
-        panel.add(setScroll);
-        panel.add(descriptionBox);
-        panel.add(Box.createVerticalGlue());
+        mainPanel.add(logPanel);
+        mainPanel.add(telScroll);
+        mainPanel.add(setScroll);
+        mainPanel.add(descriptionBox);
+        mainPanel.add(Box.createVerticalGlue());
 
-        frame.add(panel);
+        frame.add(mainPanel);
         frame.pack();
         frame.setVisible(true);
         startUpdateTimer();
     }
+    
     private void onClose() {
         if(update != null) update.cancel();
     }
+    
     private void constructLogPane() {
         logPanel = new JPanel();
         logPanel.setLayout(new FlowLayout());
@@ -246,6 +253,7 @@ public class DataWindow implements ActionListener {
         }
         if(descriptionBox != null) descriptionBox.setText(detail.toString());
     }
+    
     private void startUpdateTimer() {
         update = new java.util.Timer();
         update.scheduleAtFixedRate(new TimerTask() {
@@ -261,15 +269,19 @@ public class DataWindow implements ActionListener {
             }
         }, PERIOD, PERIOD);
     }
+    
     public void actionPerformed(ActionEvent evt) {
         if(logInput == null) return;
-        String inputText = logInput.getText();
+        
         int input;
+        String inputText = logInput.getText();
+        
         try {
             input = Integer.parseInt(inputText);
             logInput.setText(Integer.toString(input));
             context.telemLog.setPeriod(input);
-        } catch (NumberFormatException e) {
+        } 
+        catch (NumberFormatException e) {
             logInput.setText(Integer.toString(context.telemLog.getPeriod()));
         }
     }

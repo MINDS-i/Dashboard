@@ -4,6 +4,8 @@
 #define MyAppURL "https://mindsieducation.com/"
 #define MyAppExeName "Dashboard.exe"
 #define TelemDrivers "RadioDiversv2.12.06WHQL_Centified.exe"
+#define ArduinoCLI "arduino-cli.exe"
+#define ReleaseDir "C:\Archives\Working Directory\MINDS-i\Dashboard Release"
 
 [Setup]
 AppId={{C4B2ECC1-960A-4137-BFD2-23CD33DBC5B1}
@@ -28,10 +30,11 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}";
 
 [Files]
-Source: "C:\Archives\Working Directory\MINDS-i\Dashboard Release\Dashboard.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Archives\Working Directory\MINDS-i\Dashboard Release\DashBoard.jar"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Archives\Working Directory\MINDS-i\Dashboard Release\RadioDiversv2.12.06WHQL_Centified.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Archives\Working Directory\MINDS-i\Dashboard Release\resources\*"; DestDir: "{app}\resources"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#ReleaseDir}\Dashboard.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#ReleaseDir}\DashBoard.jar"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#ReleaseDir}\RadioDiversv2.12.06WHQL_Centified.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#ReleaseDir}\resources\*"; DestDir: "{app}\resources"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#ReleaseDir}\arduino-cli.exe"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"

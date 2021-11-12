@@ -1,6 +1,6 @@
 package com.table;
 
-public interface TableColumn<T> {
+public interface TelemetryColumn<T> {
     /** Returns the name of this Column */
     public String getName();
     /** Returns the value for the coll on `row` */

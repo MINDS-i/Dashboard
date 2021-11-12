@@ -21,10 +21,12 @@ class DataMessage extends Message {
 
         buildChecksum();
     }
+    
     @Override
     public boolean needsConfirm() {
         return (msgType == Serial.SETTING_DATA);
     }
+    
     @Override
     public String toString() {
         switch(msgType) {
@@ -32,6 +34,10 @@ class DataMessage extends Message {
                 return "Telemetry Message";
             case Serial.SETTING_DATA:
                 return "Settings Change";
+            case Serial.SENSOR_DATA:
+            	return "Sensor Message";
+            case Serial.INFO_DATA:
+            	return "Info Message";
         }
         return "Data Message";
     }

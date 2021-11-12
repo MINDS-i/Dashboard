@@ -15,6 +15,9 @@ public class CommandManager {
 	private LinkedList<WaypointCommand> processedCommands;
 	private LinkedList<WaypointCommand> revertedCommands;
 	
+	/**
+	 * Constructor (Private, accessed by getInstance)
+	 */
 	private CommandManager() {
 		processedCommands = new LinkedList<WaypointCommand>();
 		revertedCommands  = new LinkedList<WaypointCommand>();		
@@ -106,6 +109,9 @@ public class CommandManager {
 		return result;
 	}
 	
+	/**
+	 * Clears all tracked command lists.
+	 */
 	public void clearTrackedCommands() {
 		processedCommands.clear();
 		revertedCommands.clear();

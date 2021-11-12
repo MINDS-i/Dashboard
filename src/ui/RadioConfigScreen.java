@@ -12,7 +12,7 @@ import javax.swing.*;
 import java.util.*;
 import java.util.regex.*;
 import java.nio.charset.Charset;
-import com.table.TableColumn;
+import com.table.TelemetryColumn;
 import com.table.ColumnTableModel;
 
 public class RadioConfigScreen extends JPanel {
@@ -263,9 +263,9 @@ public class RadioConfigScreen extends JPanel {
     };
     
     private JTable makeSettingTable() {
-        java.util.List<TableColumn<?>> setCols = new ArrayList<TableColumn<?>>();
+        java.util.List<TelemetryColumn<?>> setCols = new ArrayList<TelemetryColumn<?>>();
         
-        setCols.add( new TableColumn<Integer>() {
+        setCols.add( new TelemetryColumn<Integer>() {
             public String getName() {
                 return "ID";
             }
@@ -291,7 +291,7 @@ public class RadioConfigScreen extends JPanel {
             }
         });
         
-        setCols.add( new TableColumn<String>() {
+        setCols.add( new TelemetryColumn<String>() {
             public String getName() {
                 return "Name";
             }
@@ -317,7 +317,7 @@ public class RadioConfigScreen extends JPanel {
             }
         });
         
-        setCols.add( new TableColumn<Integer>() {
+        setCols.add( new TelemetryColumn<Integer>() {
             public String getName() {
                 return "Value";
             }

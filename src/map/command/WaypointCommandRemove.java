@@ -12,6 +12,11 @@ import com.map.Dot;
  */
 public class WaypointCommandRemove extends WaypointCommand {
 	
+	/**
+	 * Constructor
+	 * @param waypoints - List of current navigational waypoints.
+	 * @param index - Index of the waypoint effected by this command.
+	 */
 	public WaypointCommandRemove(WaypointList waypoints, int index) {
 		super(waypoints, CommandType.REMOVE);
 		
@@ -19,6 +24,10 @@ public class WaypointCommandRemove extends WaypointCommand {
 		this.point = waypoints.get(index).dot();
 	}
 	
+	/**
+	 * Removes the waypoint at the selected index from the waypoint list.
+	 * @return Boolean - Whether or not the operation was successful.
+	 */
 	@Override
 	public boolean execute() {
 		waypoints.remove(index);
@@ -26,6 +35,11 @@ public class WaypointCommandRemove extends WaypointCommand {
 		return true;
 	}
 	
+	/**
+	 * Adds the waypoint selected by this removal back into the waypoint list at its original
+	 * location.
+	 * @return Boolean - Whether or not the operation was successful.
+	 */
 	@Override
 	public boolean undo() {
 		waypoints.add(point, index);
@@ -40,6 +54,10 @@ public class WaypointCommandRemove extends WaypointCommand {
 		return true;
 	}
 	
+	/**
+	 * Re-executes the previous removal operation after an undo.
+	 * @return Boolean - Whether or not the operation was successful.
+	 */
 	@Override
 	public boolean redo() {
 		return execute();
