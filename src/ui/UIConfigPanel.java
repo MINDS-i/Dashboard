@@ -23,7 +23,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import com.util.ACLIManager;
 
 /**
- * 
  * @author Chris Park @ Infinetix Corp.
  * Date: 09-2020
  * Description: UI Panel responsible for providing UI focused options to the user.

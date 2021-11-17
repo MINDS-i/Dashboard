@@ -74,10 +74,12 @@ class RoverPath implements Layer {
         Point2D pixel = toP2D(e.getPoint());
         int underneath = isOverDot(pixel, context.theme.waypointImage);
 
-        // Left click thats not over an existing point
+        // Left click that is NOT over an existing point
         if((e.getButton() == MouseEvent.BUTTON1) 
         && (underneath == Integer.MAX_VALUE)) {
 
+        	//TODO - CP - Make check for first point/geofence origin here?
+        	
             Point2D point = mapTransform.mapPosition(pixel);
             int line = isOverLine(e.getPoint());
             
