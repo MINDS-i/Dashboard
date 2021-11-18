@@ -1,9 +1,11 @@
-package com.map;
+package com.map.geofence;
 
 import com.Context;
 
 import com.map.RoverPath;
 import com.map.Dot;
+
+import java.awt.geom.Point2D;
 
 //TODO - CP - Continue fleshing out constructor. Make sure configurable size plays nice.
 
@@ -19,18 +21,37 @@ public class WaypointGeofence {
 	
 	//Constants
 	protected static final int MIN_RADIUS_FT = 150;
-	
+
+	/**
+	 * Fence Type Enum
+	 * Pre-defined fence types.
+	 */
+	public enum FenceType {
+		CIRCLE		(0),
+		SQUARE		(1);
+		
+		private final int type;
+		
+		FenceType(int type) {
+			this.type = type;
+		}
+		
+		public int getValue() {
+			return this.type;
+		}
+	};
 	
 	//Vars
 	protected int xPos;
 	protected int yPos;
 	protected int radius_ft;
+	protected FenceType fenceType;
 	
 	/**
 	 * Class Constructor
 	 * @param ctx - The application context
 	 */
-	public WaypointGeofence(Context ctx, Dot origin, int radius) {
+	public WaypointGeofence(Context ctx, Dot origin, int radius, FenceType type) {
 		//Calc positions from origin and radius
 		//check radius against default and take the larger of two.
 	}
@@ -63,7 +84,7 @@ public class WaypointGeofence {
 	//	- Fence should be thinner, but still easily visible
 	//	- Use RoverPath.java's paintLine function as a base.
 	//	- 
-	public void paintFence() {
+	public void paintFence(Point2D origin, int radius_ft,  FenceType type) {
 		
 	}
 	
