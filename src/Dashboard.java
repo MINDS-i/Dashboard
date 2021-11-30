@@ -43,10 +43,10 @@ public class Dashboard implements Runnable {
 	private Context context;
     
 	//Static Values
-    private static final int DEF_WINDOW_WIDTH  	= 1200;
-    private static final int DEF_WINDOW_HEIGHT 	= 900;
-    private static final int ROUND_WIDGET_SIZE 	= 105;
-    private static final int DEFAULT_ZOOM_LEVEL = 4;
+    private static final int DEF_WINDOW_WIDTH  		= 1200;
+    private static final int DEF_WINDOW_HEIGHT 		= 900;
+    private static final int HORIZON_WIDGET_SIZE 	= 145;
+    private static final int DEFAULT_ZOOM_LEVEL 	= 4;
 
     //UI Widget Frame
     WidgetPanel widgetPanel;
@@ -252,9 +252,10 @@ public class Dashboard implements Runnable {
         outerPanel.add(AngleWidget.createDial(
                 context, Serial.HEADING, context.theme.roverTop));
         
-        if(context.getResource("widget_type", "Angles").equals("Horizon")){
+        //TODO - CP - Fix widget bug on the following two adds (horizon and radio widgets)
+        if(context.getResource("widget_type", "Angles").equals("Horizon")) {
             outerPanel.add(createHorizonWidget());
-            outerPanel.add(RadioWidget.create(context, ROUND_WIDGET_SIZE));
+            outerPanel.add(RadioWidget.create(context, HORIZON_WIDGET_SIZE));
         } 
         else {
         	outerPanel.add(
@@ -303,7 +304,7 @@ public class Dashboard implements Runnable {
         JPanel horizon =
             HorizonWidgets.makeHorizonWidget(
             		context,
-            		ROUND_WIDGET_SIZE, 
+            		HORIZON_WIDGET_SIZE, 
             		(ArtificialHorizon ah)->{registerHorizonListeners(ah, false);
             });
         
