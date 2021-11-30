@@ -86,12 +86,12 @@ public class RadioWidget{
                 (int) (0.025*hUnit));
 
             // box sizes as ratios of height/width
-            int leftBoxX = (int) (0.05f*wUnit);
-            int rightBoxX = (int) (0.525f*wUnit);
-            int radioBoxY = (int) (0.50f*hUnit); // .35
-            int switchBoxY = (int) (0.25f*hUnit); // .2
-            int boxLength = (int) (0.425f*wUnit);
-            int switchBoxHeight = (int) (0.15f*hUnit);
+            int leftBoxX = 			(int) (0.05f * wUnit);
+            int rightBoxX = 		(int) (0.525f * wUnit);
+            int radioBoxY = 		(int) (0.50f * hUnit); // .35
+            int switchBoxY = 		(int) (0.25f * hUnit); // .2
+            int boxLength = 		(int) (0.425f * wUnit);
+            int switchBoxHeight = 	(int) (0.15f * hUnit);
 
             // Pick which switch box to fill
             boolean switchDown = data[4] <= 0.5;
