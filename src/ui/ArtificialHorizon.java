@@ -23,28 +23,34 @@ import java.io.File;
 
 public class ArtificialHorizon extends JPanel {
     public interface RepaintCallback { void repaint(); }
+    
     /**
      * Ratio of display size to the distance between the inner bar of an
      *   axis indicator and the edge of the display
      */
     private static final float WDIST  = 3.0f/20.0f;
+    
     /**
      * Ratio of display size to the length of a full tick mark on an axis
      *   indicator
      */
     private static final float TICKH  = 1.0f/20.0f;
+    
     /**
      * Ratio of display size to the width of the indicator axis lines
      */
     private static final float STROKE = 1.0f/300.0f;
+    
     /**
      * Magnitude in abstract units between marks on the indicator axis
      */
     private static final float TICK_SCALE = 10f;
+    
     /**
      * Number of ticks to display on each indicator axis
      */
     private static final int TICK_COUNT = 20;
+    
     /**
      * Ratio of normal small indicator ticks to large labeled ticks
      */
@@ -55,6 +61,7 @@ public class ArtificialHorizon extends JPanel {
     private static final Color barColor = new Color(0xBBBBBB);
     private static final Color INDICATOR_COLOR = Color.GREEN;
     private static final Color CENTER_MARKER_COLOR = Color.YELLOW;
+    
     public enum DataAxis {
         TOP(new IndicatorBarSpecs(
             WDIST, WDIST, STROKE, 1f-2f*WDIST, Axis.X_AXIS, -TICKH,
