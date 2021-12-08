@@ -5,9 +5,8 @@ import com.Context;
 import com.map.RoverPath;
 import com.map.Dot;
 
-import java.awt.geom.Point2D;
-
-//TODO - CP - Continue fleshing out constructor. Make sure configurable size plays nice.
+import java.awt.Point;
+import java.awt.Graphics;
 
 /**
  * @author Chris Park @ Infinetix Corp.
@@ -15,12 +14,13 @@ import java.awt.geom.Point2D;
  * Description: Provides an interface to create, manage, and manipulate a
  * geofence of variable size around an initial waypoint. Once placed, only
  * waypoints which fall within the bounds of the fence will be considered valid
- * and added to the waypoint mission list.
+ * and added to the waypoint mission list. In order to create a new fenced area,
+ * the current waypoint mission must be cleared.
  */
 public class WaypointGeofence {
 	
 	//Constants
-	protected static final int MIN_RADIUS_FT = 150;
+	protected static final double MIN_RADIUS_FT = 150.0;
 
 	/**
 	 * Fence Type Enum
@@ -41,19 +41,34 @@ public class WaypointGeofence {
 		}
 	};
 	
-	//Vars
-	protected int xPos;
-	protected int yPos;
-	protected int radius_ft;
+	//Standard App Vars
+	protected Context context;
+	
+	//Fence Specific Vars
 	protected FenceType fenceType;
+	protected GeofenceType fence;
+	protected double radius_ft;
 	
 	/**
 	 * Class Constructor
 	 * @param ctx - The application context
 	 */
-	public WaypointGeofence(Context ctx, Dot origin, int radius, FenceType type) {
-		//Calc positions from origin and radius
-		//check radius against default and take the larger of two.
+	public WaypointGeofence(Context ctx, Dot origin, double radius, FenceType type) {
+		context = ctx;
+		fenceType = type;
+		//Take the larger radius between the provided and default
+		radius_ft = (radius > MIN_RADIUS_FT) ? radius : MIN_RADIUS_FT;
+		
+		switch(fenceType) {
+			case CIRCLE:
+				fence = new GeofenceTypeCircle(origin, radius_ft);
+				break;
+			case SQUARE:
+				fence = new GeofenceTypeSquare(origin, radius_ft);
+				break;
+			default:
+				break;
+		};
 	}
 	
 	/**
@@ -61,8 +76,7 @@ public class WaypointGeofence {
 	 * @return - The point
 	 */
 	public Dot getOriginPoint() {
-		//TODO - CP - Implement origin retrieval here
-		return null;
+		return fence.getOrigin();
 	}
 	
 	/**
@@ -72,20 +86,15 @@ public class WaypointGeofence {
 	 * @return - boolean - Whether or not the location intersects the fence.
 	 */
 	public boolean doesLocationIntersect(Dot location) {
-		//TODO - CP - Implement point intersection check
-		return true;
+		return fence.doesIntersect(location);
 	}
 	
-	
-	//TODO - CP - Continue to flesh out paint function requirements here.
-	//Will need:
-	//	- Type of fence (Circle/Square)
-	//	- Draw X dist from origin (dashed lines pref.)
-	//	- Fence should be thinner, but still easily visible
-	//	- Use RoverPath.java's paintLine function as a base.
-	//	- 
-	public void paintFence(Point2D origin, int radius_ft,  FenceType type) {
-		
+	/**
+	 * Draws the Geofence on the map.
+	 * @param g - the Graphics context used for painting
+	 */
+	public void paintFence(Graphics g) {
+		fence.paint(g);
 	}
 	
 	

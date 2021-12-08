@@ -13,14 +13,14 @@ import java.awt.geom.Point2D;
  * Description: Concrete FenceType class defining the dimensions and
  * drawing behavior for a circular fence.
  */
-public class FenceTypeCircle extends FenceType {
+public class GeofenceTypeCircle extends GeofenceType {
 
 	/**
 	 * Constructor
 	 * @param origin - the central origin point (waypoint) for the fence
 	 * @param radius_ft - the radius to the edge of the fence from the origin
 	 */
-	public FenceTypeCircle(Dot origin, int radius_ft) {
+	public GeofenceTypeCircle(Dot origin, double radius_ft) {
 		super(origin, radius_ft);
 	}
 	
@@ -35,7 +35,7 @@ public class FenceTypeCircle extends FenceType {
 		
 		graphics2d.drawOval(
 				(int)origin.getLongitude(), (int)origin.getLatitude(),
-				radius_ft, radius_ft);
+				(int)radius_ft, (int)radius_ft);
 	}
 	
 	/**
@@ -54,5 +54,14 @@ public class FenceTypeCircle extends FenceType {
 		distanceSquared = Math.pow(xDiff, 2)+ Math.pow(yDiff, 2);
 		
 		return (distanceSquared < ((radius_ft * 2) * (radius_ft * 2)));
+	}
+	
+	/**
+	 * Returns this fences origin (center) point
+	 *  @return - The origin of the fence
+	 */
+	@Override
+	public Dot getOrigin() {
+		return origin; 
 	}
 }

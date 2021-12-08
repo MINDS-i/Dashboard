@@ -11,17 +11,17 @@ import java.awt.geom.Point2D;
  * Description: Abstract base class defining the basic shared charicteristics
  * and functions of a geofence type. 
  */
-public abstract class FenceType {
+public abstract class GeofenceType {
 	
 	Dot origin;
-	int radius_ft;
+	double radius_ft;
 	
 	/**
 	 * Constructor
 	 * @param origin - Center origin for the geofence
 	 * @param radius_ft - radius from the origin to the geofence wall
 	 */
-	public FenceType(Dot origin, int radius_ft) {
+	public GeofenceType(Dot origin, double radius_ft) {
 		this.origin = origin;
 		this.radius_ft = radius_ft;
 	}
@@ -29,4 +29,5 @@ public abstract class FenceType {
 	//Abstract functions to be overriden in concrete classes.
 	public abstract void paint(Graphics graphics);
 	public abstract boolean doesIntersect(Dot coordinate);
+	public abstract Dot getOrigin();
 }

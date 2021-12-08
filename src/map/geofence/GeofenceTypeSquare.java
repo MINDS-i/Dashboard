@@ -11,14 +11,14 @@ import java.awt.geom.Point2D;
  * Description: Concrete FenceType class defining the dimensions and
  * drawing behavior for a square fence.
  */
-public class FenceTypeSquare extends FenceType {
+public class GeofenceTypeSquare extends GeofenceType {
 
 	/**
 	 * Constructor 
 	 * @param origin - Central origin point (waypoint) of the fence
 	 * @param radius_ft - 
 	 */
-	public FenceTypeSquare(Dot origin, int radius_ft) {
+	public GeofenceTypeSquare(Dot origin, double radius_ft) {
 		super(origin, radius_ft);
 	}
 	
@@ -32,12 +32,21 @@ public class FenceTypeSquare extends FenceType {
 		Graphics2D graphics2d = (Graphics2D) graphics;
 		graphics2d.drawRect(
 				(int)origin.getLatitude(), (int)origin.getLongitude(),
-				radius_ft, radius_ft);
+				(int)radius_ft, (int)radius_ft);
 	}
 	
 	//TODO - CP - Define this override for collisions
 	@Override
 	public boolean doesIntersect(Dot coordinate) {
 		return true;
+	}
+	
+	/**
+	 * Returns this fences origin (center) point
+	 *  @return - The origin of the fence
+	 */
+	@Override
+	public Dot getOrigin() {
+		return origin; 
 	}
 }
