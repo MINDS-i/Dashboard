@@ -40,7 +40,7 @@ public class GeofenceTypeCircle extends GeofenceType {
 	
 	/**
 	 * Determines if a given coordinate lands within the geofence.
-	 * @param coordinate - the coordinate to check for inside the fence.
+	 * @param coordinate - The coordinate to check for inside the fence.
 	 * @return - True if the coordinate lands within the fence
 	 */
 	@Override

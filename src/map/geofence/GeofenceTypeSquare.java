@@ -35,10 +35,34 @@ public class GeofenceTypeSquare extends GeofenceType {
 				(int)radius_ft, (int)radius_ft);
 	}
 	
-	//TODO - CP - Define this override for collisions
+	/**
+	 * Determines if a given coordinate lands within the geofence.
+	 * @param coordinate - The coordinate to check for inside the fence.
+	 * @return - True if the coordinate lands within the fence.
+	 */
 	@Override
 	public boolean doesIntersect(Dot coordinate) {
-		return true;
+		boolean boundedByX = false;
+		boolean boundedByY = false;
+		
+		double minXWall = origin.getLatitude() - radius_ft;
+		double maxXWall = origin.getLatitude() + radius_ft;
+		double minYWall = origin.getLongitude() - radius_ft;
+		double maxYWall = origin.getLongitude() - radius_ft;
+		
+		//Check if within X dimension of fence
+		if((coordinate.getLatitude() < maxXWall)
+		&& (coordinate.getLatitude() > minXWall)) {
+			boundedByX = true;
+		}
+		
+		//Check if within Y dimension of fence
+		if((coordinate.getLongitude() < maxYWall)
+		&& (coordinate.getLongitude() > minYWall)) {
+			boundedByY = true;
+		}
+		
+		return (boundedByX && boundedByY);
 	}
 	
 	/**
