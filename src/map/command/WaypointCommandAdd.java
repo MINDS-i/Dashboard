@@ -44,9 +44,21 @@ public class WaypointCommandAdd extends WaypointCommand {
 	public boolean execute() {
 		waypoints.add(point, index);
 		
-		// If this point was added to an existing line
-		// at index 0, make it the new target of the rover. 
+
+		if(index < 0) {
+			//TODO - CP - GEOFENCE - Account for fence here and in undo?
+				//create a geofence here.
+		}
+		
+		 
 		if(index == 0) {
+			
+			//TODO - CP - GEOFENCE - Add Geofence here
+				//Gets new geofence (ctx, point, MIN_RADIUS_FT, FENCE_TYPE)
+				//Will need a way to retrieve this geofence for drawing.
+			
+			// If this point was added to an existing line
+			// at index 0, make it the new target of the rover.
 			waypoints.setTarget(index);
 		}
 		
@@ -62,6 +74,11 @@ public class WaypointCommandAdd extends WaypointCommand {
 	 */
 	@Override
 	public boolean undo() {
+		
+		if(index == 0) {
+			//TODO - CP - GEOFENCE - remove the geofence here. 
+		}
+		
 		waypoints.remove(index);
 		
 		return true;

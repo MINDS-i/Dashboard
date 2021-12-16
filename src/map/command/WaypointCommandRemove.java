@@ -30,7 +30,13 @@ public class WaypointCommandRemove extends WaypointCommand {
 	 */
 	@Override
 	public boolean execute() {
+		
+		if(index == 0) {
+			//TODO - CP - GEOFENCE - Remove the geofence here
+		}
+		
 		waypoints.remove(index);
+		
 		
 		return true;
 	}
@@ -48,6 +54,8 @@ public class WaypointCommandRemove extends WaypointCommand {
 		// If this point was added to an existing line
 		// at index 0, make it the new target of the rover. 
 		if(index == 0) {
+			//TODO - CP - GEOFENCE - Add geofence back in here
+			
 			waypoints.setTarget(index);
 		}
 		

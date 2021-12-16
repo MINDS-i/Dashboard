@@ -57,6 +57,7 @@ public class WaypointCommandClear extends WaypointCommand {
 	 */
 	@Override
 	public boolean undo() {
+		//TODO - CP - GEOFENCE - The Geofence will need to be re-added here also.
 		
 		//Add each waypoint from the backup one by one?
 		for(int i = 0; i < waypointsBackup.size(); i++) {

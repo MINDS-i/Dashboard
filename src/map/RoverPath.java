@@ -71,20 +71,22 @@ public class RoverPath implements Layer {
         	return false;
         } 
 
+        //TODO - CP - GEOFENCE - Error if not first point and exceeds geofence
+        
         Point2D pixel = toP2D(e.getPoint());
         int underneath = isOverDot(pixel, context.theme.waypointImage);
 
         // Left click that is NOT over an existing point
         if((e.getButton() == MouseEvent.BUTTON1) 
         && (underneath == Integer.MAX_VALUE)) {
-
-        	//TODO - CP - Make check for first point/geofence origin here?
         	
             Point2D point = mapTransform.mapPosition(pixel);
             int line = isOverLine(e.getPoint());
             
             // Click is NOT over an existing line
             if (line == Integer.MAX_VALUE) {
+            	
+            	//TODO - CP - GEOFENCE Make check for first point/here?
             	command = new WaypointCommandAdd(
             			waypoints, new Dot(point), waypoints.size());
             	//Manually adjust for size vs index offset
@@ -178,6 +180,7 @@ public class RoverPath implements Layer {
         }
     }
 
+    //TODO - CP - GEOFENCE paint fence here?
     private void paintDots(Graphics g) {
         drawLines(g);
         drawRoverLine(g);

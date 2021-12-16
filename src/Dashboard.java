@@ -254,7 +254,6 @@ public class Dashboard implements Runnable {
         outerPanel.add(AngleWidget.createDial(
                 context, Serial.HEADING, context.theme.roverTop));
         
-        //TODO - CP - Fix widget bug on the following two adds (horizon and radio widgets)
         if(context.getResource("widget_type", "Angles").equals("Horizon")) {
             outerPanel.add(createHorizonWidget());
             outerPanel.add(RadioWidget.create(context, HORIZON_WIDGET_SIZE));
