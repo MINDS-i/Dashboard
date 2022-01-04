@@ -711,13 +711,7 @@ public class WaypointPanel extends NinePatchPanel {
             if(selectedWaypoint < 0) {
             	//TODO - CP - No waypoints found, so place at a default
             	//location (perhaps current map view center position?)
-            	//TODO - CP - GEOFENCE - Account for Geofence placement here
             }
-            
-            //TODO - CP - GEOFENCE - If exceeds geofence error here.
-            	//if waypoint does not intersect geofence
-            		//display message
-            		//return
             
             WaypointCommand command = new WaypointCommandAdd(
             		waypoints,

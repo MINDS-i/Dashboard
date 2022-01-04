@@ -2,6 +2,7 @@ package com.map.command;
 
 import com.map.WaypointList;
 import com.map.command.WaypointCommand.CommandType;
+import com.map.geofence.WaypointGeofence;
 import com.map.Dot;
 
 /**
@@ -30,13 +31,14 @@ public class WaypointCommandRemove extends WaypointCommand {
 	 */
 	@Override
 	public boolean execute() {
+		CommandManager manager = CommandManager.getInstance();
 		
+		//If this is the initial waypoint, remove the geofence
 		if(index == 0) {
-			//TODO - CP - GEOFENCE - Remove the geofence here
+			manager.setGeofence(null);
 		}
 		
 		waypoints.remove(index);
-		
 		
 		return true;
 	}
@@ -48,13 +50,18 @@ public class WaypointCommandRemove extends WaypointCommand {
 	 */
 	@Override
 	public boolean undo() {
+		CommandManager manager = CommandManager.getInstance();
+		
 		waypoints.add(point, index);
 		waypoints.setSelected(index);
 		
-		// If this point was added to an existing line
-		// at index 0, make it the new target of the rover. 
+		
+		//TODO - CP - GEOFENCE - Add fence type (circle/square) option here
 		if(index == 0) {
-			//TODO - CP - GEOFENCE - Add geofence back in here
+			//create the geofence at the first index.
+			manager.setGeofence(
+					new WaypointGeofence(point, WaypointGeofence.MIN_RADIUS_FT,
+					WaypointGeofence.FenceType.CIRCLE));
 			
 			waypoints.setTarget(index);
 		}

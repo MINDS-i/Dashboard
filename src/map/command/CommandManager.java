@@ -1,7 +1,9 @@
 package com.map.command;
 
 import java.util.*;
+
 import com.map.command.WaypointCommand;
+import com.map.geofence.WaypointGeofence;
 
 /**
  * @author Chris Park @ Infinetix Corp.
@@ -12,15 +14,20 @@ import com.map.command.WaypointCommand;
 public class CommandManager {
 	private static CommandManager cmInstance = null;
 	
+	//Tracked command lists
 	private LinkedList<WaypointCommand> processedCommands;
 	private LinkedList<WaypointCommand> revertedCommands;
+	
+	//Geofence
+	private WaypointGeofence geofence;
 	
 	/**
 	 * Constructor (Private, accessed by getInstance)
 	 */
 	private CommandManager() {
 		processedCommands = new LinkedList<WaypointCommand>();
-		revertedCommands  = new LinkedList<WaypointCommand>();		
+		revertedCommands  = new LinkedList<WaypointCommand>();
+		geofence = null;
 	}
 	
 	/**
@@ -118,4 +125,29 @@ public class CommandManager {
 		revertedCommands.clear();
 	}
 	
+	/**
+	 * Sets the current geofence instance to be referenced by all commands.
+	 * @param fence - the geofence instance to set.
+	 */
+	public void setGeofence(WaypointGeofence fence) {
+		geofence = fence;
+	}
+	
+	/**
+	 * Retrieves the currently set geofence instance or null if 
+	 * one does not yet exist.
+	 * @return - The geofence
+	 */
+	public WaypointGeofence getGeofence() {
+		return geofence;
+	}
+	
+	/**
+	 * Informs the caller whether or not a geofence has
+	 * already been created.
+	 * @return - boolean - whether or not the fence exists.
+	 */
+	public boolean geofenceExists() {
+		return (geofence != null);
+	}
 }

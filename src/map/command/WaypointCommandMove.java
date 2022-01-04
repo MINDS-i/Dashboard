@@ -1,7 +1,10 @@
 package com.map.command;
 
+import java.util.logging.Logger;
+
 import com.map.WaypointList;
 import com.map.command.WaypointCommand.CommandType;
+import com.map.geofence.WaypointGeofence;
 import com.map.Dot;
 
 /**
@@ -10,6 +13,19 @@ import com.map.Dot;
  * Description: Command responsible for moving a waypoints location.
  */
 public class WaypointCommandMove extends WaypointCommand {
+	//Warning Strings
+	private static final String WARN_GEOFENCE_MOVE = 
+			  "WaypointCommand Move - Geofence cannot be"
+			+ " moved while other waypoints are defined. The list must"
+			+ " first be cleared.";
+	
+	private static final String WARN_NO_GEOFENCE_INTERSECT = 
+			  "WaypointCommand Move - Waypoint placement"
+			+ " exceeds geofence. Canceling movement.";
+	
+	private static final String WARN_ENDPOINT_NOT_SET =
+			  "WaypointCommand Move - Execution failure."
+			+ " Endpoint was not set.";
 	
 	/**
 	 * Constructor
@@ -26,17 +42,35 @@ public class WaypointCommandMove extends WaypointCommand {
 	
 	/**
 	 * Moves the point to the endpoint detailed by the finalize method
+	 * (See WaypointCommand Class for definition)
 	 * @return Whether or not the operation was successful. In the
 	 * case of a failure, ensure that the end point was set before
 	 * attempting execution.
 	 */
 	@Override
 	public boolean execute() {
+		CommandManager manager = CommandManager.getInstance();
+		
+		//If no endpoint set
 		if(endPoint == null) {
-			System.err.print("WaypointCommandMove - Execution failure. ");
-			System.err.println("Endpoint was not set.");
+			System.err.println(WARN_ENDPOINT_NOT_SET);
 			return false;
 		}
+		
+		//If moving the fence origin and there are other wayponts,
+		//abort the move operation and alert the user.
+		if((index == 0) && (waypoints.size() > 1)) {
+			serialLog.warning(WARN_GEOFENCE_MOVE);
+			return false;
+		}
+		
+		//If not the geofence origin and the endpoint is outside of 
+		//the current fence, abort the move.
+		if(!manager.getGeofence().doesLocationIntersect(endPoint)) {
+			serialLog.warning(WARN_NO_GEOFENCE_INTERSECT);
+			return false;
+		}
+		
 		
 		waypoints.set(endPoint, index);
 		return true;

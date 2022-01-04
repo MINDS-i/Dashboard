@@ -20,7 +20,7 @@ import java.awt.Graphics;
 public class WaypointGeofence {
 	
 	//Constants
-	protected static final double MIN_RADIUS_FT = 150.0;
+	public static final double MIN_RADIUS_FT = 150.0;
 
 	/**
 	 * Fence Type Enum
@@ -41,9 +41,6 @@ public class WaypointGeofence {
 		}
 	};
 	
-	//Standard App Vars
-	protected Context context;
-	
 	//Fence Specific Vars
 	protected FenceType fenceType;
 	protected GeofenceType fence;
@@ -51,10 +48,16 @@ public class WaypointGeofence {
 	
 	/**
 	 * Class Constructor
-	 * @param ctx - The application context
+	 * 
 	 */
-	public WaypointGeofence(Context ctx, Dot origin, double radius, FenceType type) {
-		context = ctx;
+	
+	/**
+	 * Class constructor
+	 * @param origin - The origin of the fence
+	 * @param radius - the radius of the fence from is origin.
+	 * @param type - The shape type of the fence
+	 */
+	public WaypointGeofence(Dot origin, double radius, FenceType type) {
 		fenceType = type;
 		//Take the larger radius between the provided and default
 		radius_ft = (radius > MIN_RADIUS_FT) ? radius : MIN_RADIUS_FT;
