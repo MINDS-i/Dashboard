@@ -1,6 +1,7 @@
 package com.map.geofence;
 
 import com.map.Dot;
+import com.util.UtilHelper;
 
 import java.util.*;
 
@@ -45,15 +46,15 @@ public class GeofenceTypeCircle extends GeofenceType {
 	 */
 	@Override
 	public boolean doesIntersect(Dot coordinate) {
-		double xDiff;
-		double yDiff;
-		double distanceSquared;
+		double distance;
+		distance = UtilHelper.getInstance().haversine(origin, coordinate);
+		distance = UtilHelper.getInstance().kmToFeet(distance);
 		
-		xDiff = origin.getLatitude() - coordinate.getLatitude();
-		yDiff = origin.getLongitude() - coordinate.getLongitude();
-		distanceSquared = Math.pow(xDiff, 2)+ Math.pow(yDiff, 2);
+		//TODO - CP - TEST - Remove Me once Geofence testing completed.
+		System.err.println("Geofence Circle - Distance: " + distance + "ft");
+		System.err.println("Geofence Circle -   Radius: " + radius_ft + "ft");
 		
-		return (distanceSquared < ((radius_ft * 2) * (radius_ft * 2)));
+		return (distance < radius_ft);
 	}
 	
 	/**

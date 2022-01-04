@@ -56,7 +56,6 @@ public class WaypointCommandAdd extends WaypointCommand {
 
 		//If a geofence exists 
 		if(manager.geofenceExists()) {
-			
 			//Check for and refuse a second index 0 placement
 			if(index == 0) {
 				serialLog.warning(WARN_GEOFENCE_ALREADY_PLACED);
