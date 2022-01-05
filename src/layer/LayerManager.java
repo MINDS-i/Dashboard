@@ -6,6 +6,8 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.*;
 
+import com.map.command.CommandManager;
+
 /**
  * LayerManager distributes mouse events and chances to draw on a set
  * of Layer objects sorted with largest "getZ" an "top"
@@ -34,6 +36,13 @@ public class LayerManager extends MouseAdapter {
         for(Layer l : layers) {
             l.paint(gn);
         }
+        
+        //TODO - CP - GEOFENCE - This statically draws above the map.. May
+        //need to be on it's own layer like rover path
+//        if(CommandManager.getInstance().geofenceExists()) {
+//        	CommandManager.getInstance().getGeofence().paintFence(gn);
+//        }
+        
         gn.dispose();
     }
 

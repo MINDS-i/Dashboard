@@ -45,7 +45,7 @@ public class WaypointCommandClear extends WaypointCommand {
 		//waypoint update messages for every point. An explicit clear message
 		//is sent to the rover afterwards.
 		waypoints.clear(WaypointListener.Source.REMOTE);
-		manager.setGeofence(null);
+		manager.getGeofence().setIsEnabled(false);
 		
 		if(context.sender != null) {
 			context.sender.sendWaypointList();
@@ -67,12 +67,11 @@ public class WaypointCommandClear extends WaypointCommand {
 		for(int i = 0; i < waypointsBackup.size(); i++) {
 			
 			//If this is the origin point for the geofence
-			if(i == 0) {
-				//TODO - CP - GEOFENCE - Add fence type (circle/square) option here
-				manager.setGeofence(
-						new WaypointGeofence(waypointsBackup.get(i).dot(),
-								WaypointGeofence.MIN_RADIUS_FT,
-								WaypointGeofence.FenceType.CIRCLE));
+			if(i == 0) {				
+				manager.getGeofence().setOriginLatLng(
+						waypointsBackup.get(i).dot().getLatitude(),
+						waypointsBackup.get(i).dot().getLongitude());
+				manager.getGeofence().setIsEnabled(true);
 			}
 			
 			waypoints.add(waypointsBackup.get(i).dot(), i);

@@ -1,6 +1,8 @@
 package com.map.geofence;
 
 import com.map.Dot;
+import com.map.CoordinateTransform;
+import com.util.UtilHelper;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
@@ -28,10 +30,12 @@ public class GeofenceTypeSquare extends GeofenceType {
 	 * @param graphics - The graphics context used for drawing.
 	 */
 	@Override
-	public void paint(Graphics graphics) {
+	public void paint(Graphics graphics, CoordinateTransform transform) {
 		Graphics2D graphics2d = (Graphics2D) graphics;
-		graphics2d.drawRect(
-				(int)origin.getLatitude(), (int)origin.getLongitude(),
+		Point2D point = transform.screenPosition(origin.getLocation());
+		
+		graphics2d.drawOval(
+				(int)point.getX(), (int)point.getY(),
 				(int)radius_ft, (int)radius_ft);
 	}
 	
@@ -45,32 +49,41 @@ public class GeofenceTypeSquare extends GeofenceType {
 		boolean boundedByX = false;
 		boolean boundedByY = false;
 		
-		double minXWall = origin.getLatitude() - radius_ft;
-		double maxXWall = origin.getLatitude() + radius_ft;
-		double minYWall = origin.getLongitude() - radius_ft;
-		double maxYWall = origin.getLongitude() - radius_ft;
-		
-		//Check if within X dimension of fence
-		if((coordinate.getLatitude() < maxXWall)
-		&& (coordinate.getLatitude() > minXWall)) {
-			boundedByX = true;
-		}
-		
-		//Check if within Y dimension of fence
-		if((coordinate.getLongitude() < maxYWall)
-		&& (coordinate.getLongitude() > minYWall)) {
-			boundedByY = true;
-		}
-		
+//		double minXWall = origin.getLatitude() - radius_ft;
+//		double maxXWall = origin.getLatitude() + radius_ft;
+//		double minYWall = origin.getLongitude() - radius_ft;
+//		double maxYWall = origin.getLongitude() + radius_ft;
+//		
+//		//Check if within X dimension of fence
+//		if((coordinate.getLatitude() < maxXWall)
+//		&& (coordinate.getLatitude() > minXWall)) {
+//			boundedByX = true;
+//		}
+//		
+//		//Check if within Y dimension of fence
+//		if((coordinate.getLongitude() < maxYWall)
+//		&& (coordinate.getLongitude() > minYWall)) {
+//			boundedByY = true;
+//		}
+
 		return (boundedByX && boundedByY);
 	}
 	
 	/**
-	 * Returns this fences origin (center) point
+	 * Returns this fences origin (center) point in map coordinates
 	 *  @return - The origin of the fence
 	 */
 	@Override
-	public Dot getOrigin() {
+	public Dot getOriginLatLng() {
 		return origin; 
+	}
+	
+	/**
+	 * Sets the latitude and longitude of this geofences origin.
+	 */
+	@Override
+	public void setOriginLatLng(double lat, double lng) {
+		origin.setLatitude(lat);
+		origin.setLongitude(lng);
 	}
 }

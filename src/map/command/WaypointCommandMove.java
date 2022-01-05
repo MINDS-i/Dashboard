@@ -57,20 +57,26 @@ public class WaypointCommandMove extends WaypointCommand {
 			return false;
 		}
 		
-		//If moving the fence origin and there are other wayponts,
-		//abort the move operation and alert the user.
-		if((index == 0) && (waypoints.size() > 1)) {
-			serialLog.warning(WARN_GEOFENCE_MOVE);
-			return false;
-		}
-		
-		//If not the geofence origin and the endpoint is outside of 
-		//the current fence, abort the move.
-		if(!manager.getGeofence().doesLocationIntersect(endPoint)) {
-			serialLog.warning(WARN_NO_GEOFENCE_INTERSECT);
-			return false;
-		}
-		
+		if(manager.getGeofence().getIsEnabled()) {	
+			//TODO - CP - Verify that the below size index shouldn't be > 2
+			//(Due to home and rover locations)
+			//Can be tested by setting the fence, and then immediately
+			//attempting to move it.
+			
+			//If moving the fence origin and there are other wayponts,
+			//abort the move operation and alert the user.
+			if((index == 0) && (waypoints.size() > 1)) {
+				serialLog.warning(WARN_GEOFENCE_MOVE);
+				return false;
+			}
+			
+			//If not the geofence origin and the endpoint is outside of 
+			//the current fence, abort the move.
+			if(!manager.getGeofence().doesLocationIntersect(endPoint)) {
+				serialLog.warning(WARN_NO_GEOFENCE_INTERSECT);
+				return false;
+			}
+		}		
 		
 		waypoints.set(endPoint, index);
 		return true;

@@ -2,7 +2,7 @@ package com.map;
 
 import java.awt.geom.Point2D;
 
-interface CoordinateTransform {
+public interface CoordinateTransform {
     /**
      * Transforms a (lonitude,latitude) point to absolute (x,y) pixels
      * Will return an instance of the same class as the argument p

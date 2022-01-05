@@ -35,7 +35,7 @@ public class WaypointCommandRemove extends WaypointCommand {
 		
 		//If this is the initial waypoint, remove the geofence
 		if(index == 0) {
-			manager.setGeofence(null);
+			manager.getGeofence().setIsEnabled(false);
 		}
 		
 		waypoints.remove(index);
@@ -55,13 +55,11 @@ public class WaypointCommandRemove extends WaypointCommand {
 		waypoints.add(point, index);
 		waypoints.setSelected(index);
 		
-		
-		//TODO - CP - GEOFENCE - Add fence type (circle/square) option here
 		if(index == 0) {
-			//create the geofence at the first index.
-			manager.setGeofence(
-					new WaypointGeofence(point, WaypointGeofence.MIN_RADIUS_FT,
-					WaypointGeofence.FenceType.CIRCLE));
+			//Update the geofence coordinates at the first index.
+			manager.getGeofence().setOriginLatLng(
+					point.getLatitude(), point.getLongitude());
+			manager.getGeofence().setIsEnabled(true);
 			
 			waypoints.setTarget(index);
 		}

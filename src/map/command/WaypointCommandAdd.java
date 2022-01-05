@@ -55,7 +55,7 @@ public class WaypointCommandAdd extends WaypointCommand {
 		CommandManager manager = CommandManager.getInstance();
 
 		//If a geofence exists 
-		if(manager.geofenceExists()) {
+		if(manager.getGeofence().getIsEnabled()) {
 			//Check for and refuse a second index 0 placement
 			if(index == 0) {
 				serialLog.warning(WARN_GEOFENCE_ALREADY_PLACED);
@@ -71,12 +71,11 @@ public class WaypointCommandAdd extends WaypointCommand {
 		
 		waypoints.add(point, index);
 		
-		//TODO - CP - GEOFENCE - Add fence type (circle/square) option here
 		if(index == 0) {
 			//create the geofence at the first index.
-			manager.setGeofence(
-					new WaypointGeofence(point, WaypointGeofence.MIN_RADIUS_FT,
-					WaypointGeofence.FenceType.CIRCLE));
+			manager.getGeofence().setOriginLatLng(point.getLatitude(), 
+					point.getLongitude());
+			manager.getGeofence().setIsEnabled(true);
 			
 			waypoints.setTarget(index);
 		}
@@ -97,7 +96,7 @@ public class WaypointCommandAdd extends WaypointCommand {
 		
 		//If this is the initial waypoint. Remove the geofence
 		if(index == 0) {
-			manager.setGeofence(null);
+			manager.getGeofence().setIsEnabled(false);
 		}
 		
 		waypoints.remove(index);

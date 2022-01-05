@@ -1,6 +1,7 @@
 package com.map.geofence;
 
 import com.map.Dot;
+import com.map.CoordinateTransform;
 import com.util.UtilHelper;
 
 import java.util.*;
@@ -31,11 +32,12 @@ public class GeofenceTypeCircle extends GeofenceType {
 	 * @param graphics - graphics context used for drawing.
 	 */
 	@Override
-	public void paint(Graphics graphics) {
+	public void paint(Graphics graphics, CoordinateTransform transform) {
 		Graphics2D graphics2d = (Graphics2D) graphics;
+		Point2D point = transform.screenPosition(origin.getLocation());
 		
 		graphics2d.drawOval(
-				(int)origin.getLongitude(), (int)origin.getLatitude(),
+				(int)point.getX(), (int)point.getY(),
 				(int)radius_ft, (int)radius_ft);
 	}
 	
@@ -62,7 +64,16 @@ public class GeofenceTypeCircle extends GeofenceType {
 	 *  @return - The origin of the fence
 	 */
 	@Override
-	public Dot getOrigin() {
+	public Dot getOriginLatLng() {
 		return origin; 
+	}
+	
+	/**
+	 * Sets the latitude and longitude of this geofences origin.
+	 */
+	@Override
+	public void setOriginLatLng(double lat, double lng) {
+		origin.setLatitude(lat);
+		origin.setLongitude(lng);
 	}
 }

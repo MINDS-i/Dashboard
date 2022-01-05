@@ -1,12 +1,12 @@
 package com.map.geofence;
 
-import com.Context;
-
+import com.map.CoordinateTransform;
 import com.map.RoverPath;
 import com.map.Dot;
 
 import java.awt.Point;
 import java.awt.Graphics;
+import java.awt.geom.Point2D;
 
 /**
  * @author Chris Park @ Infinetix Corp.
@@ -20,7 +20,7 @@ import java.awt.Graphics;
 public class WaypointGeofence {
 	
 	//Constants
-	public static final double MIN_RADIUS_FT = 150.0;
+	public static final double MIN_RADIUS_FT = 500.0;
 
 	/**
 	 * Fence Type Enum
@@ -41,15 +41,12 @@ public class WaypointGeofence {
 		}
 	};
 	
-	//Fence Specific Vars
+	//Vars
 	protected FenceType fenceType;
 	protected GeofenceType fence;
+	protected CoordinateTransform mapTransform;
 	protected double radius_ft;
-	
-	/**
-	 * Class Constructor
-	 * 
-	 */
+	protected boolean isEnabled;
 	
 	/**
 	 * Class constructor
@@ -57,7 +54,8 @@ public class WaypointGeofence {
 	 * @param radius - the radius of the fence from is origin.
 	 * @param type - The shape type of the fence
 	 */
-	public WaypointGeofence(Dot origin, double radius, FenceType type) {
+	public WaypointGeofence(Dot origin, double radius, FenceType type,
+			CoordinateTransform transform) {
 		fenceType = type;
 		//Take the larger radius between the provided and default
 		radius_ft = (radius > MIN_RADIUS_FT) ? radius : MIN_RADIUS_FT;
@@ -72,14 +70,34 @@ public class WaypointGeofence {
 			default:
 				break;
 		};
+		
+		isEnabled = false;
 	}
 	
 	/**
 	 * Get the point used for the origin of this Geofence.
 	 * @return - The point
 	 */
-	public Dot getOriginPoint() {
-		return fence.getOrigin();
+	public Dot getOriginLatLng() {
+		return fence.getOriginLatLng();
+	}
+	
+	/**
+	 * Set the point used for the origin of this Geofence.
+	 */
+	public void setOriginLatLng(double lat, double lng) { 
+		fence.setOriginLatLng(lat, lng);
+	}
+	
+	/**
+	 * Uses the maps coordinate transform to return the geofence's 
+	 * origin latitude/longitude position as pixel screen coordinates.
+	 * @return - Point2D - The pixel space representation of the
+	 * 					   origins Lat/Lng.
+	 */
+	public Point2D getOriginPixels() {
+		return mapTransform.screenPosition(
+				fence.getOriginLatLng().getLocation());
 	}
 	
 	/**
@@ -97,8 +115,23 @@ public class WaypointGeofence {
 	 * @param g - the Graphics context used for painting
 	 */
 	public void paintFence(Graphics g) {
-		fence.paint(g);
+		fence.paint(g, mapTransform);
 	}
 	
+	/**
+	 * Returns the enabled/disabled state of the fence.
+	 * @return - boolean - Whether or not the fence is currently enabled.
+	 */
+	public boolean getIsEnabled() {
+		return isEnabled;
+	}
 	
+	/**
+	 * Toggle the enabled/disabled state of the geofence to determine
+	 * whether it should be considered or drawn for waypoint placements.
+	 * @param enable - Whether or not to enable or disable the fence. 
+	 */
+	public void setIsEnabled(boolean enable) {
+		isEnabled = enable;
+	}
 }

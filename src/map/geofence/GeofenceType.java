@@ -1,6 +1,7 @@
 package com.map.geofence;
 
 import com.map.Dot;
+import com.map.CoordinateTransform;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
@@ -27,7 +28,8 @@ public abstract class GeofenceType {
 	}
 	
 	//Abstract functions to be overriden in concrete classes.
-	public abstract void paint(Graphics graphics);
+	public abstract void paint(Graphics graphics, CoordinateTransform transform);
 	public abstract boolean doesIntersect(Dot coordinate);
-	public abstract Dot getOrigin();
+	public abstract Dot getOriginLatLng();
+	public abstract void setOriginLatLng(double lat, double lng);
 }
