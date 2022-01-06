@@ -37,12 +37,10 @@ public class LayerManager extends MouseAdapter {
             l.paint(gn);
         }
         
-        //TODO - CP - GEOFENCE - This statically draws above the map.. May
-        //need to be on it's own layer like rover path
-//        if(CommandManager.getInstance().geofenceExists()) {
-//        	CommandManager.getInstance().getGeofence().paintFence(gn);
-//        }
-        
+        if(CommandManager.getInstance().getGeofence().getIsEnabled()) {
+        	CommandManager.getInstance().getGeofence().paintFence(gn);
+        }
+
         gn.dispose();
     }
 

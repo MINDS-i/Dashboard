@@ -35,9 +35,10 @@ public class GeofenceTypeCircle extends GeofenceType {
 	public void paint(Graphics graphics, CoordinateTransform transform) {
 		Graphics2D graphics2d = (Graphics2D) graphics;
 		Point2D point = transform.screenPosition(origin.getLocation());
-		
+
 		graphics2d.drawOval(
-				(int)point.getX(), (int)point.getY(),
+				(int)point.getX() - ((int)radius_ft / 2), 
+				(int)point.getY() - ((int)radius_ft / 2),
 				(int)radius_ft, (int)radius_ft);
 	}
 	

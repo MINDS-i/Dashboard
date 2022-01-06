@@ -59,6 +59,7 @@ public class WaypointGeofence {
 		fenceType = type;
 		//Take the larger radius between the provided and default
 		radius_ft = (radius > MIN_RADIUS_FT) ? radius : MIN_RADIUS_FT;
+		mapTransform = transform;
 		
 		switch(fenceType) {
 			case CIRCLE:

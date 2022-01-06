@@ -14,6 +14,7 @@ import com.Context;
 import com.layer.*;
 
 import com.map.command.CommandManager;
+import com.map.geofence.WaypointGeofence;
 
 import static com.map.WaypointList.*;
 import java.awt.*;
@@ -45,11 +46,6 @@ public class MapPanel extends JPanel implements CoordinateTransform {
     private LayerManager  mll = new LayerManager();
     public WaypointPanel waypointPanel;
     private RoverPath     roverPath;
-    //TODO - CP - GEOFENCE - fence will need reference here to use coord transform
-    //TODO - CP - GEOFENCE - Should change instantiation to be constant and update
-    	//coordinates within the fence instead of creating new object. This will
-    	//allow us to retain the coordinate transform reference. Will effect
-    	//All commands that new up a fence.
     
     private final Logger iolog = Logger.getLogger("d.io");
 
@@ -95,7 +91,6 @@ public class MapPanel extends JPanel implements CoordinateTransform {
 
         roverPath = new RoverPath(context, this, context.getWaypointList(), this);
         mll.add(roverPath);
-        //TODO - CP - GEOFENCE - Add fence to layer manager here?
         mll.add(mouseListener);
         addMouseWheelListener(mouseListener);
         addMouseListener(mll);
@@ -107,6 +102,18 @@ public class MapPanel extends JPanel implements CoordinateTransform {
                 repaint();
             }
         });
+        
+        //TO INVSTIGATE
+        //TODO - CP - GEOFENCE - Does not scale with zoom
+        	//May need to be placed within the layer manager to account for this
+        	//investigate RoverPath for clues...
+        //TODO - CP - GEOFENCE - Actual placment boundary exceeds visible fence.
+        	//This one may be due to rounding error in transform or draw oval?
+        //TODO - CP - GEOFENCE - I may need a radius recalc on each zoom level
+        	//Make sure that the screen coordinates at radius length scale...
+        CommandManager.getInstance().initGeofence(
+        		new Dot(), WaypointGeofence.MIN_RADIUS_FT, 
+        		WaypointGeofence.FenceType.CIRCLE, this);
     }
 
     /**

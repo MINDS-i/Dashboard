@@ -44,8 +44,8 @@ public class WaypointCommandRemove extends WaypointCommand {
 	}
 	
 	/**
-	 * Adds the waypoint selected by this removal back into the waypoint list at its original
-	 * location.
+	 * Adds the waypoint selected by this removal back into the waypoint list 
+	 * at its original location.
 	 * @return Boolean - Whether or not the operation was successful.
 	 */
 	@Override
