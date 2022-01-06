@@ -8,6 +8,7 @@ import java.util.*;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
+import java.awt.BasicStroke;
 
 /**
  * @author Chris Park @ Infinetix Corp
@@ -16,7 +17,7 @@ import java.awt.geom.Point2D;
  * drawing behavior for a circular fence.
  */
 public class GeofenceTypeCircle extends GeofenceType {
-
+	protected BasicStroke lineStroke;
 	/**
 	 * Constructor
 	 * @param origin - the central origin point (waypoint) for the fence
@@ -24,6 +25,8 @@ public class GeofenceTypeCircle extends GeofenceType {
 	 */
 	public GeofenceTypeCircle(Dot origin, double radius_ft) {
 		super(origin, radius_ft);
+		
+		lineStroke = new BasicStroke(4.0f);
 	}
 	
 	/**
@@ -36,6 +39,7 @@ public class GeofenceTypeCircle extends GeofenceType {
 		Graphics2D graphics2d = (Graphics2D) graphics;
 		Point2D point = transform.screenPosition(origin.getLocation());
 
+		graphics2d.setStroke(lineStroke);
 		graphics2d.drawOval(
 				(int)point.getX() - ((int)radius_ft / 2), 
 				(int)point.getY() - ((int)radius_ft / 2),
