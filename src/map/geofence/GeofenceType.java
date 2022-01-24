@@ -15,15 +15,18 @@ import java.awt.geom.Point2D;
 public abstract class GeofenceType {
 	
 	Dot origin;
+	Dot radiusPoint;
 	double radius_ft;
 	
 	/**
 	 * Constructor
-	 * @param origin - Center origin for the geofence
 	 * @param radius_ft - radius from the origin to the geofence wall
 	 */
-	public GeofenceType(Dot origin, double radius_ft) {
-		this.origin = origin;
+	public GeofenceType(double radius_ft) {
+		//This constructor is only called for initial setup,
+		//so the origin and radius points are defaulted to 0,0.
+		this.origin = new Dot();
+		this.radiusPoint = new Dot();
 		this.radius_ft = radius_ft;
 	}
 	
@@ -32,4 +35,5 @@ public abstract class GeofenceType {
 	public abstract boolean doesIntersect(Dot coordinate);
 	public abstract Dot getOriginLatLng();
 	public abstract void setOriginLatLng(double lat, double lng);
+	protected abstract void setRadiusLng();
 }

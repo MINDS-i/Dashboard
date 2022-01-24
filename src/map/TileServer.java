@@ -21,11 +21,9 @@ class TileServer implements MapSource {
     //Number of pixels a tile takes up
     private static final int TILE_SIZE = 256;
     
-    //QUESTION (CP) - Why min 2? (Two's Compliment leading zeros, checks out)
     //Minimum index any tile can have on Z
     private static final int MIN_Z = 2;
     
-    //QUESTION (CP) - Why max 18? (Two's Compliment of max zoom here ends up being 22. This doesn't line up...)
     //Maximum index any tile can have on Z
     private static final int MAX_Z = 18; 
     
@@ -98,7 +96,7 @@ class TileServer implements MapSource {
 
     /**
      * Calculates the ratio between crossover tile layers based on the current zoom 
-     * level and then draws the current layer.
+     * level and then draws the current scaled layer.
      * @param gd - The Graphics2d class used for rendering and color management.
      * @param center - Center Point2D position of the tiles in cache to paint.
      * @param scale - Scale of the current tile layer being drawn.

@@ -17,11 +17,11 @@ public class GeofenceTypeSquare extends GeofenceType {
 
 	/**
 	 * Constructor 
-	 * @param origin - Central origin point (waypoint) of the fence
-	 * @param radius_ft - 
+	 * @param radius_ft - the radius to the edge of the fence from the origin
 	 */
-	public GeofenceTypeSquare(Dot origin, double radius_ft) {
-		super(origin, radius_ft);
+	public GeofenceTypeSquare(double radius_ft) {
+		super(radius_ft);
+		
 	}
 	
 	/**
@@ -31,12 +31,24 @@ public class GeofenceTypeSquare extends GeofenceType {
 	 */
 	@Override
 	public void paint(Graphics graphics, CoordinateTransform transform) {
+		
+
+		//TODO - CP - GEOFENCE - Change to calc radius using haversine
+			//between two points
+		
+		
 		Graphics2D graphics2d = (Graphics2D) graphics;
-		Point2D point = transform.screenPosition(origin.getLocation());
+		Point2D center = transform.screenPosition(origin.getLocation());
+		Point2D end = transform.screenPosition(radiusPoint.getLocation());
+		
+		
+		
 		
 		graphics2d.drawOval(
-				(int)point.getX(), (int)point.getY(),
-				(int)radius_ft, (int)radius_ft);
+				(int)center.getX(), (int)center.getY(),
+				(int)(center.getX() + end.getX()), 
+				(int)(center.getY() + end.getY()));
+
 	}
 	
 	/**
@@ -85,5 +97,15 @@ public class GeofenceTypeSquare extends GeofenceType {
 	public void setOriginLatLng(double lat, double lng) {
 		origin.setLatitude(lat);
 		origin.setLongitude(lng);
+		setRadiusLng();
+	}
+	
+	@Override
+	protected void setRadiusLng() {
+		double radiusKm = UtilHelper.getInstance().feetToKm(radius_ft);
+		double degreesLng = UtilHelper.getInstance().kmToDegLng(radiusKm);
+		
+		radiusPoint = new Dot(origin.getLatitude(), 
+				origin.getLongitude() + degreesLng, origin.getAltitude());
 	}
 }

@@ -49,12 +49,13 @@ public class WaypointGeofence {
 	protected boolean isEnabled;
 	
 	/**
-	 * Class constructor
-	 * @param origin - The origin of the fence
-	 * @param radius - the radius of the fence from is origin.
-	 * @param type - The shape type of the fence
+	 * Class constructor. Creates a basic inactive geofence of the supplied
+	 * type with default coordinates.
+	 * @param radius 	- The radius of the fence from is origin.
+	 * @param type 	 	- The shape type of the fence
+	 * @param transform - The map transform used for drawing.
 	 */
-	public WaypointGeofence(Dot origin, double radius, FenceType type,
+	public WaypointGeofence(double radius, FenceType type,
 			CoordinateTransform transform) {
 		fenceType = type;
 		//Take the larger radius between the provided and default
@@ -63,10 +64,10 @@ public class WaypointGeofence {
 		
 		switch(fenceType) {
 			case CIRCLE:
-				fence = new GeofenceTypeCircle(origin, radius_ft);
+				fence = new GeofenceTypeCircle(radius_ft);
 				break;
 			case SQUARE:
-				fence = new GeofenceTypeSquare(origin, radius_ft);
+				fence = new GeofenceTypeSquare(radius_ft);
 				break;
 			default:
 				break;
@@ -74,7 +75,7 @@ public class WaypointGeofence {
 		
 		isEnabled = false;
 	}
-	
+
 	/**
 	 * Get the point used for the origin of this Geofence.
 	 * @return - The point

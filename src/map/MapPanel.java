@@ -86,6 +86,22 @@ public class MapPanel extends JPanel implements CoordinateTransform {
         south.add(east,  BorderLayout.EAST);
         south.add(north, BorderLayout.CENTER);
 
+        
+        //TO INVSTIGATE
+        //TODO - CP - GEOFENCE - Does not scale with zoom
+        	//The zoom scaling is handled by the tile server
+        	//so the same scaling approach will need to be used on
+        	//redraw. Need a way to pass the zoom factor to the
+        	//geofence.
+        //TODO - CP - GEOFENCE - Actual placement boundary exceeds visible fence.
+        	//This one may be due to rounding error in transform or draw oval?
+        //TODO - CP - GEOFENCE - I may need a radius recalc on each zoom level
+        	//Make sure that the screen coordinates at radius length scale...
+        CommandManager.getInstance().initGeofence(
+        		WaypointGeofence.MIN_RADIUS_FT,
+        		WaypointGeofence.FenceType.CIRCLE, this);
+        
+        
         setZoom(TILE_SIZE * (1 << zoom));
         setMapPosCoords(mapPosition);
 
@@ -102,18 +118,7 @@ public class MapPanel extends JPanel implements CoordinateTransform {
                 repaint();
             }
         });
-        
-        //TO INVSTIGATE
-        //TODO - CP - GEOFENCE - Does not scale with zoom
-        	//May need to be placed within the layer manager to account for this
-        	//investigate RoverPath for clues...
-        //TODO - CP - GEOFENCE - Actual placment boundary exceeds visible fence.
-        	//This one may be due to rounding error in transform or draw oval?
-        //TODO - CP - GEOFENCE - I may need a radius recalc on each zoom level
-        	//Make sure that the screen coordinates at radius length scale...
-        CommandManager.getInstance().initGeofence(
-        		new Dot(), WaypointGeofence.MIN_RADIUS_FT, 
-        		WaypointGeofence.FenceType.CIRCLE, this);
+
     }
 
     /**
@@ -208,7 +213,9 @@ public class MapPanel extends JPanel implements CoordinateTransform {
     
     public boolean setZoom(int zoom) {
         boolean valid = currentTileServer.isValidZoom(zoom);
-        if(valid) this.zoom = zoom;
+        if(valid) {
+        	this.zoom = zoom;
+        } 
         
         return valid;
     }

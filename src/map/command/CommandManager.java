@@ -140,7 +140,6 @@ public class CommandManager {
 	 * Initializes a new geofence instance with the given parameters. This
 	 * instance is disabled by default and must be enabled using the fence's
 	 * setIsEnabled() call before being utilized by the UI.
-	 * @param origin 	- The origin point at the center of the geofence.
 	 * @param radius_ft - The radius to the wall of the geofence from it's 
 	 * 					  origin in feet.
 	 * @param type		- The shape of the fence.
@@ -148,11 +147,12 @@ public class CommandManager {
 	 * 					  coordinates from longitude and latitude to pixel
 	 * 					  screen coordinates.
 	 */
-	public void initGeofence(Dot origin, double radius_ft, 
+	public void initGeofence(double radius_ft,
 			WaypointGeofence.FenceType type, CoordinateTransform transform) {
-		geofence = new WaypointGeofence(origin, radius_ft, type, transform);
+		geofence = new WaypointGeofence(radius_ft, type,
+				transform);
 	}
-	
+
 	/**
 	 * Retrieves the currently set geofence instance or null if 
 	 * one does not yet exist.
