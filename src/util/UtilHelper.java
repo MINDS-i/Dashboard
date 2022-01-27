@@ -13,7 +13,7 @@ import com.map.Dot;
 public class UtilHelper {
 	private static UtilHelper utilHelperInstance = null;
 	
-	private static final double EARTH_RADIUS_KM = 6371.00;
+	private static final double EARTH_RADIUS_KM = 6372.80;
 	private static final double FEET_PER_KM = 3280.84;
 	private static final double KM_PER_FEET = 0.0003048;
 	private static final double KM_PER_LNG = 111;

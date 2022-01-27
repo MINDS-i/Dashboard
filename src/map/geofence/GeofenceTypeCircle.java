@@ -64,7 +64,12 @@ public class GeofenceTypeCircle extends GeofenceType {
 		graphics2d.drawOval(
 				(int)(center.getX() - length), 
 				(int)(center.getY() - length),
-				(int)(2 * length), (int)(2 * length));	
+				(int)(2 * length), (int)(2 * length));
+		
+		graphics2d.drawRect(
+				(int)(center.getX() - length),
+				(int)(center.getY() - length),
+				(int)(2 * length), (int)(2 * length));
 	}
 	
 	/**
