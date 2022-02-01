@@ -86,22 +86,10 @@ public class MapPanel extends JPanel implements CoordinateTransform {
         south.add(east,  BorderLayout.EAST);
         south.add(north, BorderLayout.CENTER);
 
-        
-        //TO INVSTIGATE
-        //TODO - CP - GEOFENCE - Does not scale with zoom
-        	//The zoom scaling is handled by the tile server
-        	//so the same scaling approach will need to be used on
-        	//redraw. Need a way to pass the zoom factor to the
-        	//geofence.
-        //TODO - CP - GEOFENCE - Actual placement boundary exceeds visible fence.
-        	//This one may be due to rounding error in transform or draw oval?
-        //TODO - CP - GEOFENCE - I may need a radius recalc on each zoom level
-        	//Make sure that the screen coordinates at radius length scale...
         CommandManager.getInstance().initGeofence(
         		WaypointGeofence.MIN_RADIUS_FT,
         		WaypointGeofence.FenceType.CIRCLE, this);
-        
-        
+                
         setZoom(TILE_SIZE * (1 << zoom));
         setMapPosCoords(mapPosition);
 

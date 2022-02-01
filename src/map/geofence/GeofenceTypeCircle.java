@@ -34,7 +34,6 @@ public class GeofenceTypeCircle extends GeofenceType {
 	 * @param graphics 	- graphics context used for drawing.
 	 * @param transform - The map transform used for drawing
 	 * 					  correct location conversions.
-	 * @param zoom		- The zoom level of the map.
 	 */
 	@Override
 	public void paint(Graphics graphics, CoordinateTransform transform) {
@@ -43,28 +42,28 @@ public class GeofenceTypeCircle extends GeofenceType {
 		//Get Drawn Locations of points
 		Point2D center = transform.screenPosition(origin.getLocation());
 		Point2D end = transform.screenPosition(radiusPoint.getLocation());
-
-		//DEBUG
-//		System.err.println(
-//				"Center: X,Y: " + center.getX() + "," + center.getY());
-//		System.err.println(
-//				"End: X,Y: " + end.getX() + "," + end.getY());
 		
-		
+		//Calculate the side of a square that would be inscribed inside
+		//the geofence's circular perimeter.
 		double dX = end.getX() - center.getX();
 		double dY = end.getY() - center.getY();
 		double length = Math.sqrt((dX * dX) + (dY * dY));
 		
-		//DEBUG
-		System.err.println("Pixel Distance of radius: " + length);
-//		System.err.println("DX: " + dX);
-//		System.err.println("DY: " + dY);
-
+		//Find diameter of the fence (hypotenuse of the square) using 
+		//the Pythagorean theorum again
+		double a = Math.pow((2 * length), 2);;
+		double b = Math.pow((2 * length), 2);;
+		double fenceDiameter = Math.sqrt(a + b);
+		
+		//Draw the fence. The drawOval function assumes drawing starts
+		//from a top left corner point much like a square would be drawn,
+		//so X and Y coordinates need to be offset by half the fence
+		//diameter to center the circle on the origin point.
 		graphics2d.setStroke(lineStroke);
 		graphics2d.drawOval(
-				(int)(center.getX() - length), 
-				(int)(center.getY() - length),
-				(int)(2 * length), (int)(2 * length));
+				(int)(center.getX() - (fenceDiameter / 2)), 
+				(int)(center.getY() - (fenceDiameter / 2)),
+				(int)(fenceDiameter), (int)(fenceDiameter));
 		
 		graphics2d.drawRect(
 				(int)(center.getX() - length),
@@ -82,10 +81,6 @@ public class GeofenceTypeCircle extends GeofenceType {
 		double distance;
 		distance = UtilHelper.getInstance().haversine(origin, coordinate);
 		distance = UtilHelper.getInstance().kmToFeet(distance);
-		
-		//TODO - CP - TEST - Remove me once Geofence testing completed.
-		System.err.println("Geofence Circle - Distance: " + distance + "ft");
-		System.err.println("Geofence Circle -   Radius: " + radius_ft + "ft");
 		
 		return (distance < radius_ft);
 	}
@@ -106,12 +101,6 @@ public class GeofenceTypeCircle extends GeofenceType {
 	public void setOriginLatLng(double lat, double lng) {		
 		origin.setLatitude(lat);
 		origin.setLongitude(lng);
-		
-		//DEBUG
-		System.err.println("Setting origin, Lat: " 
-		+ origin.getLatitude() + " Lng: " 
-		+ origin.getLongitude());
-		
 		setRadiusLng();
 	}
 	
@@ -127,10 +116,5 @@ public class GeofenceTypeCircle extends GeofenceType {
 		
 		radiusPoint = new Dot(origin.getLatitude(), 
 				origin.getLongitude() + degreesLng, origin.getAltitude());
-		
-		//DEBUG
-		System.err.println("Setting radiusPoint, Lat: " 
-		+ radiusPoint.getLatitude() + " Lng: " 
-		+ radiusPoint.getLongitude());
 	}
 }

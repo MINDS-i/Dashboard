@@ -27,11 +27,11 @@ public class WaypointCommandAdd extends WaypointCommand {
 			+ " is recommended.";
 	
 	private static final String WARN_GEOFENCE_ALREADY_PLACED =
-			  "WaypointCommand Add - Geofence already in place."
+			  "WP Add - Geofence already in place."
 			+ " Cannot add waypoint at index 0.";
 	
 	private static final String WARN_NO_GEOFENCE_INTERSECT = 
-			  "WaypointCommand Add - Waypoint placement"
+			  "WP Add - Waypoint placement"
 			+ " exceeds geofence. Canceling placement.";	
 	/**
 	 * Constructor

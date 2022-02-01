@@ -31,18 +31,9 @@ public class GeofenceTypeSquare extends GeofenceType {
 	 */
 	@Override
 	public void paint(Graphics graphics, CoordinateTransform transform) {
-		
-
-		//TODO - CP - GEOFENCE - Change to calc radius using haversine
-			//between two points
-		
-		
 		Graphics2D graphics2d = (Graphics2D) graphics;
 		Point2D center = transform.screenPosition(origin.getLocation());
 		Point2D end = transform.screenPosition(radiusPoint.getLocation());
-		
-		
-		
 		
 		graphics2d.drawOval(
 				(int)center.getX(), (int)center.getY(),

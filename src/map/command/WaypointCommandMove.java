@@ -15,17 +15,21 @@ import com.map.Dot;
 public class WaypointCommandMove extends WaypointCommand {
 	//Warning Strings
 	private static final String WARN_GEOFENCE_MOVE = 
-			  "WaypointCommand Move - Geofence cannot be"
+			  "WP Move - Geofence cannot be"
 			+ " moved while other waypoints are defined. The list must"
 			+ " first be cleared.";
 	
 	private static final String WARN_NO_GEOFENCE_INTERSECT = 
-			  "WaypointCommand Move - Waypoint placement"
+			  "WP Move - Waypoint placement"
 			+ " exceeds geofence. Canceling movement.";
 	
 	private static final String WARN_ENDPOINT_NOT_SET =
-			  "WaypointCommand Move - Execution failure."
+			  "WP Move - Execution failure."
 			+ " Endpoint was not set.";
+	
+	private static final String WARN_ORIGIN_CANNOT_MOVE = 
+			"WP Move - Cannot move origin point."
+			+ " Waypoints must first be cleared.";
 	
 	/**
 	 * Constructor
@@ -57,16 +61,16 @@ public class WaypointCommandMove extends WaypointCommand {
 			return false;
 		}
 		
-		if(manager.getGeofence().getIsEnabled()) {	
-			//TODO - CP - Verify that the below size index shouldn't be > 2
-			//(Due to home and rover locations)
-			//Can be tested by setting the fence, and then immediately
-			//attempting to move it.
-			
+		if(manager.getGeofence().getIsEnabled()) {		
 			//If moving the fence origin and there are other wayponts,
 			//abort the move operation and alert the user.
 			if((index == 0) && (waypoints.size() > 1)) {
 				serialLog.warning(WARN_GEOFENCE_MOVE);
+				return false;
+			}
+			
+			if(index == 0) {
+				serialLog.warning(WARN_ORIGIN_CANNOT_MOVE);
 				return false;
 			}
 			
