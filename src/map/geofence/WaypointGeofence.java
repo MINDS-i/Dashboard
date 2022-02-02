@@ -20,7 +20,7 @@ import java.awt.geom.Point2D;
 public class WaypointGeofence {
 	
 	//Constants
-	public static final double MIN_RADIUS_FT = 500.0;
+	public static final double MIN_RADIUS_FT = 200.0;
 
 	/**
 	 * Fence Type Enum
