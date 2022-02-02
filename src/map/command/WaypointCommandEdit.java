@@ -63,11 +63,6 @@ public class WaypointCommandEdit extends WaypointCommand {
 		
 		//Geofence checks (On enabled only)
 		if(manager.getGeofence().getIsEnabled()) {
-			//TODO - CP - Verify that the below size index shouldn't be > 2
-				//(Due to home and rover locations)
-				//Can be tested by setting the fence, and then immediately
-				//attempting to move it.
-			
 			//If moving the fence origin and there are other waypoints,
 			//abort the move operation and alert the user.
 			if((index == 0) && waypoints.size() > 1) {
