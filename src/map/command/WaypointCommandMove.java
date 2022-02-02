@@ -14,11 +14,6 @@ import com.map.Dot;
  */
 public class WaypointCommandMove extends WaypointCommand {
 	//Warning Strings
-	private static final String WARN_GEOFENCE_MOVE = 
-			  "WP Move - Geofence cannot be"
-			+ " moved while other waypoints are defined. The list must"
-			+ " first be cleared.";
-	
 	private static final String WARN_NO_GEOFENCE_INTERSECT = 
 			  "WP Move - Waypoint placement"
 			+ " exceeds geofence. Canceling movement.";
@@ -62,13 +57,7 @@ public class WaypointCommandMove extends WaypointCommand {
 		}
 		
 		if(manager.getGeofence().getIsEnabled()) {		
-			//If moving the fence origin and there are other wayponts,
-			//abort the move operation and alert the user.
-			if((index == 0) && (waypoints.size() > 1)) {
-				serialLog.warning(WARN_GEOFENCE_MOVE);
-				return false;
-			}
-			
+			//If an attempt is made to move the origin, abort the move.
 			if(index == 0) {
 				serialLog.warning(WARN_ORIGIN_CANNOT_MOVE);
 				return false;
