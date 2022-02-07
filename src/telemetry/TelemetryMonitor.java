@@ -158,7 +158,6 @@ public class TelemetryMonitor {
 		protected static final double BATTERY_LOW_WARNING_THRESHOLD = 6.5;
 		protected static final double BATTERY_LOW_CUTOFF_THRESHOLD 	= 6.0;
 		protected static final int 	  VCC_AVERAGING_SIZE 			= 20;
-		protected static final int 	  MAX_SEC_BELOW_THRESHOLD 		= 20;
 		protected static final int 	  LOW_VCC_SETTLING_TIME_MS 		= 20000;
 		protected static final int 	  VCC_EVAL_CYCLE_MS 			= 1000;
 		
@@ -182,8 +181,8 @@ public class TelemetryMonitor {
 		
 		/**
 		 * Adds a value to the sample array and increments the count.
-		 * Wraps to 0 once the end of the array is reached.
-		 * @param val
+		 * Wraps to index 0 once the end of the array is reached.
+		 * @param val - The sample value to be added
 		 */
 		public void add(double val) {
 			if(sampleIndex == VCC_AVERAGING_SIZE) {
