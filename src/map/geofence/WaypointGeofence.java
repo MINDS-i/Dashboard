@@ -20,7 +20,7 @@ import java.awt.geom.Point2D;
 public class WaypointGeofence {
 	
 	//Constants
-	public static final double MIN_RADIUS_FT = 200.0;
+	public static final double MIN_RADIUS_FT = 50.0;
 
 	/**
 	 * Fence Type Enum
@@ -135,5 +135,27 @@ public class WaypointGeofence {
 	 */
 	public void setIsEnabled(boolean enable) {
 		isEnabled = enable;
+	}
+
+	/**
+	 * Returns the geofence radius in feet.
+	 * @return - the radius of the geofence.
+	 */
+	public double getRadius() {
+		return radius_ft;
+	}
+	
+	/**
+	 * Updates the radius of the geofence and forces the generation of a
+	 * new radiusPoint by calling setOriginLatLng(). (See setRadiusLng()
+	 * function in the specific fence implementation for details)
+	 * @param new_radius_ft - the radius value to update to.
+	 */
+	public void updateRadius(double new_radius_ft) {
+		Dot origin = getOriginLatLng();
+		
+		radius_ft = new_radius_ft;
+		fence.updateRadiusFeet(radius_ft);
+		fence.setOriginLatLng(origin.getLatitude(), origin.getLongitude());
 	}
 }

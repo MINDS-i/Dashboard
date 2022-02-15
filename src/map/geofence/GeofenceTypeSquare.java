@@ -91,6 +91,20 @@ public class GeofenceTypeSquare extends GeofenceType {
 		setRadiusLng();
 	}
 	
+	/**
+	 * Update the radius value of this geofence.
+	 * @param new_radius_ft - the new radius value in feet.
+	 */
+	@Override
+	public void updateRadiusFeet(double new_radius_ft) {
+		radius_ft = new_radius_ft;
+	}
+	
+	/**
+	 * Sets a map coordinate point that is the distance of the radius
+	 * away from the origin point in degrees longitude. Primarily used to
+	 * determine fence draw distance independant of map scaling factor.
+	 */
 	@Override
 	protected void setRadiusLng() {
 		double radiusKm = UtilHelper.getInstance().feetToKm(radius_ft);

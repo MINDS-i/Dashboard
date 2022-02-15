@@ -35,5 +35,7 @@ public abstract class GeofenceType {
 	public abstract boolean doesIntersect(Dot coordinate);
 	public abstract Dot getOriginLatLng();
 	public abstract void setOriginLatLng(double lat, double lng);
+	public abstract void updateRadiusFeet(double new_radius_ft);
 	protected abstract void setRadiusLng();
+	
 }

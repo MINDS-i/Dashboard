@@ -64,11 +64,6 @@ public class GeofenceTypeCircle extends GeofenceType {
 				(int)(center.getX() - (fenceDiameter / 2)), 
 				(int)(center.getY() - (fenceDiameter / 2)),
 				(int)(fenceDiameter), (int)(fenceDiameter));
-		
-//		graphics2d.drawRect(
-//				(int)(center.getX() - length),
-//				(int)(center.getY() - length),
-//				(int)(2 * length), (int)(2 * length));
 	}
 	
 	/**
@@ -102,6 +97,15 @@ public class GeofenceTypeCircle extends GeofenceType {
 		origin.setLatitude(lat);
 		origin.setLongitude(lng);
 		setRadiusLng();
+	}
+	
+	/**
+	 * Update the radius value of this geofence.
+	 * @param new_radius_ft - the new radius value in feet.
+	 */
+	@Override
+	public void updateRadiusFeet(double new_radius_ft) {
+		radius_ft = new_radius_ft;
 	}
 	
 	/**
