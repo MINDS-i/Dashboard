@@ -765,7 +765,7 @@ public class WaypointPanel extends NinePatchPanel {
         		return;
         	}
         	
-        	configWindow = new SystemConfigWindow(context);
+        	configWindow = new SystemConfigWindow(context, map);
         }
     };
     

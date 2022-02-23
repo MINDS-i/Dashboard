@@ -64,6 +64,8 @@ public class GeofenceTypeCircle extends GeofenceType {
 				(int)(center.getX() - (fenceDiameter / 2)), 
 				(int)(center.getY() - (fenceDiameter / 2)),
 				(int)(fenceDiameter), (int)(fenceDiameter));
+		
+		graphics2d.dispose();
 	}
 	
 	/**

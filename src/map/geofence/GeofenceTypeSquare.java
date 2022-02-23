@@ -39,7 +39,8 @@ public class GeofenceTypeSquare extends GeofenceType {
 				(int)center.getX(), (int)center.getY(),
 				(int)(center.getX() + end.getX()), 
 				(int)(center.getY() + end.getY()));
-
+		
+		graphics2d.dispose();
 	}
 	
 	/**

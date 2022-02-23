@@ -56,6 +56,7 @@ public class UIConfigPanel extends JPanel {
 	
 	//State and Reference vars
 	private Context 		context;
+	private MapPanel 		map;
 	private CommandManager 	commandManager;
 	private boolean			bumperIsEnabled;
 	
@@ -64,8 +65,9 @@ public class UIConfigPanel extends JPanel {
 	 * @param cxt - the application context
 	 * @param isWindows - boolean check to see if the application is running in windows
 	 */
-	public UIConfigPanel(Context cxt, boolean isWindows) {
+	public UIConfigPanel(Context cxt, MapPanel mapPanel, boolean isWindows) {
 		this.context = cxt;
+		this.map = mapPanel;
 		this.commandManager = CommandManager.getInstance();
 		
 		this.setLayout(new GridBagLayout());
@@ -192,9 +194,10 @@ public class UIConfigPanel extends JPanel {
 			if(radius < commandManager.getGeofence().MIN_RADIUS_FT) {
 				radius = commandManager.getGeofence().MIN_RADIUS_FT;
 			}
-			//TODO - CP - SETTINGS - Figure out why this isn't updating on map.
+			
 			commandManager.getGeofence().updateRadius(radius);
-		} 
+			map.repaint();
+		}
 	};
 	
 	private void toggleBumper(boolean isEnabled) {
