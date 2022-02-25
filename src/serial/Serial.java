@@ -65,9 +65,10 @@ public class Serial {
     public static final byte APM_STATE_DRIVE 		= 0x3;
     
     //Drive state sub values
-    public static final byte DRIVE_STATE_STOP 		= 0x1;
-    public static final byte DRIVE_STATE_AUTO 		= 0x2;
-    public static final byte DRIVE_STATE_RADIO 		= 0x3;
+    public static final byte DRIVE_STATE_STOP 			= 0x1;
+    public static final byte DRIVE_STATE_AUTO 			= 0x2;
+    public static final byte DRIVE_STATE_RADIO 			= 0x3;
+    public static final byte DRIVE_STATE_RADIO_FAILSAFE = 0x4;
     
     //Auto state sub values
     public static final byte AUTO_STATE_FULL 		= 0x1;
