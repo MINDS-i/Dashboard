@@ -1,7 +1,12 @@
 package com.map.command;
 
 import java.util.*;
+import java.awt.Graphics;
+
+import com.map.Dot;
+import com.map.CoordinateTransform;
 import com.map.command.WaypointCommand;
+import com.map.geofence.WaypointGeofence;
 
 /**
  * @author Chris Park @ Infinetix Corp.
@@ -12,15 +17,20 @@ import com.map.command.WaypointCommand;
 public class CommandManager {
 	private static CommandManager cmInstance = null;
 	
+	//Tracked command lists
 	private LinkedList<WaypointCommand> processedCommands;
 	private LinkedList<WaypointCommand> revertedCommands;
+	
+	//Geofence
+	private WaypointGeofence geofence;
 	
 	/**
 	 * Constructor (Private, accessed by getInstance)
 	 */
 	private CommandManager() {
 		processedCommands = new LinkedList<WaypointCommand>();
-		revertedCommands  = new LinkedList<WaypointCommand>();		
+		revertedCommands  = new LinkedList<WaypointCommand>();
+		geofence = null;
 	}
 	
 	/**
@@ -35,6 +45,10 @@ public class CommandManager {
 		
 		return cmInstance;
 	}
+	
+	/**************************************************************************/
+	//Command Processing Functions
+	/**************************************************************************/
 	
 	/**
 	 * Executes a waypoint command, adds it to the processedCommands
@@ -118,4 +132,33 @@ public class CommandManager {
 		revertedCommands.clear();
 	}
 	
+	/**************************************************************************/
+	//Geofence Functions
+	/**************************************************************************/
+	
+	/**
+	 * Initializes a new geofence instance with the given parameters. This
+	 * instance is disabled by default and must be enabled using the fence's
+	 * setIsEnabled() call before being utilized by the UI.
+	 * @param radius_ft - The radius to the wall of the geofence from it's 
+	 * 					  origin in feet.
+	 * @param type		- The shape of the fence.
+	 * @param transform	- the map coordinate transform used to convert
+	 * 					  coordinates from longitude and latitude to pixel
+	 * 					  screen coordinates.
+	 */
+	public void initGeofence(double radius_ft,
+			WaypointGeofence.FenceType type, CoordinateTransform transform) {
+		geofence = new WaypointGeofence(radius_ft, type,
+				transform);
+	}
+
+	/**
+	 * Retrieves the currently set geofence instance or null if 
+	 * one does not yet exist.
+	 * @return - The geofence
+	 */
+	public WaypointGeofence getGeofence() {
+		return geofence;
+	}
 }

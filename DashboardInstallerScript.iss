@@ -1,5 +1,5 @@
 #define MyAppName "MINDS-i Dashboard"
-#define MyAppVersion "1.0.4"
+#define MyAppVersion "1.4.0"
 #define MyAppPublisher "MINDS-i Education"
 #define MyAppURL "https://mindsieducation.com/"
 #define MyAppExeName "Dashboard.exe"

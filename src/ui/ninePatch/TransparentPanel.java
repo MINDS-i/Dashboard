@@ -18,10 +18,14 @@ import javax.swing.border.*;
  */
 
 public class TransparentPanel extends JPanel {
-    private final int LEFT_MARGIN   = 8;
+
+	//Margin Consts
+	private final int LEFT_MARGIN   = 8;
     private final int RIGHT_MARGIN  = 8;
     private final int TOP_MARGIN    = 8;
     private final int BOTTOM_MARGIN = 8;
+    
+    //Vars
     private Rectangle drawRect;
     private NinePatch np;
     private int size;
@@ -29,13 +33,12 @@ public class TransparentPanel extends JPanel {
     public TransparentPanel(Context ctx, int size){
         this.size = size;
         np = ctx.theme.horizonBorder;
-        drawRect = new Rectangle(
-            LEFT_MARGIN,
-            TOP_MARGIN,
-            size-RIGHT_MARGIN-LEFT_MARGIN,
-            size-BOTTOM_MARGIN-TOP_MARGIN
-            );
-        setPreferredSize(new Dimension(size,size));
+        
+        drawRect = new Rectangle(LEFT_MARGIN, TOP_MARGIN,
+        		(size - RIGHT_MARGIN - LEFT_MARGIN), 
+        		(size - BOTTOM_MARGIN - TOP_MARGIN));
+        
+        setPreferredSize(new Dimension(size, size));
         setOpaque(false);
         setBorder(new EmptyBorder(TOP_MARGIN, LEFT_MARGIN, BOTTOM_MARGIN, RIGHT_MARGIN));
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));

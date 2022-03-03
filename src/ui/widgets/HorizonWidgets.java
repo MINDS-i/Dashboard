@@ -36,7 +36,7 @@ public class HorizonWidgets{
         sc.setup(horizon);
 
         container.add(horizon);
-        horizon.setPreferredSize(new Dimension(size,size));
+        horizon.setPreferredSize(new Dimension(size, size));
         return container;
     }
 

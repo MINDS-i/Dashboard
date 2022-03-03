@@ -709,7 +709,7 @@ public class WaypointPanel extends NinePatchPanel {
             int selectedWaypoint = waypoints.getSelected();
             
             if(selectedWaypoint < 0) {
-            	//TODO - CP - No waypoints found, so place at a default 
+            	//TODO - CP - No waypoints found, so place at a default
             	//location (perhaps current map view center position?)
             }
             
@@ -765,7 +765,7 @@ public class WaypointPanel extends NinePatchPanel {
         		return;
         	}
         	
-        	configWindow = new SystemConfigWindow(context);
+        	configWindow = new SystemConfigWindow(context, map);
         }
     };
     

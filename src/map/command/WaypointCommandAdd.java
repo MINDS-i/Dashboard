@@ -6,6 +6,7 @@ import javax.swing.*;
 
 import com.map.WaypointList;
 import com.map.command.WaypointCommand.CommandType;
+import com.map.geofence.WaypointGeofence;
 import com.map.Dot;
 import com.util.UtilHelper;
 
@@ -16,13 +17,22 @@ import com.util.UtilHelper;
  * active sessions list.
  */
 public class WaypointCommandAdd extends WaypointCommand {
+	//Constants
 	private static final double MIN_DISTANCE_FT = 45.00;
-	private static final String WARN_STRING = "For optimal results, a minimum" 
+	
+	//Warning Strings
+	private static final String WARN_MIN_DISTANCE_DIALOG = 
+			  "For optimal results, a minimum" 
 			+ " distance of " + MIN_DISTANCE_FT + " feet between waypoints" 
 			+ " is recommended.";
 	
-	private final Logger serialLog = Logger.getLogger("d.serial");
+	private static final String WARN_GEOFENCE_ALREADY_PLACED =
+			  "WP Add - Geofence already in place."
+			+ " Cannot add waypoint at index 0.";
 	
+	private static final String WARN_NO_GEOFENCE_INTERSECT = 
+			  "WP Add - Waypoint placement"
+			+ " exceeds geofence. Canceling placement.";	
 	/**
 	 * Constructor
 	 * @param waypoints - List of current navigational waypoints.
@@ -42,11 +52,31 @@ public class WaypointCommandAdd extends WaypointCommand {
 	 */
 	@Override
 	public boolean execute() {
+		CommandManager manager = CommandManager.getInstance();
+
+		//If a geofence exists 
+		if(manager.getGeofence().getIsEnabled()) {
+			//Check for and refuse a second index 0 placement
+			if(index == 0) {
+				serialLog.warning(WARN_GEOFENCE_ALREADY_PLACED);
+				return false;
+			}
+			
+			//Check for waypoint intersection
+			if(!manager.getGeofence().doesLocationIntersect(point)) {
+				serialLog.warning(WARN_NO_GEOFENCE_INTERSECT);
+				return false;
+			}
+		}
+		
 		waypoints.add(point, index);
 		
-		// If this point was added to an existing line
-		// at index 0, make it the new target of the rover. 
 		if(index == 0) {
+			//create the geofence at the first index.
+			manager.getGeofence().setOriginLatLng(point.getLatitude(), 
+					point.getLongitude());
+			manager.getGeofence().setIsEnabled(true);
+			
 			waypoints.setTarget(index);
 		}
 		
@@ -62,6 +92,13 @@ public class WaypointCommandAdd extends WaypointCommand {
 	 */
 	@Override
 	public boolean undo() {
+		CommandManager manager = CommandManager.getInstance();
+		
+		//If this is the initial waypoint. Remove the geofence
+		if(index == 0) {
+			manager.getGeofence().setIsEnabled(false);
+		}
+		
 		waypoints.remove(index);
 		
 		return true;
@@ -96,11 +133,12 @@ public class WaypointCommandAdd extends WaypointCommand {
 			distance = UtilHelper.getInstance().kmToFeet(distance);
 			
 			if(distance < MIN_DISTANCE_FT) {
-				serialLog.finer("Waypoint placement of "  
-								+ distance 
-								+ "feet is less than recommended minimum of " 
-								+ MIN_DISTANCE_FT + "feet.");
-				JOptionPane.showMessageDialog(null, WARN_STRING);
+				serialLog.finer(
+						  "WaypointCommand Add - Waypoint placement of " 
+						+ distance 
+						+ " feet is less than recommended minimum of " 
+						+ MIN_DISTANCE_FT + " feet.");
+				JOptionPane.showMessageDialog(null, WARN_MIN_DISTANCE_DIALOG);
 				
 			}
 		}

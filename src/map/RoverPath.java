@@ -16,7 +16,7 @@ import java.util.*;
 import javax.swing.*;
 
 
-class RoverPath implements Layer {
+public class RoverPath implements Layer {
 	
     private static final Color ACTIVE_LINE_FILL = new Color(1.f, 1.f, 0.f, 1f);
     private static final Color PATH_LINE_FILL   = new Color(0f, 0f, 0f, 1f);
@@ -70,14 +70,14 @@ class RoverPath implements Layer {
         if(waypointsDisabled) {
         	return false;
         } 
-
+        
         Point2D pixel = toP2D(e.getPoint());
         int underneath = isOverDot(pixel, context.theme.waypointImage);
 
-        // Left click thats not over an existing point
+        // Left click that is NOT over an existing point
         if((e.getButton() == MouseEvent.BUTTON1) 
         && (underneath == Integer.MAX_VALUE)) {
-
+        	
             Point2D point = mapTransform.mapPosition(pixel);
             int line = isOverLine(e.getPoint());
             

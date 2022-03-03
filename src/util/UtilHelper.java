@@ -13,9 +13,10 @@ import com.map.Dot;
 public class UtilHelper {
 	private static UtilHelper utilHelperInstance = null;
 	
-	private static final double EARTH_RADIUS_KM = 6371.00;
+	private static final double EARTH_RADIUS_KM = 6372.80;
 	private static final double FEET_PER_KM = 3280.84;
-	
+	private static final double KM_PER_FEET = 0.0003048;
+	private static final double KM_PER_LNG = 111;
 	/**
 	 * Constructor (Private, accessed by getInstance
 	 */
@@ -89,11 +90,29 @@ public class UtilHelper {
 	}
 	
 	/**
-	 * Converts kilometer to feet.
+	 * Converts kilometers to feet.
 	 * @param km - distance in km to convert
 	 * @return - distance in feet.
 	 */
 	public double kmToFeet(double km) {
 		return (km * FEET_PER_KM);
+	}
+	
+	/**
+	 * Converts feet to kilometers
+	 * @param feet - distance in feet to convert
+	 * @return - distance in kilometers
+	 */
+	public double feetToKm(double feet) {
+		return (feet * KM_PER_FEET);
+	}
+	
+	/**
+	 * Converts kilometers to degrees longitude
+	 * @param km - distance in kilometers to convert
+	 * @return - distance in degrees latitude
+	 */
+	public double kmToDegLng(double km) {
+		return (km / KM_PER_LNG);
 	}
 }

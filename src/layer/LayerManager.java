@@ -6,6 +6,8 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.*;
 
+import com.map.command.CommandManager;
+
 /**
  * LayerManager distributes mouse events and chances to draw on a set
  * of Layer objects sorted with largest "getZ" an "top"
@@ -34,6 +36,11 @@ public class LayerManager extends MouseAdapter {
         for(Layer l : layers) {
             l.paint(gn);
         }
+        
+        if(CommandManager.getInstance().getGeofence().getIsEnabled()) {
+        	CommandManager.getInstance().getGeofence().paintFence(gn);
+        }
+
         gn.dispose();
     }
 
