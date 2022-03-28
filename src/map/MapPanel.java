@@ -45,7 +45,7 @@ public class MapPanel extends JPanel implements CoordinateTransform {
     private DragListener  mouseListener = new DragListener();
     private LayerManager  mll = new LayerManager();
     public WaypointPanel waypointPanel;
-    private RoverPath     roverPath;
+    public RoverPath     roverPath;
     
     private final Logger iolog = Logger.getLogger("d.io");
 
@@ -93,7 +93,8 @@ public class MapPanel extends JPanel implements CoordinateTransform {
         setZoom(TILE_SIZE * (1 << zoom));
         setMapPosCoords(mapPosition);
 
-        roverPath = new RoverPath(context, this, context.getWaypointList(), this);
+        roverPath = new RoverPath(context, this, context.getWaypointList(),
+        		this, this);
         mll.add(roverPath);
         mll.add(mouseListener);
         addMouseWheelListener(mouseListener);

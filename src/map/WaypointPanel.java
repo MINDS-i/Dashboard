@@ -9,6 +9,7 @@ import com.Dashboard;
 import com.graph.Graph;
 import com.map.coordinateListener;
 import com.map.Dot;
+import com.map.RoverPath;
 import com.serial.*;
 import com.ui.telemetry.TelemetryDataWindow;
 import com.ui.LogViewer;
@@ -43,6 +44,9 @@ public class WaypointPanel extends NinePatchPanel {
     private javax.swing.Timer zoomTimer;
     private TelemetryDataWindow telemetryDataWindow;
     
+    //Logging support
+    protected final Logger serialLog = Logger.getLogger("d.serial");
+    
     //Text Fields
     TelemField latitude;
     TelemField longitude;
@@ -62,10 +66,13 @@ public class WaypointPanel extends NinePatchPanel {
     public JButton zoomInButton;
     public JButton zoomOutButton;
     public JButton zoomFullButton;
-
+    
+    public JButton setHomeButton;
+    
     //Waypoint Options
     public JButton clearWaypoints;
-    public JButton newButton;
+    
+    //TODO - CP - SET HOME - Rename Enter Button to editor specific naming
     public JButton enterButton; 
     public JButton undoButton;
     public JButton redoButton;
@@ -214,20 +221,22 @@ public class WaypointPanel extends NinePatchPanel {
         zoomOutButton.addMouseListener(zoomOutMouseAdapter);
         zoomFullButton 	= theme.makeButton(zoomFullAction);
 
+        setHomeButton	= theme.makeButton(setHomeCommandAction);
+        
         //Waypoint Options
         clearWaypoints 	= theme.makeButton(clearWaypointsAction);
-        newButton 		= theme.makeButton(newWaypointAction);
+        
         enterButton 	= theme.makeButton(interpretLocationAction);
         undoButton 		= theme.makeButton(undoCommandAction);
         redoButton 		= theme.makeButton(redoCommandAction);
         saveButton 		= theme.makeButton(saveWaypoints);
         loadButton 		= theme.makeButton(loadWaypoints);
         missionButton 	= theme.makeButton(toggleMovement);
-        
+
         JComponent[] format = new JComponent[] {
-            tileButton, dataPanel, graphButton,
-            reTarget, looping, config, logPanelButton,
-            clearWaypoints, missionButton
+            tileButton, dataPanel, graphButton, reTarget, looping, 
+            config, logPanelButton, setHomeButton, clearWaypoints, 
+            enterButton, missionButton
         };
         
         for(JComponent jc : format) {
@@ -291,14 +300,12 @@ public class WaypointPanel extends NinePatchPanel {
             editorPanels.add(panel);
         }
 
-        int COLS = 3;
+        int COLS = 2;
         int ROWS = 2;
         int PADDING = 5;
         JPanel waypointOptions = new JPanel(
-        		new GridLayout(COLS, ROWS, PADDING, PADDING));
+        		new GridLayout(ROWS, COLS, PADDING, PADDING));
         waypointOptions.setOpaque(false);
-        waypointOptions.add(newButton);
-        waypointOptions.add(enterButton);      
         waypointOptions.add(undoButton);
         waypointOptions.add(redoButton);
         waypointOptions.add(saveButton);
@@ -316,6 +323,8 @@ public class WaypointPanel extends NinePatchPanel {
         add(Box.createRigidArea(space));
         add(new JSeparator(SwingConstants.HORIZONTAL));
         add(Box.createRigidArea(space));
+        add(setHomeButton);
+        add(Box.createRigidArea(space));
         add(clearWaypoints);
         add(Box.createRigidArea(space));
         add(selector);
@@ -323,6 +332,8 @@ public class WaypointPanel extends NinePatchPanel {
         for(JPanel panel : editorPanels) {
             add(panel);
         }
+        add(Box.createRigidArea(space));
+        add(enterButton);
         add(Box.createRigidArea(space));
         add(waypointOptions);
         add(Box.createRigidArea(space));
@@ -384,7 +395,7 @@ public class WaypointPanel extends NinePatchPanel {
      */
     private void lockWaypoints() {
     	//Buttons
-    	newButton.setEnabled(false);
+    	setHomeButton.setEnabled(false);
     	enterButton.setEnabled(false);
     	undoButton.setEnabled(false);
     	redoButton.setEnabled(false);
@@ -408,7 +419,7 @@ public class WaypointPanel extends NinePatchPanel {
      */
     private void unlockWaypoints() {
     	//Buttons
-    	newButton.setEnabled(true);
+    	setHomeButton.setEnabled(true);
     	enterButton.setEnabled(true);
     	undoButton.setEnabled(true);
     	redoButton.setEnabled(true);
@@ -699,27 +710,18 @@ public class WaypointPanel extends NinePatchPanel {
     		CommandManager.getInstance().redo();
     	}
     };
-    
-    private Action newWaypointAction = new AbstractAction() {
-        {
-            String text = "New";
-            putValue(Action.NAME, text);
-        }
-        public void actionPerformed(ActionEvent e) {
-            int selectedWaypoint = waypoints.getSelected();
-            
-            if(selectedWaypoint < 0) {
-            	//TODO - CP - No waypoints found, so place at a default
-            	//location (perhaps current map view center position?)
-            }
-            
-            WaypointCommand command = new WaypointCommandAdd(
-            		waypoints,
-            		new Dot(waypoints.get(selectedWaypoint).dot()),
-            		selectedWaypoint);
 
-            CommandManager.getInstance().process(command);
-        }
+    private Action setHomeCommandAction = new AbstractAction() {
+    	{
+    		String text = "Set Home";
+    		putValue(Action.NAME, text);
+    	}
+    	
+    	public void actionPerformed(ActionEvent e) {
+    		map.setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
+    		map.roverPath.setOpMode(RoverPath.OpMode.SET_HOME);
+    		serialLog.warning("SET HOME - Please select a home point.");
+    	}
     };
     
     private Action clearWaypointsAction = new AbstractAction() {
