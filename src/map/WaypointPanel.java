@@ -58,7 +58,7 @@ public class WaypointPanel extends NinePatchPanel {
     public JButton dataPanel;
     public JButton graphButton;
     public JButton reTarget;
-    public JButton looping; 
+    public JButton looping;
     public JButton config;
     public JButton logPanelButton;
     
@@ -73,7 +73,7 @@ public class WaypointPanel extends NinePatchPanel {
     public JButton clearWaypoints;
     
     //TODO - CP - SET HOME - Rename Enter Button to editor specific naming
-    public JButton enterButton; 
+    public JButton enterButton;
     public JButton undoButton;
     public JButton redoButton;
     public JButton saveButton;
@@ -84,17 +84,17 @@ public class WaypointPanel extends NinePatchPanel {
     private class TelemField extends JTextField {
         float lastSetValue = Float.NaN;
         @Override
-        public void setText(String newString){
+        public void setText(String newString) {
             super.setText(newString);
             lastSetValue = Float.NaN;
         }
-        void update(float newValue){
+        void update(float newValue) {
             /**
              * editable float fields will get their cursor reset unless
              * updates from possible waypointlistener events only change
              * the text when the dot moves
              */
-            if(newValue != lastSetValue){
+            if(newValue != lastSetValue) {
                 setText(Float.toString(newValue));
                 lastSetValue = newValue;
             }
