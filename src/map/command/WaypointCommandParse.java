@@ -13,8 +13,10 @@ import javax.swing.*;
 import javax.swing.filechooser.*;
 import javax.swing.JFileChooser;
 
+import com.Context;
 import com.map.*;
 import com.map.WaypointList;
+import com.map.WaypointList.*;
 import com.map.command.WaypointCommand.CommandType;
 import com.Dashboard;
 
@@ -58,6 +60,7 @@ public class WaypointCommandParse extends WaypointCommand {
 	};
 	
 	//Vars
+	protected Context context;
 	protected ParseType parseType;
 	protected ParseMode parseMode;
 	protected String fileName;
@@ -71,10 +74,11 @@ public class WaypointCommandParse extends WaypointCommand {
 	 * 						for supported types)
 	 * @param parseMode - The mode (Read/Write) of the operation to be performed.
 	 */
-	public WaypointCommandParse(WaypointList waypoints, String fileName, 
-			ParseType parseType, ParseMode parseMode) {
+	public WaypointCommandParse(WaypointList waypoints, Context context, 
+			String fileName, ParseType parseType, ParseMode parseMode) {
 		super(waypoints, CommandType.PARSE);
 		
+		this.context = context;
 		this.fileName = fileName;
 		this.parseType = parseType;
 		this.parseMode = parseMode;
@@ -96,36 +100,42 @@ public class WaypointCommandParse extends WaypointCommand {
 				write();
 				break;
 			default:
-				//Add error here
+				System.err.println("Command Parse - Unrecognized parse mode.");
 		}
 		
-		return false;
+		return true;
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * Clear the waypoint list, removing all points in the loaded path.
+	 * @return boolean - whether or not the operation was successful.
 	 */
 	@Override
 	public boolean undo() {
-		//TODO - CP - FILE SAVE/LOAD - Determine if should implement undo
-		//Clear Waypoints Command Equivelent
+		CommandManager manager = CommandManager.getInstance();
 		
-		return false;
+		waypoints.clear(WaypointListener.Source.REMOTE);
+		manager.getGeofence().setIsEnabled(false);
+		
+		if(context.sender != null) {
+			context.sender.sendWaypointList();
+			context.sender.changeMovement(false);
+		}
+		
+		return true;
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * Re-execute file parsing.
+	 * @return boolean - whether or not the operation was successful.
 	 */
 	@Override
 	public boolean redo() {
-		//TODO - CP - FILE SAVE/LOAD - Determine if should implement redo
-		return false;
+		return execute();
 	}
 	
 	/**
-	 * Directs reading functionality based on an operations ParseType
+	 * Directs reading functionality based on an operations ParseType.
 	 */
 	protected void read() {
 		
@@ -138,6 +148,7 @@ public class WaypointCommandParse extends WaypointCommand {
 				//readJSON();
 				break;
 			default:
+				System.err.println("Command Parse - Unrecognized read type");
 		}
 	}
 
@@ -154,7 +165,8 @@ public class WaypointCommandParse extends WaypointCommand {
 			case JSON:
 				//writeJSON();
 				break;
-			default:		
+			default:
+				System.err.println("Command Parse - Unrecognized write type");
 		}
 	}
 	
@@ -222,7 +234,7 @@ public class WaypointCommandParse extends WaypointCommand {
 							point = new Dot(lat, lng, (short)0);
 						} 
 						else if(xmlReader.getLocalName() == XMLElement.ELEVATION.getValue()) {
-							//TODO - CP - Parse - Add elevation parsing
+							//Do nothing for now (May be implimented at a later date
 						}						
 						break;
 					case XMLStreamConstants.CHARACTERS:

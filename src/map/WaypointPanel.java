@@ -18,6 +18,8 @@ import com.ui.SystemConfigWindow;
 import com.ui.Theme;
 import com.xml;
 
+import java.io.IOException;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.RoundRectangle2D;
@@ -29,6 +31,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.xml.stream.XMLStreamException;
+import javax.swing.filechooser.*;
 
 public class WaypointPanel extends NinePatchPanel {
     //Constants
@@ -629,22 +632,34 @@ public class WaypointPanel extends NinePatchPanel {
         }
     };
     
+    /**
+     * Action used to write the current waypoint list out to a
+     * GPX formatted xml file.
+     */
     private Action saveWaypoints = new AbstractAction() {
-
         {
             String text = "Save";
             putValue(Action.NAME, text);
             putValue(Action.SHORT_DESCRIPTION, text);
         }
         public void actionPerformed(ActionEvent e) {
-            try {
-                xml.writeXML(context);
-            } catch (XMLStreamException ex) {
-                System.err.println(ex.getMessage());
-            }
+        	WaypointCommand command;
+        	String fileName;
+
+        	fileName = getFileName("Choose file to save");
+        	command = new WaypointCommandParse(
+        			waypoints, context, fileName, 
+        			WaypointCommandParse.ParseType.XML,
+        			WaypointCommandParse.ParseMode.WRITE);
+        	
+        	CommandManager.getInstance().process(command);
         }
     };
     
+    /**
+     * Action used to read a waypoint list from a GPX 
+     * formatted xml file.
+     */
     private Action loadWaypoints = new AbstractAction() {
         {
             String text = "Load";
@@ -652,13 +667,42 @@ public class WaypointPanel extends NinePatchPanel {
             putValue(Action.SHORT_DESCRIPTION, text);
         }
         public void actionPerformed(ActionEvent e) {
-            try {
-                xml.readXML(context);
-            } catch (XMLStreamException ex) {
-                System.err.println(ex.getMessage());
-            }
+        	WaypointCommand command;
+        	String fileName;
+        	
+        	fileName = getFileName("Choose file to open");
+        	command = new WaypointCommandParse(
+        			waypoints, context, fileName,
+        			WaypointCommandParse.ParseType.XML,
+        			WaypointCommandParse.ParseMode.READ);
+        	
+        	CommandManager.getInstance().process(command);
         }
     };
+    
+    /**
+     * Opens a dialog and gets a filename/path from the user to use for 
+     * either reading or writing a GPX formatted xml file.
+     * @param title - The file dialog's window title
+     * @return - String - The target filename
+     */
+    private String getFileName(String title) {
+      	WaypointCommand command;
+    	JFileChooser chooser;
+    	FileNameExtensionFilter filter;
+    	
+    	chooser = new JFileChooser();
+    	chooser.setDialogTitle(title);
+    	filter = new FileNameExtensionFilter("GPX files", "xml", "gpx");
+    	chooser.setFileFilter(filter);
+
+    	if(chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+    		return chooser.getSelectedFile().getPath();
+    	}
+    	
+    	return "";
+    }
+    
     
     private Action interpretLocationAction = new AbstractAction() {
         {
