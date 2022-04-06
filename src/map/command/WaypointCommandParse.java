@@ -18,6 +18,7 @@ import com.map.*;
 import com.map.WaypointList;
 import com.map.WaypointList.*;
 import com.map.command.WaypointCommand.CommandType;
+import com.map.geofence.WaypointGeofence;
 import com.Dashboard;
 
 
@@ -188,6 +189,9 @@ public class WaypointCommandParse extends WaypointCommand {
 		Vector<Dot> route = new Vector<Dot>();
 		Dot point = new Dot();
 		String data = "";
+
+		//Manager here to handle geofence setup/teardown
+		CommandManager manager = CommandManager.getInstance();
 		
 		//Open the input stream
 		try {
@@ -289,7 +293,6 @@ public class WaypointCommandParse extends WaypointCommand {
 				String prompt = "Multiple routes were found;\n"
 							  + "Please enter the number of your choice: \n";
 				
-				
 				//create a user prompt for route selection...
 				for(int i = 0; i < routeList.size(); i++) {
 					options[i] = (Integer)i;
@@ -301,16 +304,32 @@ public class WaypointCommandParse extends WaypointCommand {
 						null, prompt, "Pick a route", JOptionPane.PLAIN_MESSAGE,
 						null, options, options[0]);
 			}
+
+			//Clear out any existing geofence and waypoints
+			waypoints.clear(WaypointListener.Source.REMOTE);
+			manager.getGeofence().setIsEnabled(false);
 			
-			//Clear waypoint list
-			while(waypoints.size() != 0) {
-				waypoints.remove(0);
+			if(context.sender != null) {
+				context.sender.sendWaypointList();
+				context.sender.changeMovement(false);
 			}
 			
 			//Place newly parsed waypoints.
 			for(int i = 0; i < routeList.get(selection).size(); i++) {
-				waypoints.add(routeList.get(selection).get(i), i);
+				point = routeList.get(selection).get(i);
+				waypoints.add(point, i);
+				
+				if(i == 0) {
+					//create the geofence at the first index
+					manager.getGeofence().setOriginLatLng(point.getLatitude(), 
+							point.getLongitude());
+					manager.getGeofence().setIsEnabled(true);
+					
+					waypoints.setTarget(i);
+				}
 			}
+			
+			waypoints.setSelected(waypoints.size() - 1);
 			
 			//Shut 'er down chief
 			xmlReader.close();
