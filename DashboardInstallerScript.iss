@@ -1,5 +1,5 @@
 #define MyAppName "MINDS-i Dashboard"
-#define MyAppVersion "1.4.0"
+#define MyAppVersion "1.5.0"
 #define MyAppPublisher "MINDS-i Education"
 #define MyAppURL "https://mindsieducation.com/"
 #define MyAppExeName "Dashboard.exe"
@@ -39,6 +39,9 @@ Source: "{#ReleaseDir}\arduino-cli.exe"; DestDir: "{app}"; Flags: ignoreversion
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+
+[InstallDelete]                                   
+Type: files; Name: "{localappdata}\MINDS-i Dashboard\persist.properties"
 
 [Run]
 Filename: "{app}\{#TelemDrivers}"; Description: "{cm:LaunchProgram, Radio Telemetry Drivers}"; Flags: hidewizard
