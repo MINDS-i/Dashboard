@@ -159,6 +159,12 @@ public class RoverPath implements Layer {
         			currOpMode = OpMode.STANDARD;
 					break;
 				case STANDARD:
+					
+					//If it's an attempt to delete the fence origin, return
+					if(waypoints.getSelected() == 0) {
+						return false;
+					}
+					
 					command = new WaypointCommandRemove(waypoints, underneath);
 					break;
 				default:
