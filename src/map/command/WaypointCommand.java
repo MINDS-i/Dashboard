@@ -20,7 +20,7 @@ public abstract class WaypointCommand {
 
 	protected final Logger serialLog = Logger.getLogger("d.serial");
 	
-	public enum CommandType {ADD, REMOVE, MOVE, EDIT, CLEAR, TARGET};
+	public enum CommandType {ADD, REMOVE, MOVE, EDIT, CLEAR, TARGET, PARSE};
 	
 	protected WaypointList waypoints;
 	protected CommandType type;
@@ -65,6 +65,6 @@ public abstract class WaypointCommand {
 	 * @param ep - The ending point to be moved to.
 	 */
 	public void finalize(Dot ep) {
-		this.endPoint = ep; 
+		this.endPoint = ep;
 	}
 }
