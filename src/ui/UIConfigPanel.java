@@ -23,8 +23,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import com.util.ACLIManager;
 import com.map.command.CommandManager;
 
-//TODO - CP - SETTINGS - Add Set Home to current location here or in map panels
-
 /**
  * @author Chris Park @ Infinetix Corp.
  * Date: 09-2020
