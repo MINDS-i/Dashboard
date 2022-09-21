@@ -6,6 +6,7 @@ import com.table.*;
 import com.ui.telemetry.SliderRenderer;
 import com.ui.telemetry.SliderEditor;
 import com.ui.telemetry.SettingPercentage;
+import com.util.DiagnosticManager;
 
 import java.io.*;
 import java.util.*;
@@ -22,7 +23,7 @@ import javax.swing.table.*;
 public class TableFactory {
 	
 	//Table type to return from the factory.
-	public enum TableType {Telemetry, Settings, Sliders}
+	public enum TableType {Telemetry, Settings, Sliders, SerialDiagnostics}
 	
 	//Constructor is private here to prevent object instantiation.
 	private TableFactory() {} 
@@ -41,11 +42,82 @@ public class TableFactory {
 				return buildSettingsTable(context);
 			case Sliders:
 				return buildSettingsSliderTable(context);
+			case SerialDiagnostics:
+				return buildSerialDiagnosticsTable(context);
 			default:
 				System.err.println("TableFactory Error - Unknown table type");
 		}
 		
 		return null;
+	}
+	
+	private static JTable buildSerialDiagnosticsTable(Context context) {
+		JTable table;
+		ColumnTableModel model;
+		ArrayList<TelemetryColumn<?>> columns = 
+				new ArrayList<TelemetryColumn<?>>();
+		
+		columns.add(new TelemetryColumn<String>() {
+			public String getName() {
+				return "Name";
+			}
+			
+			public String getValueAt(int row) {
+				DiagnosticManager.SerialItem item =
+						DiagnosticManager.getInstance().createSerialItem(row);
+				
+				return item.getNameString();
+			}
+			
+			public int getRowCount() {
+				return DiagnosticManager.NUM_SERIAL_STATS;
+			}
+			
+			public Class<String> getDataClass() {
+				return String.class;
+			}
+			
+			public boolean isRowEditable(int row) {
+				return false;
+			}
+			
+			public void setValueAt(String val, int row) {}
+		});
+		
+		columns.add(new TelemetryColumn<String>() {
+			public String getName() {
+				return "Count";
+			}
+			
+			public String getValueAt(int row) {
+				DiagnosticManager.SerialItem item = 
+						DiagnosticManager.getInstance().createSerialItem(row);
+				
+				return item.getValueString();
+			}
+			
+            public int getRowCount() {
+            	return DiagnosticManager.NUM_SERIAL_STATS;
+            }
+            
+            public Class<String> getDataClass() {
+                return String.class;
+            }
+            
+            public boolean isRowEditable(int row) {
+                return false;
+            }
+            
+            public void setValueAt(String val, int row) {}
+		});
+		
+		model = new ColumnTableModel(columns);
+		table = new JTable(model);
+
+		table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		table.setFillsViewportHeight(true);
+		
+		return table;
 	}
 	
 	/**
@@ -58,7 +130,8 @@ public class TableFactory {
 		JTable table;
 		ColumnTableModel model;
 		SettingList settingList = context.settingList;
-		ArrayList<TelemetryColumn<?>> columns = new ArrayList<TelemetryColumn<?>>();
+		ArrayList<TelemetryColumn<?>> columns = 
+				new ArrayList<TelemetryColumn<?>>();
         
 		columns.add(new TelemetryColumn<String>() {
             public String getName() {
@@ -175,7 +248,7 @@ public class TableFactory {
 		ArrayList<TelemetryColumn<?>> columns = new ArrayList<TelemetryColumn<?>>();
         columns.add( new TelemetryColumn<String>() {
             public String getName() {
-                return "name";
+                return "Name";
             }
             
             public String getValueAt(int row) {
@@ -204,7 +277,7 @@ public class TableFactory {
             }
             
             public String getValueAt(int row) {
-                return " "+context.getTelemetry(row);
+                return " " + context.getTelemetry(row);
             }
             
             public int getRowCount() {

@@ -6,6 +6,7 @@ import com.map.Dot;
 import com.map.MapPanel;
 import com.serial.Messages.*;
 import com.serial.*;
+import com.util.DiagnosticManager;
 import java.util.Arrays;
 import java.util.logging.Logger;
 import jssc.SerialPort;
@@ -40,6 +41,11 @@ public class SerialSender {
                     for(Iterator<Message> i = pendingConfirm.iterator(); i.hasNext();) {
                         Message msg = i.next();
                         if(msg.isPastExpiration(now)) {
+                        	
+                        	//Log send timeout
+                        	DiagnosticManager.getInstance().logSerialData(
+                        			DiagnosticManager.SEND_TIMEOUT, 1);
+
                             if(msg.numberOfFailures() >= Serial.MAX_FAILURES) {
                                 i.remove();
                                 seriallog.severe(
@@ -90,7 +96,17 @@ public class SerialSender {
                 seriallog.finer(Integer.toHexString(msg.getConfirmSum()) +
                                 " Sent " +
                                 msg.toString());
+                
+                //Log send attempt
+                DiagnosticManager.getInstance().logSerialData(
+                		DiagnosticManager.SEND, 1);
+                
             } catch (SerialPortException ex) {
+            	
+            	//Log failed send attempt
+            	DiagnosticManager.getInstance().logSerialData(
+            			DiagnosticManager.SEND_FAIL, 1);
+            	
                 seriallog.severe(ex.getMessage());
             }
         }
@@ -104,7 +120,18 @@ public class SerialSender {
                 seriallog.warning(Integer.toHexString(msg.getConfirmSum())+" "+
                                   "No response to "+msg.toString()+
                                   " resend #"+msg.numberOfFailures());
+                
+                //Log resend attempt
+                DiagnosticManager.getInstance().logSerialData(
+                		DiagnosticManager.RESEND, 1);
+                
+                
             } catch (SerialPortException ex) {
+            	
+            	//Log failed resend attempt
+            	DiagnosticManager.getInstance().logSerialData(
+            			DiagnosticManager.RESEND_FAIL, 1);
+            	
                 seriallog.severe(ex.getMessage());
             }
         }
@@ -118,6 +145,11 @@ public class SerialSender {
             for(Iterator<Message> i = pendingConfirm.iterator(); i.hasNext();) {
                 Message msg = i.next();
                 if(msg.isConfirmedBy(confirm)) {
+                	
+                	//Log send confirmation
+                	DiagnosticManager.getInstance().logSerialData(
+                			DiagnosticManager.SEND_CONFIRM, 1);
+                	
                     i.remove();
                     break;
                 }

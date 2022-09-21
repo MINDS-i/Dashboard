@@ -60,11 +60,11 @@ public class UIConfigPanel extends JPanel {
 	
 	/**
 	 * Class constructor
-	 * @param cxt - the application context
+	 * @param ctx - the application context
 	 * @param isWindows - boolean check to see if the application is running in windows
 	 */
-	public UIConfigPanel(Context cxt, MapPanel mapPanel, boolean isWindows) {
-		this.context = cxt;
+	public UIConfigPanel(Context ctx, MapPanel mapPanel, boolean isWindows) {
+		this.context = ctx;
 		this.map = mapPanel;
 		this.commandManager = CommandManager.getInstance();
 		

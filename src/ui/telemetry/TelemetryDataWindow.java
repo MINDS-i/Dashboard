@@ -4,6 +4,7 @@ import com.Context;
 import com.remote.*;
 import com.serial.*;
 import com.table.TableFactory;
+import com.ui.DiagnosticsWindow;
 
 import java.util.TimerTask;
 
@@ -69,10 +70,12 @@ public class TelemetryDataWindow implements ActionListener {
 	private JPanel PNL_Main;
 	private JPanel PNL_Settings;
 	private JPanel PNL_Top;
+	private JPanel PNL_Bottom;
 	private JLabel LBL_Log;
 	private JTextField TXF_Log;
 	
 	private JButton BTN_RestoreDefaults;
+	private JButton BTN_OpenDiagnostics;
 	
 	private JTextPane TXP_Description;
 	private JTextComponent TXC_DescriptionBox;
@@ -87,9 +90,10 @@ public class TelemetryDataWindow implements ActionListener {
 	//Standard Vars
 	private Context context;
 	private java.util.Timer updateTimer;
+	private DiagnosticsWindow diagnosticsWindow;
 		
 	/**
-	 * Class constructor resposnible for intializing and creating required 
+	 * Class constructor responsible for intializing and creating required 
 	 * telemetry/settings tables using the TableFactory class and setting 
 	 * up all UI component visual layout.
 	 * @param context - the application context
@@ -195,7 +199,7 @@ public class TelemetryDataWindow implements ActionListener {
         PNL_Settings.add(SCL_Settings);
         PNL_Settings.add(SCL_SettingsSliders);
 
-		//Build Log Panel
+		//Build log panel
 		PNL_Top = new JPanel();
 		PNL_Top.setLayout(new FlowLayout());
 		LBL_Log = new JLabel("Set logging period (ms)");
@@ -208,6 +212,12 @@ public class TelemetryDataWindow implements ActionListener {
 		PNL_Top.add(TXF_Log);		
 		PNL_Top.add(BTN_RestoreDefaults);
 		
+		//Build bottom panel
+		PNL_Bottom = new JPanel();
+		PNL_Bottom.setLayout(new FlowLayout());
+		BTN_OpenDiagnostics = new JButton(openDiagnosticsAction);
+		PNL_Bottom.add(BTN_OpenDiagnostics);
+		
 		//Set up main JPanel
 		PNL_Main = new JPanel();
 		PNL_Main.setLayout(new BoxLayout(PNL_Main, BoxLayout.PAGE_AXIS));
@@ -217,6 +227,7 @@ public class TelemetryDataWindow implements ActionListener {
 		PNL_Main.add(SCL_Telemetry);
 		PNL_Main.add(PNL_Settings);
 		PNL_Main.add(TXP_Description);
+		PNL_Main.add(PNL_Bottom);
 		PNL_Main.add(Box.createVerticalGlue());
 		
 		//Add finished panel setup to main JFrame
@@ -286,7 +297,7 @@ public class TelemetryDataWindow implements ActionListener {
 	
 	/**
 	 * Performs window closing operations such as
-	 * stoping the update timer if it is running when
+	 * stopping the update timer if it is running when
 	 * the window is closed.
 	 */
 	public void onClose() {
@@ -372,6 +383,25 @@ public class TelemetryDataWindow implements ActionListener {
 		
 		public void actionPerformed(ActionEvent e) {
 			context.sender.resetSettings();
+		}
+	};
+	
+	private Action openDiagnosticsAction = new AbstractAction() {
+		{
+			String text = "Diagnostics";
+			putValue(Action.NAME, text);
+		}
+		
+		public void actionPerformed(ActionEvent e) {
+
+			//If the window already exists. don't make a new one,
+			//just move it to the front.
+			if(diagnosticsWindow != null 
+			&& diagnosticsWindow.getVisible() == true) {
+				diagnosticsWindow.toFront();
+			}
+			
+			diagnosticsWindow = new DiagnosticsWindow(context);
 		}
 	};
 }

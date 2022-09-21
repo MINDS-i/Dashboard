@@ -2,6 +2,8 @@ package com.serial;
 
 import com.serial.SerialEventListener;
 import com.serial.Serial;
+import com.util.DiagnosticManager;
+
 import jssc.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -120,7 +122,7 @@ public class SerialConnectPanel extends JPanel {
     private void disconnect() {
         synchronized(lock) {
             if(inProgress) {
-                System.err.println("Connect command issued while a change was in Progress");
+                System.err.println("Disconnect command issued while a change was in Progress");
                 return;
             }
             
@@ -222,16 +224,28 @@ public class SerialConnectPanel extends JPanel {
 //                serialPort.setFlowControlMode(
 //                		SerialPort.FLOWCONTROL_RTSCTS_IN |
 //                		SerialPort.FLOWCONTROL_RTSCTS_OUT);
-
+                
                 serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_NONE);
+                
+                //Log baud rate
+                DiagnosticManager.getInstance().logSerialData(
+                		DiagnosticManager.LAST_BAUD_USED, baudRate);
             } 
             catch(SerialPortException ex) {
                 System.err.println(ex.getMessage());
+
+                //Log failed connection
+                DiagnosticManager.getInstance().logSerialData(
+                		DiagnosticManager.CONNECT_FAILED, 1);
                 return;
             }
 
             connectedPort = serialPort;
             listener.connectionEstablished(serialPort);
+            
+            //Log successful connection
+            DiagnosticManager.getInstance().logSerialData(
+            		DiagnosticManager.CONNECTED, 1);
             connectDone();
         }
     };
@@ -245,9 +259,17 @@ public class SerialConnectPanel extends JPanel {
             } 
             catch (Exception e) {
                 e.printStackTrace();
+                
+                //Log disconnect failed
+                DiagnosticManager.getInstance().logSerialData(
+                		DiagnosticManager.DISCONNECT_FAILED, 1);
             }
 
             connectedPort = null;
+            
+            //Log disconnect failed.
+            DiagnosticManager.getInstance().logSerialData(
+            		DiagnosticManager.DISCONNECTED, 1);
             disconnectDone();
         }
     };
