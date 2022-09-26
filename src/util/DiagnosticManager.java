@@ -280,12 +280,17 @@ public class DiagnosticManager {
 	}
 	
 	/**
-	 * Returns all tracked stats to their default values (Typically 0)
+	 * Resets all tracked stats, except for the last baud rate
+	 * used. to their default values (Typically 0)
 	 */
 	public void resetStats() {
 		
 		for(int i = 0; i < NUM_SERIAL_STATS; i++) {
-			serialStatsArray[i] = 0;
+			
+			//Don't reset the baud value since it's not a counter
+			if(i != LAST_BAUD_USED) {
+				serialStatsArray[i] = 0;	
+			}
 		}
 		
 		for(int i = 0; i < NUM_TELEMETRY_STATS; i++) {

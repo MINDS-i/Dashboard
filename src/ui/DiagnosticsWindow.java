@@ -14,6 +14,7 @@ import javax.swing.table.AbstractTableModel;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.ActionEvent;
 
 
 /**
@@ -26,7 +27,7 @@ public class DiagnosticsWindow {
 	//Constants
 	private static final int UPDATE_PERIOD_MS = 200;
 	private static final int WINDOW_WIDTH	  = 200;
-	private static final int WINDOW_HEIGHT	  = 560;
+	private static final int WINDOW_HEIGHT	  = 600;
 	
 	private static final Dimension DIAG_DIM_PREF = new Dimension(500, 140);
 	private static final Dimension DIAG_DIM_MIN	 = new Dimension(500, 140);
@@ -40,6 +41,7 @@ public class DiagnosticsWindow {
 	private JPanel		PNL_Main;
 	private JTable 		TBL_Diagnostics;
 	private JScrollPane SCL_Diagnostics;
+	private JButton		BTN_ResetToDefaults;
 	
 	//Standard Vars
 	private Context context;
@@ -73,6 +75,8 @@ public class DiagnosticsWindow {
 		SCL_Diagnostics.setPreferredSize(DIAG_DIM_PREF);
 		SCL_Diagnostics.setBorder(TABLE_BORDERS);
 		
+		BTN_ResetToDefaults = new JButton(resetToDefaultsAction);
+		
 		//Set up main JPanel
 		PNL_Main = new JPanel();
 		PNL_Main.setLayout(new BoxLayout(PNL_Main, BoxLayout.PAGE_AXIS));
@@ -80,6 +84,7 @@ public class DiagnosticsWindow {
 		//Add everything to main JPanel
 		PNL_Main.add(SCL_Diagnostics);
 		PNL_Main.add(Box.createVerticalGlue());
+		PNL_Main.add(BTN_ResetToDefaults);
 		
 		//Add finished panel setup to JFrame
 		FRM_Window.add(PNL_Main);
@@ -143,5 +148,16 @@ public class DiagnosticsWindow {
 			}
 		}, UPDATE_PERIOD_MS, UPDATE_PERIOD_MS);
 	}
+	
+	private Action resetToDefaultsAction = new AbstractAction() {
+		{
+			String text = "Reset";
+			putValue(Action.NAME, text);
+		}
+		
+		public void actionPerformed(ActionEvent e) {
+			DiagnosticManager.getInstance().resetStats();
+		}
+	};
 	
 }

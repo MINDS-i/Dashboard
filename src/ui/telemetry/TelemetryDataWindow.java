@@ -30,7 +30,6 @@ import java.awt.event.WindowEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelListener;
 import java.awt.event.MouseEvent;
-
 import java.awt.event.ActionEvent;
 
 /**
@@ -399,6 +398,7 @@ public class TelemetryDataWindow implements ActionListener {
 			if(diagnosticsWindow != null 
 			&& diagnosticsWindow.getVisible() == true) {
 				diagnosticsWindow.toFront();
+				return;
 			}
 			
 			diagnosticsWindow = new DiagnosticsWindow(context);
