@@ -145,18 +145,23 @@ public class TelemetryDataWidget extends UIWidget {
         	if(formatStr.contains("Vcc")) {
         		monitor.storeData(currData, TelemetryDataType.VOLTAGE);
         		
+        		
+        		//TODO - CP - Rework low voltage warning popup here.
+        		//Move to TelemetryMonitor evaluateVoltage function to
+        		//average out stray values and settling time.
+        		
         		//If below the warning threshold, and this is
         		//not a reset value (0.0), and we have not yet
         		//warned the user, Do so now.
-        		if((currData < BATTERY_LOW_WARNING_THRESHOLD)
-				&& (currData > 0.0)
-				&& (shouldNotifyUser)) {
-        			JFrame messageFrame = new JFrame("message");
-        			JOptionPane.showMessageDialog(messageFrame,
-        					"Unit voltage is low and will soon shut down. " 
-        				  + "Replace or recharge batteries.");
-        			shouldNotifyUser = false;
-        		}
+//        		if((currData < BATTERY_LOW_WARNING_THRESHOLD)
+//				&& (currData > 0.0)
+//				&& (shouldNotifyUser)) {
+//        			JFrame messageFrame = new JFrame("message");
+//        			JOptionPane.showMessageDialog(messageFrame,
+//        					"Unit voltage is low and will soon shut down. " 
+//        				  + "Replace or recharge batteries.");
+//        			shouldNotifyUser = false;
+//        		}
         	}
         }
         
