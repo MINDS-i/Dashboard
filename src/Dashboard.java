@@ -58,6 +58,7 @@ public class Dashboard implements Runnable {
     public GPSWidget gpsWidget;
     public BumperWidget bumperWidget;
     public MapPanel mapPanel;
+    public SerialConnectPanel serialPanel;
     
     //Logging
     private final Logger seriallog = Logger.getLogger("d.serial");
@@ -147,7 +148,7 @@ public class Dashboard implements Runnable {
             }
         };
         
-        SerialConnectPanel serialPanel = new SerialConnectPanel(connectActions);
+        serialPanel = new SerialConnectPanel(connectActions);
         serialPanel.showBaudSelector(true);
         
         JPanel messageBox = createAlertBox();
@@ -337,6 +338,11 @@ public class Dashboard implements Runnable {
         errorFrame.pack();
     }
 
+    //Toggle the enabled/disabled state of the serial panel
+    public void enableSerialPanel(boolean isActive) {
+    	serialPanel.setEnabled(isActive);
+    }
+    
     public static void main(String[] args) {
         String openglProperty = "false";
 
