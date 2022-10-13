@@ -251,4 +251,12 @@ public class SerialConnectPanel extends JPanel {
             disconnectDone();
         }
     };
+    
+    public void setEnabled(boolean shouldEnable) {
+    	refreshButton.setEnabled(shouldEnable);
+    	connectButton.setEnabled(shouldEnable);
+    	dropDown.setEnabled(shouldEnable);
+    	baudSelect.setEnabled(shouldEnable);
+    	
+    }
 }

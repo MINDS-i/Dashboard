@@ -589,12 +589,14 @@ public class WaypointPanel extends NinePatchPanel {
     	public void actionPerformed(ActionEvent e) {
     		if(isUnitMoving) {
     			unlockWaypoints();
+    			context.dash.enableSerialPanel(true);
     			context.sender.changeMovement(false);
     			putValue(Action.NAME, "Start Mission");
     			isUnitMoving = false;
     		}
     		else {
     			lockWaypoints();
+    			context.dash.enableSerialPanel(false);
     			context.sender.changeMovement(true);
     			putValue(Action.NAME, "Stop Mission");
     			isUnitMoving = true;
