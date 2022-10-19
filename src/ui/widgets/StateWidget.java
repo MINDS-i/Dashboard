@@ -41,7 +41,6 @@ public class StateWidget extends UIWidget {
 	
 	//State Tracking Variables
 	protected byte lastDriveState = 0xF;
-	protected boolean shouldLogFailsafe = true;
 	
 	/**
 	 * Class constructor
@@ -207,6 +206,10 @@ public class StateWidget extends UIWidget {
 		String fmt;
 		String fmtStr = "Drv:%s";
 				
+		//TODO - CP - Add state reqctions for: 
+			//INVALID(0)
+			//Low Voltage Stop (4)
+			//Low Voltage Restart (5)
 		switch(substate) {
 			case Serial.DRIVE_STATE_STOP:
 				fmt = String.format(fmtStr, "Stopped");
@@ -223,32 +226,16 @@ public class StateWidget extends UIWidget {
 				fmt = String.format(fmtStr, "Auto");
 				finalWidth = Math.min(fmt.length(), LINE_WIDTH);
 				
-				//Reset failsafe log trigger if coming 
-				//from a failsafe state
-				if(!shouldLogFailsafe) {
-					shouldLogFailsafe = true;
-				}
 				break;
 			case Serial.DRIVE_STATE_RADIO:
 				fmt = String.format(fmtStr, "Manual");
 				finalWidth = Math.min(fmt.length(), LINE_WIDTH);
 				
-				//Reset failsafe log trigger if coming 
-				//from a failsafe state
-				if(!shouldLogFailsafe) {
-					shouldLogFailsafe = true;
-				}
 				break;
 			case Serial.DRIVE_STATE_RADIO_FAILSAFE:
 				fmt = String.format(fmtStr, "Failsafe");
 				finalWidth = Math.min(fmt.length(), LINE_WIDTH);
 				
-				//If this is the first failsafe state received,
-				//Log a warning for the user.
-				if(shouldLogFailsafe) {
-					serialLog.warning(FAILSAFE_MSG);
-					shouldLogFailsafe = false;
-				}
 				break;
 				
 			default:
