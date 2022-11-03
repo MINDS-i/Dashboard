@@ -205,11 +205,7 @@ public class StateWidget extends UIWidget {
 		int finalWidth;
 		String fmt;
 		String fmtStr = "Drv:%s";
-				
-		//TODO - CP - Add state reqctions for: 
-			//INVALID(0)
-			//Low Voltage Stop (4)
-			//Low Voltage Restart (5)
+	    
 		switch(substate) {
 			case Serial.DRIVE_STATE_STOP:
 				fmt = String.format(fmtStr, "Stopped");
@@ -232,6 +228,13 @@ public class StateWidget extends UIWidget {
 				finalWidth = Math.min(fmt.length(), LINE_WIDTH);
 				
 				break;
+			case Serial.DRIVE_STATE_LOW_VOLTAGE_STOP:
+			case Serial.DRIVE_STATE_LOW_VOLTAGE_RESTART:
+				fmt = String.format(fmtStr, "Low Vol.");
+				finalWidth = Math.min(fmt.length(), LINE_WIDTH);
+				
+				break;
+				
 			case Serial.DRIVE_STATE_RADIO_FAILSAFE:
 				fmt = String.format(fmtStr, "Failsafe");
 				finalWidth = Math.min(fmt.length(), LINE_WIDTH);
