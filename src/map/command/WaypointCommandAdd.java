@@ -19,6 +19,7 @@ import com.util.UtilHelper;
 public class WaypointCommandAdd extends WaypointCommand {
 	//Constants
 	private static final double MIN_DISTANCE_FT = 45.00;
+	private static final int MAX_WAYPOINTS = 63;
 	
 	//Warning Strings
 	private static final String WARN_MIN_DISTANCE_DIALOG = 
@@ -33,6 +34,9 @@ public class WaypointCommandAdd extends WaypointCommand {
 	private static final String WARN_NO_GEOFENCE_INTERSECT = 
 			  "WP Add - Waypoint placement"
 			+ " exceeds geofence. Canceling placement.";	
+	
+	private static final String WARN_MAX_WAYPONTS_REACHED =
+			  "WP Add - Maximum waypoints reached.";
 	/**
 	 * Constructor
 	 * @param waypoints - List of current navigational waypoints.
@@ -54,6 +58,12 @@ public class WaypointCommandAdd extends WaypointCommand {
 	public boolean execute() {
 		CommandManager manager = CommandManager.getInstance();
 
+		//If the maximum waypoints has been reached, do nothing
+		if(waypoints.size() == MAX_WAYPOINTS) {
+			serialLog.warning(WARN_MAX_WAYPONTS_REACHED);
+			return false;
+		}
+		
 		//If a geofence exists 
 		if(manager.getGeofence().getIsEnabled()) {
 			//Check for and refuse a second index 0 placement
