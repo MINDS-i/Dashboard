@@ -1,11 +1,13 @@
 package com.map.command;
 
+import java.util.logging.Logger;
+
 import com.map.WaypointList;
 import com.map.command.WaypointCommand.CommandType;
+import com.map.geofence.WaypointGeofence;
+import com.map.Dot;
 
 import java.awt.Component;
-
-import com.map.Dot;
 
 /**
  * @author Chris Park @ Infinetix Corp.
@@ -15,6 +17,19 @@ import com.map.Dot;
  *
  */
 public class WaypointCommandEdit extends WaypointCommand {
+	//Warning Strings
+	private static final String WARN_GEOFENCE_MOVE =
+			  "WaypointCommand Edit - Geofence cannot be"
+			+ " moved while other waypoints are defined. The list must"
+			+ " first be cleared.";
+	
+	private static final String WARN_NO_GEOFENCE_INTERSECT = 
+			  "WaypointCommand Move - Waypoint placement"
+			+ " exceeds geofence. Canceling movement.";
+	
+	private static final String WARN_ENDPOINT_NOT_SET =
+			  "WaypointCommand Edit - Execution failure."
+			+ " Endpoint was not set.";
 	
 	/**
 	 * Constructor
@@ -39,11 +54,30 @@ public class WaypointCommandEdit extends WaypointCommand {
 	 */
 	@Override
 	public boolean execute() {
+		CommandManager manager = CommandManager.getInstance();
+		
 		if(endPoint == null) {
-			System.err.print("WaypointCommandMove - Execution failure. ");
-			System.err.println("Endpoint was not set.");
+			System.err.println(WARN_ENDPOINT_NOT_SET);
 			return false;
 		}
+		
+		//Geofence checks (On enabled only)
+		if(manager.getGeofence().getIsEnabled()) {
+			//If moving the fence origin and there are other waypoints,
+			//abort the move operation and alert the user.
+			if((index == 0) && waypoints.size() > 1) {
+				serialLog.warning(WARN_GEOFENCE_MOVE);
+				return false;
+			}
+			
+			//If not the geofence origin and the endpoint is outside of 
+			//the current fence, abort the move.
+			if(!manager.getGeofence().doesLocationIntersect(endPoint)) {
+				serialLog.warning(WARN_NO_GEOFENCE_INTERSECT);
+				return false;
+			}
+		}
+		
 		
 		waypoints.set(endPoint, index);
 		return true;

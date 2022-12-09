@@ -16,7 +16,9 @@ import com.serial.Serial;
  */
 public class StateWidget extends UIWidget {
 	//Constants
-	protected static final int LINE_WIDTH 	= 14;
+	protected static final int 		LINE_WIDTH 	= 14;
+	protected static final String 	FAILSAFE_MSG = "A radio failsafe has occured." 
+				+ "Please check unit power levels/replace batteries.";
 	
 	//Color Defaults
 	protected static final Color DEF_FONT_COLOR	  = Color.decode("0xEA8300");
@@ -175,7 +177,6 @@ public class StateWidget extends UIWidget {
 		String fmt;
 		String fmtStr = "Apm:%s";
 		
-//		System.err.println("StateWidget - Updating APM State");
 		switch(substate) {
 			case Serial.APM_STATE_INIT:
 				fmt = String.format(fmtStr, "Init");
@@ -204,8 +205,7 @@ public class StateWidget extends UIWidget {
 		int finalWidth;
 		String fmt;
 		String fmtStr = "Drv:%s";
-		
-//		System.err.println("StateWidget - Updating Drive State");		
+	    
 		switch(substate) {
 			case Serial.DRIVE_STATE_STOP:
 				fmt = String.format(fmtStr, "Stopped");
@@ -221,11 +221,26 @@ public class StateWidget extends UIWidget {
 			case Serial.DRIVE_STATE_AUTO:
 				fmt = String.format(fmtStr, "Auto");
 				finalWidth = Math.min(fmt.length(), LINE_WIDTH);
+				
 				break;
 			case Serial.DRIVE_STATE_RADIO:
 				fmt = String.format(fmtStr, "Manual");
 				finalWidth = Math.min(fmt.length(), LINE_WIDTH);
+				
 				break;
+			case Serial.DRIVE_STATE_LOW_VOLTAGE_STOP:
+			case Serial.DRIVE_STATE_LOW_VOLTAGE_RESTART:
+				fmt = String.format(fmtStr, "Low Vol.");
+				finalWidth = Math.min(fmt.length(), LINE_WIDTH);
+				
+				break;
+				
+			case Serial.DRIVE_STATE_RADIO_FAILSAFE:
+				fmt = String.format(fmtStr, "Failsafe");
+				finalWidth = Math.min(fmt.length(), LINE_WIDTH);
+				
+				break;
+				
 			default:
 				fmt = String.format(fmtStr, "Unknown");
 				finalWidth = Math.min(fmt.length(), LINE_WIDTH);
@@ -243,7 +258,6 @@ public class StateWidget extends UIWidget {
 		String fmt;
 		String fmtStr = "Aut:%s";
 		
-//		System.err.println("StateWidget - Updating Auto State");
 		switch(substate) {
 			case Serial.AUTO_STATE_FULL:
 				fmt = String.format(fmtStr, "Full");
@@ -282,7 +296,6 @@ public class StateWidget extends UIWidget {
 		boolean approach = ((substate & Serial.AUTO_STATE_FLAGS_APPROACH)   > 0) ? true : false;
 		boolean turn	 = ((substate & Serial.AUTO_STATE_FLAGS_TURNAROUND) > 0) ? true : false;
 		
-//		System.out.println("StateWidget - Updating Flag State");
 		if(caution && approach) {
 			fmt = String.format(fmtStr, "App. & Caut.");
 			finalWidth = Math.min(fmt.length(), LINE_WIDTH);

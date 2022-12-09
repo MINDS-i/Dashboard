@@ -21,9 +21,9 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.util.ACLIManager;
+import com.map.command.CommandManager;
 
 /**
- * 
  * @author Chris Park @ Infinetix Corp.
  * Date: 09-2020
  * Description: UI Panel responsible for providing UI focused options to the user.
@@ -39,33 +39,34 @@ public class UIConfigPanel extends JPanel {
 	private static final String DEF_HOME_COORD			= "0.0";
 	
 	//UI Componenets
-	private JPanel 		buttonPanel;
-	private JButton		toggleButton;
-	private JButton		driverButton;
-	private JButton		sketchUploadButton;
-	private JPanel 		homePanel;
-	private JPanel		lngPanel;
-	private JLabel 		lngLabel;
-	private JTextField 	lngField;
-	private JPanel		latPanel;
-	private JLabel 		latLabel;
-	private JTextField 	latField;
-	private JButton 	setHomeButton;
-	
-	private JCheckBox	bumperCheckBox;
-	private JButton		applySettingsButton;
+	private JButton			toggleButton;
+	private JButton			driverButton;
+	private JButton			sketchUploadButton;
+	private JLabel 			lngLabel;
+	private JTextField 		lngField;
+	private JLabel 			latLabel;
+	private JTextField 		latField;
+	private JButton 		setHomeButton;
+	private JLabel			fenceLabel;
+	private JTextField		fenceField;
+	private JCheckBox		bumperCheckBox;
+	private JButton			applySettingsButton;
 	
 	//State and Reference vars
-	private Context 	context;
-	private boolean		bumperIsEnabled;
+	private Context 		context;
+	private MapPanel 		map;
+	private CommandManager 	commandManager;
+	private boolean			bumperIsEnabled;
 	
 	/**
 	 * Class constructor
 	 * @param cxt - the application context
 	 * @param isWindows - boolean check to see if the application is running in windows
 	 */
-	public UIConfigPanel(Context cxt, boolean isWindows) {
+	public UIConfigPanel(Context cxt, MapPanel mapPanel, boolean isWindows) {
 		this.context = cxt;
+		this.map = mapPanel;
+		this.commandManager = CommandManager.getInstance();
 		
 		this.setLayout(new GridBagLayout());
 		
@@ -137,15 +138,31 @@ public class UIConfigPanel extends JPanel {
 		bumperCheckBox = new JCheckBox("Enable Bumper");
 		bumperCheckBox.setSelected(false);
 		constraints.gridx = 3;
-		constraints.gridy = 1;
+		constraints.gridy = 0;
 		this.add(bumperCheckBox, constraints);
 		toggleBumper(context.dash.bumperWidget.isEnabled());
+		
+		//Geofence label and radius input field
+		fenceLabel = new JLabel("Geofence Radius (Ft):");
+		constraints.gridx = 3;
+		constraints.gridy = 1;
+		this.add(fenceLabel, constraints);
+		
+		fenceField = new JTextField(DEF_TEXT_FIELD_WIDTH);
+		constraints.gridx = 5;
+		constraints.gridy = 1;
+		constraints.fill = GridBagConstraints.NONE;
+		this.add(fenceField, constraints);
+		fenceField.setText(String.valueOf(
+				commandManager.getGeofence().getRadius()));
 		
 		//Settings apply button (for Checkboxes/Radio Buttons)
 		applySettingsButton = new JButton(setSettingsAction);
 		constraints.gridx = 3;
 		constraints.gridy = 2;
+		constraints.fill = GridBagConstraints.HORIZONTAL;
 		this.add(applySettingsButton, constraints);
+		
 	}
 	
 	/**
@@ -167,7 +184,18 @@ public class UIConfigPanel extends JPanel {
 			else if(!bumperIsEnabled && bumperCheckBox.isSelected()) {
 				toggleBumper(true);
 			}
-		} 
+			
+			//Geofence radius update
+			double radius = Double.parseDouble(fenceField.getText());
+			
+			//Don't allow a radius smaller than the minimum default
+			if(radius < commandManager.getGeofence().MIN_RADIUS_FT) {
+				radius = commandManager.getGeofence().MIN_RADIUS_FT;
+			}
+			
+			commandManager.getGeofence().updateRadius(radius);
+			map.repaint();
+		}
 	};
 	
 	private void toggleBumper(boolean isEnabled) {

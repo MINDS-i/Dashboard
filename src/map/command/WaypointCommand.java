@@ -1,10 +1,12 @@
 package com.map.command;
 
+import java.util.logging.Logger;
+
 import com.map.WaypointList;
+import com.map.Dot;
+import com.map.geofence.WaypointGeofence;
 
 import java.awt.Component;
-
-import com.map.Dot;
 
 /**
  * @author Chris Park @ Infinetix Corp.
@@ -16,7 +18,9 @@ import com.map.Dot;
  */
 public abstract class WaypointCommand {
 
-	public enum CommandType {ADD, REMOVE, MOVE, EDIT, CLEAR, TARGET};
+	protected final Logger serialLog = Logger.getLogger("d.serial");
+	
+	public enum CommandType {ADD, REMOVE, MOVE, EDIT, CLEAR, TARGET, PARSE};
 	
 	protected WaypointList waypoints;
 	protected CommandType type;
@@ -28,6 +32,9 @@ public abstract class WaypointCommand {
 	// Move Vars
 	protected Dot startPoint;
 	protected Dot endPoint;
+	
+	//Geofencing Vars
+	protected WaypointGeofence geofence;
 	
 	/**
 	 * Constructor
@@ -58,6 +65,6 @@ public abstract class WaypointCommand {
 	 * @param ep - The ending point to be moved to.
 	 */
 	public void finalize(Dot ep) {
-		this.endPoint = ep; 
+		this.endPoint = ep;
 	}
 }

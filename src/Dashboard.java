@@ -58,6 +58,7 @@ public class Dashboard implements Runnable {
     public GPSWidget gpsWidget;
     public BumperWidget bumperWidget;
     public MapPanel mapPanel;
+    public SerialConnectPanel serialPanel;
     
     //Logging
     private final Logger seriallog = Logger.getLogger("d.serial");
@@ -137,15 +138,17 @@ public class Dashboard implements Runnable {
                 context.updatePort(port);
                 seriallog.info("Port opened");
                 context.sender.sendSync();
+                context.commsMonitor.getInstance().startHeartbeatTimer();
             }
             public void disconnectRequest() {
                 context.closePort();
                 seriallog.info("Serial Port Closed");
                 resetData();
+                context.commsMonitor.getInstance().stopHeartbeatTimer();
             }
         };
         
-        SerialConnectPanel serialPanel = new SerialConnectPanel(connectActions);
+        serialPanel = new SerialConnectPanel(connectActions);
         serialPanel.showBaudSelector(true);
         
         JPanel messageBox = createAlertBox();
@@ -252,7 +255,6 @@ public class Dashboard implements Runnable {
         outerPanel.add(AngleWidget.createDial(
                 context, Serial.HEADING, context.theme.roverTop));
         
-        //TODO - CP - Fix widget bug on the following two adds (horizon and radio widgets)
         if(context.getResource("widget_type", "Angles").equals("Horizon")) {
             outerPanel.add(createHorizonWidget());
             outerPanel.add(RadioWidget.create(context, HORIZON_WIDGET_SIZE));
@@ -336,6 +338,11 @@ public class Dashboard implements Runnable {
         errorFrame.pack();
     }
 
+    //Toggle the enabled/disabled state of the serial panel
+    public void enableSerialPanel(boolean isActive) {
+    	serialPanel.setEnabled(isActive);
+    }
+    
     public static void main(String[] args) {
         String openglProperty = "false";
 

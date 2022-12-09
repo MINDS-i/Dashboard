@@ -3,6 +3,7 @@ package com.map.command;
 import com.Context;
 import com.map.WaypointList.*;
 import com.map.command.WaypointCommand.CommandType;
+import com.map.geofence.WaypointGeofence;
 import com.map.WaypointList;
 import com.map.Dot;
 
@@ -38,10 +39,13 @@ public class WaypointCommandClear extends WaypointCommand {
 	 */
 	@Override
 	public boolean execute() {
+		CommandManager manager = CommandManager.getInstance();
+		
 		//Event is labeled as coming from the rover to avoid sending
 		//waypoint update messages for every point. An explicit clear message
 		//is sent to the rover afterwards.
 		waypoints.clear(WaypointListener.Source.REMOTE);
+		manager.getGeofence().setIsEnabled(false);
 		
 		if(context.sender != null) {
 			context.sender.sendWaypointList();
@@ -57,9 +61,19 @@ public class WaypointCommandClear extends WaypointCommand {
 	 */
 	@Override
 	public boolean undo() {
+		CommandManager manager = CommandManager.getInstance();
 		
-		//Add each waypoint from the backup one by one?
+		//Add each waypoint from the backup one by one
 		for(int i = 0; i < waypointsBackup.size(); i++) {
+			
+			//If this is the origin point for the geofence
+			if(i == 0) {				
+				manager.getGeofence().setOriginLatLng(
+						waypointsBackup.get(i).dot().getLatitude(),
+						waypointsBackup.get(i).dot().getLongitude());
+				manager.getGeofence().setIsEnabled(true);
+			}
+			
 			waypoints.add(waypointsBackup.get(i).dot(), i);
 		}
 		

@@ -154,6 +154,7 @@ public class xml {
                     break;
             }
         }
+        
         try {
             inputStream.close();
         } catch (IOException ex) {

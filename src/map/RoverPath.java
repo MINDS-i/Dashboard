@@ -13,10 +13,11 @@ import java.awt.event.*;
 import java.awt.geom.Point2D;
 import java.awt.image.*;
 import java.util.*;
+import java.util.logging.Logger;
 import javax.swing.*;
 
 
-class RoverPath implements Layer {
+public class RoverPath implements Layer {
 	
     private static final Color ACTIVE_LINE_FILL = new Color(1.f, 1.f, 0.f, 1f);
     private static final Color PATH_LINE_FILL   = new Color(0f, 0f, 0f, 1f);
@@ -28,26 +29,54 @@ class RoverPath implements Layer {
     private WaypointList waypoints;
     private Dot rover = new Dot();
     private Component painter;
+    private MapPanel map;
     private boolean waypointsDisabled = false;
-
+    
     
     //Movement action vars (Press, Drag, Release)
     private Dot draggedDot = null;
     private int draggedDotIdx = Integer.MAX_VALUE;
     private int downDot = Integer.MAX_VALUE;
     private WaypointCommand moveCommand;
+    private OpMode currOpMode;
+    
+    //Logging support
+    protected final Logger serialLog = Logger.getLogger("d.serial");
+    
+    /**
+     * Pre-defined state enums used for deciding the correct user action to
+     * perform based on UI context.
+     */
+    public enum OpMode {
+    	STANDARD	(0),
+    	SET_HOME	(1);
+    	
+    	private final int mode;
+    	
+    	OpMode(int mode) {
+    		this.mode = mode;
+    	}
+    	
+    	public int getValue() {
+    		return this.mode;
+    	}
+    };
     
     RoverPath(Context c, CoordinateTransform cT, WaypointList waypoints,
-    		Component painter) {
+    		Component painter, MapPanel map) {
         context = c;
         mapTransform = cT;
         this.waypoints = waypoints;
         this.painter = painter;
-
+        this.map = map;
+        
         waypointsDisabled = !Boolean.valueOf(
         		context.getResource("waypoints_enabled", "true"));
+        
+        currOpMode = OpMode.STANDARD;
     }
 
+    @Override
     public int getZ() {
         return 1;
     }
@@ -59,10 +88,12 @@ class RoverPath implements Layer {
         waypointsDisabled = !value;
     }
 
+    @Override
     public void paint(Graphics g) {
         paintDots(g);
     }
 
+    @Override
     public boolean onClick(MouseEvent e) {
     	WaypointCommand command = null;
     	boolean result = false;
@@ -70,42 +101,89 @@ class RoverPath implements Layer {
         if(waypointsDisabled) {
         	return false;
         } 
-
+        
         Point2D pixel = toP2D(e.getPoint());
         int underneath = isOverDot(pixel, context.theme.waypointImage);
 
-        // Left click thats not over an existing point
-        if((e.getButton() == MouseEvent.BUTTON1) 
+        // Left click that is NOT over an existing point
+        if((e.getButton() == MouseEvent.BUTTON1)
         && (underneath == Integer.MAX_VALUE)) {
-
+        	
             Point2D point = mapTransform.mapPosition(pixel);
             int line = isOverLine(e.getPoint());
             
             // Click is NOT over an existing line
             if (line == Integer.MAX_VALUE) {
-            	command = new WaypointCommandAdd(
-            			waypoints, new Dot(point), waypoints.size());
-            	//Manually adjust for size vs index offset
-                waypoints.setSelected(waypoints.size() - 1);
+            	
+            	switch(currOpMode) {
+            		case SET_HOME:
+            			updateHomeLocation(point);
+            			map.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            			currOpMode = OpMode.STANDARD;
+            			break;
+            		case STANDARD:
+            			command = new WaypointCommandAdd(
+                    			waypoints, new Dot(point), waypoints.size());
+                    	//Manually adjust for size vs index offset
+                        waypoints.setSelected(waypoints.size() - 1);
+            			break;
+            		default:
+            	}
             } 
             // Click is over an existing line
             else {
-            	command = new WaypointCommandAdd(
-    					waypoints, new Dot(point), line);
+            	
+            	switch(currOpMode) {
+            		case SET_HOME:
+            			updateHomeLocation(point);
+            			map.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            			currOpMode = OpMode.STANDARD;
+            			break;
+            		case STANDARD:
+            			command = new WaypointCommandAdd(
+            					waypoints, new Dot(point), line);
+            			break;
+        			default:
+            	}
             }
         } 
         // Right click on top of a point
         else if ((e.getButton() == MouseEvent.BUTTON3) 
-        		&& (underneath != Integer.MAX_VALUE)) {
-            command = new WaypointCommandRemove(waypoints, underneath);
+        	 &&  (underneath != Integer.MAX_VALUE)) {
+        	
+        	switch(currOpMode) {
+				case SET_HOME:
+					serialLog.warning("RoverPath - "
+							+ "Can't set home to existing point position.");
+        			map.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        			currOpMode = OpMode.STANDARD;
+					break;
+				case STANDARD:
+					
+					//If it's an attempt to delete the fence origin, return
+					if(waypoints.getSelected() == 0) {
+						return false;
+					}
+					
+					command = new WaypointCommandRemove(waypoints, underneath);
+					break;
+				default:
+        	}
         }
         else {
         	return false;
         }
         
-        return CommandManager.getInstance().process(command); 
+        //Make sure we don't process a command unless it's as a
+        //result of a standard action and actually exists
+        if(command != null) {
+            return CommandManager.getInstance().process(command);
+        }
+ 
+        return true;
     }
 
+    @Override
     public boolean onPress(MouseEvent e) {
         Point pixel = e.getPoint();
         downDot = isOverDot(pixel, context.theme.waypointImage);
@@ -129,6 +207,7 @@ class RoverPath implements Layer {
         return false;
     }
 
+    @Override
     public void onDrag(MouseEvent e) {
         Point2D pixel = toP2D(e.getPoint());
         if (downDot != Integer.MAX_VALUE) {
@@ -139,6 +218,7 @@ class RoverPath implements Layer {
         }
     }
 
+    @Override
     public void onRelease(MouseEvent e) {
         Point pixel = e.getPoint();
         if(draggedDotIdx != Integer.MAX_VALUE) {
@@ -337,12 +417,45 @@ class RoverPath implements Layer {
         }
     }
 
-    Point2D toP2D(Point p) {
+    public Point2D toP2D(Point p) {
         return new Point2D.Double(p.x, p.y);
     }
 
-    Point toPoint(Point2D p) {
+    public Point toPoint(Point2D p) {
         return new Point((int) p.getX(), (int) p.getY());
+    }
+    
+    /**
+     * Returns the current operational mode for determining
+     * how to handle user input.
+     * @return - enum describing the current op mode.
+     */
+    public OpMode getOpMode() {
+    	return currOpMode;
+    }
+    
+    /**
+     * Sets the current operational mode used for determining
+     * how to handle user input.
+     * @param mode - The new mode to set.
+     */
+    public void setOpMode(OpMode mode) {
+    	currOpMode = mode;
+    }
+    
+    /**
+     * Changes the current home location and updates its
+     * persistent storage value to be consistent upon successive
+     * restarts.
+     * @param location - The updated home location.
+     */
+    public void updateHomeLocation(Point2D point) {
+    	Dot home = waypoints.getHome();
+    	home.setLocation(point);
+    	waypoints.setHome(new Dot(point));
+    	context.setHomeProp(String.valueOf(home.getLatitude()), 
+    			String.valueOf(home.getLongitude()));
+    	serialLog.warning("SET HOME - Home point set.");
     }
 
 }

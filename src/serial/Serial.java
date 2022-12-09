@@ -28,6 +28,7 @@ public class Serial {
     
     //Info Types
     public static final int APM_VERSION	   	 = 0x0;
+    public static final int HEARTBEAT		 = 0x1;
     
     //Word type
     public static final int CONFIRMATION   	 = 0x0;
@@ -49,6 +50,7 @@ public class Serial {
     public static final byte START_CMD	  	 	= 0x6;
     public static final byte DISABLE_BUMPER_CMD	= 0x7;
     public static final byte ENABLE_BUMPER_CMD  = 0x8;
+    public static final byte SETTINGS_RESET_CMD = 0x9;
     
     //State types
     public static final byte APM_STATE	  	 = 0x0;
@@ -63,9 +65,14 @@ public class Serial {
     public static final byte APM_STATE_DRIVE 		= 0x3;
     
     //Drive state sub values
-    public static final byte DRIVE_STATE_STOP 		= 0x1;
-    public static final byte DRIVE_STATE_AUTO 		= 0x2;
-    public static final byte DRIVE_STATE_RADIO 		= 0x3;
+    public static final byte DRIVE_STATE_INVALID			= 0x0;
+    public static final byte DRIVE_STATE_STOP 				= 0x1;
+    public static final byte DRIVE_STATE_AUTO 				= 0x2;
+    public static final byte DRIVE_STATE_RADIO 				= 0x3;
+    public static final byte DRIVE_STATE_LOW_VOLTAGE_STOP	= 0x4;
+    public static final byte DRIVE_STATE_LOW_VOLTAGE_RESTART= 0x5;
+    public static final byte DRIVE_STATE_RADIO_FAILSAFE 	= 0x6;
+    
     
     //Auto state sub values
     public static final byte AUTO_STATE_FULL 		= 0x1;

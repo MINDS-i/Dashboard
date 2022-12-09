@@ -37,6 +37,7 @@ public class TelemetryDataWidget extends UIWidget {
 	protected TelemetryMonitor telemetryMonitor;
 	private int lineWidth;
 	private Collection<Line> lines = new ArrayList<Line>();
+
 	
 	/**
 	 * @author Chris Park @ Infinetix Corp.
@@ -93,6 +94,8 @@ public class TelemetryDataWidget extends UIWidget {
 	private class Line extends JLabel implements TelemetryListener, IMonitorListener {
         private String formatStr;
         private double currData;
+    	private boolean shouldNotifyUser;
+        
         
         /**
          * Class Constructor
@@ -106,6 +109,8 @@ public class TelemetryDataWidget extends UIWidget {
             
             telemetryMonitor.register(this);
             telemetryMonitor.start();
+            
+    		shouldNotifyUser = true;
         }
         
         /**
@@ -139,8 +144,25 @@ public class TelemetryDataWidget extends UIWidget {
         public void updateMonitor(TelemetryMonitor monitor) {
         	if(formatStr.contains("Vcc")) {
         		monitor.storeData(currData, TelemetryDataType.VOLTAGE);
+        		
+        		
+        		//TODO - CP - Rework low voltage warning popup here.
+        		//Move to TelemetryMonitor evaluateVoltage function to
+        		//average out stray values and settling time.
+        		
+        		//If below the warning threshold, and this is
+        		//not a reset value (0.0), and we have not yet
+        		//warned the user, Do so now.
+//        		if((currData < BATTERY_LOW_WARNING_THRESHOLD)
+//				&& (currData > 0.0)
+//				&& (shouldNotifyUser)) {
+//        			JFrame messageFrame = new JFrame("message");
+//        			JOptionPane.showMessageDialog(messageFrame,
+//        					"Unit voltage is low and will soon shut down. " 
+//        				  + "Replace or recharge batteries.");
+//        			shouldNotifyUser = false;
+//        		}
         	}
-        	
         }
         
         /**
@@ -151,6 +173,15 @@ public class TelemetryDataWidget extends UIWidget {
             super.repaint();
             TelemetryDataWidget.this.repaint(getX(), getY(), 
             		getWidth(), getHeight());
+        }
+        
+        /**
+         * Resets the boolean used to determine if this line should
+         * give a user facing notification when triggered to do so by
+         * some pre-defined, telemetry type specific event.
+         */
+        public void resetNotificationFlag() {
+        	shouldNotifyUser = true;
         }
 	}
 	
@@ -200,6 +231,7 @@ public class TelemetryDataWidget extends UIWidget {
 	public void reset() {
 		for(Line l : lines) {
 			l.update(0.0);
+			l.resetNotificationFlag();
 		}
 	}
 	
