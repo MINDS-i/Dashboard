@@ -153,15 +153,12 @@ public class GeofenceTypeCircle extends GeofenceType {
 		
 		  //Zone 1
 		if(latPos >= 41.0) {
-			System.err.println("Zone 1");
 			return fenceDiameter;
 		} //Zone 2
 		else if ((latPos < 41.0) && (latPos >= 34.0)) {
-			System.err.println("Zone 2");
 			return (fenceDiameter - (fenceDiameter * ZONE_2_MULTIPLIER));
 		}
 		  //Zone 3
-		System.err.println("Zone 3");
 		return (fenceDiameter - (fenceDiameter * ZONE_3_MULTIPLIER));
 	}
 }
