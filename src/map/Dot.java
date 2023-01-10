@@ -19,8 +19,9 @@ import java.awt.*;
  * @author Chris Park @ Infinetix Corp.
  * Date: 1/6/2023
  * Description: Base class used to define a waypoint location and it's common 
- * operability functions. Originally created by Brett Folkins (formerly Brett 
- * Menzies) prior to Infinetix's involvement. (approx 2020)
+ * operability functions. Based on an original class created by 
+ * Brett Folkins (formerly Brett Menzies) prior to Infinetix's involvement. 
+ * (approx 2020)
  */
 public class Dot {
 	
@@ -165,4 +166,8 @@ public class Dot {
     /*--------------------------Type Functions--------------------------------*/
     
     //TODO - CP - Type behavior defined here.
+    public void executeTypeProcesses() {
+    	//To be overriden in child classes for specific functionality
+    	//as required.
+    }
 }
