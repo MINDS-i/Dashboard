@@ -49,7 +49,8 @@ public class RoverPath implements Layer {
      */
     public enum OpMode {
     	STANDARD	(0),
-    	SET_HOME	(1);
+    	SET_HOME	(1),
+    	PLACE_SWATH	(2);
     	
     	private final int mode;
     	

@@ -52,7 +52,7 @@ public class WaypointCommandAdd extends WaypointCommand {
 	
 	/**
 	 * Adds a new waypoint at the specified location. 
-	 * @return Boolean - Whether or not the command was executed successfully.
+	 * @return Boolean - Whether or not the operation was executed successfully.
 	 */
 	@Override
 	public boolean execute() {

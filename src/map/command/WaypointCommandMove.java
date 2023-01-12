@@ -42,7 +42,7 @@ public class WaypointCommandMove extends WaypointCommand {
 	/**
 	 * Moves the point to the endpoint detailed by the finalize method
 	 * (See WaypointCommand Class for definition)
-	 * @return Whether or not the operation was successful. In the
+	 * @return Boolean - Whether or not the operation was successful. In the
 	 * case of a failure, ensure that the end point was set before
 	 * attempting execution.
 	 */
