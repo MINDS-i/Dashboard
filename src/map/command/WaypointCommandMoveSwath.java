@@ -10,7 +10,7 @@ import com.map.command.WaypointCommand.CommandType;
 import com.map.geofence.WaypointGeofence;
 import com.map.Dot;
 
-//TODO - CP - Swath Move - See below edge cases/issues to work determine.
+//TODO - CP - SWATH_MOVE - See below edge cases/issues to work determine.
 	//How do we pinpoint the start point index?
 	//Should the swath path be passed into the constructor?
 		//For all swath commands?

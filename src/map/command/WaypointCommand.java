@@ -20,6 +20,14 @@ public abstract class WaypointCommand {
 
 	protected final Logger serialLog = Logger.getLogger("d.serial");
 	
+	//Constants
+	public static final int MAX_WAYPOINTS = 63;
+	
+	//Warning Strings
+	protected static final String WARN_NO_GEOFENCE_INTERSECT = 
+			  "Add - Waypoint placement"
+			+ " exceeds geofence. Canceling placement.";
+	
 	public enum CommandType {
 		ADD, REMOVE, MOVE, EDIT, CLEAR, TARGET, PARSE, ADD_SWATH, REMOVE_SWATH,
 		MOVE_SWATH};

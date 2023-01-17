@@ -19,7 +19,6 @@ import com.util.UtilHelper;
 public class WaypointCommandAdd extends WaypointCommand {
 	//Constants
 	private static final double MIN_DISTANCE_FT = 45.00;
-	private static final int MAX_WAYPOINTS = 63;
 	
 	//Warning Strings
 	private static final String WARN_MIN_DISTANCE_DIALOG = 
@@ -30,10 +29,6 @@ public class WaypointCommandAdd extends WaypointCommand {
 	private static final String WARN_GEOFENCE_ALREADY_PLACED =
 			  "WP Add - Geofence already in place."
 			+ " Cannot add waypoint at index 0.";
-	
-	private static final String WARN_NO_GEOFENCE_INTERSECT = 
-			  "WP Add - Waypoint placement"
-			+ " exceeds geofence. Canceling placement.";	
 	
 	private static final String WARN_MAX_WAYPONTS_REACHED =
 			  "WP Add - Maximum waypoints reached.";

@@ -238,7 +238,7 @@ public class WaypointCommandParse extends WaypointCommand {
 							point = new Dot(lat, lng, (short)0);
 						} 
 						else if(xmlReader.getLocalName() == XMLElement.ELEVATION.getValue()) {
-							//Do nothing for now (May be implimented at a later date
+							//Do nothing for now (May be implimented at a later date)
 						}						
 						break;
 					case XMLStreamConstants.CHARACTERS:

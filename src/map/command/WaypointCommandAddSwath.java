@@ -10,7 +10,6 @@ import com.map.command.WaypointCommand.CommandType;
 import com.map.geofence.WaypointGeofence;
 import com.map.Dot;
 
-
 /**
  * @author Chris Park @ Infinetix Corp.
  * Date: 1-11-2023
@@ -19,9 +18,6 @@ import com.map.Dot;
  */
 public class WaypointCommandAddSwath extends WaypointCommand {
 
-	//Constants
-	//Warning Strings (If Any)
-	
 	//Member Vars
 	protected List<Dot> swathPoints;
 	
@@ -35,9 +31,6 @@ public class WaypointCommandAddSwath extends WaypointCommand {
 			WaypointList waypoints, List<Dot> swathPoints, int index) {
 		super(waypoints, CommandType.ADD_SWATH);
 		
-		//TODO - CP - SWATH_ADD Determine if the single point from inheritence should
-		//be used in some way...(perhaps as the leading point in the point
-		//list?) Or is it safe to leave it as null?
 		this.swathPoints = swathPoints;
 		this.index = index; //Where the start of the swathPoints list is.
 	}
@@ -49,12 +42,25 @@ public class WaypointCommandAddSwath extends WaypointCommand {
 	 */
 	@Override
 	public boolean execute() {
-		//TODO - CP - SWATH_ADD Do swath pattern here.
+		int currIndex = this.index;
+		CommandManager manager = CommandManager.getInstance();
+
+		//Check for any waypoint intersections first
+		for(Dot point : swathPoints) {
+			if(!manager.getGeofence().doesLocationIntersect(point)) {
+				serialLog.warning(WARN_NO_GEOFENCE_INTERSECT);
+				return false;
+			}
+		}
 		
-		//(Start at/track from insertion index)
 		//For each point in swathPoints List
-		//If the waypoint max hasn't been reached yet
-		//add current point to the master waypoint list
+		for(Dot point : swathPoints) {
+			//If the waypoint max hasn't been reached yet
+			if(waypoints.size() < MAX_WAYPOINTS) {
+				waypoints.add(point, currIndex);
+				currIndex++;
+			}
+		}
 		
 		return true;
 	}
@@ -65,12 +71,15 @@ public class WaypointCommandAddSwath extends WaypointCommand {
 	 */
 	@Override
 	public boolean undo() {
-		//TODO - CP - SWATH_ADD Undo swath pattern here.
+		int currIndex = (this.index + swathPoints.size());
+		CommandManager manager = CommandManager.getInstance();
 		
-		//(Start at insertion index + swathPoints length)
-		//Remove the point at index
-		//Repeat swathPoint length times. OR until the type of the removed
-		//point is a START type.
+		//For each index starting at the end of the swath path
+		//and continuing until the insertion index is reached...
+		for(int i = currIndex; i < this.index; i--) {
+			waypoints.remove(i);
+		}
+		
 		return true;
 	}
 	
@@ -81,7 +90,4 @@ public class WaypointCommandAddSwath extends WaypointCommand {
 	public boolean redo() {
 		return execute();
 	}
-	
-	
-	//TODO - CP - SWATH_ADD Add additional functionality here if needed.
 }
