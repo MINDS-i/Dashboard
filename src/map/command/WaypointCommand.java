@@ -25,8 +25,15 @@ public abstract class WaypointCommand {
 	
 	//Warning Strings
 	protected static final String WARN_NO_GEOFENCE_INTERSECT = 
-			  "Add - Waypoint placement"
+			  "Waypoint placement"
 			+ " exceeds geofence. Canceling placement.";
+	
+	protected static final String WARN_MAX_WAYPOINTS_REACHED =
+			  "Maximum waypoints reached.";
+	
+	protected static final String WARN_GEOFENCE_ALREADY_PLACED =
+			  "Geofence already in place."
+			+ " Cannot add waypoint at index 0.";
 	
 	public enum CommandType {
 		ADD, REMOVE, MOVE, EDIT, CLEAR, TARGET, PARSE, ADD_SWATH, REMOVE_SWATH,

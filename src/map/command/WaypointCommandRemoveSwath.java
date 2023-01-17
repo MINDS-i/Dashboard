@@ -1,6 +1,7 @@
 package com.map.command;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import javax.swing.*;
@@ -9,6 +10,7 @@ import com.map.WaypointList;
 import com.map.command.WaypointCommand.CommandType;
 import com.map.geofence.WaypointGeofence;
 import com.map.Dot;
+import com.map.WaypointType;
 
 /**
  * @author Chris Park @ Infinetix Corp.
@@ -17,9 +19,6 @@ import com.map.Dot;
  * session list.
  */
 public class WaypointCommandRemoveSwath extends WaypointCommand {
-
-	//Constants
-	//Warning Strings (If Any)
 	
 	//Member vars
 	List<Dot> swathPoints;
@@ -27,14 +26,13 @@ public class WaypointCommandRemoveSwath extends WaypointCommand {
 	/**
 	 * Constructor
 	 * @param waypoints - The master list of waypoints
-	 * @param index - The index to begin removal at.
+	 * @param index - The insertion index to begin removal at.
 	 */
 	public WaypointCommandRemoveSwath(WaypointList waypoints, int index) {
 		super(waypoints, CommandType.REMOVE_SWATH);
 		
-		//TODO - CP - SWATH_REMOVE Load all points into list by iterating 
-		//until start/end is found (depending on where we start).
 		this.index = index;
+		buildSwathList();
 	}
 	
 	/**
@@ -43,8 +41,20 @@ public class WaypointCommandRemoveSwath extends WaypointCommand {
 	 */
 	@Override
 	public boolean execute() {
-		//TODO - CP - SWATH_REMOVE - Iterate over swath points and remove
-		//them from the waypoint list
+		int currIndex = this.index;
+		boolean isSwathPoint = true;
+		Dot tempDot;
+		
+		while(isSwathPoint) {
+			tempDot = this.waypoints.get(currIndex).dot();
+			this.waypoints.remove(currIndex);
+			
+			if(tempDot.getWaypointType() == WaypointType.SWATH_END) {
+				isSwathPoint = false;
+			}
+			
+			currIndex++;
+		}
 		
 		return true;
 	}
@@ -55,7 +65,25 @@ public class WaypointCommandRemoveSwath extends WaypointCommand {
 	 */
 	@Override
 	public boolean undo() {
-		//TODO - CP - SWATH_REMOVE - Re-add swath path at insertion index.
+		int currIndex = this.index;
+		CommandManager manager = CommandManager.getInstance();
+
+		//Check for any waypoint intersections first
+		for(Dot point : swathPoints) {
+			if(!manager.getGeofence().doesLocationIntersect(point)) {
+				serialLog.warning(WARN_NO_GEOFENCE_INTERSECT);
+				return false;
+			}
+		}
+		
+		//For each point in swathPoints List
+		for(Dot point : swathPoints) {
+			//If the waypoint max hasn't been reached yet
+			if(waypoints.size() < MAX_WAYPOINTS) {
+				waypoints.add(point, currIndex);
+				currIndex++;
+			}
+		}
 		
 		return true;
 	}
@@ -72,10 +100,25 @@ public class WaypointCommandRemoveSwath extends WaypointCommand {
 	/**
 	 * Parses over the waypoint list and retrieves the points that make up
 	 * this commands related swath pattern.
-	 * @return - List - The list of points for the swath pattern.
 	 */
-	protected List<Dot> getSwathList() {
-		//TODO - CP - SWATH_REMOVE Iterate over swath points here.
-		return null;
+	protected void buildSwathList() {
+		int currIndex = this.index;
+		boolean isSwathPoint = true;
+		Dot tempDot;
+		
+		this.swathPoints = new ArrayList<Dot>();
+		
+		//Starting at the insertion index, interate over the swath points
+		//and add them until the end point is found by type check.
+		while(isSwathPoint) {
+			tempDot = this.waypoints.get(currIndex).dot();
+			this.swathPoints.add(tempDot);
+			
+			if(tempDot.getWaypointType() == WaypointType.SWATH_END) {
+				isSwathPoint = false;
+			}
+			
+			currIndex++;
+		}
 	}
 }

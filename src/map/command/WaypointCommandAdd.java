@@ -26,12 +26,6 @@ public class WaypointCommandAdd extends WaypointCommand {
 			+ " distance of " + MIN_DISTANCE_FT + " feet between waypoints" 
 			+ " is recommended.";
 	
-	private static final String WARN_GEOFENCE_ALREADY_PLACED =
-			  "WP Add - Geofence already in place."
-			+ " Cannot add waypoint at index 0.";
-	
-	private static final String WARN_MAX_WAYPONTS_REACHED =
-			  "WP Add - Maximum waypoints reached.";
 	/**
 	 * Constructor
 	 * @param waypoints - List of current navigational waypoints.
@@ -55,7 +49,7 @@ public class WaypointCommandAdd extends WaypointCommand {
 
 		//If the maximum waypoints has been reached, do nothing
 		if(waypoints.size() == MAX_WAYPOINTS) {
-			serialLog.warning(WARN_MAX_WAYPONTS_REACHED);
+			serialLog.warning(WARN_MAX_WAYPOINTS_REACHED);
 			return false;
 		}
 		

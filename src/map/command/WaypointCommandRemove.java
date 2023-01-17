@@ -52,9 +52,23 @@ public class WaypointCommandRemove extends WaypointCommand {
 	public boolean undo() {
 		CommandManager manager = CommandManager.getInstance();
 		
-		waypoints.add(point, index);
-		waypoints.setSelected(index);
+		//If a geofence exists 
+		if(manager.getGeofence().getIsEnabled()) {
+			//Check for and refuse a second index 0 placement
+			if(index == 0) {
+				serialLog.warning(WARN_GEOFENCE_ALREADY_PLACED);
+				return false;
+			}
+			
+			//Check for waypoint intersection
+			if(!manager.getGeofence().doesLocationIntersect(point)) {
+				serialLog.warning(WARN_NO_GEOFENCE_INTERSECT);
+				return false;
+			}
+		}
 		
+		waypoints.add(point, index);
+
 		if(index == 0) {
 			//Update the geofence coordinates at the first index.
 			manager.getGeofence().setOriginLatLng(
@@ -63,6 +77,8 @@ public class WaypointCommandRemove extends WaypointCommand {
 			
 			waypoints.setTarget(index);
 		}
+		
+		waypoints.setSelected(index);
 		
 		return true;
 	}
