@@ -1,5 +1,6 @@
 package com.map.command;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -9,6 +10,7 @@ import com.map.WaypointList;
 import com.map.command.WaypointCommand.CommandType;
 import com.map.geofence.WaypointGeofence;
 import com.map.Dot;
+import com.map.WaypointType;
 
 //TODO - CP - SWATH_MOVE - See below edge cases/issues to work determine.
 	//How do we pinpoint the start point index?
@@ -22,11 +24,10 @@ import com.map.Dot;
  * pattern.
  */
 public class WaypointCommandMoveSwath extends WaypointCommand {
-	//Constants
-	//Warning Strings if any
-	
+
 	//Member Vars
-	protected List<Dot> swathPoints;
+	protected List<Dot> swathStartPoints;
+	protected List<Dot> swathEndPoints;
 	
 	/**
 	 * Constructor
@@ -36,10 +37,9 @@ public class WaypointCommandMoveSwath extends WaypointCommand {
 	public WaypointCommandMoveSwath(WaypointList waypoints, int index) {
 		super(waypoints, CommandType.MOVE_SWATH);
 		
-		//TODO - CP - SWATH_MOVE - Load all swath points into the local../
-		//list for tracking here
-		
 		this.index = index;
+		buildSwathStartList();
+		this.swathEndPoints = null;
 	}
 	
 	/**
@@ -52,10 +52,32 @@ public class WaypointCommandMoveSwath extends WaypointCommand {
 	 */
 	@Override
 	public boolean execute() {
+		CommandManager manager = CommandManager.getInstance();
+		
+		
 		//TODO - CP - SWATH_MOVE See following for swath path movement:
-			//Move all swath points by supplied distance.
+			//make global copy of swath list (swathEndPoints)
+				//Move all swath points by supplied distance.
+					//Add lat diff to lat, and lng diff to lng;
 			//Make sure no point exceeds the geofence.
 			//Make sure the end point exists (not null) before moving.
+		
+		//If endpoints have not been set
+		if(swathEndPoints == null) {
+			serialLog.warning(WARN_ENDPOINT_NOT_SET);
+			return false;
+		}
+		
+		if(manager.getGeofence().getIsEnabled()) {
+			//For each swath end point
+				//Check for intersect
+					//If no intersect, abort
+//			if(!manager.getGeofence().doesLocationIntersect(pointhere)) {
+//				
+//			}
+		}
+		
+		
 		return true;
 	}
 	
@@ -78,5 +100,42 @@ public class WaypointCommandMoveSwath extends WaypointCommand {
 		return execute();
 	}
 	
-	//TODO - CP - SWATH_MOVE Determine if finalize needs to be overridden here.
+	/**
+	 * Parses over the waypoint list and retrieves the points that make up
+	 * this commands related swath pattern in their original positions.
+	 */
+	protected void buildSwathStartList() {
+		int currIndex = this.index;
+		boolean isSwathPoint = true;
+		Dot tempDot;
+		
+		this.swathStartPoints = new ArrayList<Dot>();
+		
+		//Starting at the insertion index, interate over the swath points
+		//and add them until the end point is found by type check.
+		while(isSwathPoint) {
+			tempDot = this.waypoints.get(currIndex).dot();
+			this.swathStartPoints.add(tempDot);
+			
+			if(tempDot.getWaypointType() == WaypointType.SWATH_END) {
+				isSwathPoint = false;
+			}
+			
+			currIndex++;
+		}
+	}
+	
+	/**
+	 * Parses over the waypoint list and retrieves the points that make up
+	 * this commands related swath pattern in their altered positions.
+	 */
+	protected void buildSwathEndList() {
+		
+	}
+	
+	//TODO - CP - SWATH_MOVE Create finalize overload function for all points.
+	public void finalize(double latOffset, double lngOffset) {
+		//Apply the offset to each swathPoint, copying it to the endpoint
+		//list.
+	}
 }

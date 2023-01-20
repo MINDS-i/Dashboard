@@ -14,14 +14,6 @@ import com.map.Dot;
  */
 public class WaypointCommandMove extends WaypointCommand {
 	//Warning Strings
-	private static final String WARN_NO_GEOFENCE_INTERSECT = 
-			  "WP Move - Waypoint placement"
-			+ " exceeds geofence. Canceling movement.";
-	
-	private static final String WARN_ENDPOINT_NOT_SET =
-			  "WP Move - Execution failure."
-			+ " Endpoint was not set.";
-	
 	private static final String WARN_ORIGIN_CANNOT_MOVE = 
 			"WP Move - Cannot move origin point."
 			+ " Waypoints must first be cleared.";
@@ -52,7 +44,7 @@ public class WaypointCommandMove extends WaypointCommand {
 		
 		//If no endpoint set
 		if(endPoint == null) {
-			System.err.println(WARN_ENDPOINT_NOT_SET);
+			serialLog.warning(WARN_ENDPOINT_NOT_SET);
 			return false;
 		}
 		
