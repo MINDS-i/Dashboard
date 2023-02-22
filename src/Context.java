@@ -30,7 +30,9 @@ public class Context {
     public Dashboard dash;
     public Locale locale;
     public SerialParser parser;
-    public SerialSender sender;
+    
+    private SerialSendManager sendManager;
+
     public Theme theme;
     public SettingList settingList;
     public TelemetryManager telemetry;
@@ -46,7 +48,6 @@ public class Context {
     private final File persistenceFile;
     private final String instanceLogName;
     private final Logger ioerr = Logger.getLogger("d.io");
-
     
     public Context(Dashboard dashboard) {
         dash        = dashboard;
@@ -90,8 +91,8 @@ public class Context {
         // Instance these classes after the resources have been loaded
         waypoint    = new WaypointList();
         theme       = new Theme(this);
-        sender      = new SerialSender(this);
         parser      = new SerialParser(this, waypoint);
+        sendManager = SerialSendManager.init(this);
         settingList = new SettingList(this);
         telemetry   = new TelemetryManager(this);
         telemLog    = new TelemetryLogger(this, telemetry);
@@ -100,7 +101,8 @@ public class Context {
         
         // Patch the waypoint list into the serial sender
         waypoint.addListener(new WaypointListener(){
-            @Override
+            
+        	@Override
             public void changed(Source s, Dot point, int index, Action action) {
                 if(s == Source.REMOTE) return;
                 Message tosend;
@@ -117,17 +119,26 @@ public class Context {
                     default:
                         return;
                 }
-                sender.sendMessage(tosend);
+                
+                sendManager.addMessageToQueue(tosend);
             }
+            
             @Override
             public void targetChanged(Source s, int targetIndex) {
                 if(s == Source.REMOTE) return;
-                sender.sendMessage(Message.setTarget((byte) targetIndex));
+
+                sendManager.addMessageToQueue(
+                		Message.setTarget((byte) targetIndex));
+                
             }
+
             @Override
             public void loopModeSet(Source s, boolean isLooped) {
                 if(s == Source.REMOTE) return;
-                sender.sendMessage(Message.setLooping((byte) ((isLooped)?1:0) ));
+
+                sendManager.addMessageToQueue(
+                		Message.setLooping((byte) (isLooped ? 1 : 0)));
+                
             }
         });
 
@@ -225,12 +236,12 @@ public class Context {
     public void updatePort(SerialPort newPort) {
         closePort();
         port = newPort;
-        sender.start();
+        sendManager.start();
         parser.updatePort();
         connected = true;
     }
     public void closePort() {
-        sender.stop();
+        sendManager.stop();
         port = null;
         connected = false;
     }
@@ -293,7 +304,7 @@ public class Context {
         return telemetry.getDataSources();
     }
     public void onConnection() {
-        sender.sendWaypointList();
+        sendManager.sendWaypointList(waypoint);
     }
     
     /**
@@ -310,7 +321,7 @@ public class Context {
      * @return - String
      */
     public String getAPMVersion() {
-    	sender.sendMessage(Message.requestAPMVersion());
+    	sendManager.addMessageToQueue(Message.requestAPMVersion());
     	
     	try {
     		Thread.sleep(250);	

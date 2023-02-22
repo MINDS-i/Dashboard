@@ -6,6 +6,7 @@ import com.map.command.WaypointCommand.CommandType;
 import com.map.geofence.WaypointGeofence;
 import com.map.WaypointList;
 import com.map.Dot;
+import com.serial.SerialSendManager;
 
 /**
  * @author Chris Park @ Infinetix Corp.
@@ -39,19 +40,17 @@ public class WaypointCommandClear extends WaypointCommand {
 	 */
 	@Override
 	public boolean execute() {
-		CommandManager manager = CommandManager.getInstance();
-		
+		CommandManager commandManager = CommandManager.getInstance();
+
 		//Event is labeled as coming from the rover to avoid sending
 		//waypoint update messages for every point. An explicit clear message
 		//is sent to the rover afterwards.
 		waypoints.clear(WaypointListener.Source.REMOTE);
-		manager.getGeofence().setIsEnabled(false);
+		commandManager.getGeofence().setIsEnabled(false);
 		
-		if(context.sender != null) {
-			context.sender.sendWaypointList();
-			context.sender.changeMovement(false);
-		}
-		
+		SerialSendManager.getInstance().sendWaypointList(waypoints);
+		SerialSendManager.getInstance().changeMovement(false);
+	
 		return true;
 	}
 	

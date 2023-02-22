@@ -371,7 +371,7 @@ public class TelemetryDataWindow implements ActionListener {
 		}
 		
 		public void actionPerformed(ActionEvent e) {
-			context.sender.resetSettings();
+			SerialSendManager.getInstance().resetSettings();
 		}
 	};
 }

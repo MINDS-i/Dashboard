@@ -20,6 +20,7 @@ import com.map.WaypointList.*;
 import com.map.command.WaypointCommand.CommandType;
 import com.map.geofence.WaypointGeofence;
 import com.Dashboard;
+import com.serial.SerialSendManager;
 
 
 /**
@@ -113,15 +114,13 @@ public class WaypointCommandParse extends WaypointCommand {
 	 */
 	@Override
 	public boolean undo() {
-		CommandManager manager = CommandManager.getInstance();
+		CommandManager commandManager = CommandManager.getInstance();
 		
 		waypoints.clear(WaypointListener.Source.REMOTE);
-		manager.getGeofence().setIsEnabled(false);
+		commandManager.getGeofence().setIsEnabled(false);
 		
-		if(context.sender != null) {
-			context.sender.sendWaypointList();
-			context.sender.changeMovement(false);
-		}
+		SerialSendManager.getInstance().sendWaypointList(waypoints);
+		SerialSendManager.getInstance().changeMovement(false);
 		
 		return true;
 	}
@@ -191,7 +190,7 @@ public class WaypointCommandParse extends WaypointCommand {
 		String data = "";
 
 		//Manager here to handle geofence setup/teardown
-		CommandManager manager = CommandManager.getInstance();
+		CommandManager commandManager = CommandManager.getInstance();
 		
 		//Open the input stream
 		try {
@@ -307,12 +306,10 @@ public class WaypointCommandParse extends WaypointCommand {
 
 			//Clear out any existing geofence and waypoints
 			waypoints.clear(WaypointListener.Source.REMOTE);
-			manager.getGeofence().setIsEnabled(false);
+			commandManager.getGeofence().setIsEnabled(false);
 			
-			if(context.sender != null) {
-				context.sender.sendWaypointList();
-				context.sender.changeMovement(false);
-			}
+			SerialSendManager.getInstance().sendWaypointList(waypoints);
+			SerialSendManager.getInstance().changeMovement(false);
 			
 			//Place newly parsed waypoints.
 			for(int i = 0; i < routeList.get(selection).size(); i++) {
@@ -321,9 +318,10 @@ public class WaypointCommandParse extends WaypointCommand {
 				
 				if(i == 0) {
 					//create the geofence at the first index
-					manager.getGeofence().setOriginLatLng(point.getLatitude(), 
+					commandManager.getGeofence().setOriginLatLng(
+							point.getLatitude(), 
 							point.getLongitude());
-					manager.getGeofence().setIsEnabled(true);
+					commandManager.getGeofence().setIsEnabled(true);
 					
 					waypoints.setTarget(i);
 				}

@@ -7,7 +7,7 @@ import com.serial.Serial;
 import com.serial.SerialConnectPanel;
 import com.serial.SerialEventListener;
 import com.serial.SerialParser;
-import com.serial.SerialSender;
+import com.serial.SerialSendManager;
 import com.telemetry.*;
 import com.ui.*;
 import com.ui.ArtificialHorizon.DataAxis;
@@ -137,7 +137,7 @@ public class Dashboard implements Runnable {
             public void connectionEstablished(SerialPort port) {
                 context.updatePort(port);
                 seriallog.info("Port opened");
-                context.sender.sendSync();
+                SerialSendManager.getInstance().sendSync();
                 context.commsMonitor.getInstance().startHeartbeatTimer();
             }
             public void disconnectRequest() {

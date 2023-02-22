@@ -27,10 +27,10 @@ public class GPSWidget extends UIWidget {
 	protected final static int UPDATE_DELAY_MS 		= 1000;
 	protected final static int AVERAGE_WINDOW_SIZE 	= 10;
 	
-	protected final static int    MIN_SATS_FOR_LOCK = 4;
-	protected final static double HDOP_MAX_EXCELLENT= 1.0;
-	protected final static double HDOP_MAX_GOOD		= 2.0;
-	protected final static double HDOP_MAX_FAIR		= 5.0;
+	protected static final int    MIN_SATS_FOR_LOCK = 4;
+	protected static final double HDOP_MAX_EXCELLENT= 1.0;
+	protected static final double HDOP_MAX_GOOD		= 2.0;
+	protected static final double HDOP_MAX_FAIR		= 5.0;
 	
 	//Meter Outer Panel
 	protected JPanel meterOuterPanel;
