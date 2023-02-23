@@ -170,6 +170,12 @@ public class SerialSendManager {
 			serviceTimer.cancel();
 		}
 		
+		//Clear out queues to prevent carry over between serial
+		//connection events.
+		synchronized(lock) {
+			messageQueue.clear();
+			confirmationQueue.clear();			
+		}
 		serviceTimer = null;
 	}
 	

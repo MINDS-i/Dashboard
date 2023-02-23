@@ -218,15 +218,11 @@ public class SerialParser implements SerialPortEventListener {
                     
                 case Serial.SYNC_WORD: {
                         if(a == Serial.SYNC_REQUEST) {
-                            Message message = Message.syncMessage(Serial.SYNC_RESPOND);
-                          
                             SerialSendManager.getInstance().addMessageToQueue(
-                            		message);
-                            context.onConnection();
+                            		Message.syncMessage(Serial.SYNC_RESPOND));
                         } 
-                        else if (a == Serial.SYNC_RESPOND) { //resync seen
-                            context.onConnection();
-                        }
+
+                        SerialSendManager.getInstance().sendWaypointList(waypoints);
                     }
                     break;
                     

@@ -303,9 +303,6 @@ public class Context {
     public List<DataSource> getTelemetryDataSources() {
         return telemetry.getDataSources();
     }
-    public void onConnection() {
-        sendManager.sendWaypointList(waypoint);
-    }
     
     /**
      * Sets the current APM board version string.
