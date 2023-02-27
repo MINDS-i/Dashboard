@@ -24,7 +24,7 @@ public class SerialSendManager {
 	
 	//Constants
 	private static final int SERVICE_TIMER_INIT_MS	 = 1000;
-    private static final int SERVICE_TIMER_PERIOD_MS = 50;
+    private static final int SERVICE_TIMER_PERIOD_MS = 400;
 	
 	//Timer Task Vars
 	private static final Object lock = new Object();

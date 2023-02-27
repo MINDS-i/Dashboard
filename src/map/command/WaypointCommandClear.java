@@ -48,6 +48,7 @@ public class WaypointCommandClear extends WaypointCommand {
 		waypoints.clear(WaypointListener.Source.REMOTE);
 		commandManager.getGeofence().setIsEnabled(false);
 		
+		//Send the empty list
 		SerialSendManager.getInstance().sendWaypointList(waypoints);
 		SerialSendManager.getInstance().changeMovement(false);
 	
