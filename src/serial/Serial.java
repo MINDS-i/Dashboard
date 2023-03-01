@@ -118,7 +118,7 @@ public class Serial {
     public static final int	BAUD				= SerialPort.BAUDRATE_57600;
     public static final int	U16_FIXED_POINT		= 256;
 
-    public static final int MAX_CONFIRM_WAIT_MS	= 100;
+    public static final int MAX_CONFIRM_WAIT_MS	= 400;
     public static final int MAX_FAILURES		= 2;
 
     public static final byte[] HEADER = {0x13, 0x37};
