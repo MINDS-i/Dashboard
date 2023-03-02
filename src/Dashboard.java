@@ -168,14 +168,18 @@ public class Dashboard implements Runnable {
     }
 
     private JPanel createAlertBox() {
-        AlertPanel ap = new AlertPanel(context.theme.alertFont, 8, 80);
-        ap.setColor(context.theme.textColor);
+        AlertPanel alertPanel = new AlertPanel(
+        		context.theme.alertFont, 
+        		AlertPanel.DEFAULT_ALERT_LINE_COUNT, 
+        		AlertPanel.DEFAULT_ALERT_LINE_LENGTH);
+        alertPanel.setColor(context.theme.textColor);
 
-        Handler handler = new SimpleHandler((LogRecord l, String s) ->
-                                            ap.addMessage(s));
+        Handler handler = new SimpleHandler(
+        		(LogRecord l, String s) -> alertPanel.addMessage(s));
         handler.setLevel(Level.INFO);
         rootlog.addHandler(handler);
-        return ap;
+        
+        return alertPanel;
     }
 
     private void registerHorizonListeners(ArtificialHorizon ah, boolean sideBars){

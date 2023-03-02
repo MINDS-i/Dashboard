@@ -79,7 +79,7 @@ public class UIWidget extends JPanel {
 	}	
 	
 	/**
-	 * Updates the widget title, overriding the default.
+	 * Updates the widget title.
 	 * @param title - The string to update the title to.
 	 */
 	public void updateTitle(String title) {

@@ -12,6 +12,10 @@ import java.util.logging.*;
 import java.io.*;
 
 public class AlertPanel extends JPanel {
+	
+	public static final int DEFAULT_ALERT_LINE_COUNT = 8;
+	public static final int DEFAULT_ALERT_LINE_LENGTH = 80;
+	
     private List<String> messages = new ArrayList<String>();
     private Color messageColor = Color.WHITE;
     private int lineLength;
