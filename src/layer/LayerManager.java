@@ -10,10 +10,10 @@ import com.map.command.CommandManager;
 
 /**
  * LayerManager distributes mouse events and chances to draw on a set
- * of Layer objects sorted with largest "getZ" an "top"
+ * of Layer objects sorted with largest "getZ" on "top"
  *
  * Mouse clicks and presses are passed down the layers until a layer claims the
- * event by return true in its handler. Subsequent events associated with a
+ * event by returning true in its handler. Subsequent events associated with a
  * claimed event are passed directly to the claimant.
  */
 

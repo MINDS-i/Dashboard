@@ -44,7 +44,7 @@ public class UIWidget extends JPanel {
 	 */
 	public UIWidget(Context ctx, String title) {
 		context = ctx;
-		//Param order: Top, Left, Bottom, Right
+		
 		insets =  new EmptyBorder(BORDER_TOP, BORDER_LFT, BORDER_BOT, BORDER_RHT);
 		this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 		this.setOpaque(false);

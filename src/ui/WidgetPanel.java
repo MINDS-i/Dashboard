@@ -13,11 +13,8 @@ import javax.swing.*;
 /** 
  * @author Chris Park @ Infinetix Corp.
  * Date: 12-8-20
- * Description: Main panel container for the right side of the dashboard.
- * Holds a collection of UIWidgets. 
- * 
- * Note: 12-8-20 - Future implementation improvements will aim
- * to provide additional functionality for the manipulation of contained widgets.
+ * Description: Main panel container for the containing/holding a group of 
+ * dashboard UIWidgets.
  */
 public class WidgetPanel extends NinePatchPanel {
 	//Constants
@@ -32,15 +29,19 @@ public class WidgetPanel extends NinePatchPanel {
     
 	/**
 	 * Class Constructor
+	 * The layoutType provided here should be one of the static ints defined
+	 * for the BoxLayout class, such as LINE_AXIS/PAGE_AXIS. (See Java
+	 * documentation for the BoxLayout class for details)
 	 * @param ctx - The application context
+	 * @param layoutType - The BoxLayout type to be used for orientation
 	 */
-	public WidgetPanel(Context ctx) {
+	public WidgetPanel(Context ctx, int layoutType) {
 		super(ctx.theme.panelPatch);
 		context = ctx;
 		widgets = new LinkedList<UIWidget>();
 		
 		setOpaque(false);
-		LayoutManager layout = new BoxLayout(this, BoxLayout.PAGE_AXIS);
+		LayoutManager layout = new BoxLayout(this, layoutType);
 		setLayout(layout);
 		setBorder(BorderFactory.createEmptyBorder(BORDER_TOP, BORDER_LFT,
         		BORDER_BOT, BORDER_RHT));

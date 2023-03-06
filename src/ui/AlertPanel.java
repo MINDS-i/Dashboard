@@ -29,18 +29,26 @@ public class AlertPanel extends JPanel {
 
         // Set preferred size for the container assuming W is the widest char
         FontMetrics metrics = this.getFontMetrics(messageFont);
-        setPreferredSize(new Dimension(lineLength*metrics.charWidth('W'),
-                                       lineCount*metrics.getHeight()));
-
+        setPreferredSize(new Dimension(
+        		(lineLength * metrics.charWidth('W')),
+        		(lineCount * metrics.getHeight())));
         setOpaque(false);
-        for(int i=0; i<lineCount; i++) addMessage("");
+        
+        //Fill up the alert message queue with blank lines
+        for(int i = 0; i < lineCount; i++) {
+        	addMessage("");
+        }
+        
         addMessage("Welcome!");
     }
 
     public void addMessage(String msg) {
-        while(messages.size() >= lineCount)
+        
+        while(messages.size() >= lineCount) {
             messages.remove(0);
-        messages.add( EllipsisFormatter.ellipsize(msg,lineLength) );
+        }
+        
+        messages.add(EllipsisFormatter.ellipsize(msg, lineLength));
         repaint();
     }
 

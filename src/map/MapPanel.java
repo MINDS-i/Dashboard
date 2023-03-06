@@ -30,7 +30,9 @@ import javax.imageio.*;
 import javax.swing.*;
 
 public class MapPanel extends JPanel implements CoordinateTransform {
-    private static final int TILE_SIZE = 256;
+    
+	//Constants
+	private static final int TILE_SIZE = 256;
     private static final float ZOOM_FACTOR = 1.1f;
 
     private Map<String,MapSource> mapSources;
@@ -57,18 +59,23 @@ public class MapPanel extends JPanel implements CoordinateTransform {
         this(cxt, mapPosition, zoom, null, null, null);
     }
 
-    public MapPanel(Context cxt, Point mapPosition, int zoom, JPanel north,
-                    JPanel east,
-                    JPanel south) {
+    public MapPanel(Context cxt, Point mapPosition, int zoom, 
+    		JPanel north, JPanel east, JPanel south) {
+    	
         context = cxt;
-        context.getWaypointList().addListener(new WaypointListener(){
-            @Override public void unusedEvent() { repaint(); }
+        context.getWaypointList().addListener(new WaypointListener() {
+            @Override 
+            public void unusedEvent() { 
+            	repaint();
+            }
         });
 
         mapSources = importMapSources(cxt);
         switchToServer(cxt.getResource("default_tile_server","satellite"));
 
-        for(MapSource ms : mapSources.values()) ms.addRepaintListener(this);
+        for(MapSource source : mapSources.values()) {
+        	source.addRepaintListener(this);
+        }
 
         border.setVgap(-20);
         setOpaque(true);
@@ -77,6 +84,7 @@ public class MapPanel extends JPanel implements CoordinateTransform {
 
         waypointPanel = new WaypointPanel(context, this);
         JPanel west = contain(waypointPanel);
+        
         east = contain(east);
 
         if(south == null) south = new JPanel();
@@ -289,6 +297,7 @@ public class MapPanel extends JPanel implements CoordinateTransform {
 
         Map<String, MapSource> sources = new HashMap<String,MapSource>();
         ResourceBundle rb = ctx.loadResourceBundle(sourceFile);
+        
         for(String key : rb.keySet()){
             sources.put(key, new TileServer(rb.getString(key)));
         }

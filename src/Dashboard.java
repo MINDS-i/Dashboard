@@ -43,12 +43,14 @@ public class Dashboard implements Runnable {
 	private Context context;
     
 	//Static Values
-    private static final int DEF_WINDOW_WIDTH  		= 1200;
-    private static final int DEF_WINDOW_HEIGHT 		= 900;
+//    private static final int DEF_WINDOW_WIDTH  		= 1200;
+//    private static final int DEF_WINDOW_HEIGHT 		= 900;
+    private static final int DEF_WINDOW_WIDTH  		= 1920;
+    private static final int DEF_WINDOW_HEIGHT 		= 1080;
     private static final int HORIZON_WIDGET_SIZE 	= 145;
     private static final int DEFAULT_ZOOM_LEVEL 	= 4;
 
-    //UI Widget Frame
+    //UI Widget Frames
     WidgetPanel widgetPanel;
     
     //UI Widgets
@@ -153,13 +155,15 @@ public class Dashboard implements Runnable {
         
         JPanel messageBox = createAlertBox();
 
-        mapPanel = new MapPanel(context,
-        								 new Point((int)context.getHomeProp().getY(),
-        										   (int)context.getHomeProp().getX()),
-        								 DEFAULT_ZOOM_LEVEL,
-        								 serialPanel,
-        								 createRightPanel(),
-        								 messageBox);
+        mapPanel = new MapPanel(
+        		context,
+        		new Point(
+        				(int)context.getHomeProp().getY(),
+        				(int)context.getHomeProp().getX()),
+        		DEFAULT_ZOOM_LEVEL,
+        		serialPanel,
+        		createRightPanel(),
+        		messageBox);
         
         f.add(mapPanel);
         f.pack();
@@ -221,7 +225,7 @@ public class Dashboard implements Runnable {
     	JPanel outerPanel = new JPanel();
     	outerPanel.setOpaque(false);
     	outerPanel.setLayout(new BoxLayout(outerPanel, BoxLayout.PAGE_AXIS));
-    	widgetPanel = new WidgetPanel(context);
+    	widgetPanel = new WidgetPanel(context, BoxLayout.PAGE_AXIS);
     	widgetPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
     	
     	//Telemetry Data Widget

@@ -88,8 +88,8 @@ public class Theme {
                                                new File(ttf+ctx.getResource("number_font")));
             text             = text.deriveFont(13f);
             number           = number.deriveFont(36f);
-            textColor        = new Color(255,155,30);
-            alertFont        = new Font(Font.MONOSPACED,Font.BOLD,16);
+            textColor        = new Color(255, 155, 30); //Orange
+            alertFont        = new Font(Font.MONOSPACED, Font.BOLD, 14);
         } catch(IOException|FontFormatException e) {
             Logger.getLogger("d.io").severe(e.toString());
             Dashboard.displayErrorPopup(e);
