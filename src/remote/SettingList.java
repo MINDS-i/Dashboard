@@ -31,7 +31,7 @@ public class SettingList {
     }
     public void pushSetting(int id) {
         Message msg = Message.setSetting((byte)id, settingData.get(id).getVal());
-        context.sender.sendMessage(msg);
+        SerialSendManager.getInstance().addMessageToQueue(msg);
     }
     public void updateSettingVal(int id, float val) {
         if(id < 0 || id >= settingData.size()) return;

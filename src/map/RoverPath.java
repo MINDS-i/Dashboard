@@ -305,7 +305,7 @@ public class RoverPath implements Layer {
             l = n;
         }
 
-        if(waypoints.getLooped()) {
+        if(waypoints.getIsLooped()) {
             n = toPoint(drawnLocation(0));
             paintLine(g, n, l, PATH_LINE_FILL);
         }
