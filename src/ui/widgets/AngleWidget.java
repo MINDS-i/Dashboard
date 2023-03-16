@@ -78,17 +78,17 @@ public class AngleWidget extends JPanel implements TelemetryListener {
         final int imageYC = image.getHeight() / 2;
 
         g2d.drawImage(background, 0, 0, null);
-        //
+        
         g2d.translate(bgXC, bgYC);
         g2d.rotate(theta);
         g2d.translate(-imageXC, -imageYC);
         g2d.drawImage(image, 0, 0, null);
-        //
+        
         g2d.translate(imageXC, imageYC);
         g2d.rotate(-theta);
         g2d.translate(-bgXC, -bgYC);
         g2d.drawImage(overlay, 0, 0, null);
-        //
+        
         g2d.dispose();
     }
 

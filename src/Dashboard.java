@@ -51,7 +51,7 @@ public class Dashboard implements Runnable {
     private static final int DEFAULT_ZOOM_LEVEL 	= 4;
 
     //UI Widget Frames
-    WidgetPanel widgetPanel;
+    WidgetPanel rightWidgetPanel;
     
     //UI Widgets
     private TelemetryDataWidget dataWidget;
@@ -225,13 +225,13 @@ public class Dashboard implements Runnable {
     	JPanel outerPanel = new JPanel();
     	outerPanel.setOpaque(false);
     	outerPanel.setLayout(new BoxLayout(outerPanel, BoxLayout.PAGE_AXIS));
-    	widgetPanel = new WidgetPanel(context, BoxLayout.PAGE_AXIS);
-    	widgetPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+    	rightWidgetPanel = new WidgetPanel(context, BoxLayout.PAGE_AXIS);
+    	rightWidgetPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
     	
     	//Telemetry Data Widget
     	try {
     		dataWidget = createTelemetryWidget();
-    		widgetPanel.addWidget(dataWidget);
+    		rightWidgetPanel.addWidget(dataWidget);
     	}
     	catch(Exception e) {
             iolog.severe("Failed to load telemetry widget line spec " + e);
@@ -240,23 +240,23 @@ public class Dashboard implements Runnable {
     	
     	//State Widget
     	stateWidget = new StateWidget(context);
-    	widgetPanel.addWidget(stateWidget);
+    	rightWidgetPanel.addWidget(stateWidget);
         
         
         //Ping Widget
         pingWidget = new PingWidget(context);
-        widgetPanel.add(pingWidget);
+        rightWidgetPanel.add(pingWidget);
         
         
         //GPS Widget
         gpsWidget = new GPSWidget(context);
-        widgetPanel.add(gpsWidget);
+        rightWidgetPanel.add(gpsWidget);
         
         //Bumper Widget
         bumperWidget = new BumperWidget(context);
-        widgetPanel.add(bumperWidget);
+        rightWidgetPanel.add(bumperWidget);
         
-        outerPanel.add(widgetPanel);
+        outerPanel.add(rightWidgetPanel);
         
         
         //Round Widgets

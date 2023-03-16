@@ -39,23 +39,24 @@ public abstract class WaypointCommand {
 			  "Move - Execution failure."
 			+ " Endpoint was not set.";
 	
+	//Command Types
 	public enum CommandType {
 		ADD, REMOVE, MOVE, EDIT, CLEAR, TARGET, PARSE, ADD_SWATH, REMOVE_SWATH,
 		MOVE_SWATH};
 	
-	protected WaypointList waypoints;
-	protected CommandType type;
-	
-	// Add/Remove Vars
+	//Add/Remove Vars
 	protected Dot point;
 	protected int index;
 	
-	// Move Vars
+	//Move Vars
 	protected Dot startPoint;
 	protected Dot endPoint;
 	
 	//Geofencing Vars
 	protected WaypointGeofence geofence;
+	
+	protected WaypointList waypoints;
+	protected CommandType type;
 	
 	/**
 	 * Constructor

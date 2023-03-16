@@ -74,8 +74,6 @@ public class WaypointPanel extends NinePatchPanel {
     
     //Waypoint Options
     public JButton clearWaypoints;
-    
-    //TODO - CP - SET HOME - Rename Enter Button to editor specific naming
     public JButton enterButton;
     public JButton undoButton;
     public JButton redoButton;
