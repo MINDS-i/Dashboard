@@ -75,7 +75,6 @@ public class WaypointPanel extends NinePatchPanel {
     //Waypoint Options
     public JButton clearWaypoints;
     
-    //TODO - CP - SET HOME - Rename Enter Button to editor specific naming
     public JButton enterButton;
     public JButton undoButton;
     public JButton redoButton;
@@ -569,9 +568,9 @@ public class WaypointPanel extends NinePatchPanel {
         }
 
         public void actionPerformed(ActionEvent e) {
-            waypoints.setLooped(!waypoints.getLooped());
+            waypoints.setLooped(!waypoints.getIsLooped());
             putValue(Action.NAME,
-                     (waypoints.getLooped())? "Looping Off" : "Looping On");
+                     (waypoints.getIsLooped())? "Looping Off" : "Looping On");
         }
     };
     
@@ -590,14 +589,16 @@ public class WaypointPanel extends NinePatchPanel {
     		if(isUnitMoving) {
     			unlockWaypoints();
     			context.dash.enableSerialPanel(true);
-    			context.sender.changeMovement(false);
+    			
+    			SerialSendManager.getInstance().changeMovement(false);
     			putValue(Action.NAME, "Start Mission");
     			isUnitMoving = false;
     		}
     		else {
     			lockWaypoints();
     			context.dash.enableSerialPanel(false);
-    			context.sender.changeMovement(true);
+    			
+    			SerialSendManager.getInstance().changeMovement(true);
     			putValue(Action.NAME, "Stop Mission");
     			isUnitMoving = true;
     		}

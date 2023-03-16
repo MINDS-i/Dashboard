@@ -213,18 +213,16 @@ public class SerialParser implements SerialPortEventListener {
             
             switch(subtype) {
                 case Serial.CONFIRMATION:
-                    context.sender.notifyOfConfirm(join);
+                	SerialSendManager.getInstance().addConfirmToQueue(join);
                     break;
                     
                 case Serial.SYNC_WORD: {
                         if(a == Serial.SYNC_REQUEST) {
-                            Message message = Message.syncMessage(Serial.SYNC_RESPOND);
-                            context.sender.sendMessage(message);
-                            context.onConnection();
+                            SerialSendManager.getInstance().addMessageToQueue(
+                            		Message.syncMessage(Serial.SYNC_RESPOND));
                         } 
-                        else if (a == Serial.SYNC_RESPOND) { //resync seen
-                            context.onConnection();
-                        }
+
+                        SerialSendManager.getInstance().sendWaypointList(waypoints);
                     }
                     break;
                     
@@ -232,7 +230,8 @@ public class SerialParser implements SerialPortEventListener {
                     if(a == Serial.TARGET_CMD) {
                         if(b < 0 || b >= waypoints.size()){
                             seriallog.severe("Rover transmitted inconsistent target; resyncing");
-                            context.sender.sendWaypointList();
+
+                            SerialSendManager.getInstance().sendWaypointList(waypoints);
                         } 
                         else {
                             waypoints.setTarget(b, WaypointListener.Source.REMOTE);
