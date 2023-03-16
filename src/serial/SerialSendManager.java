@@ -225,9 +225,9 @@ public class SerialSendManager {
 			try {
 				msg.send(context.port());
 				
-				if(isResend) { //If resend attempt, log a warning, add failure
+				if(isResend) { //If resend attempt, log it and add failure
 					msg.addFailure();
-	                seriallog.warning(Integer.toHexString(
+	                seriallog.fine(Integer.toHexString(
 	                		msg.getConfirmSum())
 	                		+ " " 
 	                		+ "No response to " 
