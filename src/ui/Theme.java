@@ -15,6 +15,7 @@ import javax.swing.*;
 
 //POD class for theme elements
 public class Theme {
+	//Image Assets
     public BufferedImage gaugeBackground;
     public BufferedImage gaugeRed;
     public BufferedImage gaugeSquare;
@@ -38,21 +39,31 @@ public class Theme {
     public BufferedImage verticalMeterYellow;
     public BufferedImage verticalMeterGreen;
     public BufferedImage verticalMeterSpacer;
+    public BufferedImage swathHorizontal;
+    public BufferedImage swathNone;
+    
+    //Fonts & Coloring
     public Font number;
     public Font text;
     public Font alertFont;
+    public Color textColor;
+    
+    //UI Panel Pieces
     public NinePatch buttonPatch;
     public NinePatch buttonHover;
     public NinePatch buttonPress;
     public NinePatch panelPatch;
     public NinePatch screenPatch;
     public NinePatch horizonBorder;
-    public Color textColor;
+    
+    
+    
     public Theme(Context ctx) {
         try {
             String img = ctx.getResource("image_folder");
             String ttf = ctx.getResource("font_folder");
             String np = ctx.getResource("patch_folder");
+            
             roverImage       = ImageIO.read(new File(img+ctx.getResource("map_icon")));
             waypointImage    = ImageIO.read(new File(img+ctx.getResource("waypoint_icon")));
             waypointSelected = ImageIO.read(new File(img+ctx.getResource("waypoint_selected")));
@@ -76,6 +87,8 @@ public class Theme {
             verticalMeterYellow = ImageIO.read(new File(img+ctx.getResource("gps_yellow")));
             verticalMeterGreen = ImageIO.read(new File(img+ctx.getResource("gps_green")));
             verticalMeterSpacer = ImageIO.read(new File(img+ctx.getResource("gps_spacer")));
+            swathHorizontal	 = ImageIO.read(new File(img+ctx.getResource("swath_horizontal")));
+            swathNone	 = ImageIO.read(new File(img+ctx.getResource("swath_none")));
             buttonPatch      = NinePatch.loadFrom(Paths.get(np+ctx.getResource("button")));
             buttonHover      = NinePatch.loadFrom(Paths.get(np+ctx.getResource("button_hovered")));
             buttonPress      = NinePatch.loadFrom(Paths.get(np+ctx.getResource("button_pressed")));

@@ -52,15 +52,20 @@ public class MapPanel extends JPanel implements CoordinateTransform {
     private final Logger iolog = Logger.getLogger("d.io");
 
     public MapPanel(Context cxt) {
-        this(cxt, new Point(0, 0), 6, null, null, null);
+        this(cxt, new Point(0, 0), 6, null, null, null, null);
     }
 
     public MapPanel(Context cxt, Point mapPosition, int zoom) {
-        this(cxt, mapPosition, zoom, null, null, null);
+        this(cxt, mapPosition, zoom, null, null, null, null);
     }
 
+    //North - Serial Panel
+    //East	- Widget Panel
+    //South - Log Panel
+    //Add FarmPanel
+    //West	- Map PAnel (Created in this function
     public MapPanel(Context cxt, Point mapPosition, int zoom, 
-    		JPanel north, JPanel east, JPanel south) {
+    		JPanel north, JPanel east, JPanel south, JPanel farmPanel ) {
     	
         context = cxt;
         context.getWaypointList().addListener(new WaypointListener() {
@@ -82,18 +87,34 @@ public class MapPanel extends JPanel implements CoordinateTransform {
         setBackground(new Color(0xc0, 0xc0, 0xc0));
         setLayout(border);
 
+        //Create Waypoint Panel
         waypointPanel = new WaypointPanel(context, this);
         JPanel west = contain(waypointPanel);
         
+        //Contain Telemetry Widget Panel
         east = contain(east);
+        
+        //Create southern panel
+        //add messagebox and farming widget
+        JPanel southern = new JPanel();
+        southern.setOpaque(false);
+        southern.setLayout(new BoxLayout(southern, BoxLayout.LINE_AXIS));
+        southern.add(farmPanel);
+        southern.add(south); //MessageBox
 
-        if(south == null) south = new JPanel();
-        add(south);
-        south.setLayout(new BorderLayout());
-        south.add(west,  BorderLayout.WEST);
-        south.add(east,  BorderLayout.EAST);
-        south.add(north, BorderLayout.CENTER);
-
+        //TODO - CP - Add a empty jpanel to right side of southern panel
+        	//to help maintain spacing and right widget component visibility
+        
+        JPanel uiOverlayPanel = new JPanel();
+        uiOverlayPanel.setOpaque(false);
+        
+        uiOverlayPanel.setLayout(new BorderLayout());
+        uiOverlayPanel.add(west, BorderLayout.WEST);
+        uiOverlayPanel.add(east, BorderLayout.EAST);
+        uiOverlayPanel.add(north, BorderLayout.CENTER);
+        uiOverlayPanel.add(southern, BorderLayout.SOUTH);
+        add(uiOverlayPanel);
+        
         CommandManager.getInstance().initGeofence(
         		WaypointGeofence.MIN_RADIUS_FT,
         		WaypointGeofence.FenceType.CIRCLE, this);

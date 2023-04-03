@@ -6,14 +6,13 @@ import com.Context;
 import com.ui.ninePatch.NinePatchPanel;
 import com.ui.widgets.*;
 
-
 import java.awt.*;
 import javax.swing.*;
 
 /** 
  * @author Chris Park @ Infinetix Corp.
  * Date: 12-8-20
- * Description: Main panel container for the containing/holding a group of 
+ * Description: Main panel container for holding a group of 
  * dashboard UIWidgets.
  */
 public class WidgetPanel extends NinePatchPanel {

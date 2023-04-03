@@ -43,15 +43,16 @@ public class Dashboard implements Runnable {
 	private Context context;
     
 	//Static Values
-//    private static final int DEF_WINDOW_WIDTH  		= 1200;
-//    private static final int DEF_WINDOW_HEIGHT 		= 900;
-    private static final int DEF_WINDOW_WIDTH  		= 1920;
-    private static final int DEF_WINDOW_HEIGHT 		= 1080;
+    private static final int DEF_WINDOW_WIDTH  		= 1200;
+    private static final int DEF_WINDOW_HEIGHT 		= 900;
+//    private static final int DEF_WINDOW_WIDTH  		= 1920;
+//    private static final int DEF_WINDOW_HEIGHT 		= 1080;
     private static final int HORIZON_WIDGET_SIZE 	= 145;
     private static final int DEFAULT_ZOOM_LEVEL 	= 4;
 
     //UI Widget Frames
     WidgetPanel rightWidgetPanel;
+    WidgetPanel farmingPanel;
     
     //UI Widgets
     private TelemetryDataWidget dataWidget;
@@ -153,9 +154,19 @@ public class Dashboard implements Runnable {
         serialPanel = new SerialConnectPanel(connectActions);
         serialPanel.showBaudSelector(true);
         
+        //TODO Clean up naming conventions for panels so it's not ambigous
+        //with those found in other functions in this class...
+        
         JPanel messageBox = createAlertBox();
 
-        mapPanel = new MapPanel(
+        farmingPanel = new FarmingPanel(context, BoxLayout.LINE_AXIS);
+        farmingPanel.setOpaque(false);
+        SwathPreviewWidget swathPreviewWidget = new SwathPreviewWidget(context);
+        farmingPanel.add(swathPreviewWidget);
+        //TODO - CP - Determine if farming panel needs this alignment
+//    	farmingWidgetPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+    	mapPanel = new MapPanel(
         		context,
         		new Point(
         				(int)context.getHomeProp().getY(),
@@ -163,7 +174,8 @@ public class Dashboard implements Runnable {
         		DEFAULT_ZOOM_LEVEL,
         		serialPanel,
         		createRightPanel(),
-        		messageBox);
+        		messageBox,
+        		farmingPanel);
         
         f.add(mapPanel);
         f.pack();
@@ -177,7 +189,7 @@ public class Dashboard implements Runnable {
         		AlertPanel.DEFAULT_ALERT_LINE_COUNT, 
         		AlertPanel.DEFAULT_ALERT_LINE_LENGTH);
         alertPanel.setColor(context.theme.textColor);
-
+        
         Handler handler = new SimpleHandler(
         		(LogRecord l, String s) -> alertPanel.addMessage(s));
         handler.setLevel(Level.INFO);
