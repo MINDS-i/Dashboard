@@ -100,7 +100,8 @@ public class AngleWidget extends JPanel implements TelemetryListener {
      * @param angle
      */
     public void update(double angle) {
-    	//TODO - CP - Determine a method of smoothing out one or more outlier
+    	//Potential fcor future improvement:
+    	//Determine a method of smoothing out one or more outlier
     	//reading to smooth out data hiccups. Some kind of rolling average could
     	//work, but what happens if we get multiple wrong values in a row. how
     	//do we determine that the change is real...how many samples have to

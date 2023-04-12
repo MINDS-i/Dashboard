@@ -25,22 +25,19 @@ public class SwathPreviewWidget extends UIWidget {
 	//Constants (If Any)
 		//Preview Window Dimensions?	
 	
-	//TODO - CP - Determine if these enums should be moved to own class
-	//Swath Property Enums
 	public enum SwathType {
-		//TODO - CP - Add Image Paths here (from Theme class?)
-		NONE		("A"),
-		HORIZONTAL	("B"),
-		VERITCAL	("C");
+		NONE		("None"),
+		HORIZONTAL	("Horizontal"),
+		VERITCAL	("Vertical");
 		
-		private final String path;
+		private final String name;
 		
-		SwathType(String path) {
-			this.path = path;
+		SwathType(String name) {
+			this.name = name;
 		}
 		
-		public String getImagePath() {
-			return this.path;
+		public String getImageName() {
+			return this.name;
 		}
 	};
 	
@@ -67,12 +64,16 @@ public class SwathPreviewWidget extends UIWidget {
 	//Standard Variables
 	protected ArrayList<BufferedImage> swathImages;
 	protected BufferedImage activePatternImg;
-	protected BufferedImage backgroundImg;
 	protected SwathType currSwathType;
+	protected SwathType prevSwathType;
 	protected SwathRotation currSwathRotation;
+	protected SwathRotation prevSwathRotation;
 	protected boolean isVisible;
 	
-
+	//Stored Swath Pattern Images
+	protected BufferedImage imgSwathNone;
+	protected BufferedImage imgSwathHorizontal;
+	protected BufferedImage imgSwathVertical;
 
 	//Create a square image surface
 	//Have all preset swath types as available image resources (in theme.java?)
@@ -87,63 +88,63 @@ public class SwathPreviewWidget extends UIWidget {
 		
 		//Do any init here.
 		isVisible = false;
-		//set background image
-		//Set preferred size
-		//Set rotation angle to 0/none
-		//set opaque to false
 		
+		//Set all image variables
+		imgSwathNone = 			ctx.theme.swathNone;
+		imgSwathHorizontal =	ctx.theme.swathHorizontal; 
+		imgSwathVertical =		null; //TODO - CP - ADD THIS IMAGE
 		
+		//Set default image and orientation
+		activePatternImg = imgSwathNone;
+		currSwathRotation = SwathRotation.NONE;
+		prevSwathRotation = SwathRotation.NONE;
+		currSwathType = SwathType.NONE;
+		prevSwathType = SwathType.NONE;
+		
+		//Set size constraints
+		this.setPreferredSize(
+				new Dimension(imgSwathNone.getWidth(), imgSwathNone.getHeight()));
+		this.setMaximumSize(
+				new Dimension(imgSwathNone.getWidth(), imgSwathNone.getHeight()));
+		setOpaque(false);
 	}
 
-	//(F) Init()
-	//-Create blank image surface (or show blank image?)
-	//-Set Minimum Size
-	//-Set Default Images
-	//
-
-	//(F) UpdatePreview(enum swathType, enum rotationType)
-	//Updates the preview image and its rotation to match the currently
-	//selected swath pattern.
-	//-Should probably always be updated on a users swath selection on the map
-	//-Make sure to repaint the component if there is a change	
+	/**
+	 * Updates the preview image to match the currently selected swath
+	 * pattern. Assumes a standard orientation without rotation.
+	 * @param type - The swath type to be drawn
+	 */
 	protected void updatePreview(SwathType type) {
 		updatePreview(type, SwathRotation.NONE);
 	}
 	
+	/**
+	 * Updates the preview image and its rotation to match the currently
+	 * selected swath pattern.
+	 * @param type - The swath type to be drawn
+	 * @param rotation - The orientation of the drawn swath type.
+	 */
 	protected void updatePreview(SwathType type, SwathRotation rotation) {
-		//TODO - CP - calibrate image and repaint here.
 		
 		switch(type) {
 			case HORIZONTAL:
-				switch(rotation) {
-					case NONE:
-						//Load horizontal standard
-						break;
-					case CLOCKWISE:
-						break;
-					case COUNTER_CLOCKWISE:
-						break;
-				};
+				activePatternImg = imgSwathHorizontal;
 				break;
-				
 			case VERITCAL:
-				switch(rotation) {
-					case NONE:
-						//Load vertical standard
-						break;
-					case CLOCKWISE:
-						break;
-					case COUNTER_CLOCKWISE:
-						break;
-				};
+				activePatternImg = imgSwathVertical;
 				break;
-				
 			case NONE:
-				//Load blank image
+				activePatternImg = imgSwathNone;
 				break;
 		};
 		
-		//Repaint here?
+		prevSwathType = currSwathType;
+		prevSwathRotation = currSwathRotation;
+		
+		currSwathType = type;
+		currSwathRotation = rotation;
+		
+		repaint();
 	}
 	
 	//TODO - CP - paint swath preview here.
@@ -156,8 +157,20 @@ public class SwathPreviewWidget extends UIWidget {
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		
-		Graphics g2d = (Graphics2D) g.create();
+		//If there has been no change in preview...
+		if((prevSwathRotation == currSwathRotation)
+		&& (prevSwathType == currSwathType)) {
+			return;
+		}
 		
+		Graphics2D g2d = (Graphics2D) g.create();
+		int xOffset = (activePatternImg.getWidth() / 2);
+		int yOffset = (activePatternImg.getHeight() / 2);
+
+		g2d.translate(xOffset, yOffset);
+		g2d.rotate(currSwathRotation.getRadians());
+		g2d.drawImage(activePatternImg, 0, 0, null);
+		g2d.dispose();
 	}
 	
 	/**
