@@ -268,12 +268,9 @@ public class WaypointCommandParse extends WaypointCommand {
 								//value is MPH here, since this is a short there
 								//is some potentially severe rounding error
 								if(context.getCurrentLocale() == "ground") {
-									//TODO - CP - Convert value to fixed point arithmetic for storage here?
-									
 									point.setAltitude(elevation);
 								}
 								else { //Otherwise we use the normal altitude conversion
-									//TODO - CP - Fixed point conversion needed?
 									point.setAltitude((short)(elevation * FEET_PER_METER));
 								}
 							}

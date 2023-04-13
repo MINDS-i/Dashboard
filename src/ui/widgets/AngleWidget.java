@@ -15,7 +15,7 @@ import java.lang.Math;
 public class AngleWidget extends JPanel implements TelemetryListener {
 	
 	//Constants
-	private static final double ANGLE_OFFSET_LIMIT = 10.0;
+	private static final double ANGLE_OFFSET_LIMIT = 30.0;
 	
 	//Vars
     private double theta;
