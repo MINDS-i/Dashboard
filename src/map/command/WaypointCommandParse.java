@@ -400,6 +400,7 @@ public class WaypointCommandParse extends WaypointCommand {
 			xmlWriter.writeStartElement(GPX_SCHEMA_URI, XMLElement.ROUTE.getValue());
 			xmlWriter.writeCharacters("\n");
 			
+			double elevation;
 			//Route Points
 			for(int i = 0; i < waypoints.size(); i++) {
 				xmlWriter.writeStartElement(GPX_SCHEMA_URI, XMLElement.ROUTEPOINT.getValue());
@@ -414,21 +415,19 @@ public class WaypointCommandParse extends WaypointCommand {
 				xmlWriter.writeCharacters("\n");
 				
 				xmlWriter.writeStartElement(GPX_SCHEMA_URI, XMLElement.ELEVATION.getValue());
-				
+
+				elevation = UtilHelper.getInstance().fixedToDouble(
+						waypoints.get(i).dot().getAltitude());
 				
 				//Note: We treat altitude as Speed in MPH here also. See
 				//corresponding readXML case above for further details.
-				
-				//TODO - CP - Double from fixed point conversion needed?
-					//Dot elevation/altitude should be stored as a fixed point
-					//format and not a floating point value.
 				if(context.getCurrentLocale() == "ground") {
 					xmlWriter.writeCharacters(Double.toString(
-							waypoints.get(i).dot().getAltitude()));
+							elevation));
 				}
 				else {
 					xmlWriter.writeCharacters(Double.toString(
-							waypoints.get(i).dot().getAltitude() / FEET_PER_METER));
+							(elevation / FEET_PER_METER)));
 				}
 				
 				//End XMLElement.ELEVATION
