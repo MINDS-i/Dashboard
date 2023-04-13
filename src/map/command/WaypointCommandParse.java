@@ -21,6 +21,7 @@ import com.map.command.WaypointCommand.CommandType;
 import com.map.geofence.WaypointGeofence;
 import com.Dashboard;
 import com.serial.SerialSendManager;
+import com.util.UtilHelper;
 
 
 /**
@@ -252,12 +253,15 @@ public class WaypointCommandParse extends WaypointCommand {
 							route.add(point);
 						}
 						else if(xmlReader.getLocalName() == XMLElement.ELEVATION.getValue()) {
+							short elevation;
+							
 							if(point == null) {
 								continue;
 							}
 							
-							//TODO - CP - If in ground mode, treat these as speed in MPH instead.
 							try {
+								elevation = (short)(UtilHelper.getInstance().doubleToFixed(
+										Double.parseDouble(data)));
 								
 								//Note: The altitude variable is treated as speed
 								//in MPH for ground vehicles, so we assume the
@@ -265,11 +269,12 @@ public class WaypointCommandParse extends WaypointCommand {
 								//is some potentially severe rounding error
 								if(context.getCurrentLocale() == "ground") {
 									//TODO - CP - Convert value to fixed point arithmetic for storage here?
-									point.setAltitude((short)Double.parseDouble(data));
+									
+									point.setAltitude(elevation);
 								}
 								else { //Otherwise we use the normal altitude conversion
 									//TODO - CP - Fixed point conversion needed?
-									point.setAltitude((short)(Double.parseDouble(data) * FEET_PER_METER));
+									point.setAltitude((short)(elevation * FEET_PER_METER));
 								}
 							}
 							catch(NumberFormatException | NullPointerException ex) {
