@@ -3,6 +3,7 @@ package com.util;
 import java.util.*;
 
 import com.map.Dot;
+import com.serial.Serial;
 
 /**
  * @author Chris Park @ Infinetix Corp
@@ -115,4 +116,26 @@ public class UtilHelper {
 	public double kmToDegLng(double km) {
 		return (km / KM_PER_LNG);
 	}
+	
+	/**
+	 * Converts a fixed point decimal number to a double. Currently used to
+	 * convert waypoint entry fixed point altitude/speed values to floating
+	 * point numbers for UI display and GPX file exportation.
+	 * (See WaypointCommandParse for details on the latter)
+	 * @param i - The value to be convertsed to a double
+	 * @return - the converted double value
+	 */
+	public double fixedToDouble(int i) {
+		return ((double)(i & 0xffff)) / ((double)Serial.U16_FIXED_POINT);
+	}
+	
+	/**
+	 * Converts a double value to a fixed point number representation for 
+	 * waypoint storage and transmission to a unit over serial.
+	 * @param i - The value to be converted to a fixed point number
+	 * @return - the converted fixed point number.
+	 */
+	public int doubleToFixed(double i) {
+        return (int)(i * Serial.U16_FIXED_POINT);
+    }
 }

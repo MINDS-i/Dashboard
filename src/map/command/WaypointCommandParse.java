@@ -256,8 +256,21 @@ public class WaypointCommandParse extends WaypointCommand {
 								continue;
 							}
 							
+							//TODO - CP - If in ground mode, treat these as speed in MPH instead.
 							try {
-								point.setAltitude((short)(Double.parseDouble(data) * FEET_PER_METER));
+								
+								//Note: The altitude variable is treated as speed
+								//in MPH for ground vehicles, so we assume the
+								//value is MPH here, since this is a short there
+								//is some potentially severe rounding error
+								if(context.getCurrentLocale() == "ground") {
+									//TODO - CP - Convert value to fixed point arithmetic for storage here?
+									point.setAltitude((short)Double.parseDouble(data));
+								}
+								else { //Otherwise we use the normal altitude conversion
+									//TODO - CP - Fixed point conversion needed?
+									point.setAltitude((short)(Double.parseDouble(data) * FEET_PER_METER));
+								}
 							}
 							catch(NumberFormatException | NullPointerException ex) {
 								point.setAltitude((short)0);
@@ -399,8 +412,22 @@ public class WaypointCommandParse extends WaypointCommand {
 				xmlWriter.writeCharacters("\n");
 				
 				xmlWriter.writeStartElement(GPX_SCHEMA_URI, XMLElement.ELEVATION.getValue());
-				xmlWriter.writeCharacters(
-						Double.toString(waypoints.get(i).dot().getAltitude() / FEET_PER_METER));
+				
+				
+				//Note: We treat altitude as Speed in MPH here also. See
+				//corresponding readXML case above for further details.
+				
+				//TODO - CP - Double from fixed point conversion needed?
+					//Dot elevation/altitude should be stored as a fixed point
+					//format and not a floating point value.
+				if(context.getCurrentLocale() == "ground") {
+					xmlWriter.writeCharacters(Double.toString(
+							waypoints.get(i).dot().getAltitude()));
+				}
+				else {
+					xmlWriter.writeCharacters(Double.toString(
+							waypoints.get(i).dot().getAltitude() / FEET_PER_METER));
+				}
 				
 				//End XMLElement.ELEVATION
 				xmlWriter.writeEndElement(); 

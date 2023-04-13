@@ -17,6 +17,7 @@ import com.ui.ninePatch.NinePatchPanel;
 import com.ui.SystemConfigWindow;
 import com.ui.Theme;
 import com.xml;
+import com.util.UtilHelper;
 
 import java.io.IOException;
 
@@ -82,14 +83,18 @@ public class WaypointPanel extends NinePatchPanel {
     public JButton loadButton;
     public JButton missionButton;
     
-    
+    /**
+     * TelemField Class
+     */
     private class TelemField extends JTextField {
         float lastSetValue = Float.NaN;
+        
         @Override
         public void setText(String newString) {
             super.setText(newString);
             lastSetValue = Float.NaN;
         }
+        
         void update(float newValue) {
             /**
              * editable float fields will get their cursor reset unless
@@ -183,7 +188,9 @@ public class WaypointPanel extends NinePatchPanel {
 
         latitude.update(  (float)dot.getLatitude() );
         longitude.update( (float)dot.getLongitude() );
-        altitude.update(  (float)fixedToDouble(dot.getAltitude()) );
+        
+        altitude.update(
+        		(float)UtilHelper.getInstance().fixedToDouble(dot.getAltitude()));
 
         latitude.setForeground(Color.BLACK);
         longitude.setForeground(Color.BLACK);
@@ -346,20 +353,14 @@ public class WaypointPanel extends NinePatchPanel {
         add(missionButton);
     }
 
-    private double fixedToDouble(int i) {
-        return ((double)(i&0xffff))/((double)Serial.U16_FIXED_POINT);
-    }
-    private int    doubleToFixed(double i) {
-        return (int)(i*Serial.U16_FIXED_POINT);
-    }
-
     public void interpretLocationEntry() {
     	WaypointCommand command;
     	
         try {
             int selectedWaypoint = waypoints.getSelected();
 
-            if(selectedWaypoint < 0) // rover or home location selected
+            //If the rover or home location is selected
+            if(selectedWaypoint < 0) 
                 return;
 
             //Grab waypoint info and create move command
@@ -369,17 +370,17 @@ public class WaypointPanel extends NinePatchPanel {
             Double newLongitude = Double.parseDouble(longitude.getText());
             Double tmpAltitude  = Double.parseDouble(altitude.getText());
 
-            int newAltitude = doubleToFixed(tmpAltitude);
+            int newAltitude = UtilHelper.getInstance().doubleToFixed(tmpAltitude);
             Point.Double newPosition = new Point.Double(newLongitude, newLatitude);
 
-            if((newAltitude&0xffff) == newAltitude) {
-            	
+            if((newAltitude & 0xffff) == newAltitude) {
             	
             	command.finalize(new Dot(newPosition, (short)newAltitude));
             	CommandManager.getInstance().process(command);
 
-                //set to display reconverted value
-                altitude.setText(fixedToDouble(newAltitude)+"");
+                //Set to display reconverted value
+                altitude.setText(
+                		UtilHelper.getInstance().fixedToDouble(newAltitude) + "");
             } 
             else {
                 Dot newloc = waypoints.get(selectedWaypoint).dot();
