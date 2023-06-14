@@ -102,7 +102,7 @@ public class MapPanel extends JPanel implements CoordinateTransform {
         southern.add(farmPanel);
         southern.add(south); //MessageBox
 
-        //TODO - CP - Add a empty jpanel to right side of southern panel
+        //TODO - CP - Add an empty jpanel to right side of southern panel
         	//to help maintain spacing and right widget component visibility
         
         JPanel uiOverlayPanel = new JPanel();

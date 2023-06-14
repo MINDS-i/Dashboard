@@ -11,10 +11,9 @@ import java.awt.Color;
 public enum WaypointType {
 	
 	STANDARD 		(0, "Standard", Color.red),
-	LEFT_APPROACH	(1, "Left Approach", Color.blue),
-	RIGHT_APPROACH	(2, "Right Approach", Color.orange),
-	SWATH_START		(3, "Swath Start", Color.yellow),
-	SWATH_END		(4, "Swath End", Color.yellow);
+	SWATH_START		(1, "Swath Start", Color.yellow),
+	SWATH_END		(2, "Swath End", Color.yellow),
+	SWATH			(3, "Swath Point", Color.blue);
 	
 	private final int index;
 	private final String text;

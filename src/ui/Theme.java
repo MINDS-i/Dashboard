@@ -40,6 +40,7 @@ public class Theme {
     public BufferedImage verticalMeterGreen;
     public BufferedImage verticalMeterSpacer;
     public BufferedImage swathHorizontal;
+    public BufferedImage swathVertical;
     public BufferedImage swathNone;
     
     //Fonts & Coloring
@@ -88,7 +89,8 @@ public class Theme {
             verticalMeterGreen = ImageIO.read(new File(img+ctx.getResource("gps_green")));
             verticalMeterSpacer = ImageIO.read(new File(img+ctx.getResource("gps_spacer")));
             swathHorizontal	 = ImageIO.read(new File(img+ctx.getResource("swath_horizontal")));
-            swathNone	 = ImageIO.read(new File(img+ctx.getResource("swath_none")));
+            swathVertical	 = ImageIO.read(new File(img+ctx.getResource("swath_vertical")));
+            swathNone	 	 = ImageIO.read(new File(img+ctx.getResource("swath_none")));
             buttonPatch      = NinePatch.loadFrom(Paths.get(np+ctx.getResource("button")));
             buttonHover      = NinePatch.loadFrom(Paths.get(np+ctx.getResource("button_hovered")));
             buttonPress      = NinePatch.loadFrom(Paths.get(np+ctx.getResource("button_pressed")));

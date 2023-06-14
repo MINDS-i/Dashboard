@@ -16,7 +16,6 @@ import java.util.*;
 import java.util.logging.Logger;
 import javax.swing.*;
 
-
 public class RoverPath implements Layer {
 	
     private static final Color ACTIVE_LINE_FILL = new Color(1.f, 1.f, 0.f, 1f);
@@ -128,6 +127,25 @@ public class RoverPath implements Layer {
                     	//Manually adjust for size vs index offset
                         waypoints.setSelected(waypoints.size() - 1);
             			break;
+            			
+            		case PLACE_SWATH:
+            			command = new WaypointCommandAddSwath(
+            					waypoints, new Dot(point), waypoints.size(),
+            					context.dash.farmingPanel.getType(),
+            					context.dash.farmingPanel.getRotation(),
+            					context.dash.farmingPanel.getInversion());
+            			
+            			//TODO - CP - Change this when swath group movement is in place.
+            			//Manually adjust for size vs index offset
+            			//Should select the end of the swath for now
+            			//but we'll want the beginning selected for movement later
+            			waypoints.setSelected(waypoints.size() - 1);
+            			
+            			map.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            			currOpMode = OpMode.STANDARD;
+            			
+            			break;
+            			
             		default:
             	}
             } 
@@ -135,14 +153,20 @@ public class RoverPath implements Layer {
             else {
             	
             	switch(currOpMode) {
+        			case STANDARD:
+        				command = new WaypointCommandAdd(
+        						waypoints, new Dot(point), line);
+        			break;
+        			
             		case SET_HOME:
             			updateHomeLocation(point);
             			map.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             			currOpMode = OpMode.STANDARD;
             			break;
-            		case STANDARD:
-            			command = new WaypointCommandAdd(
-            					waypoints, new Dot(point), line);
+            		
+            		case PLACE_SWATH:
+            			serialLog.warning("RoverPath - Error: "
+            					+ "Can't insert swath inside an existing path");
             			break;
         			default:
             	}
@@ -168,6 +192,10 @@ public class RoverPath implements Layer {
 					
 					command = new WaypointCommandRemove(waypoints, underneath);
 					break;
+					
+				case PLACE_SWATH:
+					//Do Nothing
+					break;
 				default:
         	}
         }
@@ -175,8 +203,7 @@ public class RoverPath implements Layer {
         	return false;
         }
         
-        //Make sure we don't process a command unless it's as a
-        //result of a standard action and actually exists
+        //Verify the command exists before processing it.
         if(command != null) {
             return CommandManager.getInstance().process(command);
         }
@@ -186,6 +213,11 @@ public class RoverPath implements Layer {
 
     @Override
     public boolean onPress(MouseEvent e) {
+    	//If we aren't in standard mode, don't allow waypoint movement.
+    	if(currOpMode != OpMode.STANDARD) {
+    		return false;
+    	}
+    	
         Point pixel = e.getPoint();
         downDot = isOverDot(pixel, context.theme.waypointImage);
         
@@ -458,5 +490,5 @@ public class RoverPath implements Layer {
     			String.valueOf(home.getLongitude()));
     	serialLog.warning("SET HOME - Home point set.");
     }
-
+    
 }

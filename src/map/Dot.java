@@ -12,7 +12,6 @@ import java.awt.*;
 //NOTES TO SELF (CPark):
 //- Are we actually utilizing all the overriden constructors?
 //	Can some be removed?
-//- Does the altitude attribute actually get used by the Rover/UAV code?
 
 /**
  * 

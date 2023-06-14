@@ -1,12 +1,16 @@
 package com.ui;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 import com.Context;
 import com.ui.ninePatch.NinePatchPanel;
 import com.ui.widgets.*;
 
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
 import javax.swing.*;
 
 /** 
@@ -25,6 +29,9 @@ public class WidgetPanel extends NinePatchPanel {
     
 	protected Context context;
 	protected LinkedList<UIWidget> widgets;
+	
+    //Logging support
+    protected final Logger serialLog = Logger.getLogger("d.serial");
     
 	/**
 	 * Class Constructor
@@ -44,6 +51,11 @@ public class WidgetPanel extends NinePatchPanel {
 		setLayout(layout);
 		setBorder(BorderFactory.createEmptyBorder(BORDER_TOP, BORDER_LFT,
         		BORDER_BOT, BORDER_RHT));
+		
+        //Do nothing to prevent clicks from falling through to map panel
+        addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent me) {}
+        });
 	}
 	
 	/**

@@ -27,7 +27,7 @@
          </setting><setting index="26" name="Position D Term" min="-inf" max="+inf" def="0.01"> Position hold D term
          </setting><setting index="27" name="Maximum Velocity" min="-inf" max="+inf" def="4.0"> Maximum over-ground travel velocity&lt;br&gt;
          </setting><setting index="28" name="MaxV Distance" min="-inf" max="+inf" def="1056"> Minimum away from desired position that results in flying towards the target at the maximum allowed velocity
-         </setting><setting index="29" name="Low Battery Warning" min="0.0" max="+inf" def="14.0"> At what voltage to consider the quadcopter low on battery
+         </setting><setting index="29" name="Low Battery Warning" min="0.0" max="+inf" def="10.5"> At what voltage to consider the quadcopter low on battery
          </setting><setting index="30" name="Magnetic Declination" min="-180" max="180" def="15.0f"> The magnetic declination in degrees of the area the quad will be   flying in
          </setting><setting index="31" name="GPS assist" min="0" max="1" def="0"> Set to 1 to enable gps loitering when flying in assisted mode with   the pitch/roll commands centered. Set to 0 to disable gps loitering; the pilot retains complete   control of pitch and roll when in assisted mode, with the processor   only stabilizing the altitude autonomously
          </setting><setting index="32" name="Auto Descent Rate" min="0" max="+inf" def="1"> The desired descent rate in feet per second for the quadcopter to   fall at when auto landing because of a radio signall loss

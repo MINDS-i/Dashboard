@@ -17,18 +17,15 @@ import java.awt.image.BufferedImage;
  * 
  * @author Chris Park @ Infinetix Corp.
  * Date: 3-6-2023
- * Description: Widget class 
- *
+ * Description: Widget used to track the currently selected swath pattern
+ * orientation and display it in the FarmingPanel.
  */
-public class SwathPreviewWidget extends UIWidget {
+public class SwathPreviewWidget extends JPanel {
 
-	//Constants (If Any)
-		//Preview Window Dimensions?	
-	
+	//Orientation Enums
 	public enum SwathType {
-		NONE		("None"),
 		HORIZONTAL	("Horizontal"),
-		VERITCAL	("Vertical");
+		VERTICAL	("Vertical");
 		
 		private final String name;
 		
@@ -43,8 +40,7 @@ public class SwathPreviewWidget extends UIWidget {
 	
 	public enum SwathRotation {
 		NONE				(0.0),
-		CLOCKWISE 			(90.0),
-		COUNTER_CLOCKWISE 	(270.0);
+		ROTATED 			(90.0);
 		
 		private final double degrees;
 		
@@ -61,30 +57,44 @@ public class SwathPreviewWidget extends UIWidget {
 		}
 	};
 	
+	public enum SwathInversion {
+		NONE		(0),
+		FLIPPED		(1);
+		
+		private final int value;
+		
+		SwathInversion(int value) {
+			this.value = value;
+		}
+		
+		public int getInversionType() {
+			return this.value;
+		}
+	};
+	
 	//Standard Variables
+	protected Context context;
 	protected ArrayList<BufferedImage> swathImages;
 	protected BufferedImage activePatternImg;
 	protected SwathType currSwathType;
 	protected SwathType prevSwathType;
 	protected SwathRotation currSwathRotation;
 	protected SwathRotation prevSwathRotation;
+	protected SwathInversion currSwathInversion;
+	protected SwathInversion prevSwathInversion;
 	protected boolean isVisible;
 	
 	//Stored Swath Pattern Images
 	protected BufferedImage imgSwathNone;
 	protected BufferedImage imgSwathHorizontal;
 	protected BufferedImage imgSwathVertical;
-
-	//Create a square image surface
-	//Have all preset swath types as available image resources (in theme.java?)
-	//depending on the selection apply/draw the appropriate image.
 	
 	/**
 	 * Class Constructor
 	 * @param ctx - the application context
 	 */
 	public SwathPreviewWidget(Context ctx) {
-		super(ctx, "Swath Preview");
+		context = ctx;
 		
 		//Do any init here.
 		isVisible = false;
@@ -92,20 +102,23 @@ public class SwathPreviewWidget extends UIWidget {
 		//Set all image variables
 		imgSwathNone = 			ctx.theme.swathNone;
 		imgSwathHorizontal =	ctx.theme.swathHorizontal; 
-		imgSwathVertical =		null; //TODO - CP - ADD THIS IMAGE
+		imgSwathVertical =		ctx.theme.swathVertical;
 		
 		//Set default image and orientation
-		activePatternImg = imgSwathNone;
+		activePatternImg = imgSwathHorizontal;
+		currSwathType = SwathType.HORIZONTAL;
+		prevSwathType = SwathType.HORIZONTAL;
 		currSwathRotation = SwathRotation.NONE;
 		prevSwathRotation = SwathRotation.NONE;
-		currSwathType = SwathType.NONE;
-		prevSwathType = SwathType.NONE;
+		currSwathInversion = SwathInversion.NONE;
+		prevSwathInversion = SwathInversion.NONE;
 		
 		//Set size constraints
 		this.setPreferredSize(
 				new Dimension(imgSwathNone.getWidth(), imgSwathNone.getHeight()));
 		this.setMaximumSize(
 				new Dimension(imgSwathNone.getWidth(), imgSwathNone.getHeight()));
+		
 		setOpaque(false);
 	}
 
@@ -114,8 +127,8 @@ public class SwathPreviewWidget extends UIWidget {
 	 * pattern. Assumes a standard orientation without rotation.
 	 * @param type - The swath type to be drawn
 	 */
-	protected void updatePreview(SwathType type) {
-		updatePreview(type, SwathRotation.NONE);
+	public void updatePreview(SwathType type) {
+		updatePreview(type, SwathRotation.NONE, SwathInversion.NONE);
 	}
 	
 	/**
@@ -124,52 +137,59 @@ public class SwathPreviewWidget extends UIWidget {
 	 * @param type - The swath type to be drawn
 	 * @param rotation - The orientation of the drawn swath type.
 	 */
-	protected void updatePreview(SwathType type, SwathRotation rotation) {
+	public void updatePreview(SwathType type, SwathRotation rotation,
+			SwathInversion inversion) {
+		prevSwathType = currSwathType;
+		prevSwathRotation = currSwathRotation;
+		prevSwathInversion = currSwathInversion;
 		
 		switch(type) {
 			case HORIZONTAL:
 				activePatternImg = imgSwathHorizontal;
 				break;
-			case VERITCAL:
+			case VERTICAL:
 				activePatternImg = imgSwathVertical;
-				break;
-			case NONE:
-				activePatternImg = imgSwathNone;
 				break;
 		};
 		
-		prevSwathType = currSwathType;
-		prevSwathRotation = currSwathRotation;
-		
 		currSwathType = type;
 		currSwathRotation = rotation;
+		currSwathInversion = inversion;
 		
 		repaint();
 	}
 	
-	//TODO - CP - paint swath preview here.
 	/**
-	 * Paints the currently selected swath preview at the angle selected
-	 * by the user.
-	 * @param g - The graphics reference
+	 * Paints the currently selected swath preview at the orientation
+	 * selected by the user.
+	 * @param g - The graphics object reference
 	 */
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		
-		//If there has been no change in preview...
-		if((prevSwathRotation == currSwathRotation)
-		&& (prevSwathType == currSwathType)) {
-			return;
-		}
-		
 		Graphics2D g2d = (Graphics2D) g.create();
 		int xOffset = (activePatternImg.getWidth() / 2);
 		int yOffset = (activePatternImg.getHeight() / 2);
-
+		
 		g2d.translate(xOffset, yOffset);
 		g2d.rotate(currSwathRotation.getRadians());
-		g2d.drawImage(activePatternImg, 0, 0, null);
+		g2d.translate(-xOffset, -yOffset);
+		
+		//If Inverted, Flip Along The Horizontal
+		if(currSwathInversion == SwathInversion.FLIPPED) {
+			g2d.drawImage(
+					activePatternImg,				//Image 
+					activePatternImg.getWidth(), 	//Pos X
+					0,								//Pos Y
+					-activePatternImg.getWidth(), 	//Invert the Width
+					activePatternImg.getHeight(),	//Standard Height
+					null);							//Observer (Unused)
+		} //Else Draw As Standard Rotation
+		else {
+			g2d.drawImage(activePatternImg, 0, 0, null);	
+		}
+		
 		g2d.dispose();
 	}
 	
@@ -181,7 +201,6 @@ public class SwathPreviewWidget extends UIWidget {
 			return;
 		}
 		
-		//TODO - CP - Show the preview here
 		this.isVisible = true;
 	}
 	
@@ -193,7 +212,6 @@ public class SwathPreviewWidget extends UIWidget {
 			return;
 		}
 		
-		//TODO - CP - Hide the preview here
 		this.isVisible = false;
 	}
 
@@ -203,5 +221,29 @@ public class SwathPreviewWidget extends UIWidget {
 	 */
 	public boolean isPreviewVisible() {
 		return isVisible;
+	}
+	
+	/**
+	 * Returns the type of swath currently selected
+	 * @return - SwathType
+	 */
+	public SwathType getSelectedType() {
+		return this.currSwathType;
+	}
+	
+	/**
+	 * Returns the type of rotation for the currentlys elected swath
+	 * @return - SwathRotation
+	 */
+	public SwathRotation getSelectedRotation() {
+		return this.currSwathRotation;
+	}
+	
+	/**
+	 * Returns whether or not the swath pattern is in inversion.
+	 * @return - SwathInversion
+	 */
+	public SwathInversion getSelectedInversion() {
+		return this.currSwathInversion;
 	}
 }

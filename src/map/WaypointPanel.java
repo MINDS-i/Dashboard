@@ -118,11 +118,9 @@ public class WaypointPanel extends NinePatchPanel {
         
         buildPanel();
         
+        //Do nothing here to prevent clicks from falling through to map panel
         addMouseListener(new MouseAdapter() {
-            public void mousePressed(MouseEvent me) {
-                //do nothing here to prevent clicks from falling through
-                //to the map panel in the background
-            }
+            public void mousePressed(MouseEvent me) {}
         });
 
         waypoints.addListener(new WaypointListener() {
@@ -764,9 +762,24 @@ public class WaypointPanel extends NinePatchPanel {
     	}
     	
     	public void actionPerformed(ActionEvent e) {
-    		map.setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
-    		map.roverPath.setOpMode(RoverPath.OpMode.SET_HOME);
-    		serialLog.warning("SET HOME - Please select a home point.");
+    		//TODO - CP - Prevent button control on waypoint panel while placeing a home point.
+    		//Using the set home button again should cancel the mode and unlock things again.
+    		
+    		//If we are in standard mode, start set home mode.
+    		if(map.roverPath.getOpMode() == RoverPath.OpMode.STANDARD) {
+    			map.setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
+        		map.roverPath.setOpMode(RoverPath.OpMode.SET_HOME);
+        		serialLog.warning("SET HOME - Please select a home point.");
+        		return;
+    		}
+    		
+    		//If we are in set home mode, cancel and return to standard mode.
+    		if(map.roverPath.getOpMode() == RoverPath.OpMode.SET_HOME) {
+    			map.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        		map.roverPath.setOpMode(RoverPath.OpMode.STANDARD);
+        		serialLog.warning("SET HOME - Home point placement canceled.");
+        		return;
+    		}
     	}
     };
     

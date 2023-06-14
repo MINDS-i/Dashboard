@@ -1,5 +1,9 @@
 package com.map.command;
 
+import com.ui.widgets.SwathPreviewWidget.SwathType;
+import com.ui.widgets.SwathPreviewWidget.SwathRotation;
+import com.ui.widgets.SwathPreviewWidget.SwathInversion;
+
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -20,19 +24,26 @@ public class WaypointCommandAddSwath extends WaypointCommand {
 
 	//Member Vars
 	protected List<Dot> swathPoints;
-	
+
 	/**
 	 * Constructor
-	 * @param waypoints = List of current navigational waypoints
-	 * @param swathPoints - Waypoint list to be manually edited by this command
+	 * @param waypoints - List of current navigational waypoints
+	 * @param point - Starting point for the swath to be built off of.
 	 * @param index - Index in the waypoint list to insert the swathPoints list
+	 * @param type - The orientation type (Horizontal/Vertical) of the swath
+	 * @param rotation - The rotation of the swath (None/Rotation (90 degrees))
+	 * @param inversion - The inversion of the swath (Inverted/Not Inverted)
 	 */
 	public WaypointCommandAddSwath(
-			WaypointList waypoints, List<Dot> swathPoints, int index) {
+			WaypointList waypoints, Dot point, int index,
+			SwathType type, SwathRotation rotation, SwathInversion inversion) {
 		super(waypoints, CommandType.ADD_SWATH);
 		
-		this.swathPoints = swathPoints;
-		this.index = index; //Where the start of the swathPoints list is.
+		//Starting index of the list of swath points.
+		this.index = index;
+		
+		//TODO - CP - Generate list of swath points with given info here.
+		
 	}
 	
 	/**
@@ -91,3 +102,9 @@ public class WaypointCommandAddSwath extends WaypointCommand {
 		return execute();
 	}
 }
+
+//TODO - CP - Create Swath patterns routines to execute from the AddSwath
+//command.
+	//Horizontal
+	//Horizontal rotate 90
+	//More after proofing that out
