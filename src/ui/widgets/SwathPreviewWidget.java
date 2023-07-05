@@ -38,25 +38,6 @@ public class SwathPreviewWidget extends JPanel {
 		}
 	};
 	
-	public enum SwathRotation {
-		NONE				(0.0),
-		ROTATED 			(90.0);
-		
-		private final double degrees;
-		
-		SwathRotation(double degrees) {
-			this.degrees = degrees;
-		}
-		
-		public double getDegrees() {
-			return this.degrees;
-		}
-		
-		public double getRadians() {
-			return Math.toRadians(this.degrees);
-		}
-	};
-	
 	public enum SwathInversion {
 		NONE		(0),
 		FLIPPED		(1);
@@ -78,8 +59,6 @@ public class SwathPreviewWidget extends JPanel {
 	protected BufferedImage activePatternImg;
 	protected SwathType currSwathType;
 	protected SwathType prevSwathType;
-	protected SwathRotation currSwathRotation;
-	protected SwathRotation prevSwathRotation;
 	protected SwathInversion currSwathInversion;
 	protected SwathInversion prevSwathInversion;
 	protected boolean isVisible;
@@ -101,15 +80,13 @@ public class SwathPreviewWidget extends JPanel {
 		
 		//Set all image variables
 		imgSwathNone = 			ctx.theme.swathNone;
-		imgSwathHorizontal =	ctx.theme.swathHorizontal; 
+		imgSwathHorizontal =	ctx.theme.swathHorizontal0; 
 		imgSwathVertical =		ctx.theme.swathVertical;
 		
 		//Set default image and orientation
 		activePatternImg = imgSwathHorizontal;
 		currSwathType = SwathType.HORIZONTAL;
 		prevSwathType = SwathType.HORIZONTAL;
-		currSwathRotation = SwathRotation.NONE;
-		prevSwathRotation = SwathRotation.NONE;
 		currSwathInversion = SwathInversion.NONE;
 		prevSwathInversion = SwathInversion.NONE;
 		
@@ -124,23 +101,21 @@ public class SwathPreviewWidget extends JPanel {
 
 	/**
 	 * Updates the preview image to match the currently selected swath
-	 * pattern. Assumes a standard orientation without rotation.
+	 * pattern. Assumes a standard orientation without inversion.
 	 * @param type - The swath type to be drawn
 	 */
 	public void updatePreview(SwathType type) {
-		updatePreview(type, SwathRotation.NONE, SwathInversion.NONE);
+		updatePreview(type, SwathInversion.NONE);
 	}
 	
 	/**
-	 * Updates the preview image and its rotation to match the currently
+	 * Updates the preview image and its inversion to match the currently
 	 * selected swath pattern.
 	 * @param type - The swath type to be drawn
-	 * @param rotation - The orientation of the drawn swath type.
+	 * @param inversion - image flipping/inversion of the drawn swath type.
 	 */
-	public void updatePreview(SwathType type, SwathRotation rotation,
-			SwathInversion inversion) {
+	public void updatePreview(SwathType type, SwathInversion inversion) {
 		prevSwathType = currSwathType;
-		prevSwathRotation = currSwathRotation;
 		prevSwathInversion = currSwathInversion;
 		
 		switch(type) {
@@ -153,7 +128,6 @@ public class SwathPreviewWidget extends JPanel {
 		};
 		
 		currSwathType = type;
-		currSwathRotation = rotation;
 		currSwathInversion = inversion;
 		
 		repaint();
@@ -171,12 +145,8 @@ public class SwathPreviewWidget extends JPanel {
 		Graphics2D g2d = (Graphics2D) g.create();
 		int xOffset = (activePatternImg.getWidth() / 2);
 		int yOffset = (activePatternImg.getHeight() / 2);
-		
-		g2d.translate(xOffset, yOffset);
-		g2d.rotate(currSwathRotation.getRadians());
-		g2d.translate(-xOffset, -yOffset);
-		
-		//If Inverted, Flip Along The Horizontal
+
+		//If Inverted, Flip Along The Y/Vertical Axis 
 		if(currSwathInversion == SwathInversion.FLIPPED) {
 			g2d.drawImage(
 					activePatternImg,				//Image 
@@ -185,7 +155,7 @@ public class SwathPreviewWidget extends JPanel {
 					-activePatternImg.getWidth(), 	//Invert the Width
 					activePatternImg.getHeight(),	//Standard Height
 					null);							//Observer (Unused)
-		} //Else Draw As Standard Rotation
+		} //Else Draw As Standard
 		else {
 			g2d.drawImage(activePatternImg, 0, 0, null);	
 		}
@@ -229,14 +199,6 @@ public class SwathPreviewWidget extends JPanel {
 	 */
 	public SwathType getSelectedType() {
 		return this.currSwathType;
-	}
-	
-	/**
-	 * Returns the type of rotation for the currentlys elected swath
-	 * @return - SwathRotation
-	 */
-	public SwathRotation getSelectedRotation() {
-		return this.currSwathRotation;
 	}
 	
 	/**

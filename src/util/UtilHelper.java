@@ -7,16 +7,24 @@ import com.map.Dot;
 /**
  * @author Chris Park @ Infinetix Corp
  * Date: 4-21-21
- * Description: Singletone class containing useful utility functions for 
- * Minds-i Dashboard specific functionality and calculations.
+ * Description: Singletone class containing useful utility functions and values
+ * for Minds-i Dashboard specific functionality and calculations.
  */
 public class UtilHelper {
 	private static UtilHelper utilHelperInstance = null;
 	
+	//Measurements and conversion factors
 	private static final double EARTH_RADIUS_KM = 6372.80;
 	private static final double FEET_PER_KM = 3280.84;
 	private static final double KM_PER_FEET = 0.0003048;
 	private static final double KM_PER_LNG = 111;
+	//
+	//KM per Degre LNG
+	
+	//Swath Pattern dimension properties
+	public static final double SWATH_LENGTH_FT = 200;
+	public static final double SWATH_WIDTH_FT = 32;
+	
 	/**
 	 * Constructor (Private, accessed by getInstance
 	 */
@@ -108,11 +116,12 @@ public class UtilHelper {
 	}
 	
 	/**
-	 * Converts kilometers to degrees longitude
+	 * Converts kilometers to degrees Latitude
 	 * @param km - distance in kilometers to convert
 	 * @return - distance in degrees latitude
 	 */
 	public double kmToDegLng(double km) {
 		return (km / KM_PER_LNG);
 	}
+
 }

@@ -2,13 +2,14 @@ package com.ui;
 
 import com.Context;
 
+import com.util.UtilHelper;
+
 import com.map.MapPanel;
 import com.map.RoverPath;
 
 import com.ui.ninePatch.NinePatchPanel;
 import com.ui.widgets.*;
 import com.ui.widgets.SwathPreviewWidget.SwathType;
-import com.ui.widgets.SwathPreviewWidget.SwathRotation;
 import com.ui.widgets.SwathPreviewWidget.SwathInversion;
 import com.ui.Theme;
 
@@ -37,14 +38,7 @@ public class FarmingPanel extends WidgetPanel {
 	private JRadioButton btnHorizontal;
 	private JRadioButton btnVertical;
 	private ButtonGroup typeButtonGroup;
-	
-	//Rotation Panel and Internals
-	private JPanel rotationButtonPanel;
-	private JLabel rotationGroupLabel;
-	private JRadioButton btnNotRotated;
-	private JRadioButton btnRotated;
-	private ButtonGroup rotationButtonGroup;
-	
+
 	//Inversion Panel and internals
 	private JPanel inversionButtonPanel;
 	private JLabel inversionGroupLabel;
@@ -52,10 +46,22 @@ public class FarmingPanel extends WidgetPanel {
 	private JRadioButton btnInverted;
 	private ButtonGroup inversionButtonGroup;
 	
-	//Mode Panel and Internals
-	private JPanel modePanel;
+	//Mode and Stats Outer Grouping Panel
+	private JPanel modeAndStatsPanel;
+	
+	//Mode Panel
+	private JPanel modeButtonPanel;
 	private JButton swathModeButton;
 	
+	//Statistics Length Panel
+	private JPanel statsLengthPanel;
+	private JLabel swathLengthTitleLabel;
+	private JLabel swathLengthValueLabel;
+	
+	//Statistics Width Panel
+	private JPanel statsWidthPanel;
+	private JLabel swathWidthTitleLabel;
+	private JLabel swathWidthValueLabel;
 	
 	public FarmingPanel(Context ctx, int layoutType) {
 		super(ctx, layoutType);
@@ -67,9 +73,8 @@ public class FarmingPanel extends WidgetPanel {
 		
 		//Create all button panel groups and their internals
 		createTypeButtonGroup();
-		createRotationButtonGroup();
 		createInversionButtonGroup();
-		createSwathModeButtons();
+		createSwathModeAndStats();
 		
       //Do nothing here to prevent clicks from falling through to map panel
       addMouseListener(new MouseAdapter() {
@@ -123,56 +128,7 @@ public class FarmingPanel extends WidgetPanel {
 		btnHorizontal.setSelected(true);
 		
 		this.add(typeButtonPanel);
-	}
-	
-	/**
-	 * Creates and collects all orientation radio buttons into a group, 
-	 * placing them within their own JPanel. This allows only one button 
-	 * to be selected at a time which is the behavior desired.
-	 */
-	protected void createRotationButtonGroup() {
-		
-		//Create Encapsulating JPanel
-		rotationButtonPanel = new JPanel();
-		rotationButtonPanel.setLayout(
-				new BoxLayout(rotationButtonPanel, BoxLayout.PAGE_AXIS));
-		rotationButtonPanel.setBackground(Color.white);
-		
-		//Add Label
-		rotationGroupLabel = new JLabel("Rotation:");
-		rotationButtonPanel.add(rotationGroupLabel);
-		
-		//Create Radio Buttons
-		btnNotRotated = new JRadioButton();
-		btnRotated = new JRadioButton();
-		
-		//Create button grouping and add to the panel
-		rotationButtonGroup = new ButtonGroup();
-		rotationButtonGroup.add(btnNotRotated);
-		rotationButtonGroup.add(btnRotated);
-		
-		Enumeration<AbstractButton> rotationButtons = 
-				rotationButtonGroup.getElements();
-		
-		//Format Radio Buttons
-		AbstractButton radioButton;
-		while(rotationButtons.hasMoreElements()) {
-			radioButton = rotationButtons.nextElement();
-			radioButton.setBackground(Color.white);
-			radioButton.setAction(updateSelection);
-			rotationButtonPanel.add(radioButton);
-		}
-		
-		//Setting Actiosn to buttons will wipe their text out so we
-		//name them here AFTER the actions are set instead.
-		btnNotRotated.setText("None");
-		btnRotated.setText("Rotated");
-		
-		//Set default selection
-		btnNotRotated.setSelected(true);
-		
-		this.add(rotationButtonPanel);
-	}		
+	}	
 
 	protected void createInversionButtonGroup() {
 		//Create Encapsulating JPanel
@@ -220,14 +176,43 @@ public class FarmingPanel extends WidgetPanel {
 	/**
 	 * Creates the required buttons for controlling swath placement mode.s
 	 */
-	protected void createSwathModeButtons() {
-		modePanel = new JPanel();
-		modePanel.setBackground(Color.white);
+	protected void createSwathModeAndStats() {
+		//Create outer containment panel
+		modeAndStatsPanel = new JPanel();
+		modeAndStatsPanel.setBackground(Color.white);
+		modeAndStatsPanel.setLayout(
+				new BoxLayout(modeAndStatsPanel, BoxLayout.PAGE_AXIS));
 		
+		//Create swath placement button
+		modeButtonPanel = new JPanel();
+		modeButtonPanel.setBackground(Color.white);
 		swathModeButton = theme.makeButton(startSwathMode);
+		modeButtonPanel.add(swathModeButton);
 		
-		modePanel.add(swathModeButton);
-		this.add(modePanel);
+		//Create length stat panel
+		statsLengthPanel = new JPanel();
+		statsLengthPanel.setBackground(Color.white);
+		swathLengthTitleLabel = new JLabel("Swath Length: ");
+		swathLengthValueLabel = new JLabel(
+				"" + UtilHelper.SWATH_LENGTH_FT + "FT");
+		statsLengthPanel.add(swathLengthTitleLabel);
+		statsLengthPanel.add(swathLengthValueLabel);
+		
+		//Create width stat panel
+		statsWidthPanel = new JPanel();
+		statsWidthPanel.setBackground(Color.white);
+		swathWidthTitleLabel = new JLabel("Swath Width: ");
+		swathWidthValueLabel = new JLabel(
+				"" + UtilHelper.SWATH_WIDTH_FT + "FT");
+		statsWidthPanel.add(swathWidthTitleLabel);
+		statsWidthPanel.add(swathWidthValueLabel);
+		
+		//Add components in order of vertical display
+		modeAndStatsPanel.add(modeButtonPanel);
+		modeAndStatsPanel.add(statsLengthPanel);
+		modeAndStatsPanel.add(statsWidthPanel);
+		
+		this.add(modeAndStatsPanel);
 	}
 
 	/**
@@ -236,14 +221,6 @@ public class FarmingPanel extends WidgetPanel {
 	 */
 	public SwathType getType() {
 		return swathPreviewWidget.getSelectedType();
-	}
-	
-	/**
-	 * Returns the type of rotation for the currentlys elected swath
-	 * @return - SwathRotation
-	 */
-	public SwathRotation getRotation() {
-		return swathPreviewWidget.getSelectedRotation();
 	}
 	
 	/**
@@ -299,19 +276,14 @@ public class FarmingPanel extends WidgetPanel {
 			SwathType type = (btnHorizontal.isSelected() ? 
 					SwathType.HORIZONTAL : 
 					SwathType.VERTICAL);
-			
-			//Rotation (Rotated or No Rotation)
-			SwathRotation rotation = (btnRotated.isSelected() ? 
-					SwathRotation.ROTATED :
-					SwathRotation.NONE);
-			
+
 			//Inversion (Flipped or No Inversion)
 			SwathInversion inversion = (btnInverted.isSelected() ? 
 					SwathInversion.FLIPPED :
 					SwathInversion.NONE);
 			
 			//Update Drawn Preview
-			swathPreviewWidget.updatePreview(type, rotation, inversion);
+			swathPreviewWidget.updatePreview(type, inversion);
 		}
 	};
 	

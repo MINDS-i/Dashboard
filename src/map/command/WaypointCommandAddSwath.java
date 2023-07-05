@@ -1,13 +1,15 @@
 package com.map.command;
 
-import com.ui.widgets.SwathPreviewWidget.SwathType;
-import com.ui.widgets.SwathPreviewWidget.SwathRotation;
-import com.ui.widgets.SwathPreviewWidget.SwathInversion;
-
 import java.util.List;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import javax.swing.*;
+
+import com.util.UtilHelper;
+
+import com.ui.widgets.SwathPreviewWidget.SwathType;
+import com.ui.widgets.SwathPreviewWidget.SwathInversion;
 
 import com.map.WaypointList;
 import com.map.command.WaypointCommand.CommandType;
@@ -22,28 +24,48 @@ import com.map.Dot;
  */
 public class WaypointCommandAddSwath extends WaypointCommand {
 
+	//Constants
+	private static final double SWATH_LENGTH_FT = 200;
+	private static final double SWATH_WIDTH_FT	= 32;
+	
 	//Member Vars
+	protected UtilHelper utilHelper;
 	protected List<Dot> swathPoints;
-
+	protected SwathType type;
+	protected SwathInversion inversion;
+	protected double lengthOffset;
+	protected double widthOffset;
+	
 	/**
 	 * Constructor
 	 * @param waypoints - List of current navigational waypoints
 	 * @param point - Starting point for the swath to be built off of.
 	 * @param index - Index in the waypoint list to insert the swathPoints list
 	 * @param type - The orientation type (Horizontal/Vertical) of the swath
-	 * @param rotation - The rotation of the swath (None/Rotation (90 degrees))
 	 * @param inversion - The inversion of the swath (Inverted/Not Inverted)
 	 */
 	public WaypointCommandAddSwath(
-			WaypointList waypoints, Dot point, int index,
-			SwathType type, SwathRotation rotation, SwathInversion inversion) {
+			WaypointList waypoints, Dot point, int index, 
+			SwathType type, SwathInversion inversion) {
 		super(waypoints, CommandType.ADD_SWATH);
 		
+		utilHelper = UtilHelper.getInstance();
+		
+		swathPoints = new ArrayList<Dot>();
 		//Starting index of the list of swath points.
+		this.point = point;
 		this.index = index;
+		this.type = type;
+		this.inversion = inversion;
 		
-		//TODO - CP - Generate list of swath points with given info here.
+		//TODO - CP - Make sure we are converted using both LAT and LNG here
+		//Depending on orientation we will need different conversion factors.
+		this.lengthOffset = utilHelper.kmToDegLng(utilHelper.feetToKm(
+				UtilHelper.SWATH_LENGTH_FT));
+		this.widthOffset = utilHelper.kmToDegLng(utilHelper.feetToKm(
+				UtilHelper.SWATH_WIDTH_FT));
 		
+		generateSwathList();
 	}
 	
 	/**
@@ -54,25 +76,26 @@ public class WaypointCommandAddSwath extends WaypointCommand {
 	@Override
 	public boolean execute() {
 		int currIndex = this.index;
-		CommandManager manager = CommandManager.getInstance();
-
-		//Check for any waypoint intersections first
-		for(Dot point : swathPoints) {
-			if(!manager.getGeofence().doesLocationIntersect(point)) {
-				serialLog.warning(WARN_NO_GEOFENCE_INTERSECT);
-				return false;
-			}
-		}
-		
-		//For each point in swathPoints List
-		for(Dot point : swathPoints) {
+//		CommandManager manager = CommandManager.getInstance();
+//
+//		//Check for any waypoint intersections first
+//		for(Dot point : swathPoints) {
+//			if(!manager.getGeofence().doesLocationIntersect(point)) {
+//				serialLog.warning(WARN_NO_GEOFENCE_INTERSECT);
+//				return false;
+//			}
+//		}
+//		
+//		//For each point in swathPoints List
+		for(Dot sPoint : swathPoints) {
 			//If the waypoint max hasn't been reached yet
 			if(waypoints.size() < MAX_WAYPOINTS) {
-				waypoints.add(point, currIndex);
+				waypoints.add(sPoint, currIndex);
 				currIndex++;
 			}
 		}
 		
+		//TODO - CP - Add the swath pattern to the waypoint list.
 		return true;
 	}
 	
@@ -82,14 +105,17 @@ public class WaypointCommandAddSwath extends WaypointCommand {
 	 */
 	@Override
 	public boolean undo() {
-		int currIndex = (this.index + swathPoints.size());
-		CommandManager manager = CommandManager.getInstance();
+//		int currIndex = (this.index + swathPoints.size());
+//		CommandManager manager = CommandManager.getInstance();
+//		
+//		//For each index starting at the end of the swath path
+//		//and continuing until the insertion index is reached...
+//		for(int i = currIndex; i < this.index; i--) {
+//			waypoints.remove(i);
+//		}
+//		
 		
-		//For each index starting at the end of the swath path
-		//and continuing until the insertion index is reached...
-		for(int i = currIndex; i < this.index; i--) {
-			waypoints.remove(i);
-		}
+		//TODO - CP - Remove the swath pattern from the waypoint list.
 		
 		return true;
 	}
@@ -101,7 +127,346 @@ public class WaypointCommandAddSwath extends WaypointCommand {
 	public boolean redo() {
 		return execute();
 	}
+	
+	/**
+	 * Uses the swath properties select a swath pattern to be generated
+	 */
+	public void generateSwathList() {
+		//TODO - CP - Add grid swath pattern.
+
+		//Determine the swath pattern to generate using orientation properties
+		switch(type) {
+			case HORIZONTAL:
+				switch(inversion) {
+					case NONE:
+						swathCreateHorizontalNotInverted();
+						break;
+						
+					case FLIPPED:
+						swathCreateHorizontalInverted();
+						break;
+				}
+				break;
+				
+			case VERTICAL:
+				switch(inversion) {
+					case NONE:
+						swathCreateVerticalNotInverted();
+						break;
+						
+					case FLIPPED:
+						swathCreateVerticalInverted();
+						break;
+				}
+				break;
+		}		
+	}
+	
+	/**
+	 * Creates a horizontally oriented swath pattern with no inversion
+	 * to be placed by the command when processed.
+	 */
+	private void swathCreateHorizontalNotInverted() {
+		Dot currentPoint;
+		
+		//Initial Point
+		currentPoint = point;
+		swathPoints.add(currentPoint);
+		
+		//Right
+		currentPoint = new Dot(
+				currentPoint.getLatitude(),
+				currentPoint.getLongitude() + lengthOffset, 
+				(short)0);
+		swathPoints.add(currentPoint);
+		
+		//Down
+		currentPoint = new Dot(
+				currentPoint.getLatitude()  - widthOffset, 
+				currentPoint.getLongitude(), 
+				(short)0);
+		swathPoints.add(currentPoint);
+		
+		//Left
+		currentPoint = new Dot(
+				currentPoint.getLatitude(),
+				currentPoint.getLongitude() - lengthOffset, 
+				(short)0);
+		swathPoints.add(currentPoint);
+		
+		//Down
+		currentPoint = new Dot(
+				currentPoint.getLatitude() - widthOffset, 
+				currentPoint.getLongitude(), 
+				(short)0);
+		swathPoints.add(currentPoint);
+		
+		//Right
+		currentPoint = new Dot(
+				currentPoint.getLatitude(),
+				currentPoint.getLongitude() + lengthOffset, 
+				(short)0);
+		swathPoints.add(currentPoint);
+		
+		//Down
+		currentPoint = new Dot(
+				currentPoint.getLatitude() - widthOffset, 
+				currentPoint.getLongitude(), 
+				(short)0);
+		swathPoints.add(currentPoint);
+		
+		//Left
+		currentPoint = new Dot(
+				currentPoint.getLatitude(), 
+				currentPoint.getLongitude() - lengthOffset, 
+				(short)0);
+		swathPoints.add(currentPoint);
+		
+		//Down
+		currentPoint = new Dot(
+				currentPoint.getLatitude()  - widthOffset, 
+				currentPoint.getLongitude(), 
+				(short)0);
+		swathPoints.add(currentPoint);
+		
+		//Right
+		currentPoint = new Dot(
+				currentPoint.getLatitude(), 
+				currentPoint.getLongitude() + lengthOffset, 
+				(short)0);
+		swathPoints.add(currentPoint);
+	}
+	
+	/**
+	 * Creates a horizontally oriented swath pattern with inversion
+	 * to be placed by the command when processed.
+	 */
+	private void swathCreateHorizontalInverted() {
+		Dot currentPoint;
+		
+		//Initial Point
+		currentPoint = point;
+		swathPoints.add(currentPoint);
+		
+		
+		//Left
+		currentPoint = new Dot(
+				currentPoint.getLatitude(), 
+				currentPoint.getLongitude() - lengthOffset, 
+				(short)0);
+		swathPoints.add(currentPoint);
+		
+		//Down
+		currentPoint = new Dot(
+				currentPoint.getLatitude() - widthOffset, 
+				currentPoint.getLongitude(), 
+				(short)0);
+		swathPoints.add(currentPoint);
+		
+		//Right
+		currentPoint = new Dot(
+				currentPoint.getLatitude(), 
+				currentPoint.getLongitude() + lengthOffset, 
+				(short)0);
+		swathPoints.add(currentPoint);
+		
+		//Down
+		currentPoint = new Dot(
+				currentPoint.getLatitude() - widthOffset, 
+				currentPoint.getLongitude(), 
+				(short)0);
+		swathPoints.add(currentPoint);
+		
+		//Left
+		currentPoint = new Dot(
+				currentPoint.getLatitude(), 
+				currentPoint.getLongitude() - lengthOffset, 
+				(short)0);
+		swathPoints.add(currentPoint);
+		
+		//Down
+		currentPoint = new Dot(
+				currentPoint.getLatitude() - widthOffset, 
+				currentPoint.getLongitude(), 
+				(short)0);
+		swathPoints.add(currentPoint);
+		
+		//Right
+		currentPoint = new Dot(
+				currentPoint.getLatitude(), 
+				currentPoint.getLongitude() + lengthOffset, 
+				(short)0);
+		swathPoints.add(currentPoint);
+		
+		//Down
+		currentPoint = new Dot(
+				currentPoint.getLatitude() - widthOffset, 
+				currentPoint.getLongitude(), 
+				(short)0);
+		swathPoints.add(currentPoint);
+		
+		//Left
+		currentPoint = new Dot(
+				currentPoint.getLatitude(), 
+				currentPoint.getLongitude() - lengthOffset, 
+				(short)0);
+		swathPoints.add(currentPoint);
+	}
+	
+	/**
+	 * Creates a vertically oriented swath pattern with no inversion to
+	 * be placed by the command when processed.
+	 */
+	private void swathCreateVerticalNotInverted() {
+		Dot currentPoint;
+		
+		//Initial Point
+		currentPoint = point;
+		swathPoints.add(currentPoint);
+		
+		//Up
+		currentPoint = new Dot(
+				currentPoint.getLatitude()  + lengthOffset, 
+				currentPoint.getLongitude(), 
+				(short)0);
+		swathPoints.add(currentPoint);
+		
+		//Right
+		currentPoint = new Dot(
+				currentPoint.getLatitude(), 
+				currentPoint.getLongitude() + widthOffset, 
+				(short)0);
+		swathPoints.add(currentPoint);
+		
+		//Down
+		currentPoint = new Dot(
+				currentPoint.getLatitude()  - lengthOffset, 
+				currentPoint.getLongitude(), 
+				(short)0);
+		swathPoints.add(currentPoint);
+		
+		//Right
+		currentPoint = new Dot(
+				currentPoint.getLatitude(), 
+				currentPoint.getLongitude() + widthOffset, 
+				(short)0);
+		swathPoints.add(currentPoint);
+		
+		//Up
+		currentPoint = new Dot(
+				currentPoint.getLatitude()  + lengthOffset, 
+				currentPoint.getLongitude(), 
+				(short)0);
+		swathPoints.add(currentPoint);
+		
+		//Right
+		currentPoint = new Dot(
+				currentPoint.getLatitude(), 
+				currentPoint.getLongitude() + widthOffset, 
+				(short)0);
+		swathPoints.add(currentPoint);
+		
+		//Down
+		currentPoint = new Dot(
+				currentPoint.getLatitude()  - lengthOffset, 
+				currentPoint.getLongitude(), 
+				(short)0);
+		swathPoints.add(currentPoint);
+		
+		//Right
+		currentPoint = new Dot(
+				currentPoint.getLatitude(), 
+				currentPoint.getLongitude() + widthOffset, 
+				(short)0);
+		swathPoints.add(currentPoint);
+		
+		//Up
+		currentPoint = new Dot(
+				currentPoint.getLatitude()  + lengthOffset, 
+				currentPoint.getLongitude(), 
+				(short)0);
+		swathPoints.add(currentPoint);
+	}
+	
+	/**
+	 * Creates a vertically oriented swath pattern with inversion to
+	 * be placed by the command when processed.
+	 */
+	private void swathCreateVerticalInverted() {
+		Dot currentPoint;
+		
+		//Initial Point
+		currentPoint = point;
+		swathPoints.add(currentPoint);
+		
+		//Down
+		currentPoint = new Dot(
+				currentPoint.getLatitude()  - lengthOffset, 
+				currentPoint.getLongitude(), 
+				(short)0);
+		swathPoints.add(currentPoint);
+		
+		//Right
+		currentPoint = new Dot(
+				currentPoint.getLatitude(), 
+				currentPoint.getLongitude() + widthOffset, 
+				(short)0);
+		swathPoints.add(currentPoint);
+		
+		//Up
+		currentPoint = new Dot(
+				currentPoint.getLatitude()  + lengthOffset, 
+				currentPoint.getLongitude(), 
+				(short)0);
+		swathPoints.add(currentPoint);
+		
+		//Right
+		currentPoint = new Dot(
+				currentPoint.getLatitude(), 
+				currentPoint.getLongitude() + widthOffset, 
+				(short)0);
+		swathPoints.add(currentPoint);
+		
+		//Down
+		currentPoint = new Dot(
+				currentPoint.getLatitude()  - lengthOffset, 
+				currentPoint.getLongitude(), 
+				(short)0);
+		swathPoints.add(currentPoint);
+		
+		//Right
+		currentPoint = new Dot(
+				currentPoint.getLatitude(), 
+				currentPoint.getLongitude() + widthOffset, 
+				(short)0);
+		swathPoints.add(currentPoint);
+		
+		//Up
+		currentPoint = new Dot(
+				currentPoint.getLatitude()  + lengthOffset, 
+				currentPoint.getLongitude(), 
+				(short)0);
+		swathPoints.add(currentPoint);
+		
+		//Right
+		currentPoint = new Dot(
+				currentPoint.getLatitude(), 
+				currentPoint.getLongitude() + widthOffset, 
+				(short)0);
+		swathPoints.add(currentPoint);
+		
+		//Down
+		currentPoint = new Dot(
+				currentPoint.getLatitude()  - lengthOffset, 
+				currentPoint.getLongitude(), 
+				(short)0);
+		swathPoints.add(currentPoint);
+	}
+	
 }
+
+
+
 
 //TODO - CP - Create Swath patterns routines to execute from the AddSwath
 //command.

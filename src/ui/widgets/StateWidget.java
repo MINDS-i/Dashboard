@@ -90,7 +90,7 @@ public class StateWidget extends UIWidget {
 		flagLabel.setOpaque(true);
 
 		JComponent[] labelList = new JComponent[] {
-			apmLabel, driveLabel, autoLabel, flagLabel //, gpsLabel	
+			apmLabel, driveLabel, autoLabel, flagLabel
 		};
 		
 		for(JComponent jc : labelList) {

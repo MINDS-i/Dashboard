@@ -61,7 +61,9 @@ public class Dot {
      * Class Constructor
      * @param latitude - The latitude of the waypoint dot.
      * @param longitude - The longitude of the waypoint dot.
-     * @param altitude - The altitude of the waypoint dot.
+     * @param altitude - The altitude/speed of the waypoint dot depending
+     * 						on whether the device used is a UAV copter or
+     * 						ground vehicle respectively.
      */
     public Dot(double latitude, double longitude, short altitude) {
         this.location = new Point.Double(longitude, latitude);

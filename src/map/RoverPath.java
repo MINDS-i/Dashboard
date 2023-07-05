@@ -132,7 +132,6 @@ public class RoverPath implements Layer {
             			command = new WaypointCommandAddSwath(
             					waypoints, new Dot(point), waypoints.size(),
             					context.dash.farmingPanel.getType(),
-            					context.dash.farmingPanel.getRotation(),
             					context.dash.farmingPanel.getInversion());
             			
             			//TODO - CP - Change this when swath group movement is in place.
@@ -143,7 +142,6 @@ public class RoverPath implements Layer {
             			
             			map.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             			currOpMode = OpMode.STANDARD;
-            			
             			break;
             			
             		default:

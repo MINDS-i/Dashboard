@@ -39,7 +39,7 @@ public class Theme {
     public BufferedImage verticalMeterYellow;
     public BufferedImage verticalMeterGreen;
     public BufferedImage verticalMeterSpacer;
-    public BufferedImage swathHorizontal;
+    public BufferedImage swathHorizontal0;
     public BufferedImage swathVertical;
     public BufferedImage swathNone;
     
@@ -88,7 +88,7 @@ public class Theme {
             verticalMeterYellow = ImageIO.read(new File(img+ctx.getResource("gps_yellow")));
             verticalMeterGreen = ImageIO.read(new File(img+ctx.getResource("gps_green")));
             verticalMeterSpacer = ImageIO.read(new File(img+ctx.getResource("gps_spacer")));
-            swathHorizontal	 = ImageIO.read(new File(img+ctx.getResource("swath_horizontal")));
+            swathHorizontal0 = ImageIO.read(new File(img+ctx.getResource("swath_horizontal_0")));
             swathVertical	 = ImageIO.read(new File(img+ctx.getResource("swath_vertical")));
             swathNone	 	 = ImageIO.read(new File(img+ctx.getResource("swath_none")));
             buttonPatch      = NinePatch.loadFrom(Paths.get(np+ctx.getResource("button")));
