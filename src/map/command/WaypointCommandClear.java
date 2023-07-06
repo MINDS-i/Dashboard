@@ -7,6 +7,7 @@ import com.map.geofence.WaypointGeofence;
 import com.map.WaypointList;
 import com.map.Dot;
 import com.serial.SerialSendManager;
+import com.util.SwathProperties;
 
 /**
  * @author Chris Park @ Infinetix Corp.
@@ -51,7 +52,9 @@ public class WaypointCommandClear extends WaypointCommand {
 		//Send the empty list
 		SerialSendManager.getInstance().sendWaypointList(waypoints);
 		SerialSendManager.getInstance().changeMovement(false);
-	
+		
+		//TODO - CP - Check for swath type and set appropriate state here
+
 		return true;
 	}
 	
@@ -76,6 +79,8 @@ public class WaypointCommandClear extends WaypointCommand {
 			
 			waypoints.add(waypointsBackup.get(i).dot(), i);
 		}
+		
+		//TODO - CP - Check for swath type and set appropriate state here
 		
 		return true;
 	}

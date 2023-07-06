@@ -36,6 +36,7 @@ public class Dot {
     public Dot() {
         this.location = new Point.Double(0,0);
         this.altitude = 0;
+        this.waypointType = WaypointType.STANDARD;
     }
     
     /**
@@ -43,18 +44,20 @@ public class Dot {
      * @param location - The Lat/Lng location of the waypoint dot.
      * @param altitude - The altitude of the waypoint dot.
      */
-    public Dot(Point2D location, short altitude) {
+    public Dot(Point2D location, short altitude, WaypointType waypointType) {
         this.location = location;
         this.altitude = altitude;
+        this.waypointType = waypointType;
     }
     
     /**
      * Class Constructor
      * @param location - The Lat/Lng location of the waypoint dot.
      */
-    public Dot(Point2D location) {
+    public Dot(Point2D location, WaypointType waypointType) {
         this.location = location;
         this.altitude = 0;
+        this.waypointType = waypointType;
     }
     
     /**
@@ -65,9 +68,11 @@ public class Dot {
      * 						on whether the device used is a UAV copter or
      * 						ground vehicle respectively.
      */
-    public Dot(double latitude, double longitude, short altitude) {
+    public Dot(double latitude, double longitude, short altitude,
+    		WaypointType waypointType) {
         this.location = new Point.Double(longitude, latitude);
         this.altitude = altitude;
+        this.waypointType = waypointType;
     }
     
     /**

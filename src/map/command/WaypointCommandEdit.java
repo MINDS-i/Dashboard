@@ -3,6 +3,7 @@ package com.map.command;
 import java.util.logging.Logger;
 
 import com.map.WaypointList;
+import com.map.WaypointType;
 import com.map.command.WaypointCommand.CommandType;
 import com.map.geofence.WaypointGeofence;
 import com.map.Dot;
@@ -42,7 +43,8 @@ public class WaypointCommandEdit extends WaypointCommand {
 		this.startPoint = new Dot(
 				waypoints.get(index).dot().getLatitude(),
 				waypoints.get(index).dot().getLongitude(),
-				waypoints.get(index).dot().getAltitude());
+				waypoints.get(index).dot().getAltitude(),
+				waypoints.get(index).dot().getWaypointType());
 		
 		this.endPoint = null;
 		this.index = index;

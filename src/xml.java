@@ -3,6 +3,7 @@ package com;
 import com.Dashboard;
 import com.map.*;
 import com.Context;
+import com.map.WaypointType;
 
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -120,7 +121,7 @@ public class xml {
                             } catch (NumberFormatException | NullPointerException e) {
                                 lng = 0;
                             }
-                            pnt = new Dot(lat,lng,(short)0);
+                            pnt = new Dot(lat,lng,(short)0, WaypointType.SWATH);
                             break;
                         case "ele":
                             break;

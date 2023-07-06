@@ -372,7 +372,12 @@ public class WaypointPanel extends NinePatchPanel {
             if((newAltitude&0xffff) == newAltitude) {
             	
             	
-            	command.finalize(new Dot(newPosition, (short)newAltitude));
+            	command.finalize(new Dot(
+            			newPosition, 
+            			(short)newAltitude,
+            			waypoints.getPoints().get(
+            					selectedWaypoint).getWaypointType()));
+            	
             	CommandManager.getInstance().process(command);
 
                 //set to display reconverted value

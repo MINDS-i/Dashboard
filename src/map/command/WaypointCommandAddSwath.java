@@ -13,6 +13,7 @@ import com.ui.widgets.SwathPreviewWidget.SwathType;
 import com.ui.widgets.SwathPreviewWidget.SwathInversion;
 
 import com.map.WaypointList;
+import com.map.WaypointType;
 import com.map.command.WaypointCommand.CommandType;
 import com.map.geofence.WaypointGeofence;
 import com.map.Dot;
@@ -90,7 +91,9 @@ public class WaypointCommandAddSwath extends WaypointCommand {
 			}
 		}
 		
-		//Set the placement flag
+		//Set the placement flag and the previous state
+		swathProperties.setPreviousSwathPlacedState(
+				swathProperties.getIsSwathPlaced());
 		swathProperties.setIsSwathPlaced(true);		
 		return true;
 	}
@@ -108,7 +111,9 @@ public class WaypointCommandAddSwath extends WaypointCommand {
 			waypoints.remove(i);
 		}
 		
-		//Reset the placement flag
+		//Reset the placement flag and the previous state
+		swathProperties.setPreviousSwathPlacedState(
+				swathProperties.getIsSwathPlaced());
 		swathProperties.setIsSwathPlaced(false);
 		
 		return true;
@@ -170,63 +175,72 @@ public class WaypointCommandAddSwath extends WaypointCommand {
 		currentPoint = new Dot(
 				currentPoint.getLatitude(),
 				currentPoint.getLongitude() + lengthOffset, 
-				(short)0);
+				(short)0,
+				WaypointType.SWATH);
 		swathPoints.add(currentPoint);
 		
 		//Down
 		currentPoint = new Dot(
 				currentPoint.getLatitude()  - widthOffset, 
 				currentPoint.getLongitude(), 
-				(short)0);
+				(short)0,
+				WaypointType.SWATH);
 		swathPoints.add(currentPoint);
 		
 		//Left
 		currentPoint = new Dot(
 				currentPoint.getLatitude(),
 				currentPoint.getLongitude() - lengthOffset, 
-				(short)0);
+				(short)0,
+				WaypointType.SWATH);
 		swathPoints.add(currentPoint);
 		
 		//Down
 		currentPoint = new Dot(
 				currentPoint.getLatitude() - widthOffset, 
 				currentPoint.getLongitude(), 
-				(short)0);
+				(short)0,
+				WaypointType.SWATH);
 		swathPoints.add(currentPoint);
 		
 		//Right
 		currentPoint = new Dot(
 				currentPoint.getLatitude(),
 				currentPoint.getLongitude() + lengthOffset, 
-				(short)0);
+				(short)0,
+				WaypointType.SWATH);
 		swathPoints.add(currentPoint);
 		
 		//Down
 		currentPoint = new Dot(
 				currentPoint.getLatitude() - widthOffset, 
 				currentPoint.getLongitude(), 
-				(short)0);
+				(short)0,
+				WaypointType.SWATH);
 		swathPoints.add(currentPoint);
 		
 		//Left
 		currentPoint = new Dot(
 				currentPoint.getLatitude(), 
 				currentPoint.getLongitude() - lengthOffset, 
-				(short)0);
+				(short)0,
+				WaypointType.SWATH);
 		swathPoints.add(currentPoint);
 		
 		//Down
 		currentPoint = new Dot(
 				currentPoint.getLatitude()  - widthOffset, 
 				currentPoint.getLongitude(), 
-				(short)0);
+				(short)0,
+				WaypointType.SWATH);
 		swathPoints.add(currentPoint);
 		
 		//Right
 		currentPoint = new Dot(
 				currentPoint.getLatitude(), 
 				currentPoint.getLongitude() + lengthOffset, 
-				(short)0);
+				(short)0,
+				WaypointType.SWATH);
 		swathPoints.add(currentPoint);
 	}
 	
@@ -246,63 +260,72 @@ public class WaypointCommandAddSwath extends WaypointCommand {
 		currentPoint = new Dot(
 				currentPoint.getLatitude(), 
 				currentPoint.getLongitude() - lengthOffset, 
-				(short)0);
+				(short)0,
+				WaypointType.SWATH);
 		swathPoints.add(currentPoint);
 		
 		//Down
 		currentPoint = new Dot(
 				currentPoint.getLatitude() - widthOffset, 
 				currentPoint.getLongitude(), 
-				(short)0);
+				(short)0,
+				WaypointType.SWATH);
 		swathPoints.add(currentPoint);
 		
 		//Right
 		currentPoint = new Dot(
 				currentPoint.getLatitude(), 
 				currentPoint.getLongitude() + lengthOffset, 
-				(short)0);
+				(short)0,
+				WaypointType.SWATH);
 		swathPoints.add(currentPoint);
 		
 		//Down
 		currentPoint = new Dot(
 				currentPoint.getLatitude() - widthOffset, 
 				currentPoint.getLongitude(), 
-				(short)0);
+				(short)0,
+				WaypointType.SWATH);
 		swathPoints.add(currentPoint);
 		
 		//Left
 		currentPoint = new Dot(
 				currentPoint.getLatitude(), 
 				currentPoint.getLongitude() - lengthOffset, 
-				(short)0);
+				(short)0,
+				WaypointType.SWATH);
 		swathPoints.add(currentPoint);
 		
 		//Down
 		currentPoint = new Dot(
 				currentPoint.getLatitude() - widthOffset, 
 				currentPoint.getLongitude(), 
-				(short)0);
+				(short)0,
+				WaypointType.SWATH);
 		swathPoints.add(currentPoint);
 		
 		//Right
 		currentPoint = new Dot(
 				currentPoint.getLatitude(), 
 				currentPoint.getLongitude() + lengthOffset, 
-				(short)0);
+				(short)0,
+				WaypointType.SWATH);
 		swathPoints.add(currentPoint);
 		
 		//Down
 		currentPoint = new Dot(
 				currentPoint.getLatitude() - widthOffset, 
 				currentPoint.getLongitude(), 
-				(short)0);
+				(short)0,
+				WaypointType.SWATH);
 		swathPoints.add(currentPoint);
 		
 		//Left
 		currentPoint = new Dot(
 				currentPoint.getLatitude(), 
 				currentPoint.getLongitude() - lengthOffset, 
-				(short)0);
+				(short)0,
+				WaypointType.SWATH);
 		swathPoints.add(currentPoint);
 	}
 	
@@ -321,63 +344,72 @@ public class WaypointCommandAddSwath extends WaypointCommand {
 		currentPoint = new Dot(
 				currentPoint.getLatitude()  + lengthOffset, 
 				currentPoint.getLongitude(), 
-				(short)0);
+				(short)0,
+				WaypointType.SWATH);
 		swathPoints.add(currentPoint);
 		
 		//Right
 		currentPoint = new Dot(
 				currentPoint.getLatitude(), 
 				currentPoint.getLongitude() + widthOffset, 
-				(short)0);
+				(short)0,
+				WaypointType.SWATH);
 		swathPoints.add(currentPoint);
 		
 		//Down
 		currentPoint = new Dot(
 				currentPoint.getLatitude()  - lengthOffset, 
 				currentPoint.getLongitude(), 
-				(short)0);
+				(short)0,
+				WaypointType.SWATH);
 		swathPoints.add(currentPoint);
 		
 		//Right
 		currentPoint = new Dot(
 				currentPoint.getLatitude(), 
 				currentPoint.getLongitude() + widthOffset, 
-				(short)0);
+				(short)0,
+				WaypointType.SWATH);
 		swathPoints.add(currentPoint);
 		
 		//Up
 		currentPoint = new Dot(
 				currentPoint.getLatitude()  + lengthOffset, 
 				currentPoint.getLongitude(), 
-				(short)0);
+				(short)0,
+				WaypointType.SWATH);
 		swathPoints.add(currentPoint);
 		
 		//Right
 		currentPoint = new Dot(
 				currentPoint.getLatitude(), 
 				currentPoint.getLongitude() + widthOffset, 
-				(short)0);
+				(short)0,
+				WaypointType.SWATH);
 		swathPoints.add(currentPoint);
 		
 		//Down
 		currentPoint = new Dot(
 				currentPoint.getLatitude()  - lengthOffset, 
 				currentPoint.getLongitude(), 
-				(short)0);
+				(short)0,
+				WaypointType.SWATH);
 		swathPoints.add(currentPoint);
 		
 		//Right
 		currentPoint = new Dot(
 				currentPoint.getLatitude(), 
 				currentPoint.getLongitude() + widthOffset, 
-				(short)0);
+				(short)0,
+				WaypointType.SWATH);
 		swathPoints.add(currentPoint);
 		
 		//Up
 		currentPoint = new Dot(
 				currentPoint.getLatitude()  + lengthOffset, 
 				currentPoint.getLongitude(), 
-				(short)0);
+				(short)0,
+				WaypointType.SWATH);
 		swathPoints.add(currentPoint);
 	}
 	
@@ -396,63 +428,72 @@ public class WaypointCommandAddSwath extends WaypointCommand {
 		currentPoint = new Dot(
 				currentPoint.getLatitude()  - lengthOffset, 
 				currentPoint.getLongitude(), 
-				(short)0);
+				(short)0,
+				WaypointType.SWATH);
 		swathPoints.add(currentPoint);
 		
 		//Right
 		currentPoint = new Dot(
 				currentPoint.getLatitude(), 
 				currentPoint.getLongitude() + widthOffset, 
-				(short)0);
+				(short)0,
+				WaypointType.SWATH);
 		swathPoints.add(currentPoint);
 		
 		//Up
 		currentPoint = new Dot(
 				currentPoint.getLatitude()  + lengthOffset, 
 				currentPoint.getLongitude(), 
-				(short)0);
+				(short)0,
+				WaypointType.SWATH);
 		swathPoints.add(currentPoint);
 		
 		//Right
 		currentPoint = new Dot(
 				currentPoint.getLatitude(), 
 				currentPoint.getLongitude() + widthOffset, 
-				(short)0);
+				(short)0,
+				WaypointType.SWATH);
 		swathPoints.add(currentPoint);
 		
 		//Down
 		currentPoint = new Dot(
 				currentPoint.getLatitude()  - lengthOffset, 
 				currentPoint.getLongitude(), 
-				(short)0);
+				(short)0,
+				WaypointType.SWATH);
 		swathPoints.add(currentPoint);
 		
 		//Right
 		currentPoint = new Dot(
 				currentPoint.getLatitude(), 
 				currentPoint.getLongitude() + widthOffset, 
-				(short)0);
+				(short)0,
+				WaypointType.SWATH);
 		swathPoints.add(currentPoint);
 		
 		//Up
 		currentPoint = new Dot(
 				currentPoint.getLatitude()  + lengthOffset, 
 				currentPoint.getLongitude(), 
-				(short)0);
+				(short)0,
+				WaypointType.SWATH);
 		swathPoints.add(currentPoint);
 		
 		//Right
 		currentPoint = new Dot(
 				currentPoint.getLatitude(), 
 				currentPoint.getLongitude() + widthOffset, 
-				(short)0);
+				(short)0,
+				WaypointType.SWATH);
 		swathPoints.add(currentPoint);
 		
 		//Down
 		currentPoint = new Dot(
 				currentPoint.getLatitude()  - lengthOffset, 
 				currentPoint.getLongitude(), 
-				(short)0);
+				(short)0,
+				WaypointType.SWATH);
 		swathPoints.add(currentPoint);
 	}
 	

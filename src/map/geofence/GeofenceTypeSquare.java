@@ -2,6 +2,7 @@ package com.map.geofence;
 
 import com.map.Dot;
 import com.map.CoordinateTransform;
+import com.map.WaypointType;
 import com.util.UtilHelper;
 
 import java.awt.*;
@@ -111,8 +112,11 @@ public class GeofenceTypeSquare extends GeofenceType {
 		double radiusKm = UtilHelper.getInstance().feetToKm(radius_ft);
 		double degreesLng = UtilHelper.getInstance().kmToDegLng(radiusKm);
 		
-		radiusPoint = new Dot(origin.getLatitude(), 
-				origin.getLongitude() + degreesLng, origin.getAltitude());
+		radiusPoint = new Dot(
+				origin.getLatitude(), 
+				(origin.getLongitude() + degreesLng), 
+				origin.getAltitude(),
+				WaypointType.STANDARD);
 	}
 	
 	/**

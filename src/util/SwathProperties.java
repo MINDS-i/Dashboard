@@ -10,12 +10,14 @@ public class SwathProperties {
 	
 	//Swath placement state
 	private boolean isSwathPlaced;
+	private boolean previousSwathPlacedState;
 	
 	/**
 	 * Const ructor (Private, accedssed by getInstance)
 	 */
 	private SwathProperties() {
 		isSwathPlaced = false;
+		previousSwathPlacedState = false;
 	}
 	
 	/**
@@ -44,6 +46,22 @@ public class SwathProperties {
 	 */
 	public void setIsSwathPlaced(boolean placed) {
 		isSwathPlaced = placed;
+	}
+	
+	/**
+	 * Gets the previous state of swath placement
+	 * @return - boolean
+	 */
+	public boolean getPreviousSwathPlacedState() {
+		return previousSwathPlacedState;
+	}
+	
+	/**
+	 * Sets the previous state of swath placement
+	 * @param placed - boolean
+	 */
+	public void setPreviousSwathPlacedState(boolean placed) {
+		previousSwathPlacedState = placed;
 	}
 	
 }

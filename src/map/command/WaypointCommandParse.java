@@ -234,7 +234,7 @@ public class WaypointCommandParse extends WaypointCommand {
 							catch (NumberFormatException | NullPointerException ex) {
 								lng = 0;
 							}
-							point = new Dot(lat, lng, (short)0);
+							point = new Dot(lat, lng, (short)0, WaypointType.STANDARD);
 						} 
 						else if(xmlReader.getLocalName() == XMLElement.ELEVATION.getValue()) {
 							//Do nothing for now (May be implimented at a later date)

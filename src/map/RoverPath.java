@@ -8,6 +8,7 @@ import com.serial.Serial;
 import com.telemetry.TelemetryListener;
 import com.layer.Layer;
 import com.util.SwathProperties;
+import com.map.WaypointType;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -124,7 +125,10 @@ public class RoverPath implements Layer {
             			break;
             		case STANDARD:
             			command = new WaypointCommandAdd(
-                    			waypoints, new Dot(point), waypoints.size());
+                    			waypoints, 
+                    			new Dot(point, WaypointType.STANDARD), 
+                    			waypoints.size());
+            			
                     	//Manually adjust for size vs index offset
                         waypoints.setSelected(waypoints.size() - 1);
             			break;
@@ -134,7 +138,9 @@ public class RoverPath implements Layer {
             			//If a swath hasn't already been placed, set the command
             			if(!SwathProperties.getInstance().getIsSwathPlaced()) {
                 			command = new WaypointCommandAddSwath(
-                					waypoints, new Dot(point), waypoints.size(),
+                					waypoints, 
+                					new Dot(point, WaypointType.SWATH), 
+                					waypoints.size(),
                 					context.dash.farmingPanel.getType(),
                 					context.dash.farmingPanel.getInversion());
                 			
@@ -158,7 +164,9 @@ public class RoverPath implements Layer {
             	switch(currOpMode) {
         			case STANDARD:
         				command = new WaypointCommandAdd(
-        						waypoints, new Dot(point), line);
+        						waypoints, 
+        						new Dot(point, WaypointType.STANDARD), 
+        						line);
         			break;
         			
             		case SET_HOME:
@@ -488,7 +496,7 @@ public class RoverPath implements Layer {
     public void updateHomeLocation(Point2D point) {
     	Dot home = waypoints.getHome();
     	home.setLocation(point);
-    	waypoints.setHome(new Dot(point));
+    	waypoints.setHome(new Dot(point, WaypointType.HOME));
     	context.setHomeProp(String.valueOf(home.getLatitude()), 
     			String.valueOf(home.getLongitude()));
     	serialLog.warning("SET HOME - Home point set.");
