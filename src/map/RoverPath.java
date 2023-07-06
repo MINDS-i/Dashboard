@@ -7,6 +7,7 @@ import com.Context;
 import com.serial.Serial;
 import com.telemetry.TelemetryListener;
 import com.layer.Layer;
+import com.util.SwathProperties;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -129,16 +130,20 @@ public class RoverPath implements Layer {
             			break;
             			
             		case PLACE_SWATH:
-            			command = new WaypointCommandAddSwath(
-            					waypoints, new Dot(point), waypoints.size(),
-            					context.dash.farmingPanel.getType(),
-            					context.dash.farmingPanel.getInversion());
             			
-            			//TODO - CP - Change this when swath group movement is in place.
-            			//Manually adjust for size vs index offset
-            			//Should select the end of the swath for now
-            			//but we'll want the beginning selected for movement later
-            			waypoints.setSelected(waypoints.size() - 1);
+            			//If a swath hasn't already been placed, set the command
+            			if(!SwathProperties.getInstance().getIsSwathPlaced()) {
+                			command = new WaypointCommandAddSwath(
+                					waypoints, new Dot(point), waypoints.size(),
+                					context.dash.farmingPanel.getType(),
+                					context.dash.farmingPanel.getInversion());
+                			
+                			waypoints.setSelected(waypoints.size() - 1);
+            			}
+            			else { //If a swath has been placed, then report error
+            				serialLog.warning("RoverPath - Error: "
+            						+ "Only one swath may be placed at a time.");
+            			}
             			
             			map.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             			currOpMode = OpMode.STANDARD;

@@ -2,7 +2,7 @@ package com.ui;
 
 import com.Context;
 
-import com.util.UtilHelper;
+import com.util.SwathProperties;
 
 import com.map.MapPanel;
 import com.map.RoverPath;
@@ -194,7 +194,7 @@ public class FarmingPanel extends WidgetPanel {
 		statsLengthPanel.setBackground(Color.white);
 		swathLengthTitleLabel = new JLabel("Swath Length: ");
 		swathLengthValueLabel = new JLabel(
-				"" + UtilHelper.SWATH_LENGTH_FT + "FT");
+				"" + SwathProperties.SWATH_LENGTH_FT + "FT");
 		statsLengthPanel.add(swathLengthTitleLabel);
 		statsLengthPanel.add(swathLengthValueLabel);
 		
@@ -203,7 +203,7 @@ public class FarmingPanel extends WidgetPanel {
 		statsWidthPanel.setBackground(Color.white);
 		swathWidthTitleLabel = new JLabel("Swath Width: ");
 		swathWidthValueLabel = new JLabel(
-				"" + UtilHelper.SWATH_WIDTH_FT + "FT");
+				"" + SwathProperties.SWATH_WIDTH_FT + "FT");
 		statsWidthPanel.add(swathWidthTitleLabel);
 		statsWidthPanel.add(swathWidthValueLabel);
 		
@@ -254,7 +254,7 @@ public class FarmingPanel extends WidgetPanel {
 				return;
 			}
 			
-			//If we we're in swath placement mode, cancel and return to standard
+			//If we're in swath placement mode, cancel and return to standard
 			if(mapPanel.roverPath.getOpMode() == RoverPath.OpMode.PLACE_SWATH) {
 				mapPanel.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 				mapPanel.roverPath.setOpMode(RoverPath.OpMode.STANDARD);

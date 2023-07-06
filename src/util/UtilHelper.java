@@ -18,12 +18,6 @@ public class UtilHelper {
 	private static final double FEET_PER_KM = 3280.84;
 	private static final double KM_PER_FEET = 0.0003048;
 	private static final double KM_PER_LNG = 111;
-	//
-	//KM per Degre LNG
-	
-	//Swath Pattern dimension properties
-	public static final double SWATH_LENGTH_FT = 200;
-	public static final double SWATH_WIDTH_FT = 32;
 	
 	/**
 	 * Constructor (Private, accessed by getInstance

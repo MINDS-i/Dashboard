@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 
 import javax.swing.*;
 
+import com.util.SwathProperties;
 import com.util.UtilHelper;
 
 import com.ui.widgets.SwathPreviewWidget.SwathType;
@@ -29,7 +30,9 @@ public class WaypointCommandAddSwath extends WaypointCommand {
 	private static final double SWATH_WIDTH_FT	= 32;
 	
 	//Member Vars
+	protected SwathProperties swathProperties;
 	protected UtilHelper utilHelper;
+	
 	protected List<Dot> swathPoints;
 	protected SwathType type;
 	protected SwathInversion inversion;
@@ -50,6 +53,7 @@ public class WaypointCommandAddSwath extends WaypointCommand {
 		super(waypoints, CommandType.ADD_SWATH);
 		
 		utilHelper = UtilHelper.getInstance();
+		swathProperties = SwathProperties.getInstance();
 		
 		swathPoints = new ArrayList<Dot>();
 		//Starting index of the list of swath points.
@@ -61,9 +65,9 @@ public class WaypointCommandAddSwath extends WaypointCommand {
 		//TODO - CP - Make sure we are converted using both LAT and LNG here
 		//Depending on orientation we will need different conversion factors.
 		this.lengthOffset = utilHelper.kmToDegLng(utilHelper.feetToKm(
-				UtilHelper.SWATH_LENGTH_FT));
+				SwathProperties.SWATH_LENGTH_FT));
 		this.widthOffset = utilHelper.kmToDegLng(utilHelper.feetToKm(
-				UtilHelper.SWATH_WIDTH_FT));
+				SwathProperties.SWATH_WIDTH_FT));
 		
 		generateSwathList();
 	}
@@ -76,17 +80,8 @@ public class WaypointCommandAddSwath extends WaypointCommand {
 	@Override
 	public boolean execute() {
 		int currIndex = this.index;
-//		CommandManager manager = CommandManager.getInstance();
-//
-//		//Check for any waypoint intersections first
-//		for(Dot point : swathPoints) {
-//			if(!manager.getGeofence().doesLocationIntersect(point)) {
-//				serialLog.warning(WARN_NO_GEOFENCE_INTERSECT);
-//				return false;
-//			}
-//		}
-//		
-//		//For each point in swathPoints List
+
+		//For each point in swathPoints List
 		for(Dot sPoint : swathPoints) {
 			//If the waypoint max hasn't been reached yet
 			if(waypoints.size() < MAX_WAYPOINTS) {
@@ -95,7 +90,8 @@ public class WaypointCommandAddSwath extends WaypointCommand {
 			}
 		}
 		
-		//TODO - CP - Add the swath pattern to the waypoint list.
+		//Set the placement flag
+		swathProperties.setIsSwathPlaced(true);		
 		return true;
 	}
 	
@@ -105,17 +101,15 @@ public class WaypointCommandAddSwath extends WaypointCommand {
 	 */
 	@Override
 	public boolean undo() {
-//		int currIndex = (this.index + swathPoints.size());
-//		CommandManager manager = CommandManager.getInstance();
-//		
-//		//For each index starting at the end of the swath path
-//		//and continuing until the insertion index is reached...
-//		for(int i = currIndex; i < this.index; i--) {
-//			waypoints.remove(i);
-//		}
-//		
+		int endIndex = (this.index + (swathPoints.size() - 1));
 		
-		//TODO - CP - Remove the swath pattern from the waypoint list.
+		//Starting at the end of the swath list, remove each swath point
+		for(int i = endIndex; i >= index; i--) {
+			waypoints.remove(i);
+		}
+		
+		//Reset the placement flag
+		swathProperties.setIsSwathPlaced(false);
 		
 		return true;
 	}
@@ -132,7 +126,6 @@ public class WaypointCommandAddSwath extends WaypointCommand {
 	 * Uses the swath properties select a swath pattern to be generated
 	 */
 	public void generateSwathList() {
-		//TODO - CP - Add grid swath pattern.
 
 		//Determine the swath pattern to generate using orientation properties
 		switch(type) {
@@ -464,12 +457,3 @@ public class WaypointCommandAddSwath extends WaypointCommand {
 	}
 	
 }
-
-
-
-
-//TODO - CP - Create Swath patterns routines to execute from the AddSwath
-//command.
-	//Horizontal
-	//Horizontal rotate 90
-	//More after proofing that out
