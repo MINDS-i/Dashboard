@@ -1,7 +1,10 @@
 package com.map.command;
 
+import java.util.List;
+
 import com.Context;
 import com.map.WaypointList.*;
+import com.map.WaypointType;
 import com.map.command.WaypointCommand.CommandType;
 import com.map.geofence.WaypointGeofence;
 import com.map.WaypointList;
@@ -42,7 +45,20 @@ public class WaypointCommandClear extends WaypointCommand {
 	@Override
 	public boolean execute() {
 		CommandManager commandManager = CommandManager.getInstance();
-
+		SwathProperties swathProperties = SwathProperties.getInstance();
+		List<Dot> pointList = waypoints.getPoints();
+		
+		//Loop through the list of points before clearing them
+		//If a swath pattern was in the list, set the trackable
+		//states in swath properties so that we can properly restore it
+		//if an undo operation happens.
+		for(Dot point : pointList) {
+			if(point.getWaypointType() == WaypointType.SWATH) {
+				swathProperties.setPreviousSwathPlacedState(true);
+				swathProperties.setIsSwathPlaced(false);
+			}
+		}
+		
 		//Event is labeled as coming from the rover to avoid sending
 		//waypoint update messages for every point. An explicit clear message
 		//is sent to the rover afterwards.
@@ -53,8 +69,6 @@ public class WaypointCommandClear extends WaypointCommand {
 		SerialSendManager.getInstance().sendWaypointList(waypoints);
 		SerialSendManager.getInstance().changeMovement(false);
 		
-		//TODO - CP - Check for swath type and set appropriate state here
-
 		return true;
 	}
 	
@@ -65,6 +79,15 @@ public class WaypointCommandClear extends WaypointCommand {
 	@Override
 	public boolean undo() {
 		CommandManager manager = CommandManager.getInstance();
+		SwathProperties swathProperties = SwathProperties.getInstance();
+	
+		//If a swath pattern exists and was previously placed inside the
+		//waypoint backup list. Set placement states to prevent additional
+		//patterns from being placed after restoring the existing one.
+		if(swathProperties.getPreviousSwathPlacedState()) {
+			swathProperties.setIsSwathPlaced(true);
+			swathProperties.setPreviousSwathPlacedState(false);
+		}
 		
 		//Add each waypoint from the backup one by one
 		for(int i = 0; i < waypointsBackup.size(); i++) {
@@ -79,9 +102,7 @@ public class WaypointCommandClear extends WaypointCommand {
 			
 			waypoints.add(waypointsBackup.get(i).dot(), i);
 		}
-		
-		//TODO - CP - Check for swath type and set appropriate state here
-		
+
 		return true;
 	}
 	

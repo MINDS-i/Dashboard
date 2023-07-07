@@ -81,7 +81,7 @@ public class SwathPreviewWidget extends JPanel {
 		//Set all image variables
 		imgSwathNone = 			ctx.theme.swathNone;
 		imgSwathHorizontal =	ctx.theme.swathHorizontal0; 
-		imgSwathVertical =		ctx.theme.swathVertical;
+		imgSwathVertical =		ctx.theme.swathVertical0;
 		
 		//Set default image and orientation
 		activePatternImg = imgSwathHorizontal;
