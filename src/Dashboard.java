@@ -127,6 +127,10 @@ public class Dashboard implements Runnable {
         }
     }
 
+    /**
+     * Creates new instances and initializes all components of the UI, 
+     * giving them their default values where applicable. 
+     */
     private void initUI() {
         JFrame f = new JFrame("MINDS-i Dashboard");
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -152,16 +156,10 @@ public class Dashboard implements Runnable {
         serialPanel = new SerialConnectPanel(connectActions);
         serialPanel.showBaudSelector(true);
         
-        //TODO - CP - Clean up naming conventions for panels so it's not ambigous
-        //with those found in other functions in this class...
-        
         JPanel messageBox = createAlertBox();
 
         swathPanel = new SwathPanel(context, BoxLayout.LINE_AXIS);
         swathPanel.setOpaque(false);
-        
-        //TODO - CP - Determine if farming panel needs this alignment
-//    	farmingWidgetPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
     	mapPanel = new MapPanel(
         		context,

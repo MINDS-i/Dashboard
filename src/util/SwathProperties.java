@@ -5,8 +5,8 @@ public class SwathProperties {
 	private static SwathProperties swathPropertiesInstance = null;
 	
 	//Swath Pattern dimension properties
-	public static final double SWATH_LENGTH_FT = 200;
-	public static final double SWATH_WIDTH_FT = 32;
+	public static final double SWATH_LENGTH_FT = 50;
+	public static final double SWATH_WIDTH_FT = 8;
 	
 	//Swath placement state
 	private boolean isSwathPlaced;

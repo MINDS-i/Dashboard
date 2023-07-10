@@ -232,6 +232,34 @@ public class SwathPanel extends WidgetPanel {
 	}
 	
 	/**
+	 * Disables all swath placement related buttons
+	 */
+	public void lockSwathPlacement() {
+		//Radio Buttons
+		btnHorizontal.setEnabled(false);
+		btnVertical.setEnabled(false);
+		btnInverted.setEnabled(false);
+		btnNotInverted.setEnabled(false);
+		
+		//Swath Placement Button
+		swathModeButton.setEnabled(false);
+	}
+	
+	/**
+	 * Enables all swath placement related buttons
+	 */
+	public void unlockSwathPlacement() {
+		//Radio Buttons
+		btnHorizontal.setEnabled(true);
+		btnVertical.setEnabled(true);
+		btnInverted.setEnabled(true);
+		btnNotInverted.setEnabled(true);
+		
+		//Swath Placement Button
+		swathModeButton.setEnabled(true);
+	}
+	
+	/**
 	 * Action used to put the user interface into swath placement
 	 * mode using the user selected parameters in this swath panel.
 	 */
@@ -286,12 +314,5 @@ public class SwathPanel extends WidgetPanel {
 			swathPreviewWidget.updatePreview(type, inversion);
 		}
 	};
-	
-
-	
-	//MANDATORY FEATURES
-
-	//TODO - CP - Add cancel mode button and tie to escape key press also?
-
-
 }
+
