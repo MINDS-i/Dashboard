@@ -50,7 +50,7 @@ public class Dashboard implements Runnable {
 
     //UI Widget Frames
     private WidgetPanel rightWidgetPanel;
-    public FarmingPanel farmingPanel;
+    public SwathPanel swathPanel;
     
     //UI Widgets
     private TelemetryDataWidget dataWidget;
@@ -157,8 +157,8 @@ public class Dashboard implements Runnable {
         
         JPanel messageBox = createAlertBox();
 
-        farmingPanel = new FarmingPanel(context, BoxLayout.LINE_AXIS);
-        farmingPanel.setOpaque(false);
+        swathPanel = new SwathPanel(context, BoxLayout.LINE_AXIS);
+        swathPanel.setOpaque(false);
         
         //TODO - CP - Determine if farming panel needs this alignment
 //    	farmingWidgetPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -172,7 +172,7 @@ public class Dashboard implements Runnable {
         		serialPanel,
         		createRightPanel(),
         		messageBox,
-        		farmingPanel);
+        		swathPanel);
         
         f.add(mapPanel);
         f.pack();

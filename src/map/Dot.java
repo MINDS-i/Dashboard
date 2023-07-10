@@ -171,7 +171,9 @@ public class Dot {
     
     /*--------------------------Type Functions--------------------------------*/
     
-    //TODO - CP - Type behavior defined here.
+    /**
+     * Defines the special type behavior of a waypoint dot.
+     */
     public void executeTypeProcesses() {
     	//To be overriden in child classes for specific functionality
     	//as required.

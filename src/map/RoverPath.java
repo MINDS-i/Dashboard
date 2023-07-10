@@ -141,8 +141,8 @@ public class RoverPath implements Layer {
                 					waypoints, 
                 					new Dot(point, WaypointType.SWATH), 
                 					waypoints.size(),
-                					context.dash.farmingPanel.getType(),
-                					context.dash.farmingPanel.getInversion());
+                					context.dash.swathPanel.getType(),
+                					context.dash.swathPanel.getInversion());
                 			
                 			waypoints.setSelected(waypoints.size() - 1);
             			}

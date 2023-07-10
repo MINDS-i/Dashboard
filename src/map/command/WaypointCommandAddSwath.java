@@ -63,7 +63,10 @@ public class WaypointCommandAddSwath extends WaypointCommand {
 		this.type = type;
 		this.inversion = inversion;
 		
-		//TODO - CP - Make sure we are converted using both LAT and LNG here
+		//TODO - CP - FIX - Make sure we convert using both LAT and LNG here
+		//Converting height along lines of longitude causes distortion
+		//because they are not paralell at any given y point.
+		
 		//Depending on orientation we will need different conversion factors.
 		this.lengthOffset = utilHelper.kmToDegLng(utilHelper.feetToKm(
 				SwathProperties.SWATH_LENGTH_FT));

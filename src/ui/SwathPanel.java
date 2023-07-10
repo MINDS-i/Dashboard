@@ -23,9 +23,9 @@ import javax.swing.*;
  * @author Chris Park @ Infinetix Corp.
  * Date: 3-21-23
  * Description: Main panel container for holding a group of
- * farming related dashboard UIWidgets.
+ * swath placement related dashboard UIWidgets.
  */
-public class FarmingPanel extends WidgetPanel {
+public class SwathPanel extends WidgetPanel {
 	
 	final Theme theme;
 	
@@ -63,7 +63,7 @@ public class FarmingPanel extends WidgetPanel {
 	private JLabel swathWidthTitleLabel;
 	private JLabel swathWidthValueLabel;
 	
-	public FarmingPanel(Context ctx, int layoutType) {
+	public SwathPanel(Context ctx, int layoutType) {
 		super(ctx, layoutType);
 		
 		theme = context.theme;
@@ -233,7 +233,7 @@ public class FarmingPanel extends WidgetPanel {
 	
 	/**
 	 * Action used to put the user interface into swath placement
-	 * mode using the user selected parameters in this farming panel.
+	 * mode using the user selected parameters in this swath panel.
 	 */
 	private Action startSwathMode = new AbstractAction() {
 		{

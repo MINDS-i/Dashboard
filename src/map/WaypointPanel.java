@@ -588,16 +588,20 @@ public class WaypointPanel extends NinePatchPanel {
     	}
     	
     	public void actionPerformed(ActionEvent e) {
+    		
+    		//If A mission is in progress stop it and unlock things
     		if(isUnitMoving) {
     			unlockWaypoints();
+    			//TODO - CP - Add swath preview unlock here
     			context.dash.enableSerialPanel(true);
     			
     			SerialSendManager.getInstance().changeMovement(false);
     			putValue(Action.NAME, "Start Mission");
     			isUnitMoving = false;
     		}
-    		else {
+    		else { //If a mission is stopped, lock things down and start
     			lockWaypoints();
+    			//TODO - CP - Add swath preview lock here
     			context.dash.enableSerialPanel(false);
     			
     			SerialSendManager.getInstance().changeMovement(true);
