@@ -224,12 +224,15 @@ public class RoverPath implements Layer {
 
     @Override
     public boolean onPress(MouseEvent e) {
+    	Point pixel = e.getPoint();
+    	
     	//If we aren't in standard mode, don't allow waypoint movement.
     	if(currOpMode != OpMode.STANDARD) {
     		return false;
     	}
     	
-        Point pixel = e.getPoint();
+    	
+        
         downDot = isOverDot(pixel, context.theme.waypointImage);
         
         if(downDot != Integer.MAX_VALUE) {
@@ -238,7 +241,13 @@ public class RoverPath implements Layer {
             if(downDot < 0 || waypointsDisabled) {
                 // Disable dragging for non-waypoint line dots
                 downDot = Integer.MAX_VALUE;
-            } 
+            }
+            else if(waypoints.get(downDot).dot().getWaypointType() 
+            		== WaypointType.SWATH) {
+            	//Disable Dragging for points that are part
+            	//of a swath pattern
+            	downDot = Integer.MAX_VALUE;
+            }
             else {
                 draggedDot = waypoints.get(downDot).dot();
                 //Initialize moveCommand but wait for end location to process.
