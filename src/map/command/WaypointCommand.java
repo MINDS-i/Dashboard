@@ -21,7 +21,9 @@ public abstract class WaypointCommand {
 	protected final Logger serialLog = Logger.getLogger("d.serial");
 	
 	//Constants
-	public static final int MAX_WAYPOINTS = 63;
+	protected static final double 	MIN_DISTANCE_FT = 45.00;
+	public static final int 		MAX_WAYPOINTS 	= 63;
+
 	
 	//Warning Strings
 	protected static final String WARN_NO_GEOFENCE_INTERSECT = 
@@ -38,6 +40,11 @@ public abstract class WaypointCommand {
 	protected static final String WARN_ENDPOINT_NOT_SET =
 			  "Move - Execution failure."
 			+ " Endpoint was not set.";
+	
+	protected static final String WARN_MIN_DISTANCE_DIALOG = 
+			  "For optimal results, a minimum" 
+			+ " distance of " + MIN_DISTANCE_FT + " feet between waypoints" 
+			+ " is recommended.";
 	
 	//Command Types
 	public enum CommandType {

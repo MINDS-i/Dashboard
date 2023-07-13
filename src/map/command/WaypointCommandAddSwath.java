@@ -98,6 +98,14 @@ public class WaypointCommandAddSwath extends WaypointCommand {
 		swathProperties.setPreviousSwathPlacedState(
 				swathProperties.getIsSwathPlaced());
 		swathProperties.setIsSwathPlaced(true);		
+		
+		//If we hit the maximum waypoints while looping,
+		//warn and return false here after setting swath states
+		if(waypoints.size() == MAX_WAYPOINTS) {
+			serialLog.warning(WARN_MAX_WAYPOINTS_REACHED);
+			return false;
+		}
+		
 		return true;
 	}
 	

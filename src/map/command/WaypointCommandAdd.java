@@ -17,15 +17,7 @@ import com.util.UtilHelper;
  * active sessions list.
  */
 public class WaypointCommandAdd extends WaypointCommand {
-	//Constants
-	private static final double MIN_DISTANCE_FT = 45.00;
-	
-	//Warning Strings
-	private static final String WARN_MIN_DISTANCE_DIALOG = 
-			  "For optimal results, a minimum" 
-			+ " distance of " + MIN_DISTANCE_FT + " feet between waypoints" 
-			+ " is recommended.";
-	
+
 	/**
 	 * Constructor
 	 * @param waypoints - List of current navigational waypoints.
