@@ -76,6 +76,8 @@ public class WaypointCommandAddSwath extends WaypointCommand {
 		generateSwathList();
 	}
 	
+	//TODO - CP - Potential edge case with fence if user tries to insert at index 0
+	
 	/**
 	 * Adds the entire list of swathPoints for the related swath pattern
 	 * to the waypoint list at the specified location.
@@ -83,6 +85,8 @@ public class WaypointCommandAddSwath extends WaypointCommand {
 	 */
 	@Override
 	public boolean execute() {
+		CommandManager manager = CommandManager.getInstance();
+		
 		int currIndex = this.index;
 
 		//For each point in swathPoints List
@@ -90,6 +94,18 @@ public class WaypointCommandAddSwath extends WaypointCommand {
 			//If the waypoint max hasn't been reached yet
 			if(waypoints.size() < MAX_WAYPOINTS) {
 				waypoints.add(sPoint, currIndex);
+				
+				if(currIndex == 0) {
+					//create the geofence at the first index.
+					manager.getGeofence().setOriginLatLng(point.getLatitude(), 
+							point.getLongitude());
+					manager.getGeofence().setIsEnabled(true);
+					
+					waypoints.setTarget(currIndex);
+				}
+				
+				waypoints.setSelected(currIndex);
+				
 				currIndex++;
 			}
 		}
@@ -115,11 +131,18 @@ public class WaypointCommandAddSwath extends WaypointCommand {
 	 */
 	@Override
 	public boolean undo() {
+		CommandManager manager = CommandManager.getInstance();
+		
 		int endIndex = (this.index + (swathPoints.size() - 1));
 		
 		//Starting at the end of the swath list, remove each swath point
 		for(int i = endIndex; i >= index; i--) {
 			waypoints.remove(i);
+			
+			//If this is the initial waypoint. Remove the fence.
+			if(index == 0) {
+				manager.getGeofence().setIsEnabled(false);
+			}
 		}
 		
 		//Reset the placement flag and the previous state
