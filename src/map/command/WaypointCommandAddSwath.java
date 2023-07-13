@@ -86,13 +86,35 @@ public class WaypointCommandAddSwath extends WaypointCommand {
 	@Override
 	public boolean execute() {
 		CommandManager manager = CommandManager.getInstance();
-		
 		int currIndex = this.index;
+		
+		//For each point in the swath list BEFORE placement begins
+		for(Dot sPoint : swathPoints) {
+			if(manager.getGeofence().getIsEnabled()) {
+				//Check for and refuse a second index 0 placement
+				if(currIndex == 0) {
+					serialLog.warning(WARN_GEOFENCE_ALREADY_PLACED);
+					return false;
+				}
+				
+				//Check for waypoint intersection
+				if(!manager.getGeofence().doesLocationIntersect(sPoint)) {
+					serialLog.warning(WARN_NO_GEOFENCE_INTERSECT);
+					return false;
+				}
+			}
+			
+			currIndex++;
+		}
 
-		//For each point in swathPoints List
+		//Reset the index for the placement pass.
+		currIndex = this.index;
+		
+		//For each point in swathPoints list during placement
 		for(Dot sPoint : swathPoints) {
 			//If the waypoint max hasn't been reached yet
 			if(waypoints.size() < MAX_WAYPOINTS) {
+				
 				waypoints.add(sPoint, currIndex);
 				
 				if(currIndex == 0) {
