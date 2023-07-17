@@ -164,6 +164,7 @@ public class MapPanel extends JPanel implements CoordinateTransform {
         return f;
     }
     
+    //TODO - CP - Need to understand how this pixel to Lat/Lng conversion works
     /**
      * Transforms absolute (x,y) pixels to (lonitude,latitude)
      * Will return an instance of the same class as the argument p
