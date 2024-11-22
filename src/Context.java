@@ -1,28 +1,30 @@
 package com;
 
-import com.Dashboard;
-import com.map.*;
-import static com.map.WaypointList.*;
-import com.remote.SettingList;
-import com.serial.*;
-import com.serial.Messages.*;
-import com.serial.CommsMonitor;
-import com.ui.*;
-import com.telemetry.*;
-import com.xml;
 import com.graph.DataSource;
-
-import java.io.*;
-import java.nio.file.*;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.logging.*;
+import com.map.Dot;
+import com.map.WaypointList;
+import com.remote.SettingList;
+import com.serial.CommsMonitor;
+import com.serial.Messages.Message;
+import com.serial.Serial;
+import com.serial.SerialParser;
+import com.serial.SerialSendManager;
+import com.telemetry.TelemetryListener;
+import com.telemetry.TelemetryLogger;
+import com.telemetry.TelemetryManager;
+import com.ui.Theme;
+import jssc.SerialPort;
 
 import java.awt.geom.Point2D;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.logging.Logger;
 
-import jssc.SerialPort;
-import jssc.SerialPortException;
+import static com.map.WaypointList.WaypointListener;
 
 
 public class Context {

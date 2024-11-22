@@ -1,18 +1,13 @@
 package com.serial;
 
-import java.util.*;
-import java.util.logging.Logger;
-
 import com.Context;
-
-import com.serial.Messages.*;
-import com.sun.org.apache.xml.internal.serializer.utils.MsgKey;
-
 import com.map.Dot;
 import com.map.WaypointList;
-
-import jssc.SerialPort;
+import com.serial.Messages.Message;
 import jssc.SerialPortException;
+
+import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * @author Chris Park @ Infinetix Corp.
