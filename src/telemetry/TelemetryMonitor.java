@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 /**
@@ -35,11 +36,7 @@ public class TelemetryMonitor {
     /**
      * Action response that triggers listener updates.
      */
-    protected ActionListener cycleUpdateAction = new ActionListener() {
-        public void actionPerformed(ActionEvent event) {
-            signalUpdate();
-        }
-    };
+    protected ActionListener cycleUpdateAction = event -> signalUpdate();
 
     /**
      * Class Constructor
@@ -50,7 +47,7 @@ public class TelemetryMonitor {
         context = ctx;
         vccMonitor = new VCCMonitor();
         updateTimer = new javax.swing.Timer(UPDATE_CYCLE_MS, cycleUpdateAction);
-        listeners = new LinkedList<IMonitorListener>();
+        listeners = new LinkedList<>();
     }
 
     /**
@@ -122,14 +119,13 @@ public class TelemetryMonitor {
      * @param type - the type of telemetry data being sent
      */
     public void storeData(double data, TelemetryDataType type) {
-        switch (type) {
-            case VOLTAGE:
-                vccMonitor.add(data);
-                break;
-            default:
-                System.err.println(
-                        "ERROR - TelemetryMonitor - data storage" +
-                                " attempted for unknown type");
+        if (Objects.requireNonNull(type) == TelemetryDataType.VOLTAGE) {
+            vccMonitor.add(data);
+        }
+        else {
+            System.err.println(
+                    "ERROR - TelemetryMonitor - data storage" +
+                            " attempted for unknown type");
         }
     }
 
@@ -236,7 +232,7 @@ public class TelemetryMonitor {
             if (elapsedMS == LOW_VCC_SETTLING_TIME_MS) {
 
                 if (isBelowThreshold
-                        && (context.getCurrentLocale() == "ground")) {
+                        && (Objects.equals(context.getCurrentLocale(), "ground"))) {
 
                     if ((context.dash.mapPanel != null)
                             && context.dash.mapPanel.waypointPanel.getIsMoving()) {

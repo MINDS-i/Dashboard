@@ -16,7 +16,7 @@ public class SampleSource implements DataSource, TelemetryListener {
 
     public SampleSource(String name) {
         this.name = name;
-        data = new ArrayList<Double>(SAMPLES);
+        data = new ArrayList<>(SAMPLES);
         for (int i = 0; i < SAMPLES; i++) {
             data.add(0.0d);
         }
@@ -35,9 +35,8 @@ public class SampleSource implements DataSource, TelemetryListener {
         int dataPos = ((int) Math.ceil(xPoint) + oldestPosition) % SAMPLES;
         int dataPrv = ((int) Math.floor(xPoint) + oldestPosition) % SAMPLES;
         double ratio = xPoint - Math.floor(xPoint);
-        double rtn = data.get(dataPos) * ratio
+        return data.get(dataPos) * ratio
                 + data.get(dataPrv) * (1.0d - ratio);
-        return rtn;
     }
 
     public String getName() {

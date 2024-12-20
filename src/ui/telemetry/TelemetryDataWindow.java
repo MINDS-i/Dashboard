@@ -127,19 +127,10 @@ public class TelemetryDataWindow implements ActionListener {
         //Set up Settings Table and ScrollPane
         TBL_Settings = TableFactory.createTable(TableFactory.TableType.Settings,
                 context);
-        TBL_Settings.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            public void valueChanged(ListSelectionEvent event) {
-                setSelectedDetails(TBL_Settings.getSelectedRow());
-            }
-        });
+        TBL_Settings.getSelectionModel().addListSelectionListener(event -> setSelectedDetails(TBL_Settings.getSelectedRow()));
 
         //Set up slider visual updates when a value is entered manually.
-        TBL_Settings.getModel().addTableModelListener(new TableModelListener() {
-            @Override
-            public void tableChanged(TableModelEvent event) {
-                updateSliderPercentages();
-            }
-        });
+        TBL_Settings.getModel().addTableModelListener(event -> updateSliderPercentages());
 
         SCL_Settings = new JScrollPane(TBL_Settings);
         SCL_Settings.setMinimumSize(SETTINGS_DIM_MIN);
@@ -177,13 +168,10 @@ public class TelemetryDataWindow implements ActionListener {
         SCL_SettingsSliders.setBorder(TABLE_BORDERS);
 
         //Tie scrolling movement to settings table
-        SCL_SettingsSliders.getViewport().addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent event) {
-                int scrollPosition =
-                        SCL_SettingsSliders.getVerticalScrollBar().getValue();
-                SCL_Settings.getVerticalScrollBar().setValue(scrollPosition);
-            }
+        SCL_SettingsSliders.getViewport().addChangeListener(event -> {
+            int scrollPosition =
+                    SCL_SettingsSliders.getVerticalScrollBar().getValue();
+            SCL_Settings.getVerticalScrollBar().setValue(scrollPosition);
         });
 
         //Pack both settings tables in flow layout settings panel

@@ -77,7 +77,7 @@ public class WaypointList {
 
     public void setRover(Dot p, WaypointListener.Source s) {
         roverLocation = p;
-        listeners.stream().forEach(l -> l.roverMoved(s, p));
+        listeners.forEach(l -> l.roverMoved(s, p));
     }
 
     /**
@@ -96,7 +96,7 @@ public class WaypointList {
 
     public void setHome(Dot p, WaypointListener.Source s) {
         homeLocation = p;
-        listeners.stream().forEach(l -> l.homeMoved(s, p));
+        listeners.forEach(l -> l.homeMoved(s, p));
     }
 
     /**
@@ -130,7 +130,7 @@ public class WaypointList {
         if (index <= targetIndex) {
             setTarget(targetIndex + 1);
         }
-        listeners.stream().forEach(l -> l.changed(s, p, index, WaypointListener.Action.ADD));
+        listeners.forEach(l -> l.changed(s, p, index, WaypointListener.Action.ADD));
     }
 
     /**
@@ -142,7 +142,7 @@ public class WaypointList {
 
     public void set(Dot p, int index, WaypointListener.Source s) {
         waypoints.set(index, p);
-        listeners.stream().forEach(l -> l.changed(s, p, index, WaypointListener.Action.SET));
+        listeners.forEach(l -> l.changed(s, p, index, WaypointListener.Action.SET));
     }
 
     /**
@@ -162,7 +162,7 @@ public class WaypointList {
         if (index <= targetIndex) {
             setTarget(targetIndex - 1);
         }
-        listeners.stream().forEach(l -> l.changed(s, p, index, WaypointListener.Action.DELETE));
+        listeners.forEach(l -> l.changed(s, p, index, WaypointListener.Action.DELETE));
     }
 
     /**
@@ -177,7 +177,7 @@ public class WaypointList {
             return;
         }
         isLooped = state;
-        listeners.stream().forEach(l -> l.loopModeSet(s, state));
+        listeners.forEach(l -> l.loopModeSet(s, state));
     }
 
     /**
@@ -194,7 +194,7 @@ public class WaypointList {
             return;
         }
         targetIndex = index;
-        listeners.stream().forEach(l -> l.targetChanged(s, index));
+        listeners.forEach(l -> l.targetChanged(s, index));
     }
 
     /**
@@ -242,7 +242,7 @@ public class WaypointList {
         }
 
         //Update listeners
-        listeners.stream().forEach(l -> l.selectionChanged(index));
+        listeners.forEach(l -> l.selectionChanged(index));
     }
 
     /**

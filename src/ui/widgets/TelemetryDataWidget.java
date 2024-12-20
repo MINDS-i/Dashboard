@@ -30,7 +30,7 @@ public class TelemetryDataWidget extends UIWidget {
     //Constants
     protected static final double BATTERY_LOW_WARNING_THRESHOLD = 6.5;
     private final int lineWidth;
-    private final Collection<Line> lines = new ArrayList<Line>();
+    private final Collection<Line> lines = new ArrayList<>();
     //Vars
     protected JPanel panel;
     protected TelemetryMonitor telemetryMonitor;
@@ -91,40 +91,38 @@ public class TelemetryDataWidget extends UIWidget {
         float fontSize = 0f;
         String defaultFormat = "% f";
         Color textColor = ctx.theme.textColor;
-        Collection<LineItem> items = new LinkedList<LineItem>();
+        Collection<LineItem> items = new LinkedList<>();
 
         try (Reader source = new FileReader(ctx.getResource(resourceKey))) {
             XMLStreamReader r =
                     XMLInputFactory.newInstance().createXMLStreamReader(source);
 
             while (r.hasNext()) {
-                switch (r.next()) {
-                    case XMLStreamConstants.START_ELEMENT:
-                        if (r.getLocalName().equals("telemetryWidget")) {
-                            width = Integer.valueOf(r.getAttributeValue(null, "width"));
-                            fontSize = Float.valueOf(r.getAttributeValue(null, "fontsize"));
-                            defaultFormat = String.format(" %% %df", (width - 1));
+                if (r.next() == XMLStreamConstants.START_ELEMENT) {
+                    if (r.getLocalName().equals("telemetryWidget")) {
+                        width = Integer.parseInt(r.getAttributeValue(null, "width"));
+                        fontSize = Float.parseFloat(r.getAttributeValue(null, "fontsize"));
+                        defaultFormat = String.format(" %% %df", (width - 1));
 
-                            String color = r.getAttributeValue(null, "color");
-                            if (color != null) {
-                                textColor = Color.decode(color);
-                            }
+                        String color = r.getAttributeValue(null, "color");
+                        if (color != null) {
+                            textColor = Color.decode(color);
                         }
-                        else if (r.getLocalName().equals("line")) {
-                            String fmt = r.getAttributeValue(null, "fmt");
-                            String idx = r.getAttributeValue(null, "telem");
+                    }
+                    else if (r.getLocalName().equals("line")) {
+                        String fmt = r.getAttributeValue(null, "fmt");
+                        String idx = r.getAttributeValue(null, "telem");
 
-                            String bgString = r.getAttributeValue(null, "bg");
-                            Color bg = (bgString != null)
-                                    ? Color.decode(bgString)
-                                    : Color.WHITE;
+                        String bgString = r.getAttributeValue(null, "bg");
+                        Color bg = (bgString != null)
+                                ? Color.decode(bgString)
+                                : Color.WHITE;
 
-                            String format = (fmt == null) ? defaultFormat : fmt;
-                            int index = (idx == null) ? -1 : Integer.valueOf(idx);
+                        String format = (fmt == null) ? defaultFormat : fmt;
+                        int index = (idx == null) ? -1 : Integer.parseInt(idx);
 
-                            items.add(new LineItem(format, index, bg));
-                        }
-                        break;
+                        items.add(new LineItem(format, index, bg));
+                    }
                 }
             }
         }

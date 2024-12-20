@@ -55,7 +55,7 @@ public class TableFactory {
         JTable table;
         ColumnTableModel model;
         SettingList settingList = context.settingList;
-        ArrayList<TelemetryColumn<?>> columns = new ArrayList<TelemetryColumn<?>>();
+        ArrayList<TelemetryColumn<?>> columns = new ArrayList<>();
 
         columns.add(new TelemetryColumn<String>() {
             public String getName() {
@@ -109,7 +109,7 @@ public class TableFactory {
 
             public void setValueAt(String val, int row) {
 
-                Float newVal = Float.valueOf(val);
+                float newVal = Float.parseFloat(val);
 
                 if (settingList.get(row).outsideOfBounds(newVal)) {
                     JFrame mf = new JFrame("Warning");
@@ -171,7 +171,7 @@ public class TableFactory {
         JTable table;
         ColumnTableModel model;
 
-        ArrayList<TelemetryColumn<?>> columns = new ArrayList<TelemetryColumn<?>>();
+        ArrayList<TelemetryColumn<?>> columns = new ArrayList<>();
         columns.add(new TelemetryColumn<String>() {
             public String getName() {
                 return "name";

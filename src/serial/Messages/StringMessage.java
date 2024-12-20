@@ -19,11 +19,6 @@ class StringMessage extends Message {
     }
 
     @Override
-    public boolean needsConfirm() {
-        return false;
-    }
-
-    @Override
     public String toString() {
         return "Message: \"" + str + "\"";
     }

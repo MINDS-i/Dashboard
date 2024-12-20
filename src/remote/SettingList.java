@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SettingList {
-    private final List<Setting> settingData = new ArrayList<Setting>();
+    private final List<Setting> settingData = new ArrayList<>();
     private final Context context;
 
     public SettingList(Context cxt) {
@@ -65,7 +65,7 @@ public class SettingList {
             return Float.NEGATIVE_INFINITY;
         }
         else {
-            return Float.valueOf(raw);
+            return Float.parseFloat(raw);
         }
     }
 

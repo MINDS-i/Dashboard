@@ -12,7 +12,7 @@ public class EllipsisFormatter extends Formatter {
      */
     public EllipsisFormatter(int maxLineLength) {
         super();
-        content = (LogRecord l) -> l.getMessage();
+        content = LogRecord::getMessage;
         this.maxLineLength = maxLineLength;
     }
 
@@ -20,7 +20,7 @@ public class EllipsisFormatter extends Formatter {
      * Make a formatter that ellipsizes the output of parent at maxLineLength
      */
     public EllipsisFormatter(Formatter parent, int maxLineLength) {
-        content = (LogRecord l) -> parent.format(l);
+        content = parent::format;
         this.maxLineLength = maxLineLength;
     }
 

@@ -83,8 +83,8 @@ public class xml {
 
     public static void readXML(Context context) throws XMLStreamException {
         Dot pnt = new Dot();
-        Vector<Dot> list = new Vector<Dot>();
-        Vector<Vector<Dot>> routes = new Vector<Vector<Dot>>();
+        Vector<Dot> list = new Vector<>();
+        Vector<Vector<Dot>> routes = new Vector<>();
         XMLInputFactory factory = XMLInputFactory.newInstance();
         String data = "";
         XMLStreamReader reader;
@@ -107,7 +107,7 @@ public class xml {
                 case XMLStreamConstants.START_ELEMENT:
                     switch (reader.getLocalName()) {
                         case "rte":
-                            list = new Vector<Dot>();
+                            list = new Vector<>();
                             break;
                         case "rtept":
                             double lat, lng;
@@ -172,22 +172,22 @@ public class xml {
             System.err.println(ex.getMessage());
             ex.printStackTrace();
         }
-        if (routes.size() == 0) {
+        if (routes.isEmpty()) {
             return;
         }
 
         int selection = 0;
         if (routes.size() > 1) {
             Integer[] options = new Integer[routes.size()];
-            String prompt = "Multiple routes were found;\n" +
-                    "Please enter the number of your choice: \n";
+            StringBuilder prompt = new StringBuilder("Multiple routes were found;\n" +
+                    "Please enter the number of your choice: \n");
             for (int i = 0; i < routes.size(); i++) {
                 options[i] = i;
-                prompt += "Route " + i + " (" + routes.get(i).size() + " Points)\n";
+                prompt.append("Route ").append(i).append(" (").append(routes.get(i).size()).append(" Points)\n");
             }
             selection = (int) JOptionPane.showInputDialog(
                     null,
-                    prompt,
+                    prompt.toString(),
                     "Pick a route",
                     JOptionPane.PLAIN_MESSAGE,
                     null,
@@ -197,7 +197,7 @@ public class xml {
 
         WaypointList p = context.getWaypointList();
         // delete old waypoints
-        while (p.size() != 0) {
+        while (!p.isEmpty()) {
             p.remove(0);
         }
         // enter in new ones

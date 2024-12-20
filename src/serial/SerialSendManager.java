@@ -39,8 +39,8 @@ public class SerialSendManager {
      */
     private SerialSendManager(Context ctx) {
         context = ctx;
-        messageQueue = new LinkedList<Message>();
-        confirmationQueue = new LinkedList<Integer>();
+        messageQueue = new LinkedList<>();
+        confirmationQueue = new LinkedList<>();
     }
 
     /**

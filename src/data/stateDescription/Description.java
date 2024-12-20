@@ -49,11 +49,10 @@ public class Description {
 
     @Override
     public String toString() {
-        String sb = name +
+        return name +
                 " (" +
                 file +
                 "): " +
                 text;
-        return sb;
     }
 }

@@ -34,11 +34,7 @@ public class CommsMonitor {
      * Timer event action that initiates a heartbeat pualse check
      * when triggered.
      */
-    private final ActionListener heartbeatCheckAction = new ActionListener() {
-        public void actionPerformed(ActionEvent event) {
-            updateHeartbeatCheck();
-        }
-    };
+    private final ActionListener heartbeatCheckAction = event -> updateHeartbeatCheck();
 
     /**
      * Private Class Constructor instantiated through getInstance

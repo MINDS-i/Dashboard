@@ -39,11 +39,7 @@ public class PingWidget extends UIWidget {
      * meters update. see constant value UPDATE_DELAY_MS for the currently
      * configured timer delay.
      */
-    ActionListener meterUpdateAction = new ActionListener() {
-        public void actionPerformed(ActionEvent event) {
-            updateMeters();
-        }
-    };
+    ActionListener meterUpdateAction = event -> updateMeters();
 
     /**
      * Class Constructor
@@ -65,7 +61,7 @@ public class PingWidget extends UIWidget {
         constraints.insets = new Insets(2, 0, 2, 0);
         constraints.anchor = GridBagConstraints.CENTER;
 
-        sensorMeters = new HashMap<Integer, ArrayList<JPanel>>();
+        sensorMeters = new HashMap<>();
         for (int i = 0; i < NUM_SENSORS; i++) {
             sensorMeters.put(i, buildMeterSet());
         }
@@ -99,7 +95,7 @@ public class PingWidget extends UIWidget {
         ArrayList<JPanel> meterSet;
         JPanel panel;
 
-        meterSet = new ArrayList<JPanel>();
+        meterSet = new ArrayList<>();
 
         //Level: None
         panel = new JPanel();
@@ -158,8 +154,6 @@ public class PingWidget extends UIWidget {
      * Updates the visual meter display for all sensor meters based on the
      * currently detected values as they compare against pre-calibrated
      * warning levels.
-     *
-     * @param index = The index of the sensor to be updated
      */
     protected void updateMeters() {
         GridBagConstraints constraints = new GridBagConstraints();

@@ -25,8 +25,8 @@ public class CommandManager {
      * Constructor (Private, accessed by getInstance)
      */
     private CommandManager() {
-        processedCommands = new LinkedList<WaypointCommand>();
-        revertedCommands = new LinkedList<WaypointCommand>();
+        processedCommands = new LinkedList<>();
+        revertedCommands = new LinkedList<>();
         geofence = null;
     }
 
@@ -44,9 +44,7 @@ public class CommandManager {
         return cmInstance;
     }
 
-    /**************************************************************************/
     //Command Processing Functions
-    /**************************************************************************/
 
     /**
      * Executes a waypoint command, adds it to the processedCommands
@@ -133,9 +131,7 @@ public class CommandManager {
         revertedCommands.clear();
     }
 
-    /**************************************************************************/
     //Geofence Functions
-    /**************************************************************************/
 
     /**
      * Initializes a new geofence instance with the given parameters. This

@@ -16,9 +16,9 @@ public class Decoder {
     private final byte[] header;
     private final byte[] footer;
     private final Checksum sum;
-    private final List<PacketReader> readers = new LinkedList<PacketReader>();
-    private final List<Packet> foundHeaders = new ArrayList<Packet>();
-    private final List<Byte> buffer = new ArrayList<Byte>();
+    private final List<PacketReader> readers = new LinkedList<>();
+    private final List<Packet> foundHeaders = new ArrayList<>();
+    private final List<Byte> buffer = new ArrayList<>();
 
     public Decoder(InputStream input, byte[] head, byte[] tail, Checksum sum) {
         this.input = input;

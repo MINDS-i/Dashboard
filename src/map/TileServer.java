@@ -319,7 +319,7 @@ class TileServer implements MapSource {
             }
         }
 
-        Collections.sort(test, new TileDistCmp(new TileTag(1, 1, 2), TileDistCmp.FURTHEST));
+        test.sort(new TileDistCmp(new TileTag(1, 1, 2), TileDistCmp.FURTHEST));
 
         for (TileTag t : test) {
             System.out.println(t);
@@ -423,15 +423,12 @@ class TileServer implements MapSource {
 
         @Override
         public String toString() {
-
-            String sb = "Tile @ " + "x: " +
+            return "Tile @ " + "x: " +
                     x +
                     " y: " +
                     y +
                     " z: " +
                     z;
-
-            return sb;
         }
     }
 

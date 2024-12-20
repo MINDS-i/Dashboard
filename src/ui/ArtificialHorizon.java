@@ -40,8 +40,8 @@ public class ArtificialHorizon extends JPanel {
     private static final Color barColor = new Color(0xBBBBBB);
     private static final Color INDICATOR_COLOR = Color.GREEN;
     private static final Color CENTER_MARKER_COLOR = Color.YELLOW;
-    private final Map<DataAxis, Float> values = new EnumMap<DataAxis, Float>(DataAxis.class);
-    private final Map<DataAxis, Boolean> enabled = new EnumMap<DataAxis, Boolean>(DataAxis.class);
+    private final Map<DataAxis, Float> values = new EnumMap<>(DataAxis.class);
+    private final Map<DataAxis, Boolean> enabled = new EnumMap<>(DataAxis.class);
     private final RepaintCallback repainter;
     private float pitch, roll;
 
@@ -60,9 +60,7 @@ public class ArtificialHorizon extends JPanel {
     }
 
     public ArtificialHorizon() {
-        repainter = () -> {
-            this.repaint();
-        };
+        repainter = this::repaint;
     }
 
     public static void makePopup() {
@@ -279,16 +277,15 @@ public class ArtificialHorizon extends JPanel {
     private void paintPlaneIndicator(Graphics2D g, int size) {
         int height = Math.max(size / 40, 1);
         int width = size * 6 / 40;
-        int seperation = width;
 
         g.setColor(wingColor);
-        g.fillRoundRect(size / 2 - width / 2 - seperation, size / 2 - height / 2,
+        g.fillRoundRect(size / 2 - width / 2 - width, size / 2 - height / 2,
                 width, height,
                 height, height);
 
         g.fillOval(size / 2 - height / 2, size / 2 - height / 2, height, height);
 
-        g.fillRoundRect(size / 2 - width / 2 + seperation, size / 2 - height / 2,
+        g.fillRoundRect(size / 2 - width / 2 + width, size / 2 - height / 2,
                 width, height,
                 height, height);
     }

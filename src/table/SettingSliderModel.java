@@ -19,7 +19,6 @@ public class SettingSliderModel extends AbstractTableModel {
     /**
      * Class Constructor
      *
-     * @param context - The application context
      */
     public SettingSliderModel(int size) {
         //Init the data structure based on the size of the

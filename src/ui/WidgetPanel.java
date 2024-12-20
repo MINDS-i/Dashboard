@@ -36,7 +36,7 @@ public class WidgetPanel extends NinePatchPanel {
     public WidgetPanel(Context ctx) {
         super(ctx.theme.panelPatch);
         context = ctx;
-        widgets = new LinkedList<UIWidget>();
+        widgets = new LinkedList<>();
 
         setOpaque(false);
         LayoutManager layout = new BoxLayout(this, BoxLayout.PAGE_AXIS);

@@ -41,7 +41,7 @@ public class LogViewer {
     public LogViewer() {
         frame = new JFrame("Event Log");
 
-        logList = new JList<Record>();
+        logList = new JList<>();
         logList.setModel(model);
         logList.addListSelectionListener(onSelect);
         logList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -104,7 +104,7 @@ public class LogViewer {
      * has received
      */
     private class LogModel extends AbstractListModel<Record> {
-        List<Record> records = new Vector<Record>();
+        List<Record> records = new Vector<>();
         public Handler logHandler = new SimpleHandler((LogRecord l, String s) -> {
             records.add(0, new Record(l));
             fireIntervalAdded(this, 0, 0);

@@ -53,7 +53,7 @@ public class Graph extends JPanel {
     private boolean antiAlias = true; //anti-aliasing render hint
 
     public Graph(List<DataSource> inputSources, boolean defaultState) {
-        sources = new ArrayList<DataConfig>();
+        sources = new ArrayList<>();
         int paintCount = 0;
         for (DataSource source : inputSources) {
             DataConfig dc = new DataConfig(source, defaultState);
@@ -66,18 +66,16 @@ public class Graph extends JPanel {
         this.add(new JButton(configPopupAction));
 
         //call back when the window is closed
-        this.addHierarchyListener(new HierarchyListener() {
-            public void hierarchyChanged(HierarchyEvent e) {
-                boolean showingChanged = (e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0;
-                if (!showingChanged) {
-                    return;
-                }
-                if (isShowing()) {
-                    onShow();
-                }
-                else {
-                    onClose();
-                }
+        this.addHierarchyListener(e -> {
+            boolean showingChanged = (e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0;
+            if (!showingChanged) {
+                return;
+            }
+            if (isShowing()) {
+                onShow();
+            }
+            else {
+                onClose();
             }
         });
 
@@ -90,7 +88,7 @@ public class Graph extends JPanel {
 
     //main method for quicker manual testing
     public static void main(String[] args) {
-        List<DataSource> trialSources = new ArrayList<DataSource>();
+        List<DataSource> trialSources = new ArrayList<>();
         DataSource sin = new DataSource() {
             public double get(double x) {
                 return 20.0 * Math.sin(x * 3.0f * Math.PI);
@@ -287,8 +285,7 @@ public class Graph extends JPanel {
         final int startY = v.height() - WALL_BUFF;
 
         int dCount = 0;
-        for (int i = 0; i < dcs.size(); i++) {
-            final DataConfig dc = dcs.get(i);
+        for (final DataConfig dc : dcs) {
             if (!dc.getDrawn()) {
                 continue;
             }

@@ -10,10 +10,10 @@ import java.util.regex.Pattern;
 
 public class TelemetryManager {
 
-    private final List<Double> telemetry = new ArrayList<Double>();
+    private final List<Double> telemetry = new ArrayList<>();
     private final Map<Integer, List<TelemetryListener>> listenerMap =
-            new HashMap<Integer, List<TelemetryListener>>();
-    private final List<DataSource> streams = new ArrayList<DataSource>();
+            new HashMap<>();
+    private final List<DataSource> streams = new ArrayList<>();
 
     private ResourceBundle labels = null;
     private int telemetryIndex = 0;
@@ -107,12 +107,7 @@ public class TelemetryManager {
     }
 
     public void registerListener(int id, TelemetryListener tl) {
-        List<TelemetryListener> listeners = listenerMap.get(id);
-
-        if (listeners == null) {
-            listeners = new LinkedList<TelemetryListener>();
-            listenerMap.put(id, listeners);
-        }
+        List<TelemetryListener> listeners = listenerMap.computeIfAbsent(id, k -> new LinkedList<>());
 
         listeners.add(tl);
     }

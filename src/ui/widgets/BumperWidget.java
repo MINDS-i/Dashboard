@@ -45,7 +45,6 @@ public class BumperWidget extends UIWidget {
     public BumperWidget(Context ctx) {
         super(ctx, "Bumper");
 
-        Font font = context.theme.text.deriveFont(FONT_SIZE);
         Dimension labelSize = new Dimension(50, 20);
 
         //Set initial bumper states
@@ -176,7 +175,7 @@ public class BumperWidget extends UIWidget {
     /**
      * Sets the working state of the widget to either enabled or disabled.
      *
-     * @param shouldEnabled - Whether or not to enable/disable the widget.
+     * @param shouldEnable - Whether or not to enable/disable the widget.
      */
     public void setEnabled(boolean shouldEnable) {
         if (shouldEnable) {

@@ -18,7 +18,7 @@ public class StateMap {
     private final Map<String, Description> map;
 
     private StateMap(Reader xmlDatabase) throws ParseException {
-        map = new ConcurrentHashMap<String, Description>();
+        map = new ConcurrentHashMap<>();
         // parse the xml database into a map of String=>Descriptions
         try {
             XMLStreamReader r = XMLInputFactory.newInstance().

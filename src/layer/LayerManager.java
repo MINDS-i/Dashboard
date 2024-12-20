@@ -20,19 +20,14 @@ import java.util.List;
  */
 
 public class LayerManager extends MouseAdapter {
-    private final List<Layer> layers = new ArrayList<Layer>();
+    private final List<Layer> layers = new ArrayList<>();
     //mouse adapter code
     Layer active = null;
 
     public void add(Layer l) {
         layers.add(l);
         //sort collection by z index
-        Collections.sort(layers, new Comparator<Layer>() {
-            @Override
-            public int compare(Layer a, Layer b) {
-                return a.getZ() - b.getZ();
-            }
-        });
+        layers.sort((a, b) -> a.getZ() - b.getZ());
     }
 
     public void draw(Graphics g) {

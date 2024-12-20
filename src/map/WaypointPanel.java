@@ -454,7 +454,7 @@ public class WaypointPanel extends NinePatchPanel {
     private void makeActions() {
         nextTileServer = new AbstractAction() {
             final java.util.List<String> serverLabels
-                    = new LinkedList<String>(map.tileServerNames());
+                    = new LinkedList<>(map.tileServerNames());
 
             {
                 updateLabel();
@@ -593,7 +593,7 @@ public class WaypointPanel extends NinePatchPanel {
             }
         }
 
-        ArrayList<EditBoxSpec> editorBoxes = new ArrayList<EditBoxSpec>();
+        ArrayList<EditBoxSpec> editorBoxes = new ArrayList<>();
         latitude = new TelemField();
         longitude = new TelemField();
         altitude = new TelemField();
@@ -601,7 +601,7 @@ public class WaypointPanel extends NinePatchPanel {
         editorBoxes.add(new EditBoxSpec(longitude, "Lng: "));
         editorBoxes.add(new EditBoxSpec(altitude, context.getResource("waypointExtra") + " "));
 
-        ArrayList<JPanel> editorPanels = new ArrayList<JPanel>();
+        ArrayList<JPanel> editorPanels = new ArrayList<>();
         for (EditBoxSpec box : editorBoxes) {
             //construct panel
             JPanel panel = new JPanel();
@@ -689,9 +689,9 @@ public class WaypointPanel extends NinePatchPanel {
             //Grab waypoint info and create move command
             command = new WaypointCommandEdit(waypoints, selectedWaypoint);
 
-            Double newLatitude = Double.parseDouble(latitude.getText());
-            Double newLongitude = Double.parseDouble(longitude.getText());
-            Double tmpAltitude = Double.parseDouble(altitude.getText());
+            double newLatitude = Double.parseDouble(latitude.getText());
+            double newLongitude = Double.parseDouble(longitude.getText());
+            double tmpAltitude = Double.parseDouble(altitude.getText());
 
             int newAltitude = doubleToFixed(tmpAltitude);
             Point.Double newPosition = new Point.Double(newLongitude, newLatitude);
@@ -803,7 +803,7 @@ public class WaypointPanel extends NinePatchPanel {
         }
 
         void update(float newValue) {
-            /**
+            /*
              * editable float fields will get their cursor reset unless
              * updates from possible waypointlistener events only change
              * the text when the dot moves

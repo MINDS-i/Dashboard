@@ -59,7 +59,7 @@ public class ACLIManager {
      * @param command - The action/command to execute
      */
     public boolean execute(ACLICommand command) {
-        params = new ArrayList<String>();
+        params = new ArrayList<>();
         params.addAll(0, Arrays.asList(CMD_EXEC, TERM_FLAG, ACLI_EXEC, ACLI_PATH));
         params.addAll(command.params);
 
@@ -123,7 +123,7 @@ public class ACLIManager {
      * @param sketchPath - The user selected path to the sketch being used.
      */
     public boolean execute(ACLICommand command, String sketchPath) {
-        params = new ArrayList<String>();
+        params = new ArrayList<>();
         params.addAll(0, Arrays.asList(CMD_EXEC, TERM_FLAG, ACLI_EXEC, ACLI_PATH));
         params.addAll(command.params);
 

@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Logger;
@@ -74,7 +75,7 @@ public class Context {
                 persistenceFile.createNewFile();
             }
 
-            InputStream is = new FileInputStream(persistenceFile);
+            InputStream is = Files.newInputStream(persistenceFile.toPath());
             persist.load(is);
             is.close();
         }
@@ -147,40 +148,26 @@ public class Context {
         });
 
         final double[] lastLatitude = new double[2];
-        telemetry.registerListener(Serial.LATITUDE, new TelemetryListener() {
-            public void update(double data) {
-                lastLatitude[0] = data;
-            }
+        telemetry.registerListener(Serial.LATITUDE, data -> lastLatitude[0] = data);
+        telemetry.registerListener(Serial.LONGITUDE, data -> {
+            Dot location = waypoint.getRover();
+            location.setLatitude(lastLatitude[0]);
+            location.setLongitude(data);
+            waypoint.setRover(location);
         });
-        telemetry.registerListener(Serial.LONGITUDE, new TelemetryListener() {
-            public void update(double data) {
-                Dot location = waypoint.getRover();
-                location.setLatitude(lastLatitude[0]);
-                location.setLongitude(data);
-                waypoint.setRover(location);
-            }
+        telemetry.registerListener(Serial.HOMELATITUDE, data -> lastLatitude[1] = data);
+        telemetry.registerListener(Serial.HOMELONGITUDE, data -> {
+            Dot location = waypoint.getHome();
+            location.setLatitude(lastLatitude[1]);
+            location.setLongitude(data);
+            waypoint.setHome(location);
         });
-        telemetry.registerListener(Serial.HOMELATITUDE, new TelemetryListener() {
-            public void update(double data) {
-                lastLatitude[1] = data;
-            }
-        });
-        telemetry.registerListener(Serial.HOMELONGITUDE, new TelemetryListener() {
-            public void update(double data) {
-                Dot location = waypoint.getHome();
-                location.setLatitude(lastLatitude[1]);
-                location.setLongitude(data);
-                waypoint.setHome(location);
-            }
-        });
-        telemetry.registerListener(Serial.ALTITUDE, new TelemetryListener() {
-            public void update(double altitude) {
-                double homeAlt = telemetry.getTelemetry(Serial.HOMEALTITUDE);
-                if (homeAlt != 0.0d) {
-                    telemetry.updateTelemetry(Serial.DELTAALTITUDE,
-                            altitude - homeAlt
-                    );
-                }
+        telemetry.registerListener(Serial.ALTITUDE, altitude -> {
+            double homeAlt = telemetry.getTelemetry(Serial.HOMEALTITUDE);
+            if (homeAlt != 0.0d) {
+                telemetry.updateTelemetry(Serial.DELTAALTITUDE,
+                        altitude - homeAlt
+                );
             }
         });
     }

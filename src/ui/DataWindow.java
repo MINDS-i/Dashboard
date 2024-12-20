@@ -67,7 +67,7 @@ public class DataWindow implements ActionListener {
 
         final SettingList settingList = context.settingList;
 
-        ArrayList<TelemetryColumn<?>> telem = new ArrayList<TelemetryColumn<?>>();
+        ArrayList<TelemetryColumn<?>> telem = new ArrayList<>();
         telem.add(new TelemetryColumn<String>() {
             public String getName() {
                 return "name";
@@ -118,7 +118,7 @@ public class DataWindow implements ActionListener {
             }
         });
 
-        ArrayList<TelemetryColumn<?>> settings = new ArrayList<TelemetryColumn<?>>();
+        ArrayList<TelemetryColumn<?>> settings = new ArrayList<>();
         settings.add(new TelemetryColumn<String>() {
             public String getName() {
                 return "name";
@@ -170,7 +170,7 @@ public class DataWindow implements ActionListener {
             }
 
             public void setValueAt(String val, int row) {
-                Float newVal = Float.valueOf(val);
+                float newVal = Float.parseFloat(val);
                 if (settingList.get(row).outsideOfBounds(newVal)) {
                     JFrame mf = new JFrame("Warning");
                     JOptionPane.showMessageDialog(
@@ -211,11 +211,7 @@ public class DataWindow implements ActionListener {
         setScroll.setBorder(tableBorders);
         telScroll.setBorder(tableBorders);
 
-        setTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            public void valueChanged(ListSelectionEvent event) {
-                setDetail(setTable.getSelectedRow());
-            }
-        });
+        setTable.getSelectionModel().addListSelectionListener(event -> setDetail(setTable.getSelectedRow()));
 
         JTextPane dBox = new JTextPane();
         dBox.setBorder(BorderFactory.createLineBorder(Color.gray));

@@ -20,11 +20,9 @@ public class RadioWidget {
         RDisp b = new RDisp(ctx.theme);
 
         for (int i = 0; i < channels.length; i++) {
-            final Integer idx = i;
+            final int idx = i;
             ctx.telemetry.registerListener(channels[i],
-                    (double d) -> {
-                        b.data[idx] = (float) d / 180f;
-                    });
+                    (double d) -> b.data[idx] = (float) d / 180f);
         }
 
         JPanel container = new TransparentPanel(ctx, size);

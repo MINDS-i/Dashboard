@@ -13,7 +13,7 @@ import java.util.NoSuchElementException;
  */
 public class WeakList<T> implements Iterable<T> {
     private final Collection<WeakReference<T>> bag
-            = new LinkedList<WeakReference<T>>();
+            = new LinkedList<>();
 
     /**
      * Create a new WeakList.
@@ -31,7 +31,7 @@ public class WeakList<T> implements Iterable<T> {
      */
     void add(T obj) {
         if (obj != null) {
-            bag.add(new WeakReference<T>(obj));
+            bag.add(new WeakReference<>(obj));
         }
     }
 

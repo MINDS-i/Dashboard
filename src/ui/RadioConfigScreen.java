@@ -106,7 +106,7 @@ public class RadioConfigScreen extends JPanel {
     }
 
     private JTable makeSettingTable() {
-        java.util.List<TelemetryColumn<?>> setCols = new ArrayList<TelemetryColumn<?>>();
+        java.util.List<TelemetryColumn<?>> setCols = new ArrayList<>();
 
         setCols.add(new TelemetryColumn<Integer>() {
             public String getName() {
@@ -239,7 +239,7 @@ public class RadioConfigScreen extends JPanel {
         //Example: S1: SERIAL_SPEED=57
         final Pattern settingRegex = Pattern.compile("S(\\d+):(.+)=(\\d+)");
         SerialPort port = null;
-        java.util.List<Setting> settings = new ArrayList<Setting>();
+        java.util.List<Setting> settings = new ArrayList<>();
 
         public TelemRadio() {
         }
@@ -298,7 +298,7 @@ public class RadioConfigScreen extends JPanel {
                 settings.add(new Setting(id, name, value));
             }
 
-            if (settings.size() == 0) {
+            if (settings.isEmpty()) {
                 JFrame mf = new JFrame("Radio did not respond");
                 JOptionPane.showMessageDialog(mf,
                         "The radio did not respond to a request to lead setting " +
@@ -366,9 +366,9 @@ public class RadioConfigScreen extends JPanel {
         }
 
         void writeDefaults() {
-            for (int i = 0; i < RADIO_DEFAULTS.length; i++) {
-                updateValue(getIndexByID(RADIO_DEFAULTS[i][0]),
-                        RADIO_DEFAULTS[i][1]);
+            for (int[] radioDefault : RADIO_DEFAULTS) {
+                updateValue(getIndexByID(radioDefault[0]),
+                        radioDefault[1]);
             }
         }
     }

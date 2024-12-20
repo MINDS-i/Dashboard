@@ -17,9 +17,7 @@ public class HorizonWidgets {
         JPanel container = new TransparentPanel(ctx, size);
 
         ArtificialHorizon horizon = new ArtificialHorizon(
-                () -> {
-                    container.repaint();
-                }
+                container::repaint
         );
         sc.setup(horizon);
 

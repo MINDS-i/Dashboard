@@ -89,7 +89,7 @@ class GraphConfigWindow {
     private JComponent buildSourceTable() {
         List<Graph.DataConfig> sources = subject.getSources();
 
-        ArrayList<TelemetryColumn<?>> cols = new ArrayList<TelemetryColumn<?>>();
+        ArrayList<TelemetryColumn<?>> cols = new ArrayList<>();
         cols.add(new TelemetryColumn<String>() {
             public String getName() {
                 return "#";
@@ -142,11 +142,7 @@ class GraphConfigWindow {
 
         ColumnTableModel colModel = new ColumnTableModel(cols);
         JTable table = new JTable(colModel);
-        table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            public void valueChanged(ListSelectionEvent event) {
-                setCloseup(sources.get(table.getSelectedRow()));
-            }
-        });
+        table.getSelectionModel().addListSelectionListener(event -> setCloseup(sources.get(table.getSelectedRow())));
         JScrollPane pane = new JScrollPane(table);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         table.setFillsViewportHeight(true);
@@ -161,11 +157,7 @@ class GraphConfigWindow {
     private JPanel buildCloseupPanel() {
         JPanel panel = new JPanel();
 
-        ChangeListener updateListener = new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                updateCloseupPaint();
-            }
-        };
+        ChangeListener updateListener = e -> updateCloseupPaint();
 
         strokeModel = new SpinnerNumberModel(1, 1, 100, 1);
 

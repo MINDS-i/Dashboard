@@ -41,47 +41,44 @@ public class SliderEditor extends JSlider implements TableCellEditor {
     public SliderEditor(Context context, JTable table) {
         super(SwingConstants.HORIZONTAL);
         this.context = context;
-        listenerList = new Vector<CellEditorListener>();
+        listenerList = new Vector<>();
         previousChangeValue = -1;
         targetRow = -1;
 
-        addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent event) {
-                Setting setting;
-                int row = table.getSelectedRow();
+        addChangeListener(event -> {
+            Setting setting;
+            int row = table.getSelectedRow();
 
-                //Don't use a row value that doesn't exist. (Table not init'd)
-                if (row < 0) {
-                    return;
-                }
-
-                //Edge Case: Ignore false change values of zero triggered when
-                //switching between sliders.
-                if (row != targetRow) {
-                    return;
-                }
-
-                //Edge Case and Update Window: The last value generated on mouse
-                //up is a duplicate of the previous change event. Update the setting
-                //value here.
-                if (previousChangeValue == getValue()) {
-                    setting = context.settingList.get(row);
-
-                    float min = setting.getMin();
-                    float max = setting.getMax();
-                    float range = Math.abs(max - min);
-                    float settingValue = ((getValue() * range) / 100) + min;
-
-                    //Set final updated value
-                    context.settingList.pushSetting(row, settingValue);
-
-                    return;
-                }
-
-                //Update the previous value to account for duplication edge case
-                previousChangeValue = getValue();
+            //Don't use a row value that doesn't exist. (Table not init'd)
+            if (row < 0) {
+                return;
             }
+
+            //Edge Case: Ignore false change values of zero triggered when
+            //switching between sliders.
+            if (row != targetRow) {
+                return;
+            }
+
+            //Edge Case and Update Window: The last value generated on mouse
+            //up is a duplicate of the previous change event. Update the setting
+            //value here.
+            if (previousChangeValue == getValue()) {
+                setting = context.settingList.get(row);
+
+                float min = setting.getMin();
+                float max = setting.getMax();
+                float range = Math.abs(max - min);
+                float settingValue = ((getValue() * range) / 100) + min;
+
+                //Set final updated value
+                context.settingList.pushSetting(row, settingValue);
+
+                return;
+            }
+
+            //Update the previous value to account for duplication edge case
+            previousChangeValue = getValue();
         });
     }
 

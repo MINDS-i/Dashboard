@@ -38,7 +38,7 @@ public class WaypointGeofence {
                             CoordinateTransform transform) {
         fenceType = type;
         //Take the larger radius between the provided and default
-        radius_ft = (radius > MIN_RADIUS_FT) ? radius : MIN_RADIUS_FT;
+        radius_ft = Math.max(radius, MIN_RADIUS_FT);
         mapTransform = transform;
 
         switch (fenceType) {

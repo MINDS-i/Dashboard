@@ -11,6 +11,7 @@ import javax.xml.stream.*;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Vector;
 
 
@@ -154,8 +155,8 @@ public class WaypointCommandParse extends WaypointCommand {
         XMLStreamReader xmlReader;
 
         //Route data vars
-        Vector<Vector<Dot>> routeList = new Vector<Vector<Dot>>();
-        Vector<Dot> route = new Vector<Dot>();
+        Vector<Vector<Dot>> routeList = new Vector<>();
+        Vector<Dot> route = new Vector<>();
         Dot point = new Dot();
         String data = "";
 
@@ -185,10 +186,10 @@ public class WaypointCommandParse extends WaypointCommand {
                         break;
 
                     case XMLStreamConstants.START_ELEMENT:
-                        if (xmlReader.getLocalName() == XMLElement.ROUTE.getValue()) {
-                            route = new Vector<Dot>();
+                        if (Objects.equals(xmlReader.getLocalName(), XMLElement.ROUTE.getValue())) {
+                            route = new Vector<>();
                         }
-                        else if (xmlReader.getLocalName() == XMLElement.ROUTEPOINT.getValue()) {
+                        else if (Objects.equals(xmlReader.getLocalName(), XMLElement.ROUTEPOINT.getValue())) {
                             double lat, lng;
 
                             try {
@@ -206,7 +207,7 @@ public class WaypointCommandParse extends WaypointCommand {
                             }
                             point = new Dot(lat, lng, (short) 0);
                         }
-                        else if (xmlReader.getLocalName() == XMLElement.ELEVATION.getValue()) {
+                        else if (Objects.equals(xmlReader.getLocalName(), XMLElement.ELEVATION.getValue())) {
                             //Do nothing for now (May be implimented at a later date
                         }
                         break;
@@ -215,17 +216,13 @@ public class WaypointCommandParse extends WaypointCommand {
                         break;
 
                     case XMLStreamConstants.END_ELEMENT:
-                        if (xmlReader.getLocalName() == XMLElement.ROUTE.getValue()) {
+                        if (Objects.equals(xmlReader.getLocalName(), XMLElement.ROUTE.getValue())) {
                             routeList.add(route);
                         }
-                        else if (xmlReader.getLocalName() == XMLElement.ROUTEPOINT.getValue()) {
+                        else if (Objects.equals(xmlReader.getLocalName(), XMLElement.ROUTEPOINT.getValue())) {
                             route.add(point);
                         }
-                        else if (xmlReader.getLocalName() == XMLElement.ELEVATION.getValue()) {
-                            if (point == null) {
-                                continue;
-                            }
-
+                        else if (Objects.equals(xmlReader.getLocalName(), XMLElement.ELEVATION.getValue())) {
                             try {
                                 point.setAltitude((short) (Double.parseDouble(data) * FEET_PER_METER));
                             }
@@ -259,18 +256,18 @@ public class WaypointCommandParse extends WaypointCommand {
             int selection = 0;
             if (routeList.size() > 1) {
                 Integer[] options = new Integer[routeList.size()];
-                String prompt = "Multiple routes were found;\n"
-                        + "Please enter the number of your choice: \n";
+                StringBuilder prompt = new StringBuilder("Multiple routes were found;\n"
+                        + "Please enter the number of your choice: \n");
 
                 //create a user prompt for route selection...
                 for (int i = 0; i < routeList.size(); i++) {
                     options[i] = i;
-                    prompt += "Route " + i + " (" + routeList.get(i).size() + " Points)\n";
+                    prompt.append("Route ").append(i).append(" (").append(routeList.get(i).size()).append(" Points)\n");
                 }
 
                 //and show a dialog to the user
                 selection = (int) JOptionPane.showInputDialog(
-                        null, prompt, "Pick a route", JOptionPane.PLAIN_MESSAGE,
+                        null, prompt.toString(), "Pick a route", JOptionPane.PLAIN_MESSAGE,
                         null, options, options[0]);
             }
 

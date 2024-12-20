@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.logging.*;
 
@@ -199,31 +200,15 @@ public class Dashboard implements Runnable {
 
     private void registerHorizonListeners(ArtificialHorizon ah, boolean sideBars) {
         final float[] lastPitch = new float[1];
-        context.telemetry.registerListener(Serial.PITCH, new TelemetryListener() {
-            public void update(double pitch) {
-                lastPitch[0] = (float) Math.toRadians(pitch);
-            }
-        });
-        context.telemetry.registerListener(Serial.ROLL, new TelemetryListener() {
-            public void update(double roll) {
-                ah.setAngles(lastPitch[0], (float) Math.toRadians(-roll));
-            }
-        });
+        context.telemetry.registerListener(Serial.PITCH, pitch -> lastPitch[0] = (float) Math.toRadians(pitch));
+        context.telemetry.registerListener(Serial.ROLL, roll -> ah.setAngles(lastPitch[0], (float) Math.toRadians(-roll)));
 
         if (sideBars) {
             ah.setEnabled(DataAxis.TOP, true);
-            context.telemetry.registerListener(Serial.HEADING, new TelemetryListener() {
-                public void update(double yaw) {
-                    ah.set(DataAxis.TOP, (float) yaw);
-                }
-            });
+            context.telemetry.registerListener(Serial.HEADING, yaw -> ah.set(DataAxis.TOP, (float) yaw));
 
             ah.setEnabled(DataAxis.RIGHT, true);
-            context.telemetry.registerListener(Serial.DELTAALTITUDE, new TelemetryListener() {
-                public void update(double alt) {
-                    ah.set(DataAxis.RIGHT, (float) alt);
-                }
-            });
+            context.telemetry.registerListener(Serial.DELTAALTITUDE, alt -> ah.set(DataAxis.RIGHT, (float) alt));
         }
     }
 
@@ -308,7 +293,7 @@ public class Dashboard implements Runnable {
      * @return - The telemetry data widget.
      */
     private TelemetryDataWidget createTelemetryWidget() throws Exception {
-        if (context.getCurrentLocale() == "ground") {
+        if (Objects.equals(context.getCurrentLocale(), "ground")) {
             return TelemetryDataWidget.fromXML(context, "telemetryWidgetGnd");
         }
         else {
@@ -328,16 +313,12 @@ public class Dashboard implements Runnable {
                 HorizonWidgets.makeHorizonWidget(
                         context,
                         HORIZON_WIDGET_SIZE,
-                        (ArtificialHorizon ah) -> {
-                            registerHorizonListeners(ah, false);
-                        });
+                        (ArtificialHorizon ah) -> registerHorizonListeners(ah, false));
 
         horizon.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                HorizonWidgets.makeHorizonWindow(context, (ArtificialHorizon ah) -> {
-                    registerHorizonListeners(ah, true);
-                }).setVisible(true);
+                HorizonWidgets.makeHorizonWindow(context, (ArtificialHorizon ah) -> registerHorizonListeners(ah, true)).setVisible(true);
             }
         });
 

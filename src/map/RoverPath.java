@@ -43,7 +43,7 @@ public class RoverPath implements Layer {
         this.painter = painter;
         this.map = map;
 
-        waypointsDisabled = !Boolean.valueOf(
+        waypointsDisabled = !Boolean.parseBoolean(
                 context.getResource("waypoints_enabled", "true"));
 
         currOpMode = OpMode.STANDARD;
@@ -69,7 +69,6 @@ public class RoverPath implements Layer {
     @Override
     public boolean onClick(MouseEvent e) {
         WaypointCommand command = null;
-        boolean result = false;
 
         if (waypointsDisabled) {
             return false;
@@ -193,7 +192,6 @@ public class RoverPath implements Layer {
 
     @Override
     public void onRelease(MouseEvent e) {
-        Point pixel = e.getPoint();
         if (draggedDotIdx != Integer.MAX_VALUE) {
             draggedDotIdx = Integer.MAX_VALUE;
 
@@ -427,7 +425,7 @@ public class RoverPath implements Layer {
      * persistent storage value to be consistent upon successive
      * restarts.
      *
-     * @param location - The updated home location.
+     * @param point - The updated home location.
      */
     public void updateHomeLocation(Point2D point) {
         Dot home = waypoints.getHome();

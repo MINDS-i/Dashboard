@@ -18,9 +18,8 @@ public class ColumnTableModel extends AbstractTableModel {
     public int getRowCount() {
         int rowCount = Integer.MAX_VALUE;
 
-        Iterator itr = columns.iterator();
-        while (itr.hasNext()) {
-            TelemetryColumn col = (TelemetryColumn) itr.next();
+        for (TelemetryColumn<?> column : columns) {
+            TelemetryColumn col = (TelemetryColumn) column;
             rowCount = Math.min(col.getRowCount(), rowCount);
         }
         return rowCount;

@@ -113,7 +113,7 @@ public class StateWidget extends UIWidget {
         }
 
         //Configure state panels
-        ArrayList<JPanel> statePanels = new ArrayList<JPanel>();
+        ArrayList<JPanel> statePanels = new ArrayList<>();
         apmPanel = new JPanel();
         apmPanel.setBorder(insets);
         apmPanel.setLayout(new BoxLayout(apmPanel, BoxLayout.LINE_AXIS));

@@ -54,11 +54,7 @@ public class GPSWidget extends UIWidget {
      * This is fired by a predetermined timer value. See UPDATE_DELAY_MS for
      * the interrupt period.
      */
-    ActionListener meterUpdateAction = new ActionListener() {
-        public void actionPerformed(ActionEvent event) {
-            determineSignalStrength();
-        }
-    };
+    ActionListener meterUpdateAction = event -> determineSignalStrength();
 
     /**
      * Class Constructor
@@ -156,7 +152,7 @@ public class GPSWidget extends UIWidget {
         ArrayList<JPanel> meterSet;
         JPanel panel;
 
-        meterSet = new ArrayList<JPanel>();
+        meterSet = new ArrayList<>();
 
         //No Signal (Unknown)
         panel = new JPanel();

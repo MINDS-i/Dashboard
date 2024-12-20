@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AlertPanel extends JPanel {
-    private final List<String> messages = new ArrayList<String>();
+    private final List<String> messages = new ArrayList<>();
     private final int lineLength;
     private final int lineCount;
     private final Font messageFont;
