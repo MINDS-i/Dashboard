@@ -4,16 +4,21 @@ import com.table.ColumnTableModel;
 import com.table.TelemetryColumn;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import javax.swing.event.*;
-import java.util.List;
 import java.util.ArrayList;
-import javax.swing.colorchooser.AbstractColorChooserPanel;
+import java.util.List;
 
 class GraphConfigWindow {
-    private static final Dimension SPINNER_SIZE = new Dimension(80,20);
-    private Graph subject;
-    private JFrame frame;
+    private static final Dimension SPINNER_SIZE = new Dimension(80, 20);
+    private final Graph subject;
+    private final JFrame frame;
+    private SpinnerNumberModel strokeModel;
+    private Graph.DataConfig closeupData;
+    private JColorChooser colorPicker;
 
     public GraphConfigWindow(Graph subject) {
         this.subject = subject;
@@ -49,26 +54,26 @@ class GraphConfigWindow {
         JPanel spinnerPanel = new JPanel();
 
         ViewSpec vs = subject.getViewSpec();
-        double curYscale  =  vs.maxY() - vs.minY();
+        double curYscale = vs.maxY() - vs.minY();
         double curYcenter = (vs.maxY() + vs.minY()) / 2.0;
-        SpinnerNumberModel yscale  =
-            new SpinnerNumberModel(curYscale, Double.MIN_NORMAL, Double.MAX_VALUE, 1.0);
+        SpinnerNumberModel yscale =
+                new SpinnerNumberModel(curYscale, Double.MIN_NORMAL, Double.MAX_VALUE, 1.0);
         SpinnerNumberModel ycenter =
-            new SpinnerNumberModel(curYcenter, -Double.MAX_VALUE, Double.MAX_VALUE, 2.0);
-        SpinnerNumberModel xscale  = new SpinnerNumberModel(1.0, 0.0, 1.0, 0.05);
+                new SpinnerNumberModel(curYcenter, -Double.MAX_VALUE, Double.MAX_VALUE, 2.0);
+        SpinnerNumberModel xscale = new SpinnerNumberModel(1.0, 0.0, 1.0, 0.05);
 
         ChangeListener cl = (ChangeEvent e) -> {
             subject.setViewSpec(new RTViewSpec(
-                yscale.getNumber().floatValue(),
-                ycenter.getNumber().floatValue(),
-                xscale.getNumber().floatValue()
+                    yscale.getNumber().floatValue(),
+                    ycenter.getNumber().floatValue(),
+                    xscale.getNumber().floatValue()
             ));
         };
 
         JCheckBox aa = new JCheckBox("AntiAlias", subject.getAntiAliasing());
-        aa.addChangeListener( (ChangeEvent e) ->
-                              subject.setAntiAliasing( aa.getModel().isSelected() )
-                            );
+        aa.addChangeListener((ChangeEvent e) ->
+                subject.setAntiAliasing(aa.getModel().isSelected())
+        );
 
         spinnerPanel.add(aa);
         spinnerPanel.add(new JLabel(" Y Scale:"));
@@ -85,42 +90,51 @@ class GraphConfigWindow {
         List<Graph.DataConfig> sources = subject.getSources();
 
         ArrayList<TelemetryColumn<?>> cols = new ArrayList<TelemetryColumn<?>>();
-        cols.add( new TelemetryColumn<String>() {
+        cols.add(new TelemetryColumn<String>() {
             public String getName() {
                 return "#";
             }
+
             public String getValueAt(int row) {
                 return sources.get(row).getName();
             }
+
             public int getRowCount() {
                 return sources.size();
             }
+
             public Class<String> getDataClass() {
                 return String.class;
             }
+
             public boolean isRowEditable(int row) {
                 return false;
             }
+
             public void setValueAt(String val, int row) {
-                ;
             }
         });
-        cols.add( new TelemetryColumn<Boolean>() {
+        cols.add(new TelemetryColumn<Boolean>() {
             public String getName() {
                 return "Graph?";
             }
+
             public Boolean getValueAt(int row) {
                 return sources.get(row).getDrawn();
             }
+
             public int getRowCount() {
                 return sources.size();
             }
+
             public Class<Boolean> getDataClass() {
                 return Boolean.class;
             }
+
             public boolean isRowEditable(int row) {
                 return true;
             }
+
             public void setValueAt(Boolean val, int row) {
                 sources.get(row).setDrawn(val);
             }
@@ -138,14 +152,10 @@ class GraphConfigWindow {
         table.setFillsViewportHeight(true);
         table.setPreferredScrollableViewportSize(new Dimension(200, 120));
         pane.setBorder(BorderFactory.createCompoundBorder(
-                           BorderFactory.createEmptyBorder(5, 10, 5,10),
-                           BorderFactory.createLineBorder(Color.BLACK)  ));
+                BorderFactory.createEmptyBorder(5, 10, 5, 10),
+                BorderFactory.createLineBorder(Color.BLACK)));
         return pane;
     }
-
-    private SpinnerNumberModel strokeModel;
-    private Graph.DataConfig   closeupData;
-    private JColorChooser      colorPicker;
 
     //provides a closeup view of the settings associated with a particular DataConfig
     private JPanel buildCloseupPanel() {
@@ -170,12 +180,14 @@ class GraphConfigWindow {
 
     private void setCloseup(Graph.DataConfig dc) {
         closeupData = dc;
-        colorPicker.setColor((Color)closeupData.getPaint());
+        colorPicker.setColor((Color) closeupData.getPaint());
     }
 
     private void updateCloseupPaint() {
-        if(closeupData == null) return;
-        closeupData.setPaint( (Paint) colorPicker.getColor() );
+        if (closeupData == null) {
+            return;
+        }
+        closeupData.setPaint(colorPicker.getColor());
     }
 
 }

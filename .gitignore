@@ -32,3 +32,5 @@ resources/images/6x6-Top - Backup.png
 out/
 .idea/
 *.iml
+_Release Builds/
+DashboardSetup.exe

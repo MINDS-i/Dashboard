@@ -1,17 +1,15 @@
 package com.ui.ninePatch;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.FontMetrics;
-import java.awt.geom.*;
-import java.awt.image.*;
-import java.io.*;
-import java.nio.file.*;
-import java.util.*;
-import javax.imageio.*;
-import javax.swing.*;
-
-import com.ui.BackgroundPanel;
-import com.ui.ninePatch.NinePatchPanel;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.AffineTransformOp;
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.WritableRaster;
+import java.io.IOException;
+import java.nio.file.Path;
 
 public class NinePatch {
     private final BufferedImage middle;
@@ -24,13 +22,64 @@ public class NinePatch {
     private final BufferedImage bottomLeft;
     private final BufferedImage bottomRight;
 
+    private NinePatch() {
+        middle = null;
+        topBorder = null;
+        leftBorder = null;
+        rightBorder = null;
+        bottomBorder = null;
+        topLeft = null;
+        topRight = null;
+        bottomLeft = null;
+        bottomRight = null;
+    }
+
+    public NinePatch(BufferedImage center, BufferedImage wall, BufferedImage corner) {
+        middle = center;
+        topBorder = copyFlipped(wall, Flip.IDENTITY);
+        leftBorder = copyRotated(wall, -90);
+        rightBorder = copyRotated(wall, 90);
+        bottomBorder = copyFlipped(wall, Flip.VERTICAL);
+        topLeft = copyFlipped(corner, Flip.IDENTITY);
+        topRight = copyFlipped(corner, Flip.HORIZONTAL);
+        bottomLeft = copyFlipped(corner, Flip.VERTICAL);
+        bottomRight = copyFlipped(corner, Flip.BOTH);
+    }
+
+    public NinePatch(BufferedImage center,
+                     BufferedImage topWall,
+                     BufferedImage sideWall,
+                     BufferedImage corner) {
+        middle = center;
+        leftBorder = copyFlipped(sideWall, Flip.IDENTITY);
+        rightBorder = copyFlipped(sideWall, Flip.BOTH);
+        topBorder = copyFlipped(topWall, Flip.IDENTITY);
+        bottomBorder = copyFlipped(topWall, Flip.BOTH);
+        topLeft = copyFlipped(corner, Flip.IDENTITY);
+        topRight = copyFlipped(corner, Flip.HORIZONTAL);
+        bottomLeft = copyFlipped(corner, Flip.VERTICAL);
+        bottomRight = copyFlipped(corner, Flip.BOTH);
+    }
+
+    public NinePatch(BufferedImage center, BufferedImage[] walls, BufferedImage[] corners) {
+        middle = center;
+        topBorder = walls[0];
+        leftBorder = walls[1];
+        rightBorder = walls[2];
+        bottomBorder = walls[3];
+        topLeft = corners[0];
+        topRight = corners[1];
+        bottomLeft = corners[2];
+        bottomRight = corners[3];
+    }
+
     static BufferedImage copyRotated(BufferedImage bi, double rotation) {
         //paramaterize rotation
         double rot = Math.toRadians(rotation);
-        int newWidth  = (int) Math.abs(bi.getWidth()*Math.cos(rot) ) +
-                        (int) Math.abs(bi.getHeight()*Math.sin(rot))  ;
-        int newHeight = (int) Math.abs(bi.getWidth()*Math.sin(rot) ) +
-                        (int) Math.abs(bi.getHeight()*Math.cos(rot))  ;
+        int newWidth = (int) Math.abs(bi.getWidth() * Math.cos(rot)) +
+                (int) Math.abs(bi.getHeight() * Math.sin(rot));
+        int newHeight = (int) Math.abs(bi.getWidth() * Math.sin(rot)) +
+                (int) Math.abs(bi.getHeight() * Math.cos(rot));
         //make compatible, rotated canvas
         ColorModel cm = bi.getColorModel();
         boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
@@ -39,9 +88,9 @@ public class NinePatch {
         //define transform to do rotation;
         Graphics2D g = ni.createGraphics();
         AffineTransform tx = new AffineTransform();
-        tx.translate(newWidth/2.0d, newHeight/2.0d); //move from 0,0 to new image center
+        tx.translate(newWidth / 2.0d, newHeight / 2.0d); //move from 0,0 to new image center
         tx.rotate(rot); //perform rotation
-        tx.translate(-bi.getWidth()/2.0d, -bi.getHeight()/2.0d); //move image to 0,0 for rotation
+        tx.translate(-bi.getWidth() / 2.0d, -bi.getHeight() / 2.0d); //move image to 0,0 for rotation
         //draw the rotation into the new image
         g.drawImage(bi, tx, null);
         g.dispose();
@@ -49,10 +98,9 @@ public class NinePatch {
         return ni;
     }
 
-    enum Flip { IDENTITY, HORIZONTAL, VERTICAL, BOTH };
     static BufferedImage copyFlipped(BufferedImage bi, Flip dir) {
         AffineTransform tx = new AffineTransform();
-        switch(dir) {
+        switch (dir) {
             case IDENTITY:
                 tx = new AffineTransform();
                 break;
@@ -73,100 +121,52 @@ public class NinePatch {
         return op.filter(bi, null);
     }
 
-    private NinePatch() {
-        middle       = null;
-        topBorder    = null;
-        leftBorder   = null;
-        rightBorder  = null;
-        bottomBorder = null;
-        topLeft      = null;
-        topRight     = null;
-        bottomLeft   = null;
-        bottomRight  = null;
-    }
-    public NinePatch(BufferedImage center, BufferedImage wall, BufferedImage corner) {
-        middle       = center;
-        topBorder    = copyFlipped(wall, Flip.IDENTITY);
-        leftBorder   = copyRotated(wall, -90);
-        rightBorder  = copyRotated(wall, 90);
-        bottomBorder = copyFlipped(wall, Flip.VERTICAL);
-        topLeft      = copyFlipped(corner, Flip.IDENTITY);
-        topRight     = copyFlipped(corner, Flip.HORIZONTAL);
-        bottomLeft   = copyFlipped(corner, Flip.VERTICAL);
-        bottomRight  = copyFlipped(corner, Flip.BOTH);
-    }
-    public NinePatch(BufferedImage center,
-                     BufferedImage topWall,
-                     BufferedImage sideWall,
-                     BufferedImage corner) {
-        middle       = center;
-        leftBorder   = copyFlipped(sideWall, Flip.IDENTITY);
-        rightBorder  = copyFlipped(sideWall, Flip.BOTH);
-        topBorder    = copyFlipped(topWall, Flip.IDENTITY);
-        bottomBorder = copyFlipped(topWall, Flip.BOTH);
-        topLeft      = copyFlipped(corner, Flip.IDENTITY);
-        topRight     = copyFlipped(corner, Flip.HORIZONTAL);
-        bottomLeft   = copyFlipped(corner, Flip.VERTICAL);
-        bottomRight  = copyFlipped(corner, Flip.BOTH);
-    }
-    public NinePatch(BufferedImage center, BufferedImage[] walls, BufferedImage[] corners) {
-        middle       = center;
-        topBorder    = walls[0];
-        leftBorder   = walls[1];
-        rightBorder  = walls[2];
-        bottomBorder = walls[3];
-        topLeft      = corners[0];
-        topRight     = corners[1];
-        bottomLeft   = corners[2];
-        bottomRight  = corners[3];
-    }
-
     public static NinePatch loadFrom(Path dir) throws IOException {
         // Only Full 9-image patches define a right border
         boolean fullPatch = dir.resolve("RightBorder.png").toFile().exists();
-        if(fullPatch){
+        if (fullPatch) {
             BufferedImage center = ImageIO.read(dir.resolve("Middle.png").toFile());
-            BufferedImage[] walls = new BufferedImage[] {
-                ImageIO.read(dir.resolve("TopBorder.png").toFile()),
-                ImageIO.read(dir.resolve("LeftBorder.png").toFile()),
-                ImageIO.read(dir.resolve("RightBorder.png").toFile()),
-                ImageIO.read(dir.resolve("BottomBorder.png").toFile())
+            BufferedImage[] walls = new BufferedImage[]{
+                    ImageIO.read(dir.resolve("TopBorder.png").toFile()),
+                    ImageIO.read(dir.resolve("LeftBorder.png").toFile()),
+                    ImageIO.read(dir.resolve("RightBorder.png").toFile()),
+                    ImageIO.read(dir.resolve("BottomBorder.png").toFile())
             };
-            BufferedImage[] joints = new BufferedImage[] {
-                ImageIO.read(dir.resolve("TopLeft.png").toFile()),
-                ImageIO.read(dir.resolve("TopRight.png").toFile()),
-                ImageIO.read(dir.resolve("BottomLeft.png").toFile()),
-                ImageIO.read(dir.resolve("BottomRight.png").toFile())
+            BufferedImage[] joints = new BufferedImage[]{
+                    ImageIO.read(dir.resolve("TopLeft.png").toFile()),
+                    ImageIO.read(dir.resolve("TopRight.png").toFile()),
+                    ImageIO.read(dir.resolve("BottomLeft.png").toFile()),
+                    ImageIO.read(dir.resolve("BottomRight.png").toFile())
             };
             return new NinePatch(center, walls, joints);
         }
 
         // If not a full patch, then only 4-image patches have TopBorder
         boolean fourPatch = dir.resolve("LeftBorder.png").toFile().exists();
-        if(fourPatch){
+        if (fourPatch) {
             return new NinePatch(
-                ImageIO.read(dir.resolve("Middle.png").toFile()),
-                ImageIO.read(dir.resolve("TopBorder.png").toFile()),
-                ImageIO.read(dir.resolve("LeftBorder.png").toFile()),
-                ImageIO.read(dir.resolve("TopLeft.png").toFile())
+                    ImageIO.read(dir.resolve("Middle.png").toFile()),
+                    ImageIO.read(dir.resolve("TopBorder.png").toFile()),
+                    ImageIO.read(dir.resolve("LeftBorder.png").toFile()),
+                    ImageIO.read(dir.resolve("TopLeft.png").toFile())
             );
         }
 
         // Must be a three image patch
         return new NinePatch(
-            ImageIO.read(dir.resolve("Middle.png").toFile()),
-            ImageIO.read(dir.resolve("TopBorder.png").toFile()),
-            ImageIO.read(dir.resolve("TopLeft.png").toFile())
+                ImageIO.read(dir.resolve("Middle.png").toFile()),
+                ImageIO.read(dir.resolve("TopBorder.png").toFile()),
+                ImageIO.read(dir.resolve("TopLeft.png").toFile())
         );
     }
 
     public Dimension minimumSize() {
         //widest left corner + widest right corner
         int width = Math.max(topLeft.getWidth(), bottomLeft.getWidth()) +
-                    Math.max(topRight.getWidth(), bottomRight.getWidth());
+                Math.max(topRight.getWidth(), bottomRight.getWidth());
         //tallest top corner + tallest bottom corner
         int height = Math.max(topLeft.getHeight(), topRight.getHeight()) +
-                     Math.max(bottomLeft.getHeight(), bottomRight.getHeight());
+                Math.max(bottomLeft.getHeight(), bottomRight.getHeight());
         return new Dimension(width, height);
     }
 
@@ -181,44 +181,46 @@ public class NinePatch {
     public void paintIn(Graphics g, int width, int height) {
         Graphics2D g2d = (Graphics2D) g;
         //fill between walls
-        paintTexture(g2d,middle,
-                     leftBorder.getWidth(), topBorder.getHeight(),
-                     width-rightBorder.getWidth(), height-bottomBorder.getHeight() );
+        paintTexture(g2d, middle,
+                leftBorder.getWidth(), topBorder.getHeight(),
+                width - rightBorder.getWidth(), height - bottomBorder.getHeight());
 
         //draw four corners
-        g.drawImage(topLeft, 0, 0,null);
-        g.drawImage(topRight , width-topRight.getWidth(),    0,null);
-        g.drawImage(bottomLeft, 0, height-bottomLeft.getHeight(), null);
-        g.drawImage(bottomRight, width-bottomRight.getWidth(), height-bottomRight.getHeight(), null);
+        g.drawImage(topLeft, 0, 0, null);
+        g.drawImage(topRight, width - topRight.getWidth(), 0, null);
+        g.drawImage(bottomLeft, 0, height - bottomLeft.getHeight(), null);
+        g.drawImage(bottomRight, width - bottomRight.getWidth(), height - bottomRight.getHeight(), null);
 
         //draw walls
         paintTexture(g2d, leftBorder,
-                     0, topLeft.getHeight(),
-                     leftBorder.getWidth(), height-bottomLeft.getHeight());
+                0, topLeft.getHeight(),
+                leftBorder.getWidth(), height - bottomLeft.getHeight());
 
         paintTexture(g2d, rightBorder,
-                     width-rightBorder.getWidth(), topRight.getHeight(),
-                     width, height-bottomRight.getHeight());
+                width - rightBorder.getWidth(), topRight.getHeight(),
+                width, height - bottomRight.getHeight());
 
         paintTexture(g2d, topBorder,
-                     topLeft.getWidth(), 0,
-                     width-topRight.getWidth(), topBorder.getHeight());
+                topLeft.getWidth(), 0,
+                width - topRight.getWidth(), topBorder.getHeight());
 
         paintTexture(g2d, bottomBorder,
-                     bottomLeft.getWidth(), height-bottomBorder.getHeight(),
-                     width-bottomRight.getWidth(), height);
+                bottomLeft.getWidth(), height - bottomBorder.getHeight(),
+                width - bottomRight.getWidth(), height);
     }
 
     private void paintTexture(Graphics2D g, BufferedImage bi,
-                              int x1, int y1, int x2, int y2  ) {
+                              int x1, int y1, int x2, int y2) {
         Graphics2D g2d = (Graphics2D) g.create();
         g2d.translate(x1, y1);
         g2d.setPaint(new TexturePaint(bi,
-                                      new Rectangle2D.Float(0f, 0f,
-                                                            (float)bi.getWidth(), (float)bi.getHeight())));
-        g2d.fillRect(0,0,x2-x1,y2-y1);
+                new Rectangle2D.Float(0f, 0f,
+                        (float) bi.getWidth(), (float) bi.getHeight())));
+        g2d.fillRect(0, 0, x2 - x1, y2 - y1);
         g2d.dispose();
     }
+
+    enum Flip {IDENTITY, HORIZONTAL, VERTICAL, BOTH}
 
     /*
     public static void main(String[] args) {
