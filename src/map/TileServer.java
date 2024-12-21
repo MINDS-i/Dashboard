@@ -4,7 +4,10 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.io.*;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -69,6 +72,8 @@ class TileServer implements MapSource {
     //concatenated to this
     private final String rootURL;
 
+    private final Path fileCacheDir;
+
     // Keeps track of the map position on the last draw to trigger new tile loads
     private TileTag centerTag = new TileTag(0, 0, 0);
     /**
@@ -87,6 +92,12 @@ class TileServer implements MapSource {
      */
     TileServer(String url) {
         this.rootURL = url;
+
+        // Create a file cache in wherever we're allowed to make temporary files.  Hash the
+        // server URL to give every server its own cache.
+        this.fileCacheDir = Paths.get(System.getProperty("java.io.tmpdir"),
+                "Minds-i-Dashboard", String.format("%08X", url.hashCode()));
+        // TODO(pjreed): Add controls for cache size, pre-seeding area, clearing cache
     }
 
     /**
@@ -274,9 +285,42 @@ class TileServer implements MapSource {
      */
     private void loadTile(TileTag target) {
         try {
-            Image img = ImageIO.read(target.getURL(rootURL));
+            BufferedImage img;
+            Path cachedPath = this.fileCacheDir.resolve(Paths.get(String.valueOf(target.z),
+                    String.valueOf(target.x), String.valueOf(target.y)));
+            File cachedFile = cachedPath.toFile();
+            try {
+                // First, try to read the file from our local disk cache.
+                img = ImageIO.read(cachedFile);
+            }
+            catch(IOException e) {
+                // If it doesn't exist, pull it from the internet...
+                try (ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+                    // Download the tile from the network
+                    try (BufferedInputStream input = new BufferedInputStream(target.getURL(rootURL).openStream())) {
+                        for (int result = input.read(); result != -1; result = input.read()) {
+                            output.write(result);
+                        }
+                    }
+                    // Write the data to our file cache, then load it as an image
+                    try (InputStream localInput = new ByteArrayInputStream(output.toByteArray())) {
+                        cachedFile.getParentFile().mkdirs();
+                        try (FileOutputStream fileOutput = new FileOutputStream(cachedFile)) {
+                            for (int result = localInput.read(); result != -1; result = localInput.read()) {
+                                fileOutput.write(result);
+                            }
+                        }
+                        catch (IOException e2) {
+                            // If we have an error writing to the cache for some reason, log it, but don't let
+                            // that stop us from loading the image.
+                            e2.printStackTrace();
+                        }
+                        localInput.reset();
+                        img = ImageIO.read(localInput);
+                    }
+                }
+            }
             addTile(target, img);
-
         }
         catch (Exception e) {
             System.err.println("failed to load " + target);

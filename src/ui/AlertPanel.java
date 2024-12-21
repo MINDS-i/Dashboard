@@ -74,8 +74,8 @@ public class AlertPanel extends JPanel {
 
             g2.setColor(Color.BLACK);
             g2.setStroke(new BasicStroke(6,
-                    BasicStroke.JOIN_ROUND,
-                    BasicStroke.CAP_ROUND));
+                    BasicStroke.CAP_ROUND,
+                    BasicStroke.JOIN_ROUND));
             g2.draw(shape);
             g2.setColor(messageColor);
             g2.fill(shape);
