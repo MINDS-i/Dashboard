@@ -33,6 +33,12 @@ public class SystemConfigWindow {
         container.add(uiTitlePanel);
         container.add(new UIConfigPanel(this.context, map, isWindows()));
 
+        // Add map tile cache config area
+        JPanel tileCacheTitlePanel = new JPanel();
+        tileCacheTitlePanel.add(new JLabel("---- Map Tile Cache Configuration ----"));
+        container.add(tileCacheTitlePanel);
+        container.add(new TileCacheConfigPanel(this.context, map));
+
         // Add radio configuration area
         JPanel lpanel = new JPanel();
         lpanel.add(new JLabel("---- Radio Configuration ----"));

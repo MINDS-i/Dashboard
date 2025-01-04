@@ -2,13 +2,13 @@ package com.telemetry;
 
 import com.Context;
 import com.util.UtilHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import java.util.logging.Logger;
 
 /**
  * @author Chris Park @ Infinetix Corp.
@@ -21,7 +21,7 @@ public class TelemetryMonitor {
 
     //Constants
     protected static final int UPDATE_CYCLE_MS = 100;
-    protected final Logger serialLog = Logger.getLogger("d.serial");
+    protected final Logger serialLog = LoggerFactory.getLogger("d.serial");
 
     //Vars, Standard Refs
     private final Context context;
@@ -236,7 +236,7 @@ public class TelemetryMonitor {
 
                     if ((context.dash.mapPanel != null)
                             && context.dash.mapPanel.waypointPanel.getIsMoving()) {
-                        serialLog.warning("VCC: Battery voltage low. Stopping unit.");
+                        serialLog.warn("VCC: Battery voltage low. Stopping unit.");
                         context.dash.mapPanel.waypointPanel.missionButton.doClick();
                     }
 

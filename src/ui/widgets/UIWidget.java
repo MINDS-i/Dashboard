@@ -1,12 +1,13 @@
 package com.ui.widgets;
 
 import com.Context;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.util.logging.Logger;
 
 /**
  * @author Chris Park @ Infinetix Corp.
@@ -24,7 +25,7 @@ public class UIWidget extends JPanel {
     protected static final int LABEL_HEIGHT = 25;
     protected static final int LABEL_WIDTH = 115;
     //Logging support
-    protected final Logger serialLog = Logger.getLogger("d.serial");
+    protected final Logger serialLog = LoggerFactory.getLogger("d.serial");
     //Standard Variables
     protected Context context;
     protected Border insets;

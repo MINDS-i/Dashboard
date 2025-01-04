@@ -15,6 +15,8 @@ import com.layer.Layer;
 import com.layer.LayerManager;
 import com.map.command.CommandManager;
 import com.map.geofence.WaypointGeofence;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,7 +26,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.logging.Logger;
 
 import static com.map.WaypointList.WaypointListener;
 
@@ -37,11 +38,11 @@ public class MapPanel extends JPanel implements CoordinateTransform {
     private final BorderLayout border = new BorderLayout();
     private final DragListener mouseListener = new DragListener();
     private final LayerManager mll = new LayerManager();
-    private final Logger iolog = Logger.getLogger("d.io");
+    private final Logger iolog = LoggerFactory.getLogger("d.io");
     public WaypointPanel waypointPanel;
     public RoverPath roverPath;
     private String currentTileServerName = "";
-    private MapSource currentTileServer = new TileServer(currentTileServerName);
+    private MapSource currentTileServer;
     private int zoom;
     private Point2D mapPosition = new Point2D.Double(0, 0);
 
@@ -57,6 +58,7 @@ public class MapPanel extends JPanel implements CoordinateTransform {
                     JPanel east,
                     JPanel south) {
         context = cxt;
+        currentTileServer = new TileServer(currentTileServerName, cxt);
         context.getWaypointList().addListener(new WaypointListener() {
             @Override
             public void unusedEvent() {
@@ -131,12 +133,19 @@ public class MapPanel extends JPanel implements CoordinateTransform {
     }
 
     /**
-     * Transforms a (longitude, latitude) point to absolute (x, y) pixels.
+     * Transforms a (longitude, latitude) point to absolute (x, y) pixels at the current zoom level.
      * Will return an instance of the same class as the argument p
      */
     public Point2D toPixels(Point2D p) {
+        return toPixels(p, zoom);
+    }
+
+    /**
+     * Transforms a (longitude, latitude) point to absolute (x, y) pixels at a specific scale.
+     * Will return an instance of the same class as the argument p
+     */
+    public static Point2D toPixels(Point2D p, double scale) {
         Point2D f = (Point2D) p.clone();
-        double scale = zoom;
         double lon = p.getX();
         double lat = Math.toRadians(p.getY());
         double x = ((lon + 180.0) / 360.0) * scale;
@@ -147,12 +156,19 @@ public class MapPanel extends JPanel implements CoordinateTransform {
     }
 
     /**
-     * Transforms absolute (x,y) pixels to (lonitude,latitude)
+     * Transforms absolute (x,y) pixels to (longitude,latitude) at the current zoom level.
      * Will return an instance of the same class as the argument p
      */
     public Point2D toCoordinates(Point2D p) {
+        return toCoordinates(p, zoom);
+    }
+
+    /**
+     * Transforms absolute (x,y) pixels to (longitude,latitude) at a specific scale.
+     * Will return an instance of the same class as the argument p
+     */
+    public static Point2D toCoordinates(Point2D p, double scale) {
         Point2D f = (Point2D) p.clone();
-        double scale = zoom;
         double x = p.getX() / scale;
         double y = ((p.getY() / scale) * 2);
         double lon = x * 360 - 180;
@@ -277,7 +293,7 @@ public class MapPanel extends JPanel implements CoordinateTransform {
             currentTileServer = mapSources.get(serverName);
         }
         else {
-            iolog.severe("No Tile Server Sources found for name " + serverName);
+            iolog.error("No Tile Server Sources found for name {}", serverName);
         }
 
         repaint();
@@ -304,16 +320,35 @@ public class MapPanel extends JPanel implements CoordinateTransform {
     private Map<String, MapSource> importMapSources(Context ctx) {
         String sourceFile = ctx.getResource("tile_server_list");
         if (sourceFile == null) {
-            iolog.severe("Couldn't find tile server list resource path");
+            iolog.error("Couldn't find tile server list resource path");
         }
 
         Map<String, MapSource> sources = new HashMap<>();
         ResourceBundle rb = ctx.loadResourceBundle(sourceFile);
         for (String key : rb.keySet()) {
-            sources.put(key, new TileServer(rb.getString(key)));
+            sources.put(key, new TileServer(rb.getString(key), this.context));
         }
 
         return sources;
+    }
+
+    /**
+     * Instructs all map sources to begin pre-loading tiles into the filesystem cache.
+     * @param callback A callback that will be sent updates as the caching progresses.
+     */
+    public void seedTileCache(TileLoadingCallback callback) {
+        mapSources.values().forEach(source -> source.preloadTiles(
+                toCoordinates(mapPosition),
+                1.0,
+                callback
+        ));
+    }
+
+    /**
+     * If map sources are currently preloading tiles, this will stop them.
+     */
+    public void stopSeeding() {
+        mapSources.values().forEach(MapSource::stopPreloading);
     }
 
     /**

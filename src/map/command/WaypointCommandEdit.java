@@ -62,14 +62,14 @@ public class WaypointCommandEdit extends WaypointCommand {
             //abort the move operation and alert the user.
             if ((index == 0) && (waypoints.size() > 1)
                     && (positionHasChanged())) {
-                serialLog.warning(WARN_GEOFENCE_MOVE);
+                serialLog.warn(WARN_GEOFENCE_MOVE);
                 return false;
             }
 
             //If not the geofence origin and the endpoint is outside of
             //the current fence, abort the move.
             if (!manager.getGeofence().doesLocationIntersect(endPoint)) {
-                serialLog.warning(WARN_NO_GEOFENCE_INTERSECT);
+                serialLog.warn(WARN_NO_GEOFENCE_INTERSECT);
                 return false;
             }
         }

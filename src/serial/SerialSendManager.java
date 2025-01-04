@@ -5,9 +5,10 @@ import com.map.Dot;
 import com.map.WaypointList;
 import com.serial.Messages.Message;
 import jssc.SerialPortException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.logging.Logger;
 
 /**
  * @author Chris Park @ Infinetix Corp.
@@ -27,7 +28,7 @@ public class SerialSendManager {
     private final Queue<Message> messageQueue;
     private final LinkedList<Integer> confirmationQueue;
     //Logger
-    private final Logger seriallog = Logger.getLogger("d.serial");
+    private final Logger seriallog = LoggerFactory.getLogger("d.serial");
     private Timer serviceTimer;
 
     //--------------Singleton Construction/Initiation Functions-----------------
@@ -88,7 +89,7 @@ public class SerialSendManager {
                 synchronized (lock) {
 
                     //If queue is empty, no service is required.
-                    if (messageQueue.size() == 0) {
+                    if (messageQueue.isEmpty()) {
                         //Clear out any confirmation queue leftovers
                         confirmationQueue.clear();
                         return;
@@ -125,10 +126,8 @@ public class SerialSendManager {
                     if (headMsg.isPastExpiration(now)) {
                         if (headMsg.numberOfFailures() >= Serial.MAX_FAILURES) {
 
-                            seriallog.severe(
-                                    "Connection failed; Rover unware of "
-                                            + headMsg
-                                            + "!");
+                            seriallog.error(
+                                    "Connection failed; Rover unware of {}!", headMsg);
                             messageQueue.remove();
                             return;
                         }
@@ -224,24 +223,17 @@ public class SerialSendManager {
 
                 if (isResend) { //If resend attempt, log it and add failure
                     msg.addFailure();
-                    seriallog.fine(Integer.toHexString(
-                            msg.getConfirmSum())
-                            + " "
-                            + "No response to "
-                            + msg
-                            + " resend #"
-                            + msg.numberOfFailures());
+                    seriallog.debug("{} No response to {} resend #{}", Integer.toHexString(
+                            msg.getConfirmSum()), msg, msg.numberOfFailures());
                 }
                 else { //otherwise just log as a normally sent message
-                    seriallog.finer(Integer.toHexString(
-                            msg.getConfirmSum())
-                            + " Sent "
-                            + msg);
+                    seriallog.debug("{} Sent {}", Integer.toHexString(
+                            msg.getConfirmSum()), msg);
                 }
 
             }
             catch (SerialPortException ex) {
-                seriallog.severe(ex.getMessage());
+                seriallog.error("Error sending message", ex);
             }
         }
     }
@@ -318,7 +310,7 @@ public class SerialSendManager {
      * Resets the units Telemetry settings to their default values.
      */
     public void resetSettings() {
-        seriallog.warning(
+        seriallog.warn(
                 "SerialSendManager - Requesting reset to default "
                         + "telemetry settings.");
 

@@ -115,7 +115,7 @@ public class BumperWidget extends UIWidget {
                 break;
             default:
                 newState = BumperStatus.UNKOWN;
-                serialLog.warning("BUMPER: Unrecognized bumper state, cannot update.");
+                serialLog.warn("BUMPER: Unrecognized bumper state, cannot update.");
         }
 
         //Update target bumper
@@ -127,7 +127,7 @@ public class BumperWidget extends UIWidget {
                 bumperStateRight = newState;
                 break;
             default:
-                serialLog.warning("BUMPER: Unkown bumper INDEX received on state update.");
+                serialLog.warn("BUMPER: Unkown bumper INDEX received on state update.");
         }
 
         //Update Colors & Label
@@ -149,7 +149,7 @@ public class BumperWidget extends UIWidget {
                 leftLabel.setBackground(DEF_ACTIVE_COLOR);
                 break;
             default:
-                serialLog.warning("BUMPER: Unknown left bumper STATE received on color update.");
+                serialLog.warn("BUMPER: Unknown left bumper STATE received on color update.");
         }
 
         //Update Right Bumper
@@ -161,7 +161,7 @@ public class BumperWidget extends UIWidget {
                 rightLabel.setBackground(DEF_ACTIVE_COLOR);
                 break;
             default:
-                serialLog.warning("BUMPER: Unknown right bumper STATE received on color update.");
+                serialLog.warn("BUMPER: Unknown right bumper STATE received on color update.");
         }
     }
 

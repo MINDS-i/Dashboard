@@ -3,7 +3,6 @@ package com;
 import com.logging.SimpleHandler;
 import com.map.MapPanel;
 import com.serial.*;
-import com.telemetry.TelemetryListener;
 import com.ui.AlertPanel;
 import com.ui.ArtificialHorizon;
 import com.ui.ArtificialHorizon.DataAxis;
@@ -11,6 +10,8 @@ import com.ui.RadioWidget;
 import com.ui.WidgetPanel;
 import com.ui.widgets.*;
 import jssc.SerialPort;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -33,9 +34,9 @@ public class Dashboard implements Runnable {
     private static final int HORIZON_WIDGET_SIZE = 145;
     private static final int DEFAULT_ZOOM_LEVEL = 4;
     //Logging
-    private final Logger seriallog = Logger.getLogger("d.serial");
-    private final Logger iolog = Logger.getLogger("d.io");
-    private final Logger rootlog = Logger.getLogger("d");
+    private final Logger seriallog = LoggerFactory.getLogger("d.serial");
+    private final Logger iolog = LoggerFactory.getLogger("d.io");
+    private final Logger rootlog = LoggerFactory.getLogger("d");
     public StateWidget stateWidget;
     public PingWidget pingWidget;
     public GPSWidget gpsWidget;
@@ -100,7 +101,7 @@ public class Dashboard implements Runnable {
             loading.dispose();
         }
         catch (IOException e) {
-            rootlog.severe("Dashboard startup failure: " + e);
+            rootlog.error("Dashboard startup failure: ", e);
             displayErrorPopup(e);
         }
     }
@@ -108,16 +109,16 @@ public class Dashboard implements Runnable {
     private void createLogDirectory() {
         File logDir = new File("log");
         try {
+            //noinspection ResultOfMethodCallIgnored
             logDir.mkdir();
         }
         catch (Exception e) {
-            System.err.println("Cannot create log directory");
-            e.printStackTrace();
+            rootlog.error("Cannot create log directory", e);
         }
     }
 
     private void initLogging() {
-        Logger root = rootlog;
+        java.util.logging.Logger root = java.util.logging.Logger.getLogger("d");
         root.setUseParentHandlers(false);
         root.setLevel(Level.ALL);
 
@@ -140,8 +141,7 @@ public class Dashboard implements Runnable {
             root.addHandler(file);
         }
         catch (Exception e) {
-            iolog.severe("Log File Write Failed " + e);
-            e.printStackTrace();
+            iolog.error("Log File Write Failed ", e);
         }
     }
 
@@ -194,7 +194,8 @@ public class Dashboard implements Runnable {
         Handler handler = new SimpleHandler((LogRecord l, String s) ->
                 ap.addMessage(s));
         handler.setLevel(Level.INFO);
-        rootlog.addHandler(handler);
+        java.util.logging.Logger root = java.util.logging.Logger.getLogger("d");
+        root.addHandler(handler);
         return ap;
     }
 
@@ -231,8 +232,7 @@ public class Dashboard implements Runnable {
             widgetPanel.addWidget(dataWidget);
         }
         catch (Exception e) {
-            iolog.severe("Failed to load telemetry widget line spec " + e);
-            e.printStackTrace();
+            iolog.error("Failed to load telemetry widget line spec ", e);
         }
 
         //State Widget

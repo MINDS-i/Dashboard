@@ -9,21 +9,20 @@ import com.serial.Messages.Message;
 import com.serial.Serial;
 import com.serial.SerialParser;
 import com.serial.SerialSendManager;
-import com.telemetry.TelemetryListener;
 import com.telemetry.TelemetryLogger;
 import com.telemetry.TelemetryManager;
 import com.ui.Theme;
 import jssc.SerialPort;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.geom.Point2D;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.logging.Logger;
 
 import static com.map.WaypointList.WaypointListener;
 
@@ -34,7 +33,7 @@ public class Context {
     private final Properties persist;
     private final File persistenceFile;
     private final String instanceLogName;
-    private final Logger ioerr = Logger.getLogger("d.io");
+    private final Logger ioerr = LoggerFactory.getLogger("d.io");
     public boolean connected;
     public Dashboard dash;
     public Locale locale;
@@ -80,8 +79,7 @@ public class Context {
             is.close();
         }
         catch (Exception e) {
-            ioerr.severe("Failed to open and read persistance file");
-            e.printStackTrace();
+            ioerr.error("Failed to open and read persistance file", e);
         }
         finally {
             loadLocale(); // defaults to "air" mode
@@ -201,12 +199,21 @@ public class Context {
                 Double.parseDouble(lng));
     }
 
+    public void setEnableTileCacheProp(boolean enabled) {
+        persist.setProperty("enableTileCache", Boolean.toString(enabled));
+        saveProps();
+    }
+
+    public boolean getEnableTileCacheProp() {
+        return Boolean.parseBoolean(persist.getProperty("enableTileCache", "True"));
+    }
+
     private void saveProps() {
         try (FileOutputStream file = new FileOutputStream(persistenceFile)) {
             persist.store(file, "");
         }
         catch (Exception e) {
-            ioerr.severe("Can't save persist props " + e);
+            ioerr.error("Can't save persist props ", e);
         }
     }
 

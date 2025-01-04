@@ -10,6 +10,8 @@ import com.ui.SystemConfigWindow;
 import com.ui.Theme;
 import com.ui.ninePatch.NinePatchPanel;
 import com.ui.telemetry.TelemetryDataWindow;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -19,7 +21,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.logging.Logger;
 
 import static com.map.WaypointList.ExtendedWaypoint;
 import static com.map.WaypointList.WaypointListener;
@@ -31,17 +32,17 @@ public class WaypointPanel extends NinePatchPanel {
     protected static final int BDR_SIZE_LR = 15;
     protected static final String NO_WAYPOINT_MSG = "N / A";
     //Logging support
-    protected final Logger serialLog = Logger.getLogger("d.serial");
+    protected final Logger serialLog = LoggerFactory.getLogger("d.serial");
     private final Context context;
     private final MapPanel map;
     private final WaypointList waypoints;
     private final Action logPanelAction = new AbstractAction() {
         final LogViewer lv;
-        final Logger log;
+        final java.util.logging.Logger log;
 
         {
             lv = new LogViewer();
-            log = Logger.getLogger("d");
+            log = java.util.logging.Logger.getLogger("d");
             log.addHandler(lv.getHandler());
             putValue(Action.NAME, "Event Log");
         }
@@ -211,7 +212,7 @@ public class WaypointPanel extends NinePatchPanel {
         public void actionPerformed(ActionEvent e) {
             map.setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
             map.roverPath.setOpMode(RoverPath.OpMode.SET_HOME);
-            serialLog.warning("SET HOME - Please select a home point.");
+            serialLog.warn("SET HOME - Please select a home point.");
         }
     };
     private final Action clearWaypointsAction = new AbstractAction() {

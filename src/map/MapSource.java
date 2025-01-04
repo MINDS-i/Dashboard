@@ -35,4 +35,19 @@ interface MapSource {
      * can be displayed by this MapSource
      */
     boolean isValidZoom(int zoomLevel);
+
+    /**
+     * Pre-loads every map tile within a certain distance from a point into the disk cache.
+     * Loading may take a long time and should run in a separate thread, so a callback can
+     * be provided to receive updates.
+     * @param center The center point of tiles to load.
+     * @param distanceKm The distance from the center within which tiles should be loaded.
+     * @param callback A callback that will be called as tiles are loaded.
+     */
+    void preloadTiles(Point2D center, double distanceKm, TileLoadingCallback callback);
+
+    /**
+     * Interrupts a preload operation that is currently in progress.
+     */
+    void stopPreloading();
 }

@@ -59,7 +59,7 @@ public class WaypointCommandAdd extends WaypointCommand {
 
         //If the maximum waypoints has been reached, do nothing
         if (waypoints.size() == MAX_WAYPOINTS) {
-            serialLog.warning(WARN_MAX_WAYPONTS_REACHED);
+            serialLog.warn(WARN_MAX_WAYPONTS_REACHED);
             return false;
         }
 
@@ -67,13 +67,13 @@ public class WaypointCommandAdd extends WaypointCommand {
         if (manager.getGeofence().getIsEnabled()) {
             //Check for and refuse a second index 0 placement
             if (index == 0) {
-                serialLog.warning(WARN_GEOFENCE_ALREADY_PLACED);
+                serialLog.warn(WARN_GEOFENCE_ALREADY_PLACED);
                 return false;
             }
 
             //Check for waypoint intersection
             if (!manager.getGeofence().doesLocationIntersect(point)) {
-                serialLog.warning(WARN_NO_GEOFENCE_INTERSECT);
+                serialLog.warn(WARN_NO_GEOFENCE_INTERSECT);
                 return false;
             }
         }
@@ -145,7 +145,7 @@ public class WaypointCommandAdd extends WaypointCommand {
             distance = UtilHelper.getInstance().kmToFeet(distance);
 
             if (distance < MIN_DISTANCE_FT) {
-                serialLog.finer(
+                serialLog.debug(
                         "WaypointCommand Add - Waypoint placement of "
                                 + distance
                                 + " feet is less than recommended minimum of "

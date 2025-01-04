@@ -8,13 +8,14 @@ import com.serial.Messages.Message;
 import jssc.SerialPortEvent;
 import jssc.SerialPortEventListener;
 import jssc.SerialPortException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileReader;
 import java.io.InputStream;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
-import java.util.logging.Logger;
 
 import static com.map.WaypointList.WaypointListener;
 
@@ -22,8 +23,8 @@ public class SerialParser implements SerialPortEventListener {
     private final Context context;
     private final WaypointList waypoints;
     private final CommsMonitor commsMonitor;
-    private final Logger seriallog = Logger.getLogger("d.serial");
-    private final Logger robotlog = Logger.getLogger("d.robot");
+    private final Logger seriallog = LoggerFactory.getLogger("d.serial");
+    private final Logger robotlog = LoggerFactory.getLogger("d.robot");
     private Decoder decoder;
     private StateMap descriptionMap;
 
@@ -57,7 +58,7 @@ public class SerialParser implements SerialPortEventListener {
             context.port().addEventListener(this);
         }
         catch (SerialPortException ex) {
-            seriallog.severe(ex.getMessage());
+            seriallog.error("Error opening serial port", ex);
         }
     }
 
@@ -153,7 +154,7 @@ public class SerialParser implements SerialPortEventListener {
                             break;
 
                         default:
-                            seriallog.severe(
+                            seriallog.error(
                                     "SerialParser - Sensor Data -"
                                             + "Unrecognized Sensor Subtype");
                             break;
@@ -179,7 +180,7 @@ public class SerialParser implements SerialPortEventListener {
                             break;
 
                         default:
-                            seriallog.severe(
+                            seriallog.error(
                                     "SerialParser - Info Data - "
                                             + "Unrecognized Info Subtype");
                             break;
@@ -224,13 +225,13 @@ public class SerialParser implements SerialPortEventListener {
                 case Serial.COMMAND_WORD:
                     if (a == Serial.TARGET_CMD) {
                         if (b < 0 || b >= waypoints.size()) {
-                            seriallog.severe("Rover transmitted inconsistent target; resyncing");
+                            seriallog.error("Rover transmitted inconsistent target; resyncing");
 
                             SerialSendManager.getInstance().sendWaypointList(waypoints);
                         }
                         else {
                             waypoints.setTarget(b, WaypointListener.Source.REMOTE);
-                            seriallog.warning("SerialParser - New target index from rover: " + b);
+                            seriallog.error("SerialParser - New target index from rover: " + b);
                         }
                     }
                     break;
@@ -251,7 +252,7 @@ public class SerialParser implements SerialPortEventListener {
                 sm = StateMap.read(fr);
             }
             catch (Exception e) {
-                seriallog.warning("Can't parse full state descriptions");
+                seriallog.error("Can't parse full state descriptions");
                 sm = null;
             }
         }

@@ -3,8 +3,8 @@ package com.map.command;
 import com.map.Dot;
 import com.map.WaypointList;
 import com.map.geofence.WaypointGeofence;
-
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Chris Park @ Infinetix Corp.
@@ -16,7 +16,7 @@ import java.util.logging.Logger;
  */
 public abstract class WaypointCommand {
 
-    protected final Logger serialLog = Logger.getLogger("d.serial");
+    protected final Logger serialLog = LoggerFactory.getLogger("d.serial");
     protected WaypointList waypoints;
     protected CommandType type;
     // Add/Remove Vars

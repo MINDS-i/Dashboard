@@ -4,6 +4,7 @@ import com.Context;
 import com.Dashboard;
 import com.ui.ninePatch.NinePatch;
 import com.ui.ninePatch.NinePatchButton;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -12,7 +13,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.logging.Logger;
 
 //POD class for theme elements
 public class Theme {
@@ -94,7 +94,7 @@ public class Theme {
             alertFont = new Font(Font.MONOSPACED, Font.BOLD, 16);
         }
         catch (IOException | FontFormatException e) {
-            Logger.getLogger("d.io").severe(e.toString());
+            LoggerFactory.getLogger("d.io").error("Error loading theme", e);
             Dashboard.displayErrorPopup(e);
         }
     }

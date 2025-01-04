@@ -3,12 +3,13 @@ package com.map;
 import com.Context;
 import com.layer.Layer;
 import com.map.command.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
-import java.util.logging.Logger;
 
 import static com.map.WaypointList.ExtendedWaypoint;
 
@@ -20,7 +21,7 @@ public class RoverPath implements Layer {
     private static final Color LINE_BORDER = new Color(0.5f, 0.5f, 0.5f, 0.0f);
     private static final int LINE_WIDTH = 10;
     //Logging support
-    protected final Logger serialLog = Logger.getLogger("d.serial");
+    protected final Logger serialLog = LoggerFactory.getLogger("d.serial");
     private final Context context;
     private final CoordinateTransform mapTransform;
     private final WaypointList waypoints;
@@ -125,7 +126,7 @@ public class RoverPath implements Layer {
 
             switch (currOpMode) {
                 case SET_HOME:
-                    serialLog.warning("RoverPath - "
+                    serialLog.warn("RoverPath - "
                             + "Can't set home to existing point position.");
                     map.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                     currOpMode = OpMode.STANDARD;
@@ -433,7 +434,7 @@ public class RoverPath implements Layer {
         waypoints.setHome(new Dot(point));
         context.setHomeProp(String.valueOf(home.getLatitude()),
                 String.valueOf(home.getLongitude()));
-        serialLog.warning("SET HOME - Home point set.");
+        serialLog.warn("SET HOME - Home point set.");
     }
 
     /**

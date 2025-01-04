@@ -1,8 +1,9 @@
 package com.serial;
 
-import java.awt.event.ActionEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.awt.event.ActionListener;
-import java.util.logging.Logger;
 
 /**
  * @author Chris Park @ Infinetix Corp.
@@ -23,7 +24,7 @@ public class CommsMonitor {
     private static final int HEARTBEAT_POLL_RATE_MS = 500;
     private static CommsMonitor cManInstance = null;
     //Logging Support
-    protected final Logger serialLog = Logger.getLogger("d.serial");
+    protected final Logger serialLog = LoggerFactory.getLogger("d.serial");
     //Heartbeat Vars
     private final javax.swing.Timer heartbeatCheckTimer;
     private int heartbeatCheckCount;
@@ -75,7 +76,7 @@ public class CommsMonitor {
         if (heartbeatCheckCount == MAX_HEARTBEAT_CHECK_COUNT) {
 
             if (!heartbeatConnectionLost) {
-                serialLog.severe(
+                serialLog.error(
                         "CommsMonitor - No serial heartbeat response from unit. "
                                 + "Please check that radio connection is established.");
                 heartbeatConnectionLost = true;
@@ -99,13 +100,13 @@ public class CommsMonitor {
     public void receiveHeartbeatPulse(int pulse) {
 
         if (awaitingInitialHeartbeat) {
-            serialLog.warning(
+            serialLog.warn(
                     "CommsMonitor - Initial serial heartbeat received.");
             awaitingInitialHeartbeat = false;
         }
 
         if (heartbeatConnectionLost) {
-            serialLog.warning(
+            serialLog.warn(
                     "CommsMonitor - Serial Heartbeat connection re-established");
             heartbeatConnectionLost = false;
         }
@@ -117,7 +118,7 @@ public class CommsMonitor {
         }
         else {
             System.err.println("Unknown heartbeat respone type received");
-            serialLog.warning(
+            serialLog.warn(
                     "CommsMonitor - Received unknown heartbeat status. Ignoring");
         }
     }

@@ -57,14 +57,14 @@ public class WaypointCommandMove extends WaypointCommand {
         if (manager.getGeofence().getIsEnabled()) {
             //If an attempt is made to move the origin, abort the move.
             if (index == 0) {
-                serialLog.warning(WARN_ORIGIN_CANNOT_MOVE);
+                serialLog.warn(WARN_ORIGIN_CANNOT_MOVE);
                 return false;
             }
 
             //If not the geofence origin and the endpoint is outside of
             //the current fence, abort the move.
             if (!manager.getGeofence().doesLocationIntersect(endPoint)) {
-                serialLog.warning(WARN_NO_GEOFENCE_INTERSECT);
+                serialLog.warn(WARN_NO_GEOFENCE_INTERSECT);
                 return false;
             }
         }

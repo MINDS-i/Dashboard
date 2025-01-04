@@ -1,5 +1,9 @@
 package com.map;
 
+import com.Context;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.Point2D;
@@ -16,7 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * MapSource implementation for web-mercator maps loaded from external
  * tile servers
  */
-class TileServer implements MapSource {
+public class TileServer implements MapSource {
 
     //label tiles on screen for debugging
     private static final boolean TILE_LABEL = false;
@@ -72,6 +76,8 @@ class TileServer implements MapSource {
     //concatenated to this
     private final String rootURL;
 
+    private final Context context;
+
     private final Path fileCacheDir;
 
     // Keeps track of the map position on the last draw to trigger new tile loads
@@ -85,18 +91,25 @@ class TileServer implements MapSource {
      */
     private Thread tileLoader = null;
 
+    private Thread preloadingThread = null;
+
+    private static final Logger logger = LoggerFactory.getLogger(TileServer.class);
+
+    public static final String CACHE_NAME = "Minds-i-Dashboard";
+
     /**
      * Class Constructor
      *
      * @param url - The root url of the tile server.
      */
-    TileServer(String url) {
+    TileServer(String url, Context ctx) {
         this.rootURL = url;
+        this.context = ctx;
 
         // Create a file cache in wherever we're allowed to make temporary files.  Hash the
         // server URL to give every server its own cache.
         this.fileCacheDir = Paths.get(System.getProperty("java.io.tmpdir"),
-                "Minds-i-Dashboard", String.format("%08X", url.hashCode()));
+                CACHE_NAME, String.format("%08X", url.hashCode()));
         // TODO(pjreed): Add controls for cache size, pre-seeding area, clearing cache
     }
 
@@ -188,6 +201,51 @@ class TileServer implements MapSource {
             centerTag = newCenterTag;
             launchTileLoader((width / TILE_SIZE) + 1, (height / TILE_SIZE) + 1);
         }
+    }
+
+    private static TileTag getTileTag(final double lat, final double lon, final int zoom) {
+        int xtile = (int) Math.floor((lon + 180) / 360 * (1 << zoom));
+        int ytile = (int) Math.floor((1 - Math.log(Math.tan(Math.toRadians(lat)) + 1 / Math.cos(Math.toRadians(lat))) / Math.PI) / 2 * (1 << zoom));
+        if (xtile < 0) {
+            xtile = 0;
+        }
+        if (xtile >= (1 << zoom)) {
+            xtile = ((1 << zoom) - 1);
+        }
+        if (ytile < 0) {
+            ytile = 0;
+        }
+        if (ytile >= (1 << zoom)) {
+            ytile = ((1 << zoom) - 1);
+        }
+        return new TileTag(xtile, ytile, zoom);
+    }
+
+    private Set<TileTag> generateSeedTags(Point2D latlon, double distKm) {
+        Set<TileTag> tileSet = new HashSet<>();
+
+        // Find all the tiles within a 5 km radius of the home point.
+        double R = 6371.0;
+
+        double lonDiff = Math.toDegrees(distKm / R / Math.cos(Math.toRadians(latlon.getY())));
+        double latDiff = Math.toDegrees(distKm / R);
+        double x1 = latlon.getX() - lonDiff;
+        double x2 = latlon.getX() + lonDiff;
+        double y1 = latlon.getY() + latDiff;
+        double y2 = latlon.getY() - latDiff;
+
+        for (int z = 1; z <= MAX_Z; z++) {
+            TileTag ulTag = getTileTag(y1, x1, z);
+            TileTag urTag = getTileTag(y1, x2, z);
+            TileTag llTag = getTileTag(y2, x2, z);
+            for (int x = ulTag.x; x <= urTag.x; x++) {
+                for (int y = ulTag.y; y <= llTag.y; y++) {
+                    tileSet.add(new TileTag(x, y, z));
+                }
+            }
+        }
+
+        return tileSet;
     }
 
     /**
@@ -291,9 +349,16 @@ class TileServer implements MapSource {
             File cachedFile = cachedPath.toFile();
             try {
                 // First, try to read the file from our local disk cache.
-                img = ImageIO.read(cachedFile);
+                if (this.context.getEnableTileCacheProp()) {
+                    img = ImageIO.read(cachedFile);
+                }
+                else {
+                    // If caching is disabled, just immediately throw an exception here to force this to
+                    // load from the server instead.
+                    throw new IOException();
+                }
             }
-            catch(IOException e) {
+            catch (IOException e) {
                 // If it doesn't exist, pull it from the internet...
                 try (ByteArrayOutputStream output = new ByteArrayOutputStream()) {
                     // Download the tile from the network
@@ -302,29 +367,34 @@ class TileServer implements MapSource {
                             output.write(result);
                         }
                     }
-                    // Write the data to our file cache, then load it as an image
                     try (InputStream localInput = new ByteArrayInputStream(output.toByteArray())) {
-                        cachedFile.getParentFile().mkdirs();
-                        try (FileOutputStream fileOutput = new FileOutputStream(cachedFile)) {
-                            for (int result = localInput.read(); result != -1; result = localInput.read()) {
-                                fileOutput.write(result);
+                        if (this.context.getEnableTileCacheProp()) {
+                            // Write the data to our file cache, then load it as an image
+                            //noinspection ResultOfMethodCallIgnored
+                            cachedFile.getParentFile().mkdirs();
+                            try (FileOutputStream fileOutput = new FileOutputStream(cachedFile)) {
+                                for (int result = localInput.read(); result != -1; result = localInput.read()) {
+                                    fileOutput.write(result);
+                                }
                             }
+                            catch (IOException e2) {
+                                // If we have an error writing to the cache for some reason, log it, but don't let
+                                // that stop us from loading the image.
+                                logger.warn("Error writing to local tile cache", e2);
+                            }
+                            localInput.reset();
                         }
-                        catch (IOException e2) {
-                            // If we have an error writing to the cache for some reason, log it, but don't let
-                            // that stop us from loading the image.
-                            e2.printStackTrace();
-                        }
-                        localInput.reset();
                         img = ImageIO.read(localInput);
                     }
                 }
             }
+            if (img == null) {
+                throw new IOException();
+            }
             addTile(target, img);
         }
         catch (Exception e) {
-            System.err.println("failed to load " + target);
-            e.printStackTrace();
+            logger.warn("failed to load {}", target, e);
         }
         finally {
             //don't repaint for prefetched tiles
@@ -367,6 +437,40 @@ class TileServer implements MapSource {
 
         for (TileTag t : test) {
             System.out.println(t);
+        }
+    }
+
+    @Override
+    public void preloadTiles(Point2D center, double distanceKm, TileLoadingCallback callback) {
+        Set<TileTag> tileSet = generateSeedTags(center, distanceKm);
+        AtomicInteger loaded = new AtomicInteger(0);
+
+        if (preloadingThread != null) {
+            preloadingThread.interrupt();
+        }
+
+        preloadingThread = new Thread(() -> {
+            try {
+                callback.started(this.rootURL, tileSet.size());
+                tileSet.forEach(tag -> {
+                    loadTile(tag);
+                    int value = loaded.incrementAndGet();
+                    callback.progress(this.rootURL, value);
+                });
+            }
+            finally {
+                callback.done(this.rootURL);
+            }
+        });
+        preloadingThread.setDaemon(true);
+        preloadingThread.start();
+    }
+
+    @Override
+    public void stopPreloading() {
+        if (preloadingThread != null) {
+            preloadingThread.interrupt();
+            preloadingThread = null;
         }
     }
 
@@ -459,7 +563,7 @@ class TileServer implements MapSource {
                 res = new URL(url);
             }
             catch (Exception e) {
-                e.printStackTrace();
+                logger.warn("Error constructing tile URL", e);
             }
 
             return res;
@@ -562,7 +666,7 @@ class TileServer implements MapSource {
 
             }
             catch (Exception e) {
-                e.printStackTrace();
+                logger.warn("Error loading tile", e);
             }
         }
 

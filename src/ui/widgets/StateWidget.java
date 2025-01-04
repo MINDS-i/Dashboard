@@ -180,7 +180,7 @@ public class StateWidget extends UIWidget {
                 //then this should be removed.
                 break;
             default:
-                serialLog.warning("State Widget: Unrecognized incoming State");
+                serialLog.warn("State Widget: Unrecognized incoming State");
         }
     }
 

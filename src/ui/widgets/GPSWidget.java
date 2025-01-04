@@ -7,7 +7,6 @@ import com.util.UtilHelper;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
@@ -266,14 +265,14 @@ public class GPSWidget extends UIWidget {
             //If there is an initial bad sat lock or the minimum sats
             //cannot be met from a previously good HDOP state, send a warning.
             if (!wasBelowMinSats && roverIsMoving) {
-                serialLog.warning("GPS: Unable to obtain satellite lock.");
+                serialLog.warn("GPS: Unable to obtain satellite lock.");
                 wasBelowMinSats = true;
             }
         }
         else {
             //If a good satellite lock was just obtained, notify the user.
             if (wasBelowMinSats) {
-                serialLog.warning("GPS: Minimum satellite lock obtained.");
+                serialLog.warn("GPS: Minimum satellite lock obtained.");
                 wasBelowMinSats = false;
             }
 
@@ -290,7 +289,7 @@ public class GPSWidget extends UIWidget {
             }
             else if (hdopAvgVal > HDOP_MAX_FAIR) {
                 currGPSStrength = GPSStrength.POOR;
-                serialLog.warning("GPS: HDOP satellite lock is poor.");
+                serialLog.warn("GPS: HDOP satellite lock is poor.");
             }
             else {
                 currGPSStrength = GPSStrength.UNKOWN;
