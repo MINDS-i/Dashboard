@@ -1,6 +1,16 @@
 <project xmlns:ivy="antlib:org.apache.ivy.ant" name="dashboard">
     <property file="build.properties" />
 
+    <target name="load-ivy">
+        <path id="ivy.lib.path">
+            <pathelement location="${ivyJarFile}"/>
+        </path>
+        <taskdef resource="org/apache/ivy/ant/antlib.xml"
+                 uri="antlib:org.apache.ivy.ant"
+                 classpathref="ivy.lib.path"
+        />
+    </target>
+
     <path id="class.path">
         <pathelement location="${outputDir}"/>
         <pathelement location="${packDir}"/>
@@ -33,7 +43,7 @@
         <mkdir dir="${testLibDir}"/>
     </target>
 
-    <target name="clean" depends="init">
+    <target name="clean" depends="init, load-ivy">
         <delete dir="${outputDir}"/>
         <delete dir="${libDir}"/>
         <delete dir="${reportsDir}"/>
@@ -42,7 +52,7 @@
         <ivy:cleancache />
     </target>
 
-    <target name="retrieve" depends="init">
+    <target name="retrieve" depends="init, load-ivy">
         <ivy:retrieve conf="testing" pattern="${testLibDir}/[artifact].[ext]"/>
         <ivy:retrieve conf="application" pattern="${libDir}/[artifact].[ext]"/>
     </target>
