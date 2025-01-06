@@ -22,6 +22,7 @@ import static com.map.TileServer.CACHE_NAME;
 
 public class TileCacheConfigPanel extends JPanel {
     private final Context context;
+    private final MapPanel map;
     private static final Logger logger = LoggerFactory.getLogger(TileCacheConfigPanel.class);
 
     private final JLabel cacheSizeLabel = new JLabel("Cache size: ");
@@ -61,6 +62,7 @@ public class TileCacheConfigPanel extends JPanel {
 
     public TileCacheConfigPanel(Context ctx, MapPanel map) {
         this.context = ctx;
+        this.map = map;
 
         this.setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
@@ -105,59 +107,22 @@ public class TileCacheConfigPanel extends JPanel {
 
         JButton seedTileCacheButton = new JButton("Seed Tile Cache");
         constraints.gridx = 2;
-        Window window = SwingUtilities.getWindowAncestor(this);
+        final TileCacheConfigPanel self = this;
         seedTileCacheButton.addActionListener(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                map.seedTileCache(new TileLoadingCallback() {
-                    // The map panel may load multiple sources at once, so consolidate their progress
-                    // into a single value.
-                    String lastStr = "";
-                    final Map<String, Integer> sourceTotals = new HashMap<>();
-                    final Map<String, Integer> sourceProgress = new HashMap<>();
-                    final AtomicInteger finishedCount = new AtomicInteger();
-
-                    @Override
-                    public void started(String source, int total) {
-                        sourceTotals.put(source, total);
-                    }
-
-                    private void updateLabel() {
-                        AtomicInteger realTotal = new AtomicInteger();
-                        AtomicInteger realProgress = new AtomicInteger();
-                        sourceTotals.values().forEach(realTotal::addAndGet);
-                        sourceProgress.values().forEach(realProgress::addAndGet);
-
-                        double pct = 100.0 * (realProgress.doubleValue() / realTotal.doubleValue());
-
-                        String strVal = String.format("%.02f%%", pct);
-                        if (!strVal.equals(lastStr)) {
-                            lastStr = strVal;
-                            cacheSizeLabel.setText(String.format("Seeding cache: %s", lastStr));
-                        }
-                    }
-
-                    @Override
-                    public void progress(String source, int number) {
-                        sourceProgress.put(source, number);
-                        updateLabel();
-                    }
-
-                    @Override
-                    public void done(String source) {
-                        int finished = finishedCount.addAndGet(1);
-                        if (finished == sourceTotals.size()) {
-                            recalculateCacheSize();
-                        }
-                    }
-                });
-                if (window != null) {
-                    window.addWindowListener(new WindowAdapter() {
-                        @Override
-                        public void windowClosing(WindowEvent e) {
-                            map.stopSeeding();
-                        }
-                    });
+                String message = "Seeding the tile cache will download every " +
+                        "map tile within " + MapPanel.SEED_CACHE_RADIUS_KM +
+                        " km of the home point.  This operation may take several minutes to " +
+                        "complete.  Continue?";
+                message = String.format("<html><body><p style='width: 400px'>%s</p></body></html>", message);
+                int result = JOptionPane.showConfirmDialog(self,
+                        message,
+                        "Seed Tile Cache",
+                        JOptionPane.OK_CANCEL_OPTION,
+                        JOptionPane.INFORMATION_MESSAGE);
+                if (result == JOptionPane.OK_OPTION) {
+                    seedTileCache();
                 }
             }
         });
@@ -167,6 +132,62 @@ public class TileCacheConfigPanel extends JPanel {
         this.add(cacheSizeLabel, constraints);
 
         recalculateCacheSize();
+    }
+
+    private void seedTileCache() {
+        Window window = SwingUtilities.getWindowAncestor(this);
+        this.map.seedTileCache(new TileLoadingCallback() {
+            // The map panel may load multiple sources at once, so consolidate their progress
+            // into a single value.
+            String lastStr = "";
+            final Map<String, Integer> sourceTotals = new HashMap<>();
+            final Map<String, Integer> sourceProgress = new HashMap<>();
+            final AtomicInteger finishedCount = new AtomicInteger();
+
+            @Override
+            public void started(String source, int total) {
+                sourceTotals.put(source, total);
+            }
+
+            private void updateLabel() {
+                AtomicInteger realTotal = new AtomicInteger();
+                AtomicInteger realProgress = new AtomicInteger();
+                sourceTotals.values().forEach(realTotal::addAndGet);
+                sourceProgress.values().forEach(realProgress::addAndGet);
+
+                double doubleTotal = realTotal.doubleValue();
+
+                double pct = doubleTotal > 0.0 ? 100.0 * (realProgress.doubleValue() / doubleTotal) : 0.0;
+
+                String strVal = String.format("%.02f%%", pct);
+                if (!strVal.equals(lastStr)) {
+                    lastStr = strVal;
+                    cacheSizeLabel.setText(String.format("Seeding cache: %s", lastStr));
+                }
+            }
+
+            @Override
+            public void progress(String source, int number) {
+                sourceProgress.put(source, number);
+                updateLabel();
+            }
+
+            @Override
+            public void done(String source) {
+                int finished = finishedCount.addAndGet(1);
+                if (finished == sourceTotals.size()) {
+                    recalculateCacheSize();
+                }
+            }
+        });
+        if (window != null) {
+            window.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    map.stopSeeding();
+                }
+            });
+        }
     }
 
     private void recalculateCacheSize() {

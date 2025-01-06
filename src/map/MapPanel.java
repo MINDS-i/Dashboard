@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * The source code for this class
  * is made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -6,7 +6,7 @@
  *
  * This code is based on the MapPanel source code written by Stepan Rutz
  * found at: http://mappanel.sourceforge.net/
- ******************************************************************************/
+ */
 
 package com.map;
 
@@ -32,11 +32,10 @@ import static com.map.WaypointList.WaypointListener;
 public class MapPanel extends JPanel implements CoordinateTransform {
     private static final int TILE_SIZE = 256;
     private static final float ZOOM_FACTOR = 1.1f;
+    public static final double SEED_CACHE_RADIUS_KM = 1.0;
 
     private final Map<String, MapSource> mapSources;
     private final Context context;
-    private final BorderLayout border = new BorderLayout();
-    private final DragListener mouseListener = new DragListener();
     private final LayerManager mll = new LayerManager();
     private final Logger iolog = LoggerFactory.getLogger("d.io");
     public WaypointPanel waypointPanel;
@@ -73,6 +72,7 @@ public class MapPanel extends JPanel implements CoordinateTransform {
             ms.addRepaintListener(this);
         }
 
+        BorderLayout border = new BorderLayout();
         border.setVgap(-20);
         setOpaque(true);
         setBackground(new Color(0xc0, 0xc0, 0xc0));
@@ -101,6 +101,7 @@ public class MapPanel extends JPanel implements CoordinateTransform {
         roverPath = new RoverPath(context, this, context.getWaypointList(),
                 this, this);
         mll.add(roverPath);
+        DragListener mouseListener = new DragListener();
         mll.add(mouseListener);
         addMouseWheelListener(mouseListener);
         addMouseListener(mll);
@@ -242,8 +243,8 @@ public class MapPanel extends JPanel implements CoordinateTransform {
         if (!success) {
             return false;
         }
-        double dx = (pivot.x - getWidth() / 2);
-        double dy = (pivot.y - getHeight() / 2);
+        double dx = (pivot.x - getWidth() / 2.0);
+        double dy = (pivot.y - getHeight() / 2.0);
         Point2D endLoc = new Point2D.Double(
                 startLoc.getX() * ZOOM_FACTOR + dx * (ZOOM_FACTOR - 1.0),
                 startLoc.getY() * ZOOM_FACTOR + dy * (ZOOM_FACTOR - 1.0));
@@ -258,8 +259,8 @@ public class MapPanel extends JPanel implements CoordinateTransform {
         if (!success) {
             return;
         }
-        double dx = (pivot.x - getWidth() / 2);
-        double dy = (pivot.y - getHeight() / 2);
+        double dx = (pivot.x - getWidth() / 2.0);
+        double dy = (pivot.y - getHeight() / 2.0);
         Point2D endLoc = new Point2D.Double(
                 startLoc.getX() / ZOOM_FACTOR + dx * (1.0 / ZOOM_FACTOR - 1.0),
                 startLoc.getY() / ZOOM_FACTOR + dy * (1.0 / ZOOM_FACTOR - 1.0));
@@ -339,7 +340,7 @@ public class MapPanel extends JPanel implements CoordinateTransform {
     public void seedTileCache(TileLoadingCallback callback) {
         mapSources.values().forEach(source -> source.preloadTiles(
                 toCoordinates(mapPosition),
-                1.0,
+                SEED_CACHE_RADIUS_KM,
                 callback
         ));
     }
