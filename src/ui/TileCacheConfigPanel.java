@@ -47,7 +47,7 @@ public class TileCacheConfigPanel extends JPanel {
                 cacheSizeLabel.setText(String.format("Cache size: %d MB", size.longValue() / (1024 * 1024)));
             }
             catch (NoSuchFileException e) {
-                logger.warn("No cache exists.", e);
+                logger.warn("No cache exists.  That's fine if it was just cleared.");
                 cacheSizeLabel.setText("Cache size: 0 MB");
             }
             catch (IOException e) {
@@ -184,9 +184,13 @@ public class TileCacheConfigPanel extends JPanel {
             window.addWindowListener(new WindowAdapter() {
                 @Override
                 public void windowClosing(WindowEvent e) {
+                    logger.info("Stopping cache thread.");
                     map.stopSeeding();
                 }
             });
+        }
+        else {
+            logger.error("Unable to get parent window; cache thread may not stop properly.");
         }
     }
 

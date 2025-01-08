@@ -13,7 +13,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -33,6 +33,9 @@ public class TileServer implements MapSource {
 
     //Maximum index any tile can have on Z
     private static final int MAX_Z = 19;
+
+    // Allow zooming in this many levels past MAX_Z; tiles will be stretched to fit
+    private static final int EXTRA_Z = 2;
 
     //Maximum index any tile can have on Y (Used in TileTag Hashcode calculation only)
     private static final int MAX_Y = (1 << MAX_Z) / TILE_SIZE;
@@ -85,13 +88,12 @@ public class TileServer implements MapSource {
     /**
      * Instantiates and starts a new TileLoader thread. If one
      * is already running it is interrupted.
-     *
-     * @param width - The width in map tiles of the map
-     * @param height - The Height in tiles of the map.
      */
     private Thread tileLoader = null;
 
-    private Thread preloadingThread = null;
+    private final ForkJoinPool myPool = new ForkJoinPool(CC_REQUEST);
+
+    private ForkJoinTask<?> preloadingTask = null;
 
     private static final Logger logger = LoggerFactory.getLogger(TileServer.class);
 
@@ -144,9 +146,17 @@ public class TileServer implements MapSource {
         double zfix = (double) scale / (double) Integer.highestOneBit(scale);
         int zoom = (31 - Integer.numberOfLeadingZeros(scale / TILE_SIZE));
 
-        if (zfix >= ZOOM_CROSSOVER) {
+        if (zfix >= ZOOM_CROSSOVER && zoom < MAX_Z) {
             zoom += 1;
             zfix /= 2.0;
+        }
+        else if (zoom > MAX_Z) {
+            // If we're trying to paint a zoom level that is higher than our max zoom, get the tile for
+            // the highest zoom we support and then scale it up.
+            while (zoom > MAX_Z) {
+                zoom--;
+                zfix *= 2.0;
+            }
         }
 
         //effective width/height after zoom correction
@@ -257,7 +267,7 @@ public class TileServer implements MapSource {
      */
     public boolean isValidZoom(int zoomLevel) {
         int zoom = 31 - Integer.numberOfLeadingZeros(zoomLevel / TILE_SIZE);
-        return (zoom >= MIN_Z && zoom < MAX_Z);
+        return (zoom >= MIN_Z && zoom < (MAX_Z + EXTRA_Z));
     }
 
     /**
@@ -445,32 +455,30 @@ public class TileServer implements MapSource {
         Set<TileTag> tileSet = generateSeedTags(center, distanceKm);
         AtomicInteger loaded = new AtomicInteger(0);
 
-        if (preloadingThread != null) {
-            preloadingThread.interrupt();
+        if (preloadingTask != null) {
+            preloadingTask.cancel(true);
         }
 
-        preloadingThread = new Thread(() -> {
+        callback.started(rootURL, tileSet.size());
+        preloadingTask = myPool.submit(() -> tileSet.parallelStream().forEach(tileTag -> {
             try {
-                callback.started(this.rootURL, tileSet.size());
-                tileSet.forEach(tag -> {
-                    loadTile(tag);
-                    int value = loaded.incrementAndGet();
-                    callback.progress(this.rootURL, value);
-                });
+                loadTile(tileTag);
             }
             finally {
-                callback.done(this.rootURL);
+                int value = loaded.incrementAndGet();
+                callback.progress(rootURL, value);
+                if (value == tileSet.size()) {
+                    callback.done(rootURL);
+                }
             }
-        });
-        preloadingThread.setDaemon(true);
-        preloadingThread.start();
+        }));
     }
 
     @Override
     public void stopPreloading() {
-        if (preloadingThread != null) {
-            preloadingThread.interrupt();
-            preloadingThread = null;
+        if (preloadingTask != null) {
+            preloadingTask.cancel(true);
+            preloadingTask = null;
         }
     }
 
@@ -596,7 +604,7 @@ public class TileServer implements MapSource {
         int numToLoad;
 
         AtomicInteger loadIndex = new AtomicInteger(0);
-        AtomicInteger finishedHelpers = new AtomicInteger(0);
+        Semaphore helperSem = new Semaphore(0);
         java.util.List<TileTag> toLoad = new ArrayList<>(CACHE_SIZE);
 
         /**
@@ -651,19 +659,23 @@ public class TileServer implements MapSource {
 
                 //Set up and wait for the loading threads
                 numToLoad = Math.min(toLoad.size(), CACHE_SIZE);
+                helperSem.release(CC_REQUEST);
                 for (int i = 0; i < CC_REQUEST; i++) {
+                    helperSem.acquire();
                     (new Helper()).start();
                 }
 
-                while (finishedHelpers.get() != CC_REQUEST) {
-                    try {
-                        Thread.sleep(50);
-                    }
-                    catch (Exception e) {
-                        stop = true;
+                try {
+                    for (int i = 0; i < CC_REQUEST; i++) {
+                        helperSem.acquire();
                     }
                 }
-
+                catch (Exception e) {
+                    stop = true;
+                }
+            }
+            catch (InterruptedException e) {
+                logger.warn("TileLoader thread was interrupted", e);
             }
             catch (Exception e) {
                 logger.warn("Error loading tile", e);
@@ -685,20 +697,22 @@ public class TileServer implements MapSource {
         }
 
         private class Helper extends Thread {
-
             @Override
             public void run() {
+                try {
+                    while (true) {
+                        int index = loadIndex.getAndIncrement();
 
-                while (true) {
-                    int index = loadIndex.getAndIncrement();
+                        if (index >= numToLoad || TileLoader.this.stop) {
+                            break;
+                        }
 
-                    if (index >= numToLoad || TileLoader.this.stop) {
-                        finishedHelpers.incrementAndGet();
-                        break;
+                        TileTag next = toLoad.get(index);
+                        loadTile(next);
                     }
-
-                    TileTag next = toLoad.get(index);
-                    loadTile(next);
+                }
+                finally {
+                    helperSem.release();
                 }
             }
         }
