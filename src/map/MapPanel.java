@@ -32,7 +32,7 @@ import static com.map.WaypointList.WaypointListener;
 public class MapPanel extends JPanel implements CoordinateTransform {
     private static final int TILE_SIZE = 256;
     private static final float ZOOM_FACTOR = 1.1f;
-    public static final double SEED_CACHE_RADIUS_KM = 1.0;
+    public static final double SEED_CACHE_RADIUS_KM = 2.0;
 
     private final Map<String, MapSource> mapSources;
     private final Context context;
@@ -46,14 +46,14 @@ public class MapPanel extends JPanel implements CoordinateTransform {
     private Point2D mapPosition = new Point2D.Double(0, 0);
 
     public MapPanel(Context cxt) {
-        this(cxt, new Point(0, 0), 6, null, null, null);
+        this(cxt, new Point2D.Double(0.0, 0.0), 6, null, null, null);
     }
 
-    public MapPanel(Context cxt, Point mapPosition, int zoom) {
+    public MapPanel(Context cxt, Point2D mapPosition, int zoom) {
         this(cxt, mapPosition, zoom, null, null, null);
     }
 
-    public MapPanel(Context cxt, Point mapPosition, int zoom, JPanel north,
+    public MapPanel(Context cxt, Point2D mapPosition, int zoom, JPanel north,
                     JPanel east,
                     JPanel south) {
         context = cxt;
@@ -172,11 +172,11 @@ public class MapPanel extends JPanel implements CoordinateTransform {
         Point2D f = (Point2D) p.clone();
         double x = p.getX() / scale;
         double y = ((p.getY() / scale) * 2);
-        double lon = x * 360 - 180;
+        double lon = x * 360.0 - 180.0;
         double lat = Math.toDegrees(
                 Math.atan(
                         Math.sinh(
-                                Math.PI * (1 - y)
+                                Math.PI * (1.0 - y)
                         )
                 )
         );

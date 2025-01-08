@@ -18,6 +18,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileReader;
@@ -174,8 +175,8 @@ public class Dashboard implements Runnable {
         JPanel messageBox = createAlertBox();
 
         mapPanel = new MapPanel(context,
-                new Point((int) context.getHomeProp().getY(),
-                        (int) context.getHomeProp().getX()),
+                new Point2D.Double(context.getHomeProp().getY(),
+                        context.getHomeProp().getX()),
                 DEFAULT_ZOOM_LEVEL,
                 serialPanel,
                 createRightPanel(),

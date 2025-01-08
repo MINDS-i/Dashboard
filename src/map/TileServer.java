@@ -91,13 +91,17 @@ public class TileServer implements MapSource {
      */
     private Thread tileLoader = null;
 
-    private final ForkJoinPool myPool = new ForkJoinPool(CC_REQUEST);
+    // Note that this is static so it will be shared by all instances of this class;
+    // we want to limit the number of concurrent downloads across all servers
+    private static final ForkJoinPool myPool = new ForkJoinPool(CC_REQUEST);
 
     private ForkJoinTask<?> preloadingTask = null;
 
     private static final Logger logger = LoggerFactory.getLogger(TileServer.class);
 
     public static final String CACHE_NAME = "Minds-i-Dashboard";
+
+    private final String cacheHash;
 
     /**
      * Class Constructor
@@ -107,12 +111,12 @@ public class TileServer implements MapSource {
     TileServer(String url, Context ctx) {
         this.rootURL = url;
         this.context = ctx;
+        this.cacheHash = String.format("%08X", url.hashCode());
 
         // Create a file cache in wherever we're allowed to make temporary files.  Hash the
         // server URL to give every server its own cache.
         this.fileCacheDir = Paths.get(System.getProperty("java.io.tmpdir"),
-                CACHE_NAME, String.format("%08X", url.hashCode()));
-        // TODO(pjreed): Add controls for cache size, pre-seeding area, clearing cache
+                CACHE_NAME, cacheHash);
     }
 
     /**
@@ -352,6 +356,10 @@ public class TileServer implements MapSource {
      * Method for fetching a given TileTag and putting it in the cache
      */
     private void loadTile(TileTag target) {
+        loadTile(target, true);
+    }
+
+    private void loadTile(TileTag target, boolean inMemory) {
         try {
             BufferedImage img;
             Path cachedPath = this.fileCacheDir.resolve(Paths.get(String.valueOf(target.z),
@@ -401,14 +409,16 @@ public class TileServer implements MapSource {
             if (img == null) {
                 throw new IOException();
             }
-            addTile(target, img);
+            if (inMemory) {
+                addTile(target, img);
+            }
         }
         catch (Exception e) {
             logger.warn("failed to load {}", target, e);
         }
         finally {
             //don't repaint for prefetched tiles
-            if (target.z == centerTag.z) {
+            if (target.z == centerTag.z && inMemory) {
                 contentChanged();
             }
         }
@@ -454,6 +464,8 @@ public class TileServer implements MapSource {
     public void preloadTiles(Point2D center, double distanceKm, TileLoadingCallback callback) {
         Set<TileTag> tileSet = generateSeedTags(center, distanceKm);
         AtomicInteger loaded = new AtomicInteger(0);
+        logger.info("Seeding {} tiles for {}; grabbing {} km around {}",
+                tileSet.size(), this.cacheHash, distanceKm, center);
 
         if (preloadingTask != null) {
             preloadingTask.cancel(true);
@@ -462,12 +474,13 @@ public class TileServer implements MapSource {
         callback.started(rootURL, tileSet.size());
         preloadingTask = myPool.submit(() -> tileSet.parallelStream().forEach(tileTag -> {
             try {
-                loadTile(tileTag);
+                loadTile(tileTag, false);
             }
             finally {
                 int value = loaded.incrementAndGet();
                 callback.progress(rootURL, value);
                 if (value == tileSet.size()) {
+                    logger.debug("Done loading tiles for {}", this.cacheHash);
                     callback.done(rootURL);
                 }
             }
@@ -477,6 +490,7 @@ public class TileServer implements MapSource {
     @Override
     public void stopPreloading() {
         if (preloadingTask != null) {
+            logger.debug("Cancelling seeding for {}.", this.cacheHash);
             preloadingTask.cancel(true);
             preloadingTask = null;
         }

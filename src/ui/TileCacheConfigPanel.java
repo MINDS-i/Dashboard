@@ -36,6 +36,7 @@ public class TileCacheConfigPanel extends JPanel {
                 Path folder = Paths.get(System.getProperty("java.io.tmpdir"), CACHE_NAME);
                 cacheSizeLabel.setText("Cache size: calculating...");
 
+                logger.debug("Calculating size of {}...", folder);
                 Files.walkFileTree(folder, new SimpleFileVisitor<Path>() {
                     @Override
                     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
@@ -44,7 +45,7 @@ public class TileCacheConfigPanel extends JPanel {
                     }
                 });
 
-                cacheSizeLabel.setText(String.format("Cache size: %d MB", size.longValue() / (1024 * 1024)));
+                cacheSizeLabel.setText(String.format("Cache size: %.0f MB", (size.doubleValue() / (1024 * 1024))));
             }
             catch (NoSuchFileException e) {
                 logger.warn("No cache exists.  That's fine if it was just cleared.");
@@ -111,10 +112,11 @@ public class TileCacheConfigPanel extends JPanel {
         seedTileCacheButton.addActionListener(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
+                String cachePath = Paths.get(System.getProperty("java.io.tmpdir"), CACHE_NAME).toAbsolutePath().toString();
                 String message = "Seeding the tile cache will download every " +
                         "map tile within " + MapPanel.SEED_CACHE_RADIUS_KM +
-                        " km of the home point.  This operation may take several minutes to " +
-                        "complete.  Continue?";
+                        " km of the home point and save them in " + cachePath + ".  This operation may " +
+                        "take several minutes to complete.  Continue?";
                 message = String.format("<html><body><p style='width: 400px'>%s</p></body></html>", message);
                 int result = JOptionPane.showConfirmDialog(self,
                         message,
@@ -184,7 +186,7 @@ public class TileCacheConfigPanel extends JPanel {
             window.addWindowListener(new WindowAdapter() {
                 @Override
                 public void windowClosing(WindowEvent e) {
-                    logger.info("Stopping cache thread.");
+                    logger.debug("Stopping cache thread.");
                     map.stopSeeding();
                 }
             });
