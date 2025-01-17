@@ -131,7 +131,7 @@ public class WaypointPanel extends NinePatchPanel {
             WaypointCommand command;
             String fileName;
 
-            fileName = getFileName("Choose file to save");
+            fileName = getFileName("Choose file to save", JFileChooser.SAVE_DIALOG);
             command = new WaypointCommandParse(
                     waypoints, context, fileName,
                     WaypointCommandParse.ParseType.XML,
@@ -155,7 +155,10 @@ public class WaypointPanel extends NinePatchPanel {
             WaypointCommand command;
             String fileName;
 
-            fileName = getFileName("Choose file to open");
+            fileName = getFileName("Choose file to open", JFileChooser.OPEN_DIALOG);
+            if (fileName.isEmpty()) {
+                return;
+            }
             command = new WaypointCommandParse(
                     waypoints, context, fileName,
                     WaypointCommandParse.ParseType.XML,
@@ -777,7 +780,7 @@ public class WaypointPanel extends NinePatchPanel {
      * @param title - The file dialog's window title
      * @return - String - The target filename
      */
-    private String getFileName(String title) {
+    private String getFileName(String title, int type) {
         WaypointCommand command;
         JFileChooser chooser;
         FileNameExtensionFilter filter;
@@ -787,7 +790,9 @@ public class WaypointPanel extends NinePatchPanel {
         filter = new FileNameExtensionFilter("GPX files", "xml", "gpx");
         chooser.setFileFilter(filter);
 
-        if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+        int result = type == JFileChooser.OPEN_DIALOG ? chooser.showOpenDialog(this) : chooser.showSaveDialog(this);
+
+        if (result == JFileChooser.APPROVE_OPTION) {
             return chooser.getSelectedFile().getPath();
         }
 

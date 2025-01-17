@@ -77,7 +77,7 @@
         </java>
     </target>
 
-    <target name="release" depends="updateMessageDatabase,test">
+    <target name="release" depends="test">
         <fail message="Failing tests; build aborted" if="test.failed"/>
         <jar destfile="${outputJar}" basedir="${outputDir}">
             <zipgroupfileset dir="${libDir}">
