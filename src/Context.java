@@ -1,28 +1,30 @@
 package com;
 
-import com.Dashboard;
-import com.map.*;
-import static com.map.WaypointList.*;
-import com.remote.SettingList;
-import com.serial.*;
-import com.serial.Messages.*;
-import com.serial.CommsMonitor;
-import com.ui.*;
-import com.telemetry.*;
-import com.xml;
 import com.graph.DataSource;
-
-import java.io.*;
-import java.nio.file.*;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.logging.*;
+import com.map.Dot;
+import com.map.WaypointList;
+import com.remote.SettingList;
+import com.serial.CommsMonitor;
+import com.serial.Messages.Message;
+import com.serial.Serial;
+import com.serial.SerialParser;
+import com.serial.SerialSendManager;
+import com.telemetry.TelemetryListener;
+import com.telemetry.TelemetryLogger;
+import com.telemetry.TelemetryManager;
+import com.ui.Theme;
+import jssc.SerialPort;
 
 import java.awt.geom.Point2D;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.logging.Logger;
 
-import jssc.SerialPort;
-import jssc.SerialPortException;
+import static com.map.WaypointList.WaypointListener;
 
 
 public class Context {
@@ -30,7 +32,9 @@ public class Context {
     public Dashboard dash;
     public Locale locale;
     public SerialParser parser;
-    public SerialSender sender;
+    
+    private SerialSendManager sendManager;
+
     public Theme theme;
     public SettingList settingList;
     public TelemetryManager telemetry;
@@ -46,7 +50,6 @@ public class Context {
     private final File persistenceFile;
     private final String instanceLogName;
     private final Logger ioerr = Logger.getLogger("d.io");
-
     
     public Context(Dashboard dashboard) {
         dash        = dashboard;
@@ -90,8 +93,8 @@ public class Context {
         // Instance these classes after the resources have been loaded
         waypoint    = new WaypointList();
         theme       = new Theme(this);
-        sender      = new SerialSender(this);
         parser      = new SerialParser(this, waypoint);
+        sendManager = SerialSendManager.init(this);
         settingList = new SettingList(this);
         telemetry   = new TelemetryManager(this);
         telemLog    = new TelemetryLogger(this, telemetry);
@@ -100,7 +103,8 @@ public class Context {
         
         // Patch the waypoint list into the serial sender
         waypoint.addListener(new WaypointListener(){
-            @Override
+            
+        	@Override
             public void changed(Source s, Dot point, int index, Action action) {
                 if(s == Source.REMOTE) return;
                 Message tosend;
@@ -117,17 +121,26 @@ public class Context {
                     default:
                         return;
                 }
-                sender.sendMessage(tosend);
+                
+                sendManager.addMessageToQueue(tosend);
             }
+            
             @Override
             public void targetChanged(Source s, int targetIndex) {
                 if(s == Source.REMOTE) return;
-                sender.sendMessage(Message.setTarget((byte) targetIndex));
+
+                sendManager.addMessageToQueue(
+                		Message.setTarget((byte) targetIndex));
+                
             }
+
             @Override
             public void loopModeSet(Source s, boolean isLooped) {
                 if(s == Source.REMOTE) return;
-                sender.sendMessage(Message.setLooping((byte) ((isLooped)?1:0) ));
+
+                sendManager.addMessageToQueue(
+                		Message.setLooping((byte) (isLooped ? 1 : 0)));
+                
             }
         });
 
@@ -225,12 +238,12 @@ public class Context {
     public void updatePort(SerialPort newPort) {
         closePort();
         port = newPort;
-        sender.start();
+        sendManager.start();
         parser.updatePort();
         connected = true;
     }
     public void closePort() {
-        sender.stop();
+        sendManager.stop();
         port = null;
         connected = false;
     }
@@ -292,9 +305,6 @@ public class Context {
     public List<DataSource> getTelemetryDataSources() {
         return telemetry.getDataSources();
     }
-    public void onConnection() {
-        sender.sendWaypointList();
-    }
     
     /**
      * Sets the current APM board version string.
@@ -310,7 +320,7 @@ public class Context {
      * @return - String
      */
     public String getAPMVersion() {
-    	sender.sendMessage(Message.requestAPMVersion());
+    	sendManager.addMessageToQueue(Message.requestAPMVersion());
     	
     	try {
     		Thread.sleep(250);	

@@ -2,6 +2,9 @@ package com.ui;
 
 import com.Context;
 import com.map.*;
+import com.util.ACLIManager;
+import com.map.command.CommandManager;
+import com.serial.SerialSendManager;
 
 import java.io.*;
 import java.text.Format;
@@ -20,8 +23,7 @@ import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.util.ACLIManager;
-import com.map.command.CommandManager;
+
 
 /**
  * @author Chris Park @ Infinetix Corp.
@@ -201,7 +203,7 @@ public class UIConfigPanel extends JPanel {
 	private void toggleBumper(boolean isEnabled) {
 		bumperIsEnabled = isEnabled;
 		bumperCheckBox.setSelected(bumperIsEnabled);
-		context.sender.toggleBumper(bumperIsEnabled);
+		SerialSendManager.getInstance().toggleBumper(bumperIsEnabled);
 		context.dash.bumperWidget.setEnabled(bumperIsEnabled);
 	}
 	

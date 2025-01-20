@@ -1,11 +1,11 @@
 #define MyAppName "MINDS-i Dashboard"
-#define MyAppVersion "1.5.2"
+#define MyAppVersion "1.7.0"
 #define MyAppPublisher "MINDS-i Education"
 #define MyAppURL "https://mindsieducation.com/"
 #define MyAppExeName "Dashboard.exe"
 #define TelemDrivers "RadioDiversv2.12.06WHQL_Centified.exe"
 #define ArduinoCLI "arduino-cli.exe"
-#define ReleaseDir "C:\Archives\Working Directory\MINDS-i\Dashboard Release"
+#define ReleaseDir "C:\Archives\Working Directory\MINDS-i\_Release Builds"
 
 [Setup]
 AppId={{C4B2ECC1-960A-4137-BFD2-23CD33DBC5B1}
@@ -18,7 +18,7 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={pf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
-OutputDir=C:\Archives\Working Directory\MINDS-i\Dashboard Installer
+OutputDir=C:\Archives\Working Directory\MINDS-i\_Release Builds\_Installers
 OutputBaseFilename=DashboardSetup
 Compression=lzma
 SolidCompression=yes

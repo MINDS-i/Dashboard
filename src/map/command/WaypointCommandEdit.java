@@ -65,7 +65,8 @@ public class WaypointCommandEdit extends WaypointCommand {
 		if(manager.getGeofence().getIsEnabled()) {
 			//If moving the fence origin and there are other waypoints,
 			//abort the move operation and alert the user.
-			if((index == 0) && waypoints.size() > 1) {
+			if((index == 0) && (waypoints.size() > 1)
+			&& (positionHasChanged())) {
 				serialLog.warning(WARN_GEOFENCE_MOVE);
 				return false;
 			}
@@ -78,6 +79,7 @@ public class WaypointCommandEdit extends WaypointCommand {
 			}
 		}
 		
+		//if lat and lng are the same and alt changed. Okay go ahead
 		
 		waypoints.set(endPoint, index);
 		return true;
@@ -101,4 +103,27 @@ public class WaypointCommandEdit extends WaypointCommand {
 	public boolean redo() {
 		return execute();
 	}	
+	
+	/**
+	 * Checks whether the Latitude or Longitude position has changed for this
+	 * edit event. This explicitly IGNORES the Altitude/Speed component to
+	 * allow for speed changes to the geofences waypoint center when more than
+	 * one waypoint has been placed for the current mission.
+	 * @return - Boolean - Whether or not the waypoint position has changed.
+	 */
+	private boolean positionHasChanged() {
+		double epsilon = 0.00001;
+		
+		if(Math.abs(endPoint.getLatitude() - startPoint.getLatitude()) > epsilon) {
+			return true;
+		}
+		
+		if(Math.abs(endPoint.getLongitude() - startPoint.getLongitude()) > epsilon) {
+			return true;
+		}
+		
+		return false;
+	}
 }
+
+

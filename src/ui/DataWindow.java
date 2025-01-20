@@ -4,25 +4,24 @@
  */
 
 package com.ui;
-import com.Dashboard;
-import com.serial.*;
-import com.Context;
-import com.remote.*;
-import com.table.TelemetryColumn;
-import com.table.ColumnTableModel;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.*;
-import java.awt.FlowLayout;
-import java.io.*;
-import java.nio.file.*;
-import java.util.*;
+import com.Context;
+import com.remote.Setting;
+import com.remote.SettingList;
+import com.serial.Serial;
+import com.table.ColumnTableModel;
+import com.table.TelemetryColumn;
+
 import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
-import javax.swing.table.*;
-import javax.swing.text.*;
+import javax.swing.border.Border;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.text.JTextComponent;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.TimerTask;
 
 public class DataWindow implements ActionListener {
     public static final long PERIOD = 200; //update period in MS

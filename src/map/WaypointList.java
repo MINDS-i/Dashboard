@@ -186,7 +186,7 @@ public class WaypointList {
     /**
      * Return if waypoints are currently looped
      */
-    public boolean getLooped(){
+    public boolean getIsLooped(){
         return isLooped;
     }
     
@@ -266,5 +266,21 @@ public class WaypointList {
         while (!waypoints.isEmpty()) {
             remove(0, s);
         }
+    }
+    
+    /**
+     * Gets whether this waypoint list is empty or not.
+     * @return - True/False - Whether or not the waypoint list is emtpy
+     */
+    public boolean isEmpty() {
+    	return waypoints.isEmpty();
+    }
+    
+    /**
+     * Returns the internal List of Dot objects representing each waypoint.
+     * @return - The list of waypoint dots
+     */
+    public List<Dot> getPoints() {
+    	return waypoints;
     }
 }

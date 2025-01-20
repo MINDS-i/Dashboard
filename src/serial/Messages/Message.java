@@ -14,6 +14,7 @@ public class Message {
     protected int    confirmSum;
     protected int    failCount;
     protected Date   sent;
+    protected boolean hasBeenSent;
     
     protected Message() { //subclasses must call buildChecksums after making content
         failCount = 0;
@@ -23,6 +24,7 @@ public class Message {
         failCount	= 0;
         content     = data.clone();
         buildChecksum();
+        hasBeenSent = false;
     }
     
     public void sendTime(Date date) {
@@ -49,12 +51,17 @@ public class Message {
         return confirmSum;
     }
     
+    public boolean getHasBeenSent() {
+    	return hasBeenSent;
+    }
+    
     public void send(SerialPort port) throws SerialPortException {
         port.writeBytes(Serial.HEADER);
         port.writeBytes(content);
         port.writeBytes(checkPair);
         port.writeBytes(Serial.FOOTER);
         sent = new Date();
+        hasBeenSent = true;
     }
     
     private byte[] concat(byte[] a, byte[] b) {

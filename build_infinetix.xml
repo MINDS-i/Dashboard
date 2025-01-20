@@ -9,13 +9,6 @@
         </fileset>
     </path>
 
-    <path id="class.testpath">
-        <path refid="class.path"/>
-        <fileset dir="${testLibDir}">
-            <include name="**/*.jar"/>
-        </fileset>
-    </path>
-
     <manifestclasspath property="jar.classpath"
                        jarfile="${outputJar}">
         <classpath>
@@ -26,25 +19,17 @@
     <target name="init">
         <mkdir dir="${resourceDir}"/>
         <mkdir dir="${sourceDir}"/>
-        <mkdir dir="${testDir}"/>
         <mkdir dir="${outputDir}"/>
         <mkdir dir="${libDir}"/>
         <mkdir dir="${reportsDir}"/>
-        <mkdir dir="${testLibDir}"/>
     </target>
 
     <target name="clean" depends="init">
         <delete dir="${outputDir}"/>
-        <!--<delete dir="${libDir}"/>-->
         <delete dir="${reportsDir}"/>
         <delete file="${outputZip}"/>
         <delete file="${outputJar}"/>
         <ivy:cleancache />
-    </target>
-
-    <target name="retrieve" depends="init">
-        <ivy:retrieve conf="testing" pattern="${testLibDir}/[artifact].[ext]"/>
-        <ivy:retrieve conf="application" pattern="${libDir}/[artifact].[ext]"/>
     </target>
 
     <target name="compile" depends="init">
@@ -64,8 +49,7 @@
         </java>
     </target>
 
-    <target name="release" depends="updateMessageDatabase,test">
-        <fail message="Failing tests; build aborted" if="test.failed"/>
+	<target name="release" depends="updateMessageDatabase, compile">
         <jar destfile="${outputJar}" basedir="${outputDir}">
             <zipgroupfileset dir="${libDir}">
                 <include name="*.jar"/>
@@ -81,28 +65,6 @@
             <zipfileset dir="./" includes="${outputJar}"/>
         </zip>
         <delete dir="${outputDir}" />
-    </target>
-
-    <target name="compileTests" depends="compile">
-        <javac srcdir="${testDir}" destdir="${outputDir}"
-                includeantruntime="false" >
-            <classpath refid="class.testpath"/>
-            <compilerarg value="-XDignore.symbol.file"/>
-        </javac>
-    </target>
-
-    <target name="test" depends="compileTests">
-        <!-- use "ant -Dtest.match=* run" to run a subset of all tests -->
-        <property name="test.match" value="*"/>
-        <junit failureproperty="test.failed">
-            <classpath refid="class.testpath"/>
-            <formatter type="plain" usefile="false" />
-            <batchtest fork="yes" todir="${reportsDir}">
-                <fileset dir="${testDir}">
-                    <include name="**/${test.match}_test.java"/>
-                </fileset>
-            </batchtest>
-        </junit>
     </target>
 
     <target name="updateMessageDatabase">

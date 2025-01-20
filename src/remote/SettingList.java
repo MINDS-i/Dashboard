@@ -1,14 +1,17 @@
 package com.remote;
 
 import com.Context;
-import com.remote.Setting;
-import com.serial.*;
-import com.serial.Messages.*;
+import com.serial.Messages.Message;
+import com.serial.Serial;
+import com.serial.SerialSendManager;
 
-import java.io.*;
-import java.nio.file.*;
-import java.util.*;
-import javax.xml.stream.*;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamReader;
+import java.io.File;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SettingList {
     private List<Setting> settingData = new ArrayList<Setting>();
@@ -31,7 +34,7 @@ public class SettingList {
     }
     public void pushSetting(int id) {
         Message msg = Message.setSetting((byte)id, settingData.get(id).getVal());
-        context.sender.sendMessage(msg);
+        SerialSendManager.getInstance().addMessageToQueue(msg);
     }
     public void updateSettingVal(int id, float val) {
         if(id < 0 || id >= settingData.size()) return;
@@ -50,7 +53,7 @@ public class SettingList {
     }
     private void loadSettingData() {
         settingData.clear();
-        for(int i=0; i<Serial.MAX_SETTINGS; i++) {
+        for(int i = 0; i< Serial.MAX_SETTINGS; i++) {
             settingData.add(new Setting("#"+i, "", 0, 0, 0));
         }
 
