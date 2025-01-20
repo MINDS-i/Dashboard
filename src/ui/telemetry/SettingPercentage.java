@@ -8,62 +8,67 @@ package com.ui.telemetry;
  * control Telemetry settings.
  */
 public class SettingPercentage {
-	private int percentage;
-	
-	/**
-	 * Class Constructor. Defaults value to 0 percent
-	 */
-	public SettingPercentage() {
-		this(0);
-	}
-	
-	/**
-	 * Class Constructor. Sets percentage to specified
-	 * value.
-	 * @param value - the value to set the percentage to.
-	 */
-	public SettingPercentage(int value) {
-		setPercentage(value);
-	}
-	
-	/**
-	 * Sets the percentage value.
-	 * @param value - The new percentage value
-	 */
-	public void setPercentage(int value) {
-		percentage = value;
-	}
-	
-	/**
-	 * Sets the percentage value from an existing SettingPercentage object.
-	 * @param value - The new percentage value
-	 */
-	public void setPercentage(Object value) {
-		if(value instanceof SettingPercentage) {
-			setPercentage(((SettingPercentage) value).getPercentage());
-		}
-		else if (value instanceof String) {
-			setPercentage(Integer.parseInt((String) value));
-		}
-		else {
-			setPercentage((int)value);
-		}
-	}
-	
-	/**
-	 * Returns the current percentage value
-	 * @return - int
-	 */
-	public int getPercentage() {
-		return percentage;
-	}
-	
-	/**
-	 * Returns the string representation of the current
-	 * percentage value.
-	 * @return - String
-	 */
-	public String toString() {
-		return String.valueOf(percentage);
-	}
+    private int percentage;
+
+    /**
+     * Class Constructor. Defaults value to 0 percent
+     */
+    public SettingPercentage() {
+        this(0);
+    }
+
+    /**
+     * Class Constructor. Sets percentage to specified
+     * value.
+     *
+     * @param value - the value to set the percentage to.
+     */
+    public SettingPercentage(int value) {
+        setPercentage(value);
+    }
+
+    /**
+     * Returns the current percentage value
+     *
+     * @return - int
+     */
+    public int getPercentage() {
+        return percentage;
+    }
+
+    /**
+     * Sets the percentage value.
+     *
+     * @param value - The new percentage value
+     */
+    public void setPercentage(int value) {
+        percentage = value;
+    }
+
+    /**
+     * Sets the percentage value from an existing SettingPercentage object.
+     *
+     * @param value - The new percentage value
+     */
+    public void setPercentage(Object value) {
+        if (value instanceof SettingPercentage) {
+            setPercentage(((SettingPercentage) value).getPercentage());
+        }
+        else if (value instanceof String) {
+            setPercentage(Integer.parseInt((String) value));
+        }
+        else {
+            setPercentage((int) value);
+        }
+    }
+
+    /**
+     * Returns the string representation of the current
+     * percentage value.
+     *
+     * @return - String
+     */
+    public String toString() {
+        return String.valueOf(percentage);
+    }
 }

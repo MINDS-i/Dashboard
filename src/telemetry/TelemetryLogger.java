@@ -1,38 +1,43 @@
 package com.telemetry;
 
-import com.graph.DataSource;
-import com.ui.SampleSource;
 import com.Context;
-import java.util.*;
-import java.io.*;
-import java.text.SimpleDateFormat;
-import java.text.DecimalFormat;
 
-public class TelemetryLogger{
-    private final static int DEFAULT_LOG_PERIOD_MS = 250;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.util.TimerTask;
+
+public class TelemetryLogger {
     static final DecimalFormat numberFormat = new DecimalFormat("#.########");
+    private final static int DEFAULT_LOG_PERIOD_MS = 250;
+    private final long startTime;
+    private final TelemetryManager telemetry;
     private BufferedWriter logFile;
     private java.util.Timer logTimer;
     private int logPeriod;
-    private long startTime;
-    private TelemetryManager telemetry;
     private int previousTelemetryIndex;
 
-    public TelemetryLogger(Context ctx, TelemetryManager tm){
+    public TelemetryLogger(Context ctx, TelemetryManager tm) {
         telemetry = tm;
         try {
             String logn = ctx.getInstanceLogName();
-            FileWriter fileWriter = new FileWriter("log/"+logn+".telem", false);
+            FileWriter fileWriter = new FileWriter("log/" + logn + ".telem", false);
             logFile = new BufferedWriter(fileWriter);
-        } catch (IOException ex) {
+        }
+        catch (IOException ex) {
             System.err.println(ex);
         }
         setPeriod(DEFAULT_LOG_PERIOD_MS);
         startTime = System.currentTimeMillis();
     }
 
-    public void setPeriod(int period){
-        if(logTimer != null) {
+    public int getPeriod() {
+        return logPeriod;
+    }
+
+    public void setPeriod(int period) {
+        if (logTimer != null) {
             logTimer.cancel();
             logTimer.purge();
         }
@@ -40,10 +45,6 @@ public class TelemetryLogger{
         TimerTask task = makeTimerTask();
         logTimer.scheduleAtFixedRate(task, period, period);
         logPeriod = period;
-    }
-
-    public int getPeriod(){
-        return logPeriod;
     }
 
     private String formatLog(double t) {
@@ -55,20 +56,23 @@ public class TelemetryLogger{
             public void run() {
                 try {
                     int tmIdx = telemetry.changeIndex();
-                    if(tmIdx == previousTelemetryIndex) return;
+                    if (tmIdx == previousTelemetryIndex) {
+                        return;
+                    }
                     previousTelemetryIndex = tmIdx;
 
                     long dt = System.currentTimeMillis() - startTime;
-                    logFile.write(dt+", ");
+                    logFile.write(dt + ", ");
 
-                    for(int i=0; i<telemetry.maxIndex(); i++){
+                    for (int i = 0; i < telemetry.maxIndex(); i++) {
                         logFile.write(formatLog(telemetry.get(i)));
                         logFile.write(", ");
                     }
 
                     logFile.newLine();
                     logFile.flush();
-                } catch (IOException ex) {
+                }
+                catch (IOException ex) {
                     System.err.println(ex);
                 }
             }
