@@ -1,1 +1,32 @@
-<MessageDB><Message name="DISARMED" path="/examples/quadcopter/quadcopter.ino">Hold Down and to the right on the Throttle stick for two seconds to begin the arming process </Message><Message name="NOFLY" path="/examples/quadcopter/quadcopter.ino">Flight aborted due to error status </Message><Message name="CALIBRATE" path="/examples/quadcopter/quadcopter.ino">Calibrating the gyroscope. This lasts for two seconds. Keep the quadcopter as still as possible. </Message><Message name="FLYING" path="/examples/quadcopter/quadcopter.ino">         * Hold down and to the left on the throttle stick to disarm </Message><Message name="FAILSAFE" path="/examples/quadcopter/quadcopter.ino">         * Auto-landing; Radio signal loss detected </Message><Message name="MSG_TEST" path="/examples/telemetryTest/telemetryTest.ino">This is a test of a robot transmitted string </Message><Message name="HMCFAIL" path="/src/input/APM/HMC5883L.h">HMC5883L Compass sensor failed contact or reported bad status</Message><Message name="MPUFAIL" path="/src/input/APM/MPU6000.h">No response or incorrect WHO_AM_I response from the MPU </Message><Message name="LOWVOLT" path="/src/input/APM/Power.h">Quadcopter battery critically low quadcopter battery level fell below the low battery warning voltage </Message><Message name="LPSFAIL" path="/src/input/altIMU/LPS25H.h">LPS25H Barometer returned a bad status </Message><Message name="DEFAULTS" path="/src/platforms/Quadcopter.h">No previously configured flight parameters detected, resetting to defaults </Message><Message name="IMULOAD" path="/src/platforms/Ardupilot.h">Couldn't load a valid Accelerometer and Magnetometer tune from EEPROM </Message></MessageDB>
+<MessageDB>
+    <Message name="DISARMED" path="/examples/quadcopter/quadcopter.ino">Hold Down and to the right on the Throttle stick
+        for two seconds to begin the arming process
+    </Message>
+    <Message name="NOFLY" path="/examples/quadcopter/quadcopter.ino">Flight aborted due to error status</Message>
+    <Message name="CALIBRATE" path="/examples/quadcopter/quadcopter.ino">Calibrating the gyroscope. This lasts for two
+        seconds. Keep the quadcopter as still as possible.
+    </Message>
+    <Message name="FLYING" path="/examples/quadcopter/quadcopter.ino">* Hold down and to the left on the throttle stick
+        to disarm
+    </Message>
+    <Message name="FAILSAFE" path="/examples/quadcopter/quadcopter.ino">* Auto-landing; Radio signal loss detected
+    </Message>
+    <Message name="MSG_TEST" path="/examples/telemetryTest/telemetryTest.ino">This is a test of a robot transmitted
+        string
+    </Message>
+    <Message name="HMCFAIL" path="/src/input/APM/HMC5883L.h">HMC5883L Compass sensor failed contact or reported bad
+        status
+    </Message>
+    <Message name="MPUFAIL" path="/src/input/APM/MPU6000.h">No response or incorrect WHO_AM_I response from the MPU
+    </Message>
+    <Message name="LOWVOLT" path="/src/input/APM/Power.h">Quadcopter battery critically low quadcopter battery level
+        fell below the low battery warning voltage
+    </Message>
+    <Message name="LPSFAIL" path="/src/input/altIMU/LPS25H.h">LPS25H Barometer returned a bad status</Message>
+    <Message name="DEFAULTS" path="/src/platforms/Quadcopter.h">No previously configured flight parameters detected,
+        resetting to defaults
+    </Message>
+    <Message name="IMULOAD" path="/src/platforms/Ardupilot.h">Couldn't load a valid Accelerometer and Magnetometer tune
+        from EEPROM
+    </Message>
+</MessageDB>
