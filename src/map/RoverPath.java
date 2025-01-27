@@ -71,7 +71,7 @@ public class RoverPath implements Layer {
     public boolean onClick(MouseEvent e) {
         WaypointCommand command = null;
 
-        if (waypointsDisabled) {
+        if (waypointsDisabled && currOpMode != OpMode.SET_HOME) {
             return false;
         }
 
