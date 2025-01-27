@@ -4,16 +4,16 @@ import com.Context;
 import com.map.MapPanel;
 
 import javax.swing.*;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
 import java.awt.*;
 
 public class SystemConfigWindow {
     protected static final String COPY_RIGHT_TEXT =
-            "Map data courtesy of\n" +
-                    "Esri, DigitalGlobe, Earthstar Geographics, CNES/Airbus DS, GeoEye, USDA FSA, USGS, Getmapping, Aerogrid, IGN, IGP, and the GIS User Community\n" +
-                    "Maps © www.thunderforest.com, Data © www.osm.org/copyright";
+            "<html><p align=\"center\">" +
+            "Map data courtesy of:" +
+            "Esri, DigitalGlobe, Earthstar Geographics, CNES/Airbus DS, GeoEye,<br>" +
+            "USDA FSA, USGS, Getmapping, Aerogrid, IGN, IGP, and the GIS User Community<br>" +
+            "Maps © www.thunderforest.com, Data © www.osm.org/copyright" +
+            "</p></html>";
     private final Context context;
     private final JFrame frame;
     private final MapPanel map;
@@ -58,15 +58,13 @@ public class SystemConfigWindow {
         container.add(versionPane);
 
         // Add copyright notices
-        JTextPane copyRights = new JTextPane();
+        JLabel copyRights = new JLabel();
         Font tmp = copyRights.getFont();
         copyRights.setFont(tmp.deriveFont(9f));
         copyRights.setOpaque(false);
-        StyledDocument doc = copyRights.getStyledDocument();
-        SimpleAttributeSet center = new SimpleAttributeSet();
-        StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
-        doc.setParagraphAttributes(0, doc.getLength(), center, false);
-
+        copyRights.setAlignmentX(Component.CENTER_ALIGNMENT);
+        copyRights.setHorizontalAlignment(SwingConstants.CENTER);
+        copyRights.setHorizontalTextPosition(SwingConstants.CENTER);
         copyRights.setText(COPY_RIGHT_TEXT);
         container.add(copyRights);
 

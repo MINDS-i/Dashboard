@@ -359,6 +359,7 @@ public class MapPanel extends JPanel implements CoordinateTransform {
     private class DragListener implements Layer, MouseWheelListener {
         private Point downCoords = null;
         private Point2D downPosition = null;
+        private double totalScrolled = 0.0;
 
         public int getZ() {
             return -1;
@@ -395,13 +396,15 @@ public class MapPanel extends JPanel implements CoordinateTransform {
         }
 
         public void mouseWheelMoved(MouseWheelEvent e) {
-            int rotation = e.getWheelRotation();
+            totalScrolled += e.getPreciseWheelRotation();
             Point mouseCoords = e.getPoint();
-            if (rotation < 0) {
+            if (totalScrolled <= -1.0) {
                 zoomIn(new Point(mouseCoords.x, mouseCoords.y));
+                totalScrolled = 0.0;
             }
-            else {
+            else if (totalScrolled >= 1.0){
                 zoomOut(new Point(mouseCoords.x, mouseCoords.y));
+                totalScrolled = 0.0;
             }
         }
 

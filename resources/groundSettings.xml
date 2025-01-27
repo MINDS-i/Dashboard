@@ -1,28 +1,68 @@
-<settingList><setting index="0" name="Line Gravity" min="0.25" max="5.00" def="1.00"> Defines how strongly the rover should attempt to return to the original course between waypoints, verses the direct path from its current location to the target&lt;br&gt;
-	 </setting><setting index="1" name="Steer Throw" min="0" max="90" def="45"> The number of degrees that rover will turn its wheels when it needs to to turn its most extreme amount
-	 </setting><setting index="2" name="Steer Style" min="0" max="2" def="2"> Switches between arctangent of error steering (0) &lt;br&gt; square of error steering (1) &lt;br&gt; and proportional to error steering (2)
-     </setting><setting index="3" name="Steer Scalar" min="0" max="8" def="1.5"> Multiplier that determines how aggressively to steer
-	 </setting><setting index="4" name="Min Fwd Speed" min="1" max="3" def="1.5"> Minimum forward driving speed in MPH
-	 </setting><setting index="5" name="Max Fwd Speed" min="1.5" max="3" def="3.0"> Maximum forward driving speed in MPH
-	 </setting><setting index="6" name="Rev Str Throw" min="0" max="90" def="20"> How far to turn the wheels when backing away from an obstacle
-	 </setting><setting index="7" name="Reverse Speed" min="-2" max="-1" def="-1.0"> Speed in MPH to drive in reverse
-	 </setting><setting index="8" name="Ping Factor" min="1" max="20000" def="1400"> Factor to determine how strongly obstacles effect the rover's course &lt;br&gt; Larger numbers correspond to larger effects from obstacles
-	 </setting><setting index="9" name="Coast Time" min="2000" max="8000" def="2000"> Time in milliseconds to coast before reversing when an obstacle is encountered
-	 </setting><setting index="10" name="Min Rev Time" min="500" max="2000" def="1000"> Minimum time in seconds to reverse away from an obstacle
-	 </setting><setting index="11" name="Cruise P" min="0" max="1" def="0.05"> P term in cruise control PID loop
-	 </setting><setting index="12" name="Cruise I" min="0" max="10" def="0.1"> I term in cruise control PID loop
-	 </setting><setting index="13" name="Cruise D" min="0" max="10" def="0.0"> D term in cruise control PID loop
-	 </setting><setting index="14" name="Tire Diameter" min="0" max="12" def="5.85"> Tire Diameter in inches, used to calculate MPH
-	 </setting><setting index="15" name="Steer Center" min="0" max="180" def="90"> Center point in degrees corresponding to driving straight
-	 </setting><setting index="16" name="Waypoint acheived radius in miles" min="0" max=".003" def=".00075"> Radius centered at waypoint where target is determined to be meet
-	 </setting><setting index="17" name="Approach radius" min="0" max=".0076" def=".0015"> Radius cneter at waypoint where the approach flag is set
-	 </setting><setting index="20" name="Steer Skew" min="-45" max="45" def="0"> 
-	 </setting><setting index="21" name="Avoid Ping value Edges" min="500" max="10000" def="1000"> 
-	 </setting><setting index="22" name="Avoid Ping value Middles" min="500" max="10000" def="1800"> 
-	 </setting><setting index="23" name="Avoid Ping value center" min="500" max="10000" def="3200"> 
-	 </setting><setting index="24" name="Warn Ping value Edges" min="500" max="10000" def="2500"> 
-	 </setting><setting index="25" name="Warn Ping value Middles" min="500" max="10000" def="5000"> 
-	 </setting><setting index="26" name="Warn Ping value center" min="500" max="10000" def="8000"> 
-	 </setting><setting index="27" name="Radio Failsafe" min="0" max="1" def="0"> Enable = 1 Disable = 0
-	 </setting><setting index="28" name="Radio Controller" min="0" max="1" def="0"> 6 Channel - TGY = 0 3 Channel - HobbyKing = 1
-	 </setting></settingList>
+<settingList>
+    <setting index="0" name="Line Gravity" min="0.25" max="5.00" def="1.00">Defines how strongly the rover should
+        attempt to return to the original course between waypoints, verses the direct path from its current location to
+        the target&lt;br&gt;
+    </setting>
+    <setting index="1" name="Steer Throw" min="0" max="90" def="45">The number of degrees that rover will turn its
+        wheels when it needs to turn its most extreme amount
+    </setting>
+    <setting index="2" name="Steer Style" min="0" max="2" def="2">Switches between arctangent of error steering (0) &lt;br&gt;
+        square of error steering (1) &lt;br&gt; and proportional to error steering (2)
+    </setting>
+    <setting index="3" name="Steer Scalar" min="0" max="8" def="1.5">Multiplier that determines how aggressively to
+        steer
+    </setting>
+    <setting index="4" name="Min Fwd Speed" min="1" max="3" def="1.5">Minimum forward driving speed in MPH
+    </setting>
+    <setting index="5" name="Max Fwd Speed" min="1.5" max="3" def="3.0">Maximum forward driving speed in MPH
+    </setting>
+    <setting index="6" name="Rev Str Throw" min="0" max="90" def="20">How far to turn the wheels when backing away from
+        an obstacle
+    </setting>
+    <setting index="7" name="Reverse Speed" min="-2" max="-1" def="-1.0">Speed in MPH to drive in reverse
+    </setting>
+    <setting index="8" name="Ping Factor" min="1" max="20000" def="1400">Factor to determine how strongly obstacles
+        effect the rover's course &lt;br&gt; Larger numbers correspond to larger effects from obstacles
+    </setting>
+    <setting index="9" name="Coast Time" min="2000" max="8000" def="2000">Time in milliseconds to coast before reversing
+        when an obstacle is encountered
+    </setting>
+    <setting index="10" name="Min Rev Time" min="500" max="2000" def="1000">Minimum time in seconds to reverse away from
+        an obstacle
+    </setting>
+    <setting index="11" name="Cruise P" min="0" max="1" def="0.05">P term in cruise control PID loop
+    </setting>
+    <setting index="12" name="Cruise I" min="0" max="10" def="0.1">I term in cruise control PID loop
+    </setting>
+    <setting index="13" name="Cruise D" min="0" max="10" def="0.0">D term in cruise control PID loop
+    </setting>
+    <setting index="14" name="Tire Diameter" min="0" max="12" def="5.85">Tire Diameter in inches, used to calculate MPH
+    </setting>
+    <setting index="15" name="Steer Center" min="0" max="180" def="90">Center point in degrees corresponding to driving
+        straight
+    </setting>
+    <setting index="16" name="Waypoint acheived radius in miles" min="0" max=".003" def=".00075">Radius centered at
+        waypoint where target is determined to be meet
+    </setting>
+    <setting index="17" name="Approach radius" min="0" max=".0076" def=".0015">Radius cneter at waypoint where the
+        approach flag is set
+    </setting>
+    <setting index="20" name="Steer Skew" min="-45" max="45" def="0">
+    </setting>
+    <setting index="21" name="Avoid Ping value Edges" min="500" max="10000" def="1000">
+    </setting>
+    <setting index="22" name="Avoid Ping value Middles" min="500" max="10000" def="1800">
+    </setting>
+    <setting index="23" name="Avoid Ping value center" min="500" max="10000" def="3200">
+    </setting>
+    <setting index="24" name="Warn Ping value Edges" min="500" max="10000" def="2500">
+    </setting>
+    <setting index="25" name="Warn Ping value Middles" min="500" max="10000" def="5000">
+    </setting>
+    <setting index="26" name="Warn Ping value center" min="500" max="10000" def="8000">
+    </setting>
+    <setting index="27" name="Radio Failsafe" min="0" max="1" def="0">Enable = 1 Disable = 0
+    </setting>
+    <setting index="28" name="Radio Controller" min="0" max="1" def="0">6 Channel - TGY = 0 3 Channel - HobbyKing = 1
+    </setting>
+</settingList>
