@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.function.Function;
 
 import static com.map.WaypointList.WaypointListener;
 
@@ -45,7 +46,8 @@ public class Context {
     public CommsMonitor commsMonitor;
     private SerialPort port;
     private ResourceBundle resources;
-    private String APMVersion;
+    private String APMVersion = "x.x.x";
+    private Function<String, Void> apmVersionCallback;
 
     public Context(Dashboard dashboard) {
         dash = dashboard;
@@ -329,24 +331,14 @@ public class Context {
      *
      * @return - String
      */
-    public String getAPMVersion() {
+    public void getAPMVersion(Function<String, Void> callback) {
         sendManager.addMessageToQueue(Message.requestAPMVersion());
+        apmVersionCallback = callback;
 
-        try {
-            Thread.sleep(250);
-        }
-        catch (InterruptedException ex) {
-            Thread.currentThread().interrupt();
-            System.err.println("Context - Wait for version interrupted with exception: "
-                    + ex);
-        }
-
-
-        if (APMVersion == null || APMVersion.isEmpty()) {
-            APMVersion = "x.x.x";
-        }
-
-        return APMVersion;
+        // Go ahead and call the call back with whatever we have now just so it
+        // gets filled in with something.  We'll call it again if we get a response
+        // to the above message.
+        callback.apply(APMVersion);
     }
 
     /**
@@ -356,5 +348,8 @@ public class Context {
      */
     public void setAPMVersion(String version) {
         APMVersion = version;
+        if (apmVersionCallback != null) {
+            apmVersionCallback.apply(APMVersion);
+        }
     }
 }
