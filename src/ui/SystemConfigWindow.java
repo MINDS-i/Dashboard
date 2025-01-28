@@ -17,6 +17,7 @@ public class SystemConfigWindow {
     private final Context context;
     private final JFrame frame;
     private final MapPanel map;
+    private final JLabel versionPane;
 
     public SystemConfigWindow(Context cxt, MapPanel mapPanel) {
         this.context = cxt;
@@ -47,15 +48,14 @@ public class SystemConfigWindow {
         container.add(Box.createRigidArea(new Dimension(0, 10)));
 
         // Add version numbers
-        String versionString = String.format(
-                "MINDS-i Dashboard | Dashboard Version %s | APM Version %s | %s",
-                context.getResource("version_id"),
-                context.getAPMVersion(),
-                context.getResource("release_date"));
-
-        JLabel versionPane = new JLabel(versionString);
+        versionPane = new JLabel("Waiting...");
         versionPane.setAlignmentX(Component.CENTER_ALIGNMENT);
         container.add(versionPane);
+
+        // Getting the APM version requires making a request to the remote system.
+        // We pass the context a callback so that it can make a request, and then we
+        // can update the UI when it's complete.
+        context.getAPMVersion(this::setVersionString);
 
         // Add copyright notices
         JLabel copyRights = new JLabel();
@@ -72,6 +72,21 @@ public class SystemConfigWindow {
         frame.pack();
         frame.setResizable(false);
         frame.setVisible(true);
+    }
+
+    private String formatVersionString(String apmVersion) {
+        return String.format(
+                "MINDS-i Dashboard | Dashboard Version %s | APM Version %s | %s",
+                context.getResource("version_id"),
+                apmVersion,
+                context.getResource("release_date"));
+    }
+
+    private Void setVersionString(String apmVersion) {
+        SwingUtilities.invokeLater(() -> {
+            versionPane.setText(formatVersionString(apmVersion));
+        });
+        return null;
     }
 
     private boolean isWindows() {

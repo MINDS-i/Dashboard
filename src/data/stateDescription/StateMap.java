@@ -1,5 +1,8 @@
 package com.data.stateDescription;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
@@ -16,6 +19,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class StateMap {
     private final Map<String, Description> map;
+
+    private final Logger myLogger = LoggerFactory.getLogger(StateMap.class);
 
     private StateMap(Reader xmlDatabase) throws ParseException {
         map = new ConcurrentHashMap<>();
@@ -35,10 +40,20 @@ public class StateMap {
                         }
                         break;
                     case XMLStreamConstants.CHARACTERS:
+                        final String parsedText = r.getText().trim();
+                        if (parsedText.isEmpty()) {
+                            // We could see whitespace before we get an element; if so,
+                            // skip it.
+                            break;
+                        }
+                        if (text == null) {
+                            myLogger.error("Haven't seen an element start!");
+                            break;
+                        }
                         text.append(r.getText().trim());
                         break;
                     case XMLStreamConstants.END_ELEMENT:
-                        if (name != null && file != null && text != null) {
+                        if (name != null && file != null) {
                             addDescription(name, file, text.toString());
                             name = null;
                             file = null;

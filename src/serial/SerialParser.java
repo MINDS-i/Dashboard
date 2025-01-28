@@ -245,14 +245,13 @@ public class SerialParser implements SerialPortEventListener {
 
     private class StringReader implements PacketReader {
         private StateMap sm;
-
         {
             String dbName = context.getResource("stateDescriptions");
             try (Reader fr = new FileReader(dbName)) {
                 sm = StateMap.read(fr);
             }
             catch (Exception e) {
-                seriallog.error("Can't parse full state descriptions");
+                seriallog.error("Can't parse full state descriptions", e);
                 sm = null;
             }
         }
