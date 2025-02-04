@@ -17,7 +17,7 @@ public class RadioWidget {
      */
     public static JPanel create(Context ctx, int size) {
         int[] channels = {RDPITCH, RDROLL, RDYAW, RDTHROTTLE, RDSWITCH, RDAUX2};
-        RDisp b = new RDisp(ctx.theme);
+        RDisp b = new RDisp(ctx.theme, channels.length);
 
         for (int i = 0; i < channels.length; i++) {
             final int idx = i;
@@ -47,12 +47,13 @@ public class RadioWidget {
         private static final Color borderColor = Color.BLACK;
         private final Color iconColor;
         private final Font font;
-        float[] data = new float[5];
+        private final float[] data;
 
-        RDisp(Theme theme) {
+        RDisp(Theme theme, int dataLen) {
+            data = new float[dataLen];
             this.font = theme.text.deriveFont(Font.BOLD, 14.0f);
             this.iconColor = theme.textColor;
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < dataLen; i++) {
                 data[i] = 0.5f;
             }
         }
