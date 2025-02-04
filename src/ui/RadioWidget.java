@@ -16,7 +16,7 @@ public class RadioWidget {
      * lines as bar graphs in a `size`^2 region
      */
     public static JPanel create(Context ctx, int size) {
-        int[] channels = {RDPITCH, RDROLL, RDYAW, RDTHROTTLE, RDGEAR};
+        int[] channels = {RDPITCH, RDROLL, RDYAW, RDTHROTTLE, RDSWITCH, RDAUX2};
         RDisp b = new RDisp(ctx.theme);
 
         for (int i = 0; i < channels.length; i++) {

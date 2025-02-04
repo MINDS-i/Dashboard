@@ -103,13 +103,15 @@ public class Serial {
     public static final int RDPITCH = 10;
     public static final int RDROLL = 11;
     public static final int RDYAW = 12;
-    public static final int RDGEAR = 13;
-    public static final int HOMELATITUDE = 14;
-    public static final int HOMELONGITUDE = 15;
-    public static final int HOMEALTITUDE = 16;
-    public static final int DELTAALTITUDE = 17;
-    public static final int GPSNUMSAT = 18;
-    public static final int GPSHDOP = 19;
+    public static final int RDSWITCH = 13;
+    public static final int RDAUX2 = 14;
+    public static final int HOMELATITUDE = 15;
+    public static final int HOMELONGITUDE = 16;
+    public static final int HOMEALTITUDE = 17;
+    public static final int DELTAALTITUDE = 18;
+    public static final int GPSNUMSAT = 19;
+    public static final int GPSHDOP = 20;
+    public static final int HEADING_LOCK = 21;
 
     public static final int MAX_WAYPOINTS = 64;
     public static final int MAX_SETTINGS = 64;
