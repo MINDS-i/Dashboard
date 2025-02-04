@@ -99,9 +99,9 @@ public class Serial {
     public static final int VOLTAGE = 6;
     public static final int AMPERAGE = 7;
     public static final int ALTITUDE = 8;
-    public static final int RDTHROTTLE = 9;
+    public static final int RDROLL = 9;
     public static final int RDPITCH = 10;
-    public static final int RDROLL = 11;
+    public static final int RDTHROTTLE = 11;
     public static final int RDYAW = 12;
     public static final int RDSWITCH = 13;
     public static final int RDAUX2 = 14;
