@@ -4,6 +4,10 @@ MINDS-i Dashboard
 This repository is used for providing releases of the MINDS-i Dashboard.  Click [Releases](https://github.com/MINDS-i/Dashboard/releases) on the
 right side to find the latest version for your platform.
 
+Instructions for configuring the Mars Rover: https://spaces.hightail.com/space/Z8ZzZS21bc
+
+The latest MINDS-i Intellidrive Image: https://spaces.hightail.com/space/w7vNwQRvSD
+
 Previous Releases
 -----------------
 
